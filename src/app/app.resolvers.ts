@@ -8,6 +8,8 @@ import { QuickChatService } from 'app/layout/common/quick-chat/quick-chat.servic
 import { ShortcutsService } from 'app/layout/common/shortcuts/shortcuts.service';
 import { UserService } from 'app/core/user/user.service';
 import { PlatformService } from 'app/core/platform/platform.service';
+import { JwtService } from './core/jwt/jwt.service';
+import { AuthService } from './core/auth/auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +20,8 @@ export class InitialDataResolver implements Resolve<any>
      * Constructor
      */
     constructor(
+        private _jwtService: JwtService,
+        private _authService: AuthService,
         private _messagesService: MessagesService,
         private _navigationService: NavigationService,
         private _notificationsService: NotificationsService,
@@ -47,7 +51,7 @@ export class InitialDataResolver implements Resolve<any>
             this._notificationsService.getAll(),
             this._quickChatService.getChats(),
             this._shortcutsService.getAll(),
-            this._userService.get()
+            this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
         ]);
     }
 }

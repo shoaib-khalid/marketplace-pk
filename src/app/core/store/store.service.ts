@@ -8,6 +8,7 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { takeUntil } from 'rxjs/operators';
 import { LogService } from 'app/core/logging/log.service';
 import { FormControl } from '@angular/forms';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -34,6 +35,7 @@ export class StoresService
     constructor(
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
+        private _authService: AuthService,
         private _jwt: JwtService,
         private _logging: LogService
     )
@@ -212,15 +214,6 @@ export class StoresService
     }
 
     /**
-     * Getter for access token
-     */
- 
-    get accessToken(): string
-    {
-        return localStorage.getItem('accessToken') ?? '';
-    }    
-
-    /**
      * Getter for pagination
      */
     get pagination$(): Observable<StorePagination>
@@ -240,76 +233,75 @@ export class StoresService
     /**
      * Get the current logged in store data
      */
-    getStores(id: string = "", page: number = 0, size: number = 10, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
-        Observable<{ pagination: StorePagination; stores: Store[] }>
-    {
-        let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-        let accessToken = "accessToken";
-        let clientId = this._jwt.getJwtPayload(this.accessToken).uid;
+    // getStores(id: string = "", page: number = 0, size: number = 10, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
+    //     Observable<{ pagination: StorePagination; stores: Store[] }>
+    // {
+    //     let productService = this._apiServer.settings.apiServer.productService;
+    //     let accessToken = "accessToken";
+    //     let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                clientId: clientId,
-                page: '' + page,
-                pageSize: '' + size,
-                sortByCol: '' + sort,
-                sortingOrder: '' + order.toUpperCase(),
-                name: '' + search
-            }
-        };
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: {
+    //             clientId: clientId,
+    //             page: '' + page,
+    //             pageSize: '' + size,
+    //             sortByCol: '' + sort,
+    //             sortingOrder: '' + order.toUpperCase(),
+    //             name: '' + search
+    //         }
+    //     };
 
-        if (category !== "") {
-            header.params["verticalCode"] = category;
-        }
+    //     if (category !== "") {
+    //         header.params["verticalCode"] = category;
+    //     }
 
-        // if ada id change url stucture
-        if (id !== "") { id = "/" + id } 
+    //     // if ada id change url stucture
+    //     if (id !== "") { id = "/" + id } 
         
-        return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
-        .pipe(
-            tap((response) => {
+    //     return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
+    //     .pipe(
+    //         tap((response) => {
                 
-                this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+    //             this._logging.debug("Response from StoresService (Before Reconstruct)",response);
 
-                // Pagination
-                let _pagination = {
-                    length: response["data"].totalElements,
-                    size: response["data"].size,
-                    page: response["data"].number,
-                    lastPage: response["data"].totalPages,
-                    startIndex: response["data"].pageable.offset,
-                    endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                }
-                this._logging.debug("Response from StoresService (pagination)",_pagination);
+    //             // Pagination
+    //             let _pagination = {
+    //                 length: response["data"].totalElements,
+    //                 size: response["data"].size,
+    //                 page: response["data"].number,
+    //                 lastPage: response["data"].totalPages,
+    //                 startIndex: response["data"].pageable.offset,
+    //                 endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+    //             }
+    //             this._logging.debug("Response from StoresService (pagination)",_pagination);
                 
-                // this is local
-                this._currentStores = response["data"].content;
+    //             // this is local
+    //             this._currentStores = response["data"].content;
                 
-                (this._currentStores).forEach(async (item, index) => {
-                    // let assets = await this.getStoreAssets(item.id);
-                    // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
-                    // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
-                });
+    //             (this._currentStores).forEach(async (item, index) => {
+    //                 // let assets = await this.getStoreAssets(item.id);
+    //                 // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
+    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
+    //                 // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
+    //             });
 
-                this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
+    //             this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
 
-                // this is observable service
+    //             // this is observable service
 
-                this._pagination.next(_pagination);
-                this._stores.next(this._currentStores);
-            })
-        );
-    }
+    //             this._pagination.next(_pagination);
+    //             this._stores.next(this._currentStores);
+    //         })
+    //     );
+    // }
 
     getStoresById(id: string): Observable<Store>
     {
@@ -343,9 +335,9 @@ export class StoresService
     getStoreById(id: string): Observable<Store>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        // let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        // let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
-        let clientId = this._jwt.getJwtPayload(this.accessToken).uid;
+        // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
@@ -368,7 +360,7 @@ export class StoresService
     getStoreByDomainName(domainName: string): Observable<Store>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -401,90 +393,90 @@ export class StoresService
         );
     }
 
-    post(storeBody: CreateStore): Observable<any>
-    {
-        let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-        let accessToken = "accessToken";
-        let clientId = this._jwt.getJwtPayload(this.accessToken).uid;
+    // post(storeBody: CreateStore): Observable<any>
+    // {
+    //     let productService = this._apiServer.settings.apiServer.productService;
+    //     //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+    //     let accessToken = "accessToken";
+    //     let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                "clientId": clientId
-            }
-        };
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: {
+    //             "clientId": clientId
+    //         }
+    //     };
         
-        return this.store$.pipe(
-            take(1),
-            // switchMap(products => this._httpClient.post<InventoryProduct>('api/apps/ecommerce/inventory/product', {}).pipe(
-            switchMap(stores => this._httpClient.post<Store>(productService + '/stores', storeBody , header).pipe(
-                map((response) => {
+    //     return this.store$.pipe(
+    //         take(1),
+    //         // switchMap(products => this._httpClient.post<InventoryProduct>('api/apps/ecommerce/inventory/product', {}).pipe(
+    //         switchMap(stores => this._httpClient.post<Store>(productService + '/stores', storeBody , header).pipe(
+    //             map((response) => {
 
-                    this._logging.debug("Response from StoresService (Create Store)",response);
+    //                 this._logging.debug("Response from StoresService (Create Store)",response);
 
-                    // Return the new product
-                    return response;
-                })
-            ))
-        );
-    }
+    //                 // Return the new product
+    //                 return response;
+    //             })
+    //         ))
+    //     );
+    // }
 
     /**
      * Update the store
      *
      * @param store
      */
-    update(storeId: string, storeBody: Store): Observable<Store>
-    {
-        let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-        let accessToken = "accessToken";
-        let clientId = this._jwt.getJwtPayload(this.accessToken).uid;
+    // update(storeId: string, storeBody: Store): Observable<Store>
+    // {
+    //     let productService = this._apiServer.settings.apiServer.productService;
+    //     //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+    //     let accessToken = "accessToken";
+    //     let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                "clientId": clientId
-            }
-        };
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: {
+    //             "clientId": clientId
+    //         }
+    //     };
         
-        return this.stores$.pipe(
-            take(1),
-            // switchMap(products => this._httpClient.post<InventoryProduct>('api/apps/ecommerce/inventory/product', {}).pipe(
-            switchMap(stores => this._httpClient.put<Store>(productService + '/stores/' + storeId , storeBody , header).pipe(
-                map((response) => {
+    //     return this.stores$.pipe(
+    //         take(1),
+    //         // switchMap(products => this._httpClient.post<InventoryProduct>('api/apps/ecommerce/inventory/product', {}).pipe(
+    //         switchMap(stores => this._httpClient.put<Store>(productService + '/stores/' + storeId , storeBody , header).pipe(
+    //             map((response) => {
 
-                    this._logging.debug("Response from StoresService (Edit Store)",response);
+    //                 this._logging.debug("Response from StoresService (Edit Store)",response);
 
-                    // Find the index of the updated product
-                    const index = stores.findIndex(item => item.id === storeId);
+    //                 // Find the index of the updated product
+    //                 const index = stores.findIndex(item => item.id === storeId);
 
-                    // Update the product
-                    stores[index] = { ...stores[index], ...response["data"]};
+    //                 // Update the product
+    //                 stores[index] = { ...stores[index], ...response["data"]};
 
-                    // Update the products
-                    this._stores.next(stores);
+    //                 // Update the products
+    //                 this._stores.next(stores);
 
-                    // Return the new product
-                    return response["data"];
-                }),
-                switchMap(response => this.store$.pipe(
-                    take(1),
-                    filter(item => item && item.id === storeId),
-                    tap(() => {
+    //                 // Return the new product
+    //                 return response["data"];
+    //             }),
+    //             switchMap(response => this.store$.pipe(
+    //                 take(1),
+    //                 filter(item => item && item.id === storeId),
+    //                 tap(() => {
 
-                        // Update the product if it's selected
-                        this._store.next(response);
+    //                     // Update the product if it's selected
+    //                     this._store.next(response);
 
-                        // Return the updated product
-                        return response;
-                    })
-                ))
-            ))
+    //                     // Return the updated product
+    //                     return response;
+    //                 })
+    //             ))
+    //         ))
             
-        );
-    }
+    //     );
+    // }
 
     /**
      * Delete the store
@@ -492,47 +484,47 @@ export class StoresService
      * @param storeId
      */
 
-    delete(storeId: string): Observable<any>
-    {
-        let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-        let accessToken = "accessToken";
-        let clientId = this._jwt.getJwtPayload(this.accessToken).uid;
+    // delete(storeId: string): Observable<any>
+    // {
+    //     let productService = this._apiServer.settings.apiServer.productService;
+    //     //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+    //     let accessToken = "accessToken";
+    //     let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                "clientId": clientId
-            }
-        };
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: {
+    //             "clientId": clientId
+    //         }
+    //     };
         
-        return this.stores$.pipe(
-            take(1),
-            switchMap(stores => this._httpClient.delete(productService +'/stores/' + storeId, header).pipe(
-                map((response) => {
+    //     return this.stores$.pipe(
+    //         take(1),
+    //         switchMap(stores => this._httpClient.delete(productService +'/stores/' + storeId, header).pipe(
+    //             map((response) => {
 
-                    this._logging.debug("Response from StoresService (Delete Store)",response);
+    //                 this._logging.debug("Response from StoresService (Delete Store)",response);
 
-                    // Find the index of the deleted product
-                    const index = stores.findIndex(item => item.id === storeId);
+    //                 // Find the index of the deleted product
+    //                 const index = stores.findIndex(item => item.id === storeId);
 
-                    // Delete the product
-                    stores.splice(index, 1);
+    //                 // Delete the product
+    //                 stores.splice(index, 1);
 
-                    // Update the products
-                    this._stores.next(stores);
+    //                 // Update the products
+    //                 this._stores.next(stores);
 
-                    let isDeleted:boolean = false;
-                    if (response["status"] === 200) {
-                        isDeleted = true
-                    }
+    //                 let isDeleted:boolean = false;
+    //                 if (response["status"] === 200) {
+    //                     isDeleted = true
+    //                 }
 
-                    // Return the deleted status
-                    return isDeleted;
-                })
-            ))
-        );
-    }
+    //                 // Return the deleted status
+    //                 return isDeleted;
+    //             })
+    //         ))
+    //     );
+    // }
 
     setFirstStoreId(){
         this.stores$
@@ -549,7 +541,7 @@ export class StoresService
     getStoreCategories(name: string="", id: string = "", page: number = 0, size: number = 30, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc'): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -618,7 +610,7 @@ export class StoresService
     getStoreDiscounts(): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
@@ -644,7 +636,7 @@ export class StoresService
     getStoreRegionCountries(): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
@@ -663,7 +655,7 @@ export class StoresService
     getStoreRegionCountryState(regionCountryId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -689,7 +681,7 @@ export class StoresService
     postTiming(storeId: string, storeTiming: StoreTiming): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -706,7 +698,7 @@ export class StoresService
     putTiming(storeId: string, day: string ,storeTiming: StoreTiming): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -723,7 +715,7 @@ export class StoresService
     getStoreSnooze() : Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -748,7 +740,7 @@ export class StoresService
     async getStoreAssets(storeId: string)
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -768,7 +760,7 @@ export class StoresService
     postAssets(storeId: string, storeAssets): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -785,7 +777,7 @@ export class StoresService
     deleteAssetsBanner(storeId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -802,7 +794,7 @@ export class StoresService
     deleteAssetsLogo(storeId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -823,7 +815,7 @@ export class StoresService
     getStoreDeliveryProvider(query: StoreDeliveryProvider): Observable<StoreDeliveryProvider[]>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
@@ -854,7 +846,7 @@ export class StoresService
     getStoreRegionCountryDeliveryProvider(storeId: string, deliveryServiceProviderId: string = ""): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -881,7 +873,7 @@ export class StoresService
     postStoreRegionCountryDeliveryProvider(storeId: string, deliveryServiceProviderId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -902,7 +894,7 @@ export class StoresService
     getStoreDeliveryDetails(storeId: string): Observable<StoreDeliveryDetails>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
@@ -921,7 +913,7 @@ export class StoresService
     postStoreDeliveryDetails(storeId: string, storeDelivery: StoreDeliveryDetails): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -938,7 +930,7 @@ export class StoresService
     putStoreDeliveryDetails(storeId: string, storeDelivery: StoreDeliveryDetails): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -959,7 +951,7 @@ export class StoresService
     getSelfDeliveryStateCharges(storeId: string): Observable<StoreSelfDeliveryStateCharges[]>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
@@ -978,7 +970,7 @@ export class StoresService
     postSelfDeliveryStateCharges(storeId: string, stateDeliveryCharge: StoreSelfDeliveryStateCharges): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -996,7 +988,7 @@ export class StoresService
     putSelfDeliveryStateCharges(storeId: string, stateDeliveryId: string, stateDeliveryCharge: StoreSelfDeliveryStateCharges): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -1014,7 +1006,7 @@ export class StoresService
     deleteSelfDeliveryStateCharges(storeId: string, stateDeliveryId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -1035,7 +1027,7 @@ export class StoresService
 
     async getExistingName(name:string){
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {
@@ -1062,7 +1054,7 @@ export class StoresService
 
     async getExistingURL(url: string){
         let productService = this._apiServer.settings.apiServer.productService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
         let accessToken = "accessToken";
 
         const header = {

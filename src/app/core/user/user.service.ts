@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Client, Customer, User } from 'app/core/user/user.types';
+import { AppConfig } from 'app/config/service.config';
+import { JwtService } from 'app/core/jwt/jwt.service';
+import { LogService } from 'app/core/logging/log.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +20,13 @@ export class UserService
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor(
+        private _httpClient: HttpClient,
+        private _apiServer: AppConfig,
+        private _authService: AuthService,
+        private _jwt: JwtService,
+        private _logging: LogService
+    )
     {
     }
 
@@ -80,13 +90,20 @@ export class UserService
     /**
      * Get the current logged in user data
      */
-    get(): Observable<User>
+    get(ownerId: string): Observable<any>
     {
-        return this._httpClient.get<User>('api/common/user').pipe(
-            tap((user) => {
-                this._user.next(user);
-            })
-        );
+        let userService = this._apiServer.settings.apiServer.userService;
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.get<any>(userService + "/customers/" + ownerId, header)
+            .pipe(
+                tap((user) => {
+                    this._logging.debug("Response from UserService (getCustomerById)",user);
+                    this._user.next(user);
+                })
+            );
     }
 
     /**
