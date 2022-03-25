@@ -25,17 +25,17 @@ configProdJson:
       }
   volumeMount:
   - mountPath: /usr/local/apache2/htdocs/assets/config/config.prod.json
-    name: merchant-portal-x-vol
+    name: marketplace-vol
     subPath: config.prod.json
   volumes:
   - configMap:
-      name: merchant-portal-x-cm
-    name: merchant-portal-x-vol
+      name: marketplace-cm
+    name: marketplace-vol
 fullnameOverride: ""
 image:
   pullPolicy: Always
-  repository: kalsym/merchant-portal-x
-  tag: 1.0.0
+  repository: kalsym/marketplace
+  tag: 0.0.1
 imagePullSecrets:
 - name: kalsym-docker-hub
 ingress:
@@ -43,13 +43,13 @@ ingress:
   className: ""
   enabled: true
   hosts:
-  - host: merchant.symplified.it
+  - host: customer.symplified.it
     paths:
     - path: /
       pathType: ImplementationSpecific
   tls:
   - hosts:
-    - merchant.symplified.it
+    - customer.symplified.it
     secretName: secret-tls-it
 nameOverride: ""
 nodeSelector: {}
