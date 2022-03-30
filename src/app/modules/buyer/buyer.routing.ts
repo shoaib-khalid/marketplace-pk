@@ -1,11 +1,35 @@
 import { Route } from '@angular/router';
+import { OrderListComponent } from './order-list/order-list.component';
 
 export const buyerRoutes: Route[] = [
-        // buyer routes
-        {
-            path       : '',
-            children   : [
-                {path: 'example', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule)},
-            ]
-        }
+    // buyer routes
+    {
+        path     : ':progress-slug',
+        data: {
+            breadcrumb: ''
+        },
+        children   : [
+            {
+                path: '',
+                resolve  : {
+                    // products: ProductsResolver,
+                    // categories: StoreCategoriesResolver
+                },
+                data: {
+                    breadcrumb: ''
+                },
+                component: OrderListComponent,
+            }
+        ],
+        // component: OrderDetailsComponent,
+        // resolve  : {
+        //     // categories: StoreCategoriesResolver,
+        //     // discounts: StoreDiscountsResolver
+        // }
+    },
+    {
+        path     : '',
+        redirectTo: 'all-progress',
+        component: OrderListComponent
+    }
 ]; 

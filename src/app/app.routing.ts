@@ -90,7 +90,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'classy',
+            layout: 'fnb',
             roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -98,7 +98,7 @@ export const appRoutes: Route[] = [
             platformSetup: PlatformSetupResolver
         },
         children   : [
-            {path: '', loadChildren: () => import('app/modules/buyer/buyer.module').then(m => m.BuyerModule)},
+            {path: 'buyer', loadChildren: () => import('app/modules/buyer/buyer.module').then(m => m.BuyerModule)},
         ]
     }, 
 
