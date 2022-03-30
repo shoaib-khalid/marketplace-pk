@@ -80,6 +80,7 @@ export const appRoutes: Route[] = [
         },
         children   : [
             {path: 'home', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
+            {path: 'token', loadChildren: () => import('app/modules/landing/token/token.module').then(m => m.LandingTokenModule)}
         ]
     },
 

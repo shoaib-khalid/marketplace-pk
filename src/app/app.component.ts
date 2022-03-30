@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
 import { PlatformService } from 'app/core/platform/platform.service';
+import { CookieService } from 'ngx-cookie-service';
 
 declare let gtag: Function;
 
@@ -27,7 +28,8 @@ export class AppComponent
     constructor(
         private _titleService: Title,
         private _router: Router,
-        private _platformsService: PlatformService
+        private _platformsService: PlatformService,
+        private _cookieService: CookieService
     )
     {
     }

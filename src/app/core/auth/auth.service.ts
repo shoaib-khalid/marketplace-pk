@@ -139,7 +139,8 @@ export class AuthService
 
         let userService = this._apiServer.settings.apiServer.userService;
         const header = {
-            headers: new HttpHeaders().set("Authorization", this.publicToken)
+            headers: new HttpHeaders().set("Authorization", this.publicToken),
+            withCredentials: true
         };
         
         return this._httpClient.post(userService + '/customers/authenticate', credentials, header)
@@ -162,6 +163,8 @@ export class AuthService
 
                     // Store the access token in the local storage
                     this.jwtAccessToken = token;
+
+                    sessionStorage.setItem('jwtAccessToken', token);
 
                     // Set the authenticated flag to true
                     this._authenticated = true;
@@ -186,7 +189,8 @@ export class AuthService
         // Renew token
         let userService = this._apiServer.settings.apiServer.userService;
         const header = {
-            headers: new HttpHeaders().set("Authorization", this.publicToken)
+            headers: new HttpHeaders().set("Authorization", this.publicToken),
+            withCredentials: true
         };        
         
         return this._httpClient.post(userService + '/customers/session/refresh', this._jwt.getJwtPayload(this.jwtAccessToken).rft, header)

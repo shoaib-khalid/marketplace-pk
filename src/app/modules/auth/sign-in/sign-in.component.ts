@@ -6,6 +6,7 @@ import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { UserService } from 'app/core/user/user.service';
+import * as saveAs from 'file-saver';
 
 @Component({
     selector     : 'auth-sign-in',

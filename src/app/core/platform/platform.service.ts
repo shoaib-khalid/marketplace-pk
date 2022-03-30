@@ -94,10 +94,7 @@ export class PlatformService
     * Set current platform
     */
     set(): Observable<any>
-    {
-
-        console.log();
-        
+    {        
         // ----------------------
         // Get store by URL
         // ----------------------
