@@ -44,7 +44,9 @@ export class AuthInterceptor implements HttpInterceptor
             // act stand from jwtAccessToken
             let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
             newReq = req.clone({
-                headers: req.headers.set('Authorization', 'Bearer ' + accessToken)
+                // headers: req.headers.set('Authorization', 'Bearer ' + accessToken)
+                // for temporary
+                headers: req.headers.set('Authorization', 'Bearer ' + 'accessToken')
             });
         }
 

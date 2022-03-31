@@ -239,7 +239,7 @@
                                                                 <img
                                                                 class="w-32"
                                                                 [alt]="'Product thumbnail image of ' + orderItemDetail.productName"
-                                                                [src]="orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url : displayStoreLogo(store.storeAssets)">
+                                                                [src]="orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url : 'assets/branding/symplified/logo/symplified.png'">
                                                                 <div
                                                                     class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
                                                                 </div>
@@ -254,7 +254,7 @@
                                                         </div>
                                                         <div class="items-end w-full flex flex-col">
                                                             <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
-                                                            <h3 class="font-bold text-primary">{{orderItemDetail.productPrice | currency: store.regionCountry.currencySymbol}}</h3>
+                                                            <h3 class="font-bold text-primary">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                                         </div>
                                                     </div>
                                                     <!-- <div class="flex flex-row justify-between w-full py-2">
@@ -295,14 +295,14 @@
                                                                 mat-button
                                                                 >
                                                             <label 
-                                                                (click)="openDetailsDialog(orderDetails.id)"
+                                                                [routerLink]="['/buyer/order/' + orderDetails.id]"
                                                                 class="flex items-center justify-center h-10 px-2 border rounded-lg border-primary-300 bg-primary hover:border-primary-500 cursor-pointer"
                                                                 for="add-to-cart-button"
                                                                 matRipple>
                                                                 <span class="text-sm font-semibold text-black">Order Details</span>
                                                             </label>
                                                         </div>
-                                                        <div class="w-20 pl-2">
+                                                        <!-- <div class="w-20 pl-2">
                                                             <input
                                                                 id="order-list-button"
                                                                 type="button"
@@ -316,11 +316,11 @@
                                                                 matRipple>
                                                                 <mat-icon class="text-black" svgIcon="mat_outline:receipt_long"></mat-icon>
                                                             </label>
-                                                        </div>
+                                                        </div> -->
                                                     </div>
-                                                    <div class="flex flex-row w-44 justify-between mb-6">
+                                                    <div class="flex flex-row w-40 justify-between mb-6">
                                                         <p class="items-center font-semibold text-gray-400">Total Order :</p> 
-                                                        <h3 class="w-fulltext-lg font-semibold">{{orderDetails.total | currency: store.regionCountry.currencySymbol}}</h3>
+                                                        <h3 class="w-fulltext-lg font-semibold">{{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                                     </div>
                                                 </div>
                                             </div>
@@ -363,7 +363,7 @@
                                                     <img
                                                         class="w-32"
                                                         [alt]="'Product thumbnail image of ' + cartItem.productName"
-                                                        [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(store.storeAssets)">
+                                                        [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : 'assets/branding/symplified/logo/symplified.png'">
                                                     <div
                                                         class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
                                                     </div>

@@ -13,10 +13,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SharedModule } from 'app/shared/shared.module';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { OrderListComponent } from './order-list/order-list.component';
+import { OrderDetailsComponent } from './order-details/order-details.component';
 
 @NgModule({
     declarations: [
-        OrderListComponent
+        OrderListComponent,
+        OrderDetailsComponent
     ],
     imports     : [
         RouterModule.forChild(buyerRoutes),

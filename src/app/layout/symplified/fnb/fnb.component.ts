@@ -86,9 +86,7 @@ export class FnbLayoutComponent implements OnDestroy
     /**
      * On init
     */
-    ngOnInit() {
-        console.log("msukks");
-                    
+    ngOnInit() {                    
         this._cartService.cartItems$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: CartItem[]) => {

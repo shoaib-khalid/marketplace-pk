@@ -115,19 +115,8 @@ export class OrderListComponent implements OnInit
         .subscribe((response: Store) => {
             this.store = response;
 
-            // -----------------------
-            // Store Country & States
-            // -----------------------
-
-            // Get store states
-            this._storesService.getStoreRegionCountryState(this.store.regionCountry.id)
-            .subscribe((response)=>{
-
-                this.regionCountryStates = response;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+            console.log("masuk", response);
+    
 
             // Mark for check
             this._changeDetectorRef.markForCheck();
