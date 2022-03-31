@@ -9,6 +9,9 @@ import { CartService } from 'app/core/cart/cart.service';
 import { CartItem } from 'app/core/cart/cart.types';
 import { DatePipe } from '@angular/common';
 import { ProductsService } from 'app/core/product/product.service';
+import { UserService } from 'app/core/user/user.service';
+import { AuthService } from 'app/core/auth/auth.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 
 @Component({
     selector     : 'fnb-layout',
@@ -33,6 +36,9 @@ export class FnbLayoutComponent implements OnDestroy
     isHomePage: boolean = true;
 
     isLoading: boolean = false;
+
+    customerAuthenticate: CustomerAuthenticate;
+    user: any;
 
     // isHamburgerMenuOpen: boolean = false;
 
@@ -62,7 +68,8 @@ export class FnbLayoutComponent implements OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
-        private _productsService: ProductsService
+        private _userService: UserService,
+        private _authService: AuthService
     )
     {
     }
@@ -115,31 +122,46 @@ export class FnbLayoutComponent implements OnDestroy
 
         // Get the store categories
         this._storesService.storeCategories$
-            .subscribe((response: StoreCategory[]) => {
+        .subscribe((response: StoreCategory[]) => {
 
-                
-                this.storeCategories = response;
+            
+            this.storeCategories = response;
 
-                if (this.storeCategories && this.storeCategories.length > 0) {
-                    this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
-                    
-                    let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
-                    this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
-    
-                    // set loading to true
-                    this.isLoading = true;
-                    
-                    // this._productsService.getProducts(0, 12, "name", "asc", "", 'ACTIVE', this.storeCategory ? this.storeCategory.id : '')
-                    //     .subscribe(()=>{
-                    //         // set loading to false
-                    //         this.isLoading = false;
-                    //     });
-                }
+            if (this.storeCategories && this.storeCategories.length > 0) {
+                this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
                 
+                let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
+                this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
+
+                // set loading to true
+                this.isLoading = true;
+                
+                // this._productsService.getProducts(0, 12, "name", "asc", "", 'ACTIVE', this.storeCategory ? this.storeCategory.id : '')
+                //     .subscribe(()=>{
+                //         // set loading to false
+                //         this.isLoading = false;
+                //     });
+            }
+            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._authService.customerAuthenticate$
+            .subscribe((response: CustomerAuthenticate) => {
+                
+                this.customerAuthenticate = response;
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        this._userService.get(this.customerAuthenticate.session.ownerId)
+        .subscribe((response)=>{
+
+            this.user = response.data
+            
+        });
 
         // this._notificationService.notification$
         //     .pipe(takeUntil(this._unsubscribeAll))
@@ -409,5 +431,10 @@ export class FnbLayoutComponent implements OnDestroy
     reload(){
         this._router.routeReuseStrategy.shouldReuseRoute = () => false;
         this._router.onSameUrlNavigation = 'reload';
+    }
+
+    signOut(): void
+    {
+        this._router.navigate(['/sign-out']);
     }
 }

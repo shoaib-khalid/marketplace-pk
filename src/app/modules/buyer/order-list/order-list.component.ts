@@ -103,20 +103,14 @@ export class OrderListComponent implements OnInit
             this._changeDetectorRef.markForCheck();
         });        
 
-        this._orderService.getOrdersWithDetails().subscribe((response) =>{
-            console.log("Tengok Order :",response);
-            
-        });
+        this._orderService.getOrdersWithDetails().subscribe((response) =>{});
         
         // --------------
         // Get store
         // --------------
         this._storesService.store$
         .subscribe((response: Store) => {
-            this.store = response;
-
-            console.log("masuk", response);
-    
+            this.store = response;    
 
             // Mark for check
             this._changeDetectorRef.markForCheck();

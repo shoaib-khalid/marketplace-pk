@@ -128,10 +128,12 @@
                                         </label>
                                     </div>
                                     <!-- Login/SignUp -->
-                                    <div class="flex flex-row pl-8 items-center">
-                                        <span class="cursor-pointer">Sign In</span>
+                                    <div class="hidden sm:block sm:flex flex-row pl-8 items-center">
+                                        <ng-container *ngIf="user">
+                                            <span class="cursor-pointer">{{user.email}}</span>
+                                        </ng-container>
                                         <span> &nbsp; | &nbsp; </span>
-                                        <span class="cursor-pointer">Sign Up</span>
+                                        <span class="cursor-pointer hover:text-primary" (click)="signOut()">Sign Out</span>
                                     </div>
                                 </div>
                             </div>
@@ -232,18 +234,18 @@
     <!-- Categories -->
     <div class="flex flex-col w-full overflow-auto bg-card">
         <div class="flex flex-col">
-            <!-- View All Product -->
-            <input 
-                [id]="'categories-btn-all-product'" 
-                type="button" 
-                class="w-0 h-0 invisible"
-                (click)="changeCatalogue('')">
-            <label
-                class="text-black shadow text-center m-4 p-2.5 bg-primary rounded-full cursor-pointer"
-                [for]="'categories-btn-all-product'"
-            >
-                <span class="">View All Product</span>
-            </label>
+
+            <!-- customer email -->
+            <div *ngIf="user" class="font-semibold px-6 pt-4 pb-2">{{user.email}}</div>
+
+            <!-- sign out button -->
+            <div class="m-4">
+                <button 
+                    class="w-full h-10 font-medium hover:bg-black hover:text-primary bg-primary rounded-full" 
+                    (click)="signOut()">
+                    Sign Out
+                </button>
+            </div>
 
             <!-- Choose Category -->
             <div class="font-semibold px-6 pt-4 pb-2">Choose Category x</div>

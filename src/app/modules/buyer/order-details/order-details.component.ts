@@ -69,19 +69,15 @@ export class OrderDetailsComponent implements OnInit
 
     ngOnInit() {
 
-        this.orderId = this._route.snapshot.paramMap.get('order-id');
-
-        console.log("this.orderId",this.orderId);
-        
+        this.orderId = this._route.snapshot.paramMap.get('order-id');        
 
         this.ordersDetails$ = this._orderService.ordersDetails$;
 
         this._orderService.getOrdersWithDetails().subscribe((response) =>{
-            console.log("Tahi Order :",response);
+            console.log("Tengok Order :",response);
             
             this._orderService.getOrderById(this.orderId).subscribe((response)=>{
                 this.orderDetails = response.data
-                console.log("jubaa",this.orderDetails);
             });
         });
         
@@ -89,9 +85,8 @@ export class OrderDetailsComponent implements OnInit
         this._orderService.getDeliveryRiderDetails(this.orderId)
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((rider: DeliveryRiderDetails) => {
-            this.rider$ = rider
-            console.log("redor",this.rider$);
-            
+
+            this.rider$ = rider            
         });
         
     }

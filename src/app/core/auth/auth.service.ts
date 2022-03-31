@@ -36,21 +36,21 @@ export class AuthService
      * Getter for Customer Authenticate
      *
     */
-     get customerAuthenticate$(): Observable<CustomerAuthenticate>
-     {
-         return this._customerAuthenticate.asObservable();
-     }
- 
-     /**
-      * Setter for Customer Authenticate
-      *
-      * @param value
-      */
-     set customerAuthenticate(value: CustomerAuthenticate)
-     {
-         // Store the value
-         this._customerAuthenticate.next(value);
-     }
+    get customerAuthenticate$(): Observable<CustomerAuthenticate>
+    {
+        return this._customerAuthenticate.asObservable();
+    }
+
+    /**
+     * Setter for Customer Authenticate
+     *
+     * @param value
+     */
+    set customerAuthenticate(value: CustomerAuthenticate)
+    {
+        // Store the value
+        this._customerAuthenticate.next(value);
+    }
 
 
     /**
@@ -169,7 +169,7 @@ export class AuthService
                     // Set the authenticated flag to true
                     this._authenticated = true;
 
-                    this._customerAuthenticate = response.data;
+                    this._customerAuthenticate.next(response.data);
 
                     // // Store the user on the user service
                     // this._userService.user = response.user;
@@ -221,6 +221,8 @@ export class AuthService
 
                     // Set the authenticated flag to true
                     this._authenticated = true;
+
+                    this._customerAuthenticate.next(response.data);
 
                     // Return true
                     return of(true);
