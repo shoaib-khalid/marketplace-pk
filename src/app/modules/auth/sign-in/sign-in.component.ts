@@ -5,6 +5,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
 // import * as saveAs from 'file-saver';
 
@@ -37,6 +38,7 @@ export class AuthSignInComponent implements OnInit
         private _userService: UserService,
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
+        private _apiServer: AppConfig,
         private _router: Router
     )
     {
@@ -53,10 +55,14 @@ export class AuthSignInComponent implements OnInit
     {
         // Create the form
         this.signInForm = this._formBuilder.group({
-            username     : ['', [Validators.required]],
-            password  : ['', Validators.required],
-            rememberMe: ['']
+            domain      : [''],
+            username    : ['', [Validators.required]],
+            password    : ['', Validators.required],
+            rememberMe  : ['']
         });
+
+        let domain = this._apiServer.settings.storeFrontDomain;
+        this.signInForm.get('domain').patchValue(domain);
 
         // We need to check first the location before we proceed to send the payload
         // this.signInForm.disable();

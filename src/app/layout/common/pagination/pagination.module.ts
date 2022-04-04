@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { PaginationComponent } from 'app/layout/common/pagination/pagination.component';
 import { SharedModule } from 'app/shared/shared.module';
-import { JwPaginationModule } from 'jw-angular-pagination';
+// import { JwPaginationModule } from 'jw-angular-pagination';
 
 @NgModule({
     declarations: [
@@ -14,7 +14,7 @@ import { JwPaginationModule } from 'jw-angular-pagination';
         MatButtonModule,
         MatIconModule,
         MatMenuModule,
-        JwPaginationModule,
+        // JwPaginationModule,
         SharedModule
     ],
     exports     : [
