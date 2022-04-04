@@ -74,7 +74,6 @@ export class OrderDetailsComponent implements OnInit
         this.ordersDetails$ = this._orderService.ordersDetails$;
 
         this._orderService.getOrdersWithDetails().subscribe((response) =>{
-            console.log("Tengok Order :",response);
             
             this._orderService.getOrderById(this.orderId).subscribe((response)=>{
                 this.orderDetails = response.data
