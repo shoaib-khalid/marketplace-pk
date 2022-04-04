@@ -98,7 +98,8 @@ export const appRoutes: Route[] = [
             platformSetup: PlatformSetupResolver
         },
         children   : [
-            {path: 'buyer', loadChildren: () => import('app/modules/buyer/buyer.module').then(m => m.BuyerModule)},
+            {path: 'buyer', loadChildren: () => import('app/modules/buyer/order/order.module').then(m => m.OrderModule)},
+            {path: 'checkout', loadChildren: () => import('app/modules/buyer/checkout/checkout.module').then(m => m.BuyerCheckoutModule)},
         ]
     }, 
 

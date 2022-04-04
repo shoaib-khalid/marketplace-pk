@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import { OrderDetailsComponent } from './order-details/order-details.component';
 import { OrderListComponent } from './order-list/order-list.component';
 
-export const buyerRoutes: Route[] = [
+export const orderRoutes: Route[] = [
     {
         path     : 'order/:order-id',
         data: {
