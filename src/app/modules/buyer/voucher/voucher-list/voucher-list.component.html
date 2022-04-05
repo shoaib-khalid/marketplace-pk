@@ -1,0 +1,91 @@
+<!-- Voucher List -->
+<div class="relative flex flex-col items-center w-full h-full">
+    <!-- Main menu -->
+    <div class="flex flex-col items-center w-full h-auto my-5 px-5">
+        <!-- Container -->
+        <div class="flex flex-col md:flex-row justify-between mt-4 w-full max-w-280">
+
+            <!--  Voucher -->
+            <div class="flex flex-row w-full">
+           
+                <div class="flex flex-col pr-6">
+                    <h1>My Voucher</h1>
+                </div>
+                <div class="flex flex-col w-full px-2">
+                    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
+                
+                    <input
+                        matInput
+                        [autocomplete]="'off'"
+                        [placeholder]="'Input Promo Code '">
+                    </mat-form-field>
+
+                </div>
+
+                <div class="w-24">
+                    <input
+                        id="add-voucher-button"
+                        type="button"
+                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                        mat-button
+                        >
+                    <label 
+                        class="flex items-center justify-center h-10 px-2 border rounded-lg border-primary-300 bg-primary hover:border-primary-500 cursor-pointer"
+                        for="add-to-cart-button"
+                        (click)="searchPromoCode('HELLOWORLD')"
+                        matRipple>
+                        <span class="text-sm font-semibold text-black">Add</span>
+                    </label>
+                </div>
+            
+    
+            </div>
+
+    
+        </div>
+
+        <div class="flex flex-col w-full items-center py-2">
+         
+
+                <mat-tab-group class="border border-gray-300">
+                        
+                        <mat-tab label="All"> 
+                            <div class="grid grid-cols-2 grid-flow-row gap-3">
+
+                        
+                                <ng-container *ngFor="let categoryList of [].constructor(6); let i = index;">
+                                    <div class="flex flex-col items-center">
+                                        <div class="box-border h-32 w-72 p-4 border-4 ml-2 shadow-lg border hover:border-2 rounded-lg overflow-hidden cursor-pointer"
+                                            (click)="openVoucherDetails(i)"
+                                        >
+                                        <p class="leading-none group-hover:text-primary">Voucher  {{i}}</p>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                
+                            </div> 
+                        </mat-tab>
+    
+                        <mat-tab label="Used"> 
+                            <div class="grid grid-cols-2 grid-flow-row gap-3">
+
+                        
+                                <ng-container *ngFor="let categoryList of [].constructor(6); let i = index;">
+                                    <div class="flex flex-col items-center">
+                                        <div class="box-border h-32 w-72 p-4 border-4 ml-2 shadow-lg border hover:border-2 rounded-lg overflow-hidden cursor-pointer"
+                                            (click)="openVoucherDetails(i)"
+                                        >
+                                        <p class="leading-none group-hover:text-primary">Voucher  {{i}}</p>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                
+                            </div> 
+                        </mat-tab>
+    
+    
+                </mat-tab-group>
+        </div>
+        
+    </div>
+</div>

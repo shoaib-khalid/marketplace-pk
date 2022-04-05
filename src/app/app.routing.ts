@@ -100,6 +100,8 @@ export const appRoutes: Route[] = [
         children   : [
             {path: 'buyer', loadChildren: () => import('app/modules/buyer/order/order.module').then(m => m.OrderModule)},
             {path: 'checkout', loadChildren: () => import('app/modules/buyer/checkout/checkout.module').then(m => m.BuyerCheckoutModule)},
+            {path: 'buyer-voucher', loadChildren: () => import('app/modules/buyer/voucher/voucher.module').then(m => m.VoucherModule)},
+
         ]
     }, 
 
