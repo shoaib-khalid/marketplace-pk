@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, timer } from 'rxjs';
 import { finalize, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AuthService } from 'app/core/auth/auth.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector     : 'auth-sign-out',
@@ -11,7 +12,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 })
 export class AuthSignOutComponent implements OnInit, OnDestroy
 {
-    countdown: number = 5;
+    countdown: number = 3;
     countdownMapping: any = {
         '=1'   : '# second',
         'other': '# seconds'
@@ -24,8 +25,10 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
-        private _router: Router
+        private _router: Router,
+        private _activatedRoute: ActivatedRoute
     )
     {
     }
@@ -39,14 +42,33 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+            
+        
         // Sign out
         this._authService.signOut();
-
+        
         // Redirect after the countdown
         timer(1000, 1000)
             .pipe(
                 finalize(() => {
-                    this._router.navigate(['sign-in']);
+                    
+                    let redirectUrl = '';
+
+                    // Navigate to the redirect url
+                    this._activatedRoute.queryParams.subscribe(param => {
+                            redirectUrl = param['redirectUrl'];     
+
+                            if (redirectUrl) {
+                                this._document.location.href = redirectUrl;
+                                
+                            }
+                            else {
+                                this._router.navigate(['sign-in']);
+                                
+                            }
+                        })
+
                 }),
                 takeWhile(() => this.countdown > 0),
                 takeUntil(this._unsubscribeAll),

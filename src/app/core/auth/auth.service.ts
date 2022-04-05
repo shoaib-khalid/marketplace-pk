@@ -8,6 +8,7 @@ import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service'
 import { CustomerAuthenticate } from './auth.types';
+import { UserRole } from '../user/user.types';
 
 @Injectable()
 export class AuthService
@@ -264,7 +265,7 @@ export class AuthService
             "name": user.name,
             "username": user.username,
             "password": user.password,
-            "roleId": "STORE_OWNER",
+            "roleId": UserRole.Customer,
             "countryId":user.countryId
           };
         
