@@ -12,6 +12,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 export class VoucherListComponent implements OnInit, OnDestroy
 {
 
+    inputPromoCode:string ='';
     /**
      * Constructor
      */
@@ -91,8 +92,51 @@ export class VoucherListComponent implements OnInit, OnDestroy
         return confirmation;
     }
 
-    searchPromoCode(promoCode:string){
-        console.log('PROOCODE',promoCode);
+    searchPromoCode(){
+
+        let voucherCodes =[
+            'FREESHIPPING',
+            'RAYADEALS'
+        ]
+
+        //IF VOUCHER EXIST
+        if(voucherCodes.includes(this.inputPromoCode)){
+            const confirmation = this._fuseConfirmationService.open({
+                title  : '', 
+                message: 'Voucher code applied',
+                icon       : {
+                    show : false,
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel : {
+                        show : false,
+                    }
+                }
+            });
+        } 
+        else{
+            const confirmation = this._fuseConfirmationService.open({
+                title  : '',
+                message: 'Invalid code, please try again',
+                icon       : {
+                    show : false,
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel : {
+                        show : false,
+                    }
+                }
+            });
+        }
+        
 
     }
 
