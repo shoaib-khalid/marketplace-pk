@@ -12,12 +12,13 @@ import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged }
 import { CheckoutService } from './checkout.service';
 import { CheckoutValidationService } from './checkout.validation.service';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ChooseDeliveryAddressComponent } from './choose-delivery-address/choose-delivery-address.component';
 import { CartDiscount, DeliveryProvider, DeliveryProviderGroup, Order, Payment } from './checkout.types';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { AddAddressComponent } from './add-address/add-address.component';
+import { EditAddressComponent } from './edit-address/edit-address.component';
 
 @Component({
     selector     : 'buyer-checkout',
@@ -404,7 +405,7 @@ export class BuyerCheckoutComponent implements OnInit
         this._checkoutService.getCustomerInfo(email, phoneNumber)
             .subscribe((response)=>{
                 if (response && response.customerAddress.length > 0) {
-                    let dialogRef = this._dialog.open(ChooseDeliveryAddressComponent, { disableClose: true, data: response });
+                    let dialogRef = this._dialog.open(AddAddressComponent, { disableClose: true, data: response });
                     dialogRef.afterClosed().subscribe((result) => {
                         if (result.isAddress === true) {
                             this.checkoutForm.get('id').patchValue(response.id);
@@ -1038,11 +1039,64 @@ export class BuyerCheckoutComponent implements OnInit
         }
     }
 
-    // checkPickupOrder(){
-    //     if
-    //     this.checkoutForm.get('state').setErrors({required: false});
-    //     this.checkoutForm.get('city').setErrors({required: false});
-    //     this.checkoutForm.get('postCode').setErrors({required: false});
-    //     this.checkoutForm.get('address').setErrors({required: false});
-    // }
+    addNewAddress() : void 
+    {
+    const dialogRef = this._dialog.open(
+        AddAddressComponent, {
+            width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+            // height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+            maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+            // maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+            disableClose: true,
+            });
+        
+        dialogRef.afterClosed().subscribe();
+    }
+
+    editAddress() : void 
+    {
+        const dialogRef = this._dialog.open(
+            EditAddressComponent, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                // height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                // maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                });
+            
+            dialogRef.afterClosed().subscribe();
+    }
+
+    deleteAddress(){
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete Address',
+            message: 'Are you sure you want to remove this Address ?',
+            icon:{
+                name:"mat_outline:delete_forever"
+            },
+            actions: {
+                confirm: {
+                    label: 'Delete'
+                }
+            }
+        });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+
+                // Get the discount object
+                // const discount = this.selectedDiscountForm.getRawValue();
+
+                // Delete the discount on the server
+                // this._discountService.deleteDiscount(discount.id).subscribe(() => {
+
+                //     // Close the details
+                //     this.closeDetails();
+                // });
+            }
+        });
+    }
 }

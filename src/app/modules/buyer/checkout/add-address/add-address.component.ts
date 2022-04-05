@@ -2,17 +2,17 @@ import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 @Component({
-  selector: 'choose-delivery-address',
-  templateUrl: './choose-delivery-address.component.html'
+  selector: 'add-address',
+  templateUrl: './add-address.component.html'
 })
-export class ChooseDeliveryAddressComponent implements OnInit {
+export class AddAddressComponent implements OnInit {
 
   showButton: boolean = false;
   addresses: string[];
   selectedAddressId: string;
 
   constructor(
-    private dialogRef: MatDialogRef<ChooseDeliveryAddressComponent>,
+    private dialogRef: MatDialogRef<AddAddressComponent>,
     @Inject(MAT_DIALOG_DATA) private data: any
   ) { }
 
