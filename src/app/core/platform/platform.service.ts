@@ -167,6 +167,13 @@ export class PlatformService
                     platformLogo = "logo_easydukan_bg-removebg.png";
                     platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
                     platformUrl = "customer2.symplified.it"; // staging url
+                } else if (this.url.domain === 'customer.symplified.services') {
+                    // Staging Symplified
+                    platformId = "symplified";
+                    platformName = "SYMplified.biz";
+                    platformSlug = "symplified-staging";
+                    platformLogo = "logo_symplified_bg-removebg.png";
+                    platformLogoDark = "logo_symplified_bg-removebg.png";
                 } else {
                     console.error("Unregistered domain name", this.url.domainName)
                 }

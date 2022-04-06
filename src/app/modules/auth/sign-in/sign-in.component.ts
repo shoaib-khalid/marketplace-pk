@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -7,6 +7,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
+import { DOCUMENT } from '@angular/common';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -34,6 +35,7 @@ export class AuthSignInComponent implements OnInit
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
         private _authService: AuthService,
@@ -118,10 +120,25 @@ export class AuthSignInComponent implements OnInit
                             // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
                             // to the correct page after a successful sign in. This way, that url can be set via
                             // routing file and we don't have to touch here.
-                            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                            // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
         
+                            // // Navigate to the redirect url
+                            // this._router.navigateByUrl(redirectURL);
+                            
+
                             // Navigate to the redirect url
-                            this._router.navigateByUrl(redirectURL);
+                            this._activatedRoute.queryParams.subscribe(param => {
+                                    const redirectUrl = param['redirectUrl'];     
+
+                                    if (redirectUrl) {
+                                        this._document.location.href = redirectUrl;
+                                        
+                                    }
+                                    else {
+                                        this._router.navigateByUrl('/signed-in-redirect');
+                                        
+                                    }
+                            })
                     }
                 },
                 (error) => {

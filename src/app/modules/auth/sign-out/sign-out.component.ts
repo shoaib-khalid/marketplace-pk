@@ -53,11 +53,9 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
             .pipe(
                 finalize(() => {
                     
-                    let redirectUrl = '';
-
                     // Navigate to the redirect url
                     this._activatedRoute.queryParams.subscribe(param => {
-                            redirectUrl = param['redirectUrl'];     
+                            const redirectUrl = param['redirectUrl'];     
 
                             if (redirectUrl) {
                                 this._document.location.href = redirectUrl;
@@ -67,7 +65,7 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
                                 this._router.navigate(['sign-in']);
                                 
                             }
-                        })
+                    })
 
                 }),
                 takeWhile(() => this.countdown > 0),
