@@ -103,6 +103,10 @@ export class BuyerCheckoutComponent implements OnInit
 
     allowsStorePickup: boolean = false;
 
+    inputPromoCode:string ='';
+    discountAmountVoucherApplied: number = 0.00;
+    displaydiscountAmountVoucherApplied:any = 0.00;
+
     /**
      * Constructor
      */
@@ -123,6 +127,7 @@ export class BuyerCheckoutComponent implements OnInit
     }
 
     ngOnInit() {
+
         // Create the support form
         this.checkoutForm = this._formBuilder.group({
             // Main Store Section
@@ -1045,4 +1050,63 @@ export class BuyerCheckoutComponent implements OnInit
     //     this.checkoutForm.get('postCode').setErrors({required: false});
     //     this.checkoutForm.get('address').setErrors({required: false});
     // }
+
+    redeemPromoCode(){
+
+        // dummy data promo code available
+        let voucherCodes =[
+            'FREESHIPPING',
+            'RAYADEALS'
+        ]
+
+        //IF VOUCHER EXIST
+        if(voucherCodes.includes(this.inputPromoCode)){
+            const confirmation = this._fuseConfirmationService.open({
+                title  : '', 
+                message: 'Voucher code applied',
+                icon       : {
+                    show : false,
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel : {
+                        show : false,
+                    }
+                }
+            });
+            //to show the dusocunted price when voucher applied
+            this.discountAmountVoucherApplied = 10.50;
+            this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
+           
+        } 
+        else{
+            const confirmation = this._fuseConfirmationService.open({
+                title  : '',
+                message: 'Invalid code, please try again',
+                icon       : {
+                    show : false,
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel : {
+                        show : false,
+                    }
+                }
+            });
+        }
+    }
+
+    selectOnVoucher(value:string){
+
+        //to show the disocunted price when voucher applied
+        this.discountAmountVoucherApplied = parseFloat(value);
+        this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
+                  
+    }
 }
