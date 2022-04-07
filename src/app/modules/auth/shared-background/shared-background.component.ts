@@ -5,7 +5,11 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
 import { StoresService } from 'app/core/store/store.service';
-import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { map, mergeMap, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
+import { Subject } from 'rxjs';
+
 
 @Component({
     selector     : 'app-shared-background',
@@ -17,6 +21,9 @@ export class SharedBackgroundComponent implements OnInit
 {
     image: any=[];
     countryCode:string='';
+
+    platform: Platform;
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
     
     /**
      * Constructor
@@ -26,6 +33,7 @@ export class SharedBackgroundComponent implements OnInit
         private _formBuilder: FormBuilder,
         private _router: Router,
         private _storesService:StoresService,
+        private _platformsService: PlatformService,
 
     )
     {
@@ -41,7 +49,13 @@ export class SharedBackgroundComponent implements OnInit
     ngOnInit(): void
     {
 
-
+        // Subscribe to platform data
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                this.platform = platform;
+                
+            });
       
     }
 
