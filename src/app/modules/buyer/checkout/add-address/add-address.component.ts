@@ -1,5 +1,13 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { PlatformLocation } from '@angular/common';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { AuthService } from 'app/core/auth/auth.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { UserService } from 'app/core/user/user.service';
+import { CheckoutService } from '../checkout.service';
+import { CheckoutValidationService } from '../checkout.validation.service';
 
 @Component({
   selector: 'add-address',
@@ -7,26 +15,78 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 })
 export class AddAddressComponent implements OnInit {
 
+  createAddressForm: FormGroup;
+
   showButton: boolean = false;
   addresses: string[];
   selectedAddressId: string;
 
+  customerAuthenticate: CustomerAuthenticate;
+  user: any;
+  state: any;
+  regionCountryStates: any;
+
   constructor(
     private dialogRef: MatDialogRef<AddAddressComponent>,
+    private _formBuilder: FormBuilder,
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _checkoutService: CheckoutService,
+    private _authService: AuthService,
+    private _userService: UserService,
+    private _plateformService : PlatformService,
+    private _platformLocation: PlatformLocation,
+
+
     @Inject(MAT_DIALOG_DATA) private data: any
   ) { }
 
   ngOnInit(): void {
-    this.addresses = this.data.customerAddress.map(item => {
-      return { 
-        id: item.id, 
-        displayAddress: item.address + " " + item.city + " " + item.postCode + " " + item.state + " " + item.country
-      }
+
+    // Create the support form
+    this.createAddressForm = this._formBuilder.group({
+      // Main Store Section
+      fullName            : ['', Validators.required],
+      email               : ['', [Validators.required, CheckoutValidationService.emailValidator]],
+      phoneNumber         : ['', CheckoutValidationService.phonenumberValidator],
+      address             : ['', Validators.required],
+      postCode            : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), CheckoutValidationService.postcodeValidator]],
+      state               : ['', Validators.required],
+      city                : ['', Validators.required],
     });
 
-    if (this.addresses.length === 1) {
-      this.selectedAddressId = this.addresses[0]["id"];
-    }
+    this._authService.customerAuthenticate$
+    .subscribe((response: CustomerAuthenticate) => {
+        
+      this.customerAuthenticate = response;   
+
+      // Mark for check
+      this._changeDetectorRef.markForCheck();
+    });
+
+    this._userService.get(this.customerAuthenticate.session.ownerId)
+      .subscribe((response)=>{
+
+        this.user = response.data
+    
+        this._plateformService.set()
+        .subscribe((response) =>{
+
+          this.state = response.country
+          
+        })
+        
+        // Get states
+        this._checkoutService.getStoreRegionCountryState(this.state)
+        .subscribe((response)=>{
+          
+          this.regionCountryStates = response;
+
+          // Mark for check
+          this._changeDetectorRef.markForCheck();
+        })
+          
+      }
+    );
 
   }
 
@@ -34,18 +94,40 @@ export class AddAddressComponent implements OnInit {
     this.dialogRef.close({isAddress: false});
   }
 
-  chooseAddress() {
+  // chooseAddress() {
 
-    let _addresses = this.data.customerAddress;
-    let index = _addresses.findIndex(item => item.id === this.selectedAddressId);
+  //   let _addresses = this.data.customerAddress;
+  //   let index = _addresses.findIndex(item => item.id === this.selectedAddressId);
     
-    if (index > -1) {
-      const address = _addresses[index];
-      address["isAddress"] = true;
-      this.dialogRef.close(address);
-    } else {
-      this.dialogRef.close({isAddress: false});
+  //   if (index > -1) {
+  //     const address = _addresses[index];
+  //     address["isAddress"] = true;
+  //     this.dialogRef.close(address);
+  //   } else {
+  //     this.dialogRef.close({isAddress: false});
+  //   }
+  // }
+
+  createAddress() {
+
+    const createAddressBody = {
+      name       : this.createAddressForm.get('fullName').value,
+      address    : this.createAddressForm.get('address').value,
+      city       : this.createAddressForm.get('city').value,
+      country    : this.state,
+      customerId : this.user.id,
+      email      : this.createAddressForm.get('email').value,
+      phoneNumber: this.createAddressForm.get('phoneNumber').value,
+      postCode   : this.createAddressForm.get('postCode').value,
+      state      : this.createAddressForm.get('state').value,
     }
+
+    this._checkoutService.postCustomerAddress(this.user.id, createAddressBody)
+    .subscribe((response) => {
+
+    });
+
+    this.dialogRef.close();
   }
 
 }

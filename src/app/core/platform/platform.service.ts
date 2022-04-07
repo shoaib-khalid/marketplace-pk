@@ -122,6 +122,7 @@ export class PlatformService
                 let platformName;
                 let platformLogo;
                 let platformLogoDark;
+                let platformCountry;
                 let platformUrl = this.url.domain;
                 if (this.url.domain === 'customer.symplified.it') {
                     // Staging Symplified
@@ -130,6 +131,7 @@ export class PlatformService
                     platformSlug = "symplified-staging";
                     platformLogo = "logo_symplified_bg-removebg.png";
                     platformLogoDark = "logo_symplified_bg-removebg.png";
+                    platformCountry = "MYS";
                 } else if (this.url.domain === 'customer.symplified.biz') {
                     // Production Symplified
                     platformId = "symplified";
@@ -137,6 +139,7 @@ export class PlatformService
                     platformSlug = "symplified-production";
                     platformLogo = "logo_symplified_bg-removebg.png";
                     platformLogoDark = "logo_symplified_bg-removebg.png";
+                    platformCountry = "MYS";
                 } else if (this.url.domain === 'customer.symplified.test') {
                     // Development Symplified
                     platformId = "symplified";
@@ -145,6 +148,7 @@ export class PlatformService
                     platformLogo = "logo_symplified_bg-removebg.png";
                     platformLogoDark = "logo_symplified_bg-removebg.png";
                     platformUrl = "customer.symplified.it"; // staging url
+                    platformCountry = "MYS";
                 } else if (this.url.domain === 'customer2.symplified.it') {
                     // Staging Easydukan
                     platformId = "easydukan";
@@ -152,6 +156,7 @@ export class PlatformService
                     platformSlug = "easydukan-staging";
                     platformLogo = "logo_easydukan_bg-removebg.png";
                     platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
+                    platformCountry = "PAK";
                 } else if (this.url.domain === 'customer.easydukan.co') {
                     // Production Easydukan
                     platformId = "easydukan";
@@ -159,6 +164,7 @@ export class PlatformService
                     platformSlug = "easydukan-production";
                     platformLogo = "logo_easydukan_bg-removebg.png";
                     platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
+                    platformCountry = "PAK";
                 } else if (this.url.domain === 'customer.easydukan.test') {
                     // Development Easydukan
                     platformId = "easydukan";
@@ -167,6 +173,7 @@ export class PlatformService
                     platformLogo = "logo_easydukan_bg-removebg.png";
                     platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
                     platformUrl = "customer2.symplified.it"; // staging url
+                    platformCountry = "PAK";
                 } else {
                     console.error("Unregistered domain name", this.url.domainName)
                 }
@@ -177,7 +184,8 @@ export class PlatformService
                     name: platformName,
                     logo: platformLogo,
                     logoDark: platformLogoDark,
-                    url: platformUrl
+                    url: platformUrl,
+                    country: platformCountry
                 };
 
                 // set this

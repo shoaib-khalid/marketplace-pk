@@ -13,18 +13,18 @@
 
                 <ng-container *ngIf="true">
                     <!-- Checkout form section -->
-                    <div class="flex flex-col order-2 md:order-1 w-full mt-8 md:mt-0">
+                    <div class="flex flex-col order-2 md:order-1 w-full md:min-w-120 md:max-w-180 mt-8 md:mt-0">
                         <!-- Delivery Address -->
-                        <div class="flex flex-col border-b pb-2">
+                        <div class="w-full flex flex-col border-b pb-2">
                             <h1 class="text-2xl font-bold pb-2">Delivery Addresses</h1>
-                            <div class="w-full md:max-w-180">
-                                <div class="flex flex-nowrap items-center justify-between overflow-x-scroll">
-                                    <div class="flex flex-wrap items-center p-1">
+                            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+                                <ng-container *ngFor="let Address of customerAddresses">
+                                    <div class="hidden sm:block flex-wrap items-center p-1">
                                         <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 bg-primary-50 border border-primary-300 cursor-pointer">
                                             <div class="flex flex-row justify-between">
                                                 <div class="flex flex-col">
-                                                    <h3 class="text-lg font-semibold leading-tight">Ahmad John bin Smith</h3>
-                                                    <h3 class="font-medium">+60123456789</h3>
+                                                    <h3 class="text-lg font-semibold leading-tight">{{Address.name}}</h3>
+                                                    <h3 class="font-medium">{{Address.phoneNumber}}</h3>
                                                     <!-- <div class="flex flex-col ml-6">
                                                         <div class="text-2xl font-semibold leading-tight">Mountain tops</div>
                                                         <div class="text-secondary font-medium text-md">Travel locations</div>
@@ -35,15 +35,15 @@
                                                     <mat-icon class="text-primary pl-1" svgIcon="mat_solid:verified"></mat-icon>
                                                 </div>
                                             </div>
-                                            <div class="mt-6">S-12-U9, First Subang, SS15 Courtyard, 47500 Subang jaya, Selangor</div>
+                                            <div class="mt-6 w-full h-full">{{Address.address}}, {{Address.postCode}}, {{Address.city}}, {{Address.state}}</div>
                                             <div class="flex flex-row justify-between pt-4">
                                                 <div class="flex flex-row">
                                                     <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
-                                                    <span (click)="editAddress()" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
+                                                    <span (click)="editAddress(Address.id)" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
                                                 </div>
                                                 <div class="flex flex-row">
                                                     <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
-                                                    <span (click)="deleteAddress()" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
+                                                    <span (click)="deleteAddress(Address.id)" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
                                                 </div>
                                                 <div class="flex flex-row pl-4">
                                                     <mat-icon class="text-center text-primary-700" svgIcon="heroicons_outline:clipboard-check"></mat-icon>
@@ -52,117 +52,169 @@
                                             </div>
                                         </fuse-card>
                                     </div>
-                                    <div class="flex flex-wrap items-center p-1">
-                                        <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
-                                            <div class="flex flex-row justify-between">
-                                                <div class="flex flex-col">
-                                                    <h3 class="text-lg font-semibold leading-tight">Joel Wong</h3>
-                                                    <h3 class="font-medium">+6012395289</h3>
-                                                </div>
-                                                <div class="flex flex-row">
-                                                    <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
-                                                </div>
-                                            </div>
-                                            <div class="mt-6">Pt 432,Kampung Bukit Cicak gelepar, Kota Bharu, Perak</div>
-                                            <div class="flex flex-row justify-between pt-4">
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
-                                                </div>
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
-                                                </div>
-                                                <div class="flex flex-row pl-4">
-                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
-                                                </div>
-                                            </div>
-                                        </fuse-card>
-                                    </div>
-                                    <div class="flex flex-wrap items-center p-1">
-                                        <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
-                                            <div class="flex flex-col">
-                                                <div class="flex flex-row justify-between">
-                                                    <div class="flex flex-col">
-                                                        <h3 class="text-lg font-semibold leading-tight">Alfred Molina</h3>
-                                                        <h3 class="font-medium">+601987389</h3>
-                                                    </div>
-                                                    <div class="flex flex-row">
-                                                        <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
-                                                    </div>                                                        
-                                                </div>
-                                                <div class="mt-6">No.12A, Jalan Rambutan 6, 42100, taman Klang Utama,Selangor</div>
-                                                <div class="flex flex-row justify-between pt-4">
-                                                    <div class="flex flex-row">
-                                                        <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
-                                                        <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
-                                                    </div>
-                                                    <div class="flex flex-row">
-                                                        <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
-                                                        <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
-                                                    </div>
-                                                    <div class="flex flex-row pl-4">
-                                                        <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
-                                                        <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fuse-card>
-                                    </div>
-                                    <div class="flex flex-wrap items-center p-1">
-                                        <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
-                                            <div class="flex flex-row justify-between">
-                                                <div class="flex flex-col">
-                                                    <h3 class="text-lg font-semibold leading-tight">Joe Bow</h3>
-                                                    <h3 class="font-medium">+601999999</h3>
-                                                </div>
-                                                <div class="flex flex-row">
-                                                    <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
-                                                </div>
-                                            </div>
-                                            <div class="mt-6">Lot 1416, Jalan Bilal Hong, 40200 Shah Alam, Selangor</div>
-                                            <div class="flex flex-row justify-between pt-4">
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
-                                                </div>
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
-                                                </div>
-                                                <div class="flex flex-row pl-4">
-                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
-                                                </div>
-                                            </div>
-                                        </fuse-card>
-                                    </div>
-                                    <div class="flex flex-wrap items-center p-1">
-                                        <fuse-card
-                                            (click)="addNewAddress()" 
-                                            class="flex flex-col w-80 h-48 rounded-lg border border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
-                                            <div class="w-full pt-14 items-center justify-center flex flex-col">
-                                                <mat-icon class="text-primary w-10 h-10 items-center" svgIcon="add"></mat-icon>
-                                                <span class="text-primary text-center text-lg">Add New Address</span>
-                                            </div>
-                                        </fuse-card>
-                                    </div>
+                                </ng-container>
+                                <div class="hidden sm:block flex-wrap items-center p-1">
+                                    <fuse-card
+                                        (click)="addNewAddress()" 
+                                        class="flex flex-col w-80 h-48 rounded-lg border border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                        <div class="w-full pt-14 items-center justify-center flex flex-col">
+                                            <mat-icon class="text-primary w-10 h-10 items-center" svgIcon="add"></mat-icon>
+                                            <span class="text-primary text-center text-lg">Add New Address</span>
+                                        </div>
+                                    </fuse-card>
                                 </div>
+                                <!-- Delivery Addresses for mobile view -->
+                                <div class="w-full block sm:hidden flex-col">
+                                    <div class="pb-1">
+                                        <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                            <div (click)="addNewAddress()" class="pl-4 pr-3 flex flex-row w-full justify-between">
+                                                <span>Add New Address</span>
+                                                <mat-icon svgIcon="add"></mat-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <mat-accordion class="max-w-4xl mt-8">
+                                        <ng-container>
+                                            <mat-expansion-panel class="border-gray-300 border">
+                                                <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                                                    <mat-panel-title class="font-medium leading-tight">Delivery Addresses</mat-panel-title>
+                                                </mat-expansion-panel-header>
+                                                <ng-container *ngFor="let Address of customerAddresses">
+                                                    <div class="pb-1">
+                                                        <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                                            <div (click)="editAddress(Address.id)" class="flex flex-col w-full">
+                                                                <div class="flex flex-col">
+                                                                    <div class="flex flex-row justify-between">
+                                                                        <span class="font-semibold">{{Address.name}}</span>
+                                                                        <div class="flex flex-row justify-end">
+                                                                            <span class="text-primary">Default</span>
+                                                                            <mat-icon class="text-primary pl-1" svgIcon="mat_solid:verified"></mat-icon>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span class="font-semibold">{{Address.phoneNumber}}</span>
+                                                                    <span>{{Address.address}}, {{Address.postCode}}, {{Address.city}}, {{Address.state}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+                                            </mat-expansion-panel>
+                                        </ng-container>
+                                    </mat-accordion>
+                                    
+                                </div>
+                                <!-- <div class="flex flex-wrap items-center p-1">
+                                    <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
+                                        <div class="flex flex-row justify-between">
+                                            <div class="flex flex-col">
+                                                <h3 class="text-lg font-semibold leading-tight">Joel Wong</h3>
+                                                <h3 class="font-medium">+6012395289</h3>
+                                            </div>
+                                            <div class="flex flex-row">
+                                                <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
+                                            </div>
+                                        </div>
+                                        <div class="mt-6">Pt 432,Kampung Bukit Cicak gelepar, Kota Bharu, Perak</div>
+                                        <div class="flex flex-row justify-between pt-4">
+                                            <div class="flex flex-row">
+                                                <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
+                                            </div>
+                                            <div class="flex flex-row">
+                                                <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
+                                            </div>
+                                            <div class="flex flex-row pl-4">
+                                                <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
+                                            </div>
+                                        </div>
+                                    </fuse-card>
+                                </div>
+                                <div class="flex flex-wrap items-center p-1">
+                                    <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
+                                        <div class="flex flex-col">
+                                            <div class="flex flex-row justify-between">
+                                                <div class="flex flex-col">
+                                                    <h3 class="text-lg font-semibold leading-tight">Alfred Molina</h3>
+                                                    <h3 class="font-medium">+601987389</h3>
+                                                </div>
+                                                <div class="flex flex-row">
+                                                    <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
+                                                </div>                                                        
+                                            </div>
+                                            <div class="mt-6">No.12A, Jalan Rambutan 6, 42100, taman Klang Utama,Selangor</div>
+                                            <div class="flex flex-row justify-between pt-4">
+                                                <div class="flex flex-row">
+                                                    <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
+                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
+                                                </div>
+                                                <div class="flex flex-row">
+                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
+                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
+                                                </div>
+                                                <div class="flex flex-row pl-4">
+                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
+                                                    <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fuse-card>
+                                </div>
+                                <div class="flex flex-wrap items-center p-1">
+                                    <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 border border-gray-300 cursor-pointer">
+                                        <div class="flex flex-row justify-between">
+                                            <div class="flex flex-col">
+                                                <h3 class="text-lg font-semibold leading-tight">Joe Bow</h3>
+                                                <h3 class="font-medium">+601999999</h3>
+                                            </div>
+                                            <div class="flex flex-row">
+                                                <h3 class="text-primary hover:text-primary-700 font-bold">Set As Default</h3>
+                                            </div>
+                                        </div>
+                                        <div class="mt-6">Lot 1416, Jalan Bilal Hong, 40200 Shah Alam, Selangor</div>
+                                        <div class="flex flex-row justify-between pt-4">
+                                            <div class="flex flex-row">
+                                                <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
+                                            </div>
+                                            <div class="flex flex-row">
+                                                <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
+                                            </div>
+                                            <div class="flex flex-row pl-4">
+                                                <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:clipboard"></mat-icon>
+                                                <span class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Select</span>
+                                            </div>
+                                        </div>
+                                    </fuse-card>
+                                </div>
+                                <div class="flex flex-wrap items-center p-1">
+                                    <fuse-card
+                                        (click)="addNewAddress()" 
+                                        class="flex flex-col w-80 h-48 rounded-lg border border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                        <div class="w-full pt-14 items-center justify-center flex flex-col">
+                                            <mat-icon class="text-primary w-10 h-10 items-center" svgIcon="add"></mat-icon>
+                                            <span class="text-primary text-center text-lg">Add New Address</span>
+                                        </div>
+                                    </fuse-card>
+                                </div> -->
                             </div>
                         </div>
                         <!-- Store Pickup -->
-                        <div class="flex flex-col my-3 sm:flex-row justify-between sm:items-center w-full">
+                        <div class="flex flex-col m-2 w-full">
                             <h1 class="text-2xl font-bold pb-2 sm:pb-0">Pin Location</h1>
-                            <!-- <div *ngIf="true" class="flex flex-row w-full sm:w-auto justify-between">
-                                <p class="mr-4">I want to pick my order from store</p>
-                                <mat-slide-toggle
-                                    [color]="'primary'"
-                                    [formControlName]="'storePickup'"
-                                    (change)="allowPickupStore();addressFormChanges();"
-                                    >
-                                </mat-slide-toggle>
-                            </div> -->
+                            <div class="w-full border rounded-lg border-gray-300">
+                                <fuse-card
+                                    (click)="addNewAddress()" 
+                                    class="flex flex-col w-80 h-48 m-5 rounded-lg border border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                    <div class="w-full pt-14 items-center justify-center flex flex-col">
+                                        <mat-icon class="text-primary w-10 h-10 items-center" svgIcon="add"></mat-icon>
+                                        <span class="text-primary text-center text-lg">Add New Address</span>
+                                    </div>
+                                </fuse-card>
+                            </div>
                         </div>
                     </div>
                 </ng-container>

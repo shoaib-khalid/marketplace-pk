@@ -6,4 +6,5 @@ export interface Platform
     logoDark?: string;
     slug?: string;
     url?: string;
+    country?: string;
 }

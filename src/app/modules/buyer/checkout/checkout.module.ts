@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
@@ -39,6 +40,7 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
         MatDialogModule,
         MatRadioModule,
         FuseCardModule,
+        MatExpansionModule,
         SharedModule
     ],
     providers   : [
