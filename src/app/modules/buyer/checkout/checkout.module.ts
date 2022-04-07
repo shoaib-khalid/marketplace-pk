@@ -9,19 +9,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
-import { ChooseDeliveryAddressComponent } from './choose-delivery-address/choose-delivery-address.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
-import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { BuyerCheckoutComponent } from './checkout.component';
 import { BuyerCheckoutRoutes } from './checkout.routing';
 import { FuseCardModule } from '@fuse/components/card';
+import { AddAddressComponent } from './add-address/add-address.component';
+import { EditAddressComponent } from './edit-address/edit-address.component';
+import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 
 @NgModule({
     declarations: [
         BuyerCheckoutComponent,
-        ChooseDeliveryAddressComponent,
+        AddAddressComponent,
+        EditAddressComponent,
         ModalConfirmationDeleteItemComponent
     ],
     imports     : [
@@ -37,6 +40,7 @@ import { FuseCardModule } from '@fuse/components/card';
         MatDialogModule,
         MatRadioModule,
         FuseCardModule,
+        MatExpansionModule,
         SharedModule
     ],
     providers   : [

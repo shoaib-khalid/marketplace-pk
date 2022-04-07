@@ -12,12 +12,16 @@ import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged }
 import { CheckoutService } from './checkout.service';
 import { CheckoutValidationService } from './checkout.validation.service';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ChooseDeliveryAddressComponent } from './choose-delivery-address/choose-delivery-address.component';
-import { CartDiscount, DeliveryProvider, DeliveryProviderGroup, Order, Payment } from './checkout.types';
+import { Address, CartDiscount, DeliveryProvider, DeliveryProviderGroup, Order, Payment } from './checkout.types';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { AddAddressComponent } from './add-address/add-address.component';
+import { EditAddressComponent } from './edit-address/edit-address.component';
+import { AuthService } from 'app/core/auth/auth.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { UserService } from 'app/core/user/user.service';
 
 @Component({
     selector     : 'buyer-checkout',
@@ -42,6 +46,14 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
             ::ng-deep .mat-radio-button .mat-radio-ripple{
                 display: none;
             }
+
+            .mat-select-panel mat-option.mat-option {
+                height: unset;
+              }
+              
+            .mat-option-text.mat-option-text {
+                white-space: normal;
+              }
         `
     ]
 })
@@ -106,6 +118,9 @@ export class BuyerCheckoutComponent implements OnInit
     inputPromoCode:string ='';
     discountAmountVoucherApplied: number = 0.00;
     displaydiscountAmountVoucherApplied:any = 0.00;
+    customerAuthenticate: CustomerAuthenticate;
+    user: any;
+    customerAddresses: Address[] = [];
 
     /**
      * Constructor
@@ -118,6 +133,9 @@ export class BuyerCheckoutComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _authService: AuthService,
+        private _userService: UserService,
+
         private _datePipe: DatePipe,
         private _dialog: MatDialog,
         private _router: Router,
@@ -151,6 +169,30 @@ export class BuyerCheckoutComponent implements OnInit
 
         // Set Payment Completion Status "Calculate Charges"
         this.paymentCompletionStatus = { id:"CALCULATE_CHARGES", label: "Calculate Charges" };
+
+        this._authService.customerAuthenticate$
+        .subscribe((response: CustomerAuthenticate) => {
+            
+            this.customerAuthenticate = response;
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Get customer Addresses
+        this._checkoutService.customerAddresses$
+        .subscribe((response: Address[]) => {
+            
+            this.customerAddresses = response
+            
+        });
+
+        this._userService.get(this.customerAuthenticate.session.ownerId)
+        .subscribe((response)=>{
+
+            this.user = response.data
+ 
+        });
 
         // --------------
         // Get store
@@ -409,7 +451,7 @@ export class BuyerCheckoutComponent implements OnInit
         this._checkoutService.getCustomerInfo(email, phoneNumber)
             .subscribe((response)=>{
                 if (response && response.customerAddress.length > 0) {
-                    let dialogRef = this._dialog.open(ChooseDeliveryAddressComponent, { disableClose: true, data: response });
+                    let dialogRef = this._dialog.open(AddAddressComponent, { disableClose: true, data: response });
                     dialogRef.afterClosed().subscribe((result) => {
                         if (result.isAddress === true) {
                             this.checkoutForm.get('id').patchValue(response.id);
@@ -867,180 +909,71 @@ export class BuyerCheckoutComponent implements OnInit
     // @ Private methods
     // -----------------------------------------------------------------------------------------------------
 
-    checkStoreTiming(storeTiming: StoreTiming[], storeSnooze: StoreSnooze): void
+
+    addNewAddress() : void 
     {
-        // the only thing that this function required is this.store.storeTiming
-
-        let todayDate = new Date();
-        let today = this.daysArray[todayDate.getDay()];
-
-        // check if store closed for all days
-        let isStoreCloseAllDay = storeTiming.map(item => item.isOff);
-
-        // --------------------
-        // Check store timing
-        // --------------------
-
-        // isStoreCloseAllDay.includes(false) means that there's a day that the store is open
-        // hence, we need to find the day that the store is open
-        if (isStoreCloseAllDay.includes(false)) {
-            storeTiming.forEach((item, index) => {
-                if (item.day === today) {
-                    // this mean store opened
-                    if (item.isOff === false) {
-                        let openTime = new Date();
-                        openTime.setHours(Number(item.openTime.split(":")[0]), Number(item.openTime.split(":")[1]), 0);
-
-                        let closeTime = new Date();
-                        closeTime.setHours(Number(item.closeTime.split(":")[0]), Number(item.closeTime.split(":")[1]), 0);
-
-                        if(todayDate >= openTime && todayDate < closeTime ) {
-                            // console.info("We are OPEN today!");
-
-                            // --------------------
-                            // Check store snooze
-                            // --------------------
-
-                            let snoozeEndTime = new Date(storeSnooze.snoozeEndTime);
-                            let nextStoreOpeningTime: string = "";                            
-
-                            if (storeSnooze.isSnooze === true) {
-                                // console.info("Store is currently on snooze");
-
-                                // check if snoozeEndTime exceed closeTime
-                                if (snoozeEndTime > closeTime) {
-                                    // console.info("Store snooze exceed closeTime");
-
-                                    // ------------------------
-                                    // Find next available day
-                                    // ------------------------
-
-                                    let dayBeforeArray = storeTiming.slice(0, index + 1);
-                                    let dayAfterArray = storeTiming.slice(index + 1, storeTiming.length);
-                                    
-                                    let nextAvailableDay = dayAfterArray.concat(dayBeforeArray);                                
-                                    nextAvailableDay.forEach((object, iteration, array) => {
-                                        // this mean store opened
-                                        if (object.isOff === false) {
-                                            let nextOpenTime = new Date();
-                                            nextOpenTime.setHours(Number(object.openTime.split(":")[0]), Number(object.openTime.split(":")[1]), 0);
-
-                                            let nextCloseTime = new Date();
-                                            nextCloseTime.setHours(Number(object.closeTime.split(":")[0]), Number(object.closeTime.split(":")[1]), 0);
-
-                                            if(todayDate >= nextOpenTime){
-                                                let nextOpen = (iteration === 0) ? ("tommorow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
-                                                // console.info("We will open " + nextOpen);
-                                                this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
-                                                nextStoreOpeningTime = "Store will open " + nextOpen;
-                                                array.length = iteration + 1;
-                                            }
-                                        } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
-                                        }
-                                    });
-
-                                } else {
-                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(storeSnooze.snoozeEndTime,'EEEE, h:mm a');
-                                }                                
-
-                                if (storeSnooze.snoozeReason && storeSnooze.snoozeReason !== null) {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
-                                } else {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to unexpected reason. " + nextStoreOpeningTime;
-                                }
-                            }
-                            
-                            // ---------------------
-                            // check for break hour
-                            // ---------------------
-                            if ((item.breakStartTime && item.breakStartTime !== null) && (item.breakEndTime && item.breakEndTime !== null)) {
-                                let breakStartTime = new Date();
-                                breakStartTime.setHours(Number(item.breakStartTime.split(":")[0]), Number(item.breakStartTime.split(":")[1]), 0);
-    
-                                let breakEndTime = new Date();
-                                breakEndTime.setHours(Number(item.breakEndTime.split(":")[0]), Number(item.breakEndTime.split(":")[1]), 0);
-
-                                if(todayDate >= breakStartTime && todayDate < breakEndTime ) {
-                                    // console.info("We are on BREAK! We will open at " + item.breakEndTime);
-                                    this.notificationMessage = "Sorry for the inconvenience, We are on break! We will open at " + item.breakEndTime;
-                                }
-                            }
-                        } else if (todayDate < openTime) {
-                            // this mean it's open today but it's before store opening hour (store not open yet)
-                            this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open at " + item.openTime;
-                        } else {
-
-                            // console.info("We are CLOSED for the day!");
-
-                            // ------------------------
-                            // Find next available day
-                            // ------------------------
-
-                            let dayBeforeArray = storeTiming.slice(0, index + 1);
-                            let dayAfterArray = storeTiming.slice(index + 1, storeTiming.length);
-                            
-                            let nextAvailableDay = dayAfterArray.concat(dayBeforeArray);                                
-                            nextAvailableDay.forEach((object, iteration, array) => {
-                                // this mean store opened
-                                if (object.isOff === false) {
-                                    let nextOpenTime = new Date();
-                                    nextOpenTime.setHours(Number(object.openTime.split(":")[0]), Number(object.openTime.split(":")[1]), 0);
-
-                                    let nextCloseTime = new Date();
-                                    nextCloseTime.setHours(Number(object.closeTime.split(":")[0]), Number(object.closeTime.split(":")[1]), 0);
-
-                                    if(todayDate >= nextOpenTime){
-                                        let nextOpen = (iteration === 0) ? ("tommorow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
-                                        // console.info("We will open " + nextOpen);
-                                        this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
-                                        array.length = iteration + 1;
-                                    }
-                                } else {
-                                    console.warn("Store close on " + object.day);
-                                }
-                            });
-                        }
-                    } else {
-
-                        console.warn("We are CLOSED today");
-                        
-                        // ------------------------
-                        // Find next available day
-                        // ------------------------
-
-                        let dayBeforeArray = storeTiming.slice(0, index + 1);
-                        let dayAfterArray = storeTiming.slice(index + 1, storeTiming.length);
-                        
-                        let nextAvailableDay = dayAfterArray.concat(dayBeforeArray);
-            
-                        nextAvailableDay.forEach((object, iteration, array) => {
-                            // this mean store opened
-                            if (object.isOff === false) {
-                                
-                                let nextOpenTime = new Date();                    
-                                nextOpenTime.setHours(Number(object.openTime.split(":")[0]), Number(object.openTime.split(":")[1]), 0);
-                                
-                                let nextCloseTime = new Date();
-                                nextCloseTime.setHours(Number(object.closeTime.split(":")[0]), Number(object.closeTime.split(":")[1]), 0);
-                                  
-                                if(todayDate >= nextOpenTime){
-                                    let nextOpen = (iteration === 0) ? ("tommorow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
-                                    // console.info("We will open " + nextOpen);
-                                    this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
-                                    array.length = iteration + 1;
-                                }
-                            } else {
-                                console.warn("Store close on this " + object.day);
-                            }
-                        });
-                    }
-                }
+    const dialogRef = this._dialog.open(
+        AddAddressComponent, {
+            width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+            height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+            maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+            maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+            disableClose: true,
             });
-        } else {
-            // this indicate that store closed for all days
-            this.notificationMessage = "Sorry for the inconvenience, We are closed!";
-        }
+        
+        dialogRef.afterClosed().subscribe();
+    }
+
+    editAddress(addressId:string)
+    {
+        const dialogRef = this._dialog.open(
+            EditAddressComponent, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data:{ addressId:addressId }
+                });                
+            
+        //     dialogRef.afterClosed().subscribe(result =>{
+        //         if (result.valid === false) {
+        //             return;
+        //         }
+        //     });
+    }
+
+    deleteAddress(addressId: string) {
+        
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete Address',
+            message: 'Are you sure you want to remove this Address ?',
+            icon:{
+                name:"mat_outline:delete_forever",
+                color:"primary"
+            },
+            actions: {
+                confirm: {
+                    label: 'Delete',
+                    color: 'primary'
+                }
+            }
+        });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+                
+                // Delete the discount on the server
+                this._checkoutService.deleteCustomerAddress(addressId).subscribe(() => {
+
+                    // Close the details
+                    // this.closeDetails();
+                });
+            }
+        });
     }
 
     // checkPickupOrder(){
