@@ -104,109 +104,156 @@ export class PlatformService
 
         let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
         this.url.domain = sanatiseUrl;
+        
 
         let domainNameArr = sanatiseUrl.split('.');
         domainNameArr.shift();
 
         this.url.domainName = domainNameArr.join("."); 
+
         
         let subDomainName = sanatiseUrl.split('.')[0];
         this.url.subDomainName = subDomainName;
-        
-        return this._platform.pipe(
-            take(1),
-            map((platform) => {
 
-                let platformSlug;
-                let platformId;
-                let platformName;
-                let platformLogo;
-                let platformLogoDark;
-                let platformCountry;
-                let platformUrl = this.url.domain;
-                if (this.url.domain === 'customer.symplified.services') {
-                    // Staging Symplified
-                    platformId = "symplified";
-                    platformName = "SYMplified.biz";
-                    platformSlug = "symplified-staging";
-                    platformLogo = "logo_symplified_bg-removebg.png";
-                    platformLogoDark = "logo_symplified_bg-removebg.png";
-                    platformCountry = "MYS";
-                } else if (this.url.domain === 'customer.symplified.biz') {
-                    // Production Symplified
-                    platformId = "symplified";
-                    platformName = "SYMplified.biz";
-                    platformSlug = "symplified-production";
-                    platformLogo = "logo_symplified_bg-removebg.png";
-                    platformLogoDark = "logo_symplified_bg-removebg.png";
-                    platformCountry = "MYS";
-                } else if (this.url.domain === 'customer.symplified.test') {
-                    // Development Symplified
-                    platformId = "symplified";
-                    platformName = "SYMplified.biz";
-                    platformSlug = "symplified-development";
-                    platformLogo = "logo_symplified_bg-removebg.png";
-                    platformLogoDark = "logo_symplified_bg-removebg.png";
-                    platformUrl = "customer.symplified.it"; // staging url
-                    platformCountry = "MYS";
-                } else if (this.url.domain === 'customer2.symplified.services') {
-                    // Staging Easydukan
-                    platformId = "easydukan";
-                    platformName = "EasyDukan";
-                    platformSlug = "easydukan-staging";
-                    platformLogo = "logo_easydukan_bg-removebg.png";
-                    platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
-                    platformCountry = "PAK";
-                } else if (this.url.domain === 'customer.easydukan.co') {
-                    // Production Easydukan
-                    platformId = "easydukan";
-                    platformName = "EasyDukan";
-                    platformSlug = "easydukan-production";
-                    platformLogo = "logo_easydukan_bg-removebg.png";
-                    platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
-                    platformCountry = "PAK";
-                } else if (this.url.domain === 'customer.easydukan.test') {
-                    // Development Easydukan
-                    platformId = "easydukan";
-                    platformName = "EasyDukan";
-                    platformSlug = "easydukan-development";
-                    platformLogo = "logo_easydukan_bg-removebg.png";
-                    platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
-                    platformUrl = "customer2.symplified.it"; // staging url
-                } else if (this.url.domain === 'customer.symplified.services') {
-                    // Staging Symplified
-                    platformId = "symplified";
-                    platformName = "SYMplified.biz";
-                    platformSlug = "symplified-staging";
-                    platformLogo = "logo_symplified_bg-removebg.png";
-                    platformLogoDark = "logo_symplified_bg-removebg.png";
-                    platformCountry = "PAK";
-                } else {
-                    console.error("Unregistered domain name", this.url.domainName)
-                }
+        // return this._platform.pipe(
+        //     take(1),
+        //     map((platform) => {
+
+        //         let platformSlug;
+        //         let platformId;
+        //         let platformName;
+        //         let platformLogo;
+        //         let platformLogoDark;
+        //         let platformCountry;
+        //         let platformUrl = this.url.domain;
+        //         if (this.url.domain === 'customer.symplified.services') {
+        //             // Staging Symplified
+        //             platformId = "symplified";
+        //             platformName = "SYMplified.biz";
+        //             platformSlug = "symplified-staging";
+        //             platformLogo = "logo_symplified_bg-removebg.png";
+        //             platformLogoDark = "logo_symplified_bg-removebg.png";
+        //             platformCountry = "MYS";
+        //         } else if (this.url.domain === 'customer.symplified.biz') {
+        //             // Production Symplified
+        //             platformId = "symplified";
+        //             platformName = "SYMplified.biz";
+        //             platformSlug = "symplified-production";
+        //             platformLogo = "logo_symplified_bg-removebg.png";
+        //             platformLogoDark = "logo_symplified_bg-removebg.png";
+        //             platformCountry = "MYS";
+        //         } else if (this.url.domain === 'customer.symplified.test') {
+        //             // Development Symplified
+        //             platformId = "symplified";
+        //             platformName = "SYMplified.biz";
+        //             platformSlug = "symplified-development";
+        //             platformLogo = "logo_symplified_bg-removebg.png";
+        //             platformLogoDark = "logo_symplified_bg-removebg.png";
+        //             platformUrl = "customer.symplified.it"; // staging url
+        //             platformCountry = "MYS";
+        //         } else if (this.url.domain === 'customer2.symplified.services') {
+        //             // Staging Easydukan
+        //             platformId = "easydukan";
+        //             platformName = "EasyDukan";
+        //             platformSlug = "easydukan-staging";
+        //             platformLogo = "logo_easydukan_bg-removebg.png";
+        //             platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
+        //             platformCountry = "PAK";
+        //         } else if (this.url.domain === 'customer.easydukan.co') {
+        //             // Production Easydukan
+        //             platformId = "easydukan";
+        //             platformName = "EasyDukan";
+        //             platformSlug = "easydukan-production";
+        //             platformLogo = "logo_easydukan_bg-removebg.png";
+        //             platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
+        //             platformCountry = "PAK";
+        //         } else if (this.url.domain === 'customer.easydukan.test') {
+        //             // Development Easydukan
+        //             platformId = "easydukan";
+        //             platformName = "EasyDukan";
+        //             platformSlug = "easydukan-development";
+        //             platformLogo = "logo_easydukan_bg-removebg.png";
+        //             platformLogoDark = "logo_easydukan_bg-removebg-dark.png";
+        //             platformUrl = "customer2.symplified.it"; // staging url
+        //         } else if (this.url.domain === 'customer.symplified.services') {
+        //             // Staging Symplified
+        //             platformId = "symplified";
+        //             platformName = "SYMplified.biz";
+        //             platformSlug = "symplified-staging";
+        //             platformLogo = "logo_symplified_bg-removebg.png";
+        //             platformLogoDark = "logo_symplified_bg-removebg.png";
+        //             platformCountry = "PAK";
+        //         } else {
+        //             console.error("Unregistered domain name", this.url.domainName)
+        //         }
                 
-                let newPlatform = {
-                    id: platformId,
-                    slug: platformSlug,
-                    name: platformName,
-                    logo: platformLogo,
-                    logoDark: platformLogoDark,
-                    url: platformUrl,
-                    country: platformCountry
-                };
+        //         let newPlatform = {
+        //             id: platformId,
+        //             slug: platformSlug,
+        //             name: platformName,
+        //             logo: platformLogo,
+        //             logoDark: platformLogoDark,
+        //             url: platformUrl,
+        //             country: platformCountry
+        //         };
 
-                // set this
-                this.platformControl.setValue(newPlatform);
+        //         // set this
+        //         this.platformControl.setValue(newPlatform);
 
-                // Update the store
-                this._platform.next(newPlatform);
+        //         // Update the store
+        //         this._platform.next(newPlatform);
 
-                this._logging.debug("Response from PlatformsService (Set)", newPlatform);
+        //         this._logging.debug("Response from PlatformsService (Set)", newPlatform);
 
-                // Return the store
-                return newPlatform;
-            })
-        );
+        //         // Return the store
+        //         return newPlatform;
+        //     })
+        // );
+
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._authService.publicToken;
+        let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;        
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params:{
+                domain:this.url.domain
+            }
+        };
+        
+        return this._httpClient.get<any>(productService + '/platformconfig', header)
+            .pipe(
+                tap((response) => {
+                    
+                    this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+
+                    response["data"].map((res)=>{
+                            let newPlatform = {
+                            id: res.platformId,
+                            name: res.platformName,
+                            logo: res.platformLogo,
+                            logoDark: res.platformLogoDark,
+                            country: res.platformCountry,
+                            favicon16:res.platformFavIcon,
+                            favicon32:res.platformFavIcon32,
+                            gacode:res.gaCode
+                        };
+                        
+                    // set this
+                    this.platformControl.setValue(newPlatform);
+
+                    // Update the store
+                    this._platform.next(newPlatform);
+
+                    this._logging.debug("Response from PlatformsService (Set)", newPlatform);
+
+                    // Return the store
+                    return newPlatform;
+                    })
+
+               
+                })
+            );
     }
 
     /**

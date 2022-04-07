@@ -21,6 +21,8 @@ export class AuthSignUpComponent implements OnInit
     };
     signUpForm: FormGroup;
     showAlert: boolean = false;
+    isError: boolean = false;
+
 
     //to be display the text
     titleText:string ='Sign Up';
@@ -70,6 +72,7 @@ export class AuthSignUpComponent implements OnInit
         // Do nothing if the form is invalid
         if ( this.signUpForm.invalid )
         {
+            this.isError = true;
             return;
         }
 
@@ -78,6 +81,8 @@ export class AuthSignUpComponent implements OnInit
 
         // Hide the alert
         this.showAlert = false;
+        this.isError = false;
+
 
         // Sign up
         this._authService.signUp(this.signUpForm.value)
@@ -93,12 +98,19 @@ export class AuthSignUpComponent implements OnInit
                     this.signUpForm.enable();
 
                     // Reset the form
-                    this.signUpNgForm.resetForm();
+                    // this.signUpNgForm.resetForm();
 
                     // Set the alert
+                    let message;
+                    if (response.status === 409) {
+                        message = "Something went wrong, " + response.error.data;
+                    } else {
+                        message = "Something went wrong, please try again.";
+                    }
+                    
                     this.alert = {
                         type   : 'error',
-                        message: 'Something went wrong, please try again.'
+                        message: message
                     };
 
                     // Show the alert

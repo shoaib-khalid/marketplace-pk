@@ -51,8 +51,9 @@ export class SharedLogoComponent implements OnInit
         // Subscribe to platform data
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => {
+            .subscribe((platform) => {
                 this.platform = platform;
+                
             });
     }
 
