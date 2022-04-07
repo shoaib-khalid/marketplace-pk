@@ -622,6 +622,62 @@
                                     </div>
                                 </ng-container>
                             </div>
+
+                            <!-- input promo code -->
+                            <div class="flex flex-row w-full">
+                                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64 px-1">
+                            
+                                <input
+                                    matInput
+                                    [autocomplete]="'off'"
+                                    [(ngModel)] ="inputPromoCode"
+                                    [ngModelOptions]="{standalone: true}"
+                                    [placeholder]="'Input Promo Code '">
+                                </mat-form-field>
+                                <div class="w-24">
+                                    <input
+                                        id="add-voucher-button"
+                                        type="button"
+                                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                        mat-button
+                                        >
+                                    <label 
+                                        class="flex items-center justify-center h-10 px-2 border rounded-lg border-primary-300 bg-primary hover:border-primary-500 cursor-pointer"
+                                        for="add-to-cart-button"
+                                        (click)="redeemPromoCode()"
+                                        matRipple>
+                                        <span class="text-sm font-semibold text-black">Redeem</span>
+                                    </label>
+                                </div>
+            
+                            </div>
+
+                            <!-- Select vocuher listing -->
+                            <div class="flex flex-row w-full py-2 items-center">
+                          
+                                    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64 px-1">
+                                        <mat-select 
+                                        placeholder="Select voucher"
+                                        (selectionChange)="selectOnVoucher(voucherSelector.value)"
+                                        #voucherSelector="matSelect">
+                                          <!-- <mat-option *ngFor="let voucher of vouchers" [value]="voucher.value">
+                                            {{voucher.viewValue}}
+                                          </mat-option> -->
+                                          <mat-option value="10.00">
+                                              RM 10 OFF
+                                          </mat-option>
+                                          <mat-option value="15.00">
+                                            RM 15 OFF
+                                        </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                         
+                                <div class="w-24">
+                                    <p class="font-semibold"> -RM {{displaydiscountAmountVoucherApplied}}</p>
+                                </div>
+
+                            </div>
                             <!-- grand total -->
                             <div class="flex flex-row w-full border-t justify-between py-2">
                                 <span class="font-semibold text-gray-500">Grand Total</span> 
