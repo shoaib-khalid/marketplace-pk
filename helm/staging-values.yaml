@@ -13,14 +13,16 @@ configProdJson:
           },
           "apiServer": {
               "flowBuilderService"  : "https://api.symplified.it/flow-builder/v1",
-              "userService"         : "https://api.symplified.it/user-service/v1",
+              "userService"         : "https://api.symplified.services/user-service/v1",
               "productService"      : "https://api.symplified.it/product-service/v1",
               "orderService"        : "https://api.symplified.it/order-service/v1",
               "reportService"       : "https://api.symplified.it/report-service/v1",
               "deliveryService"     : "https://api.symplified.it/delivery-service/v1",
               "paymentService"      : "https://api.symplified.it/payment-service/v1"
           },
-          "storeFrontDomain"        : ".symplified.ai",
+          "storeFrontDomain"          : ".symplified.services",
+          "marketplaceDomain"         : "customer.symplified.services",
+          "merchantPortalDomain"      : "merchant.symplified.it",
           "logging": 0
       }
   volumeMount:
@@ -35,7 +37,7 @@ fullnameOverride: ""
 image:
   pullPolicy: Always
   repository: kalsym/marketplace
-  tag: 0.0.2
+  tag: 0.0.3
 imagePullSecrets:
 - name: kalsym-docker-hub
 ingress:
@@ -43,14 +45,21 @@ ingress:
   className: ""
   enabled: true
   hosts:
-  - host: customer.symplified.it
+  - host: customer.symplified.services
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  - host: customer2.symplified.services
     paths:
     - path: /
       pathType: ImplementationSpecific
   tls:
   - hosts:
-    - customer.symplified.it
-    secretName: secret-tls-it
+    - customer.symplified.services
+    secretName: secret-tls-services
+  - hosts:
+    - customer2.symplified.services
+    secretName: secret-tls-services
 nameOverride: ""
 nodeSelector: {}
 podAnnotations: {}

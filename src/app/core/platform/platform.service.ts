@@ -124,7 +124,7 @@ export class PlatformService
                 let platformLogoDark;
                 let platformCountry;
                 let platformUrl = this.url.domain;
-                if (this.url.domain === 'customer.symplified.it') {
+                if (this.url.domain === 'customer.symplified.services') {
                     // Staging Symplified
                     platformId = "symplified";
                     platformName = "SYMplified.biz";
@@ -149,7 +149,7 @@ export class PlatformService
                     platformLogoDark = "logo_symplified_bg-removebg.png";
                     platformUrl = "customer.symplified.it"; // staging url
                     platformCountry = "MYS";
-                } else if (this.url.domain === 'customer2.symplified.it') {
+                } else if (this.url.domain === 'customer2.symplified.services') {
                     // Staging Easydukan
                     platformId = "easydukan";
                     platformName = "EasyDukan";
