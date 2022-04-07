@@ -5,6 +5,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseValidators } from '@fuse/validators';
 import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector     : 'auth-reset-password',
@@ -27,13 +28,17 @@ export class AuthResetPasswordComponent implements OnInit
     titleText:string ='Reset your password';
     descriptionText:string ='Create a new password for your account';
 
+    clientId: string;
+    code: string;
 
     /**
      * Constructor
      */
     constructor(
         private _authService: AuthService,
-        private _formBuilder: FormBuilder
+        private _formBuilder: FormBuilder,
+        private _route: ActivatedRoute
+
     )
     {
     }
@@ -56,6 +61,11 @@ export class AuthResetPasswordComponent implements OnInit
                 validators: FuseValidators.mustMatch('password', 'passwordConfirm')
             }
         );
+
+        this._route.queryParams.subscribe(params => {
+            this.clientId = params['id'];
+            this.code = params['code'];
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -79,38 +89,48 @@ export class AuthResetPasswordComponent implements OnInit
         // Hide the alert
         this.showAlert = false;
 
-        // Send the request to the server
-        // this._authService.resetPassword(this.resetPasswordForm.get('password').value)
-        //     .pipe(
-        //         finalize(() => {
+        // this will remove the item from the object
+        const { passwordConfirm, ...createClientBody } = this.resetPasswordForm.value;
 
-        //             // Re-enable the form
-        //             this.resetPasswordForm.enable();
+        //Send the request to the server
+        this._authService.resetPassword(this.clientId, this.code, createClientBody)
+        .pipe(
+            finalize(() => {
 
-        //             // Reset the form
-        //             this.resetPasswordNgForm.resetForm();
+                // Re-enable the form
+                this.resetPasswordForm.enable();
 
-        //             // Show the alert
-        //             this.showAlert = true;
-        //         })
-        //     )
-        //     .subscribe(
-        //         (response) => {
+                // Reset the form
+                this.resetPasswordNgForm.resetForm();
 
-        //             // Set the alert
-        //             this.alert = {
-        //                 type   : 'success',
-        //                 message: 'Your password has been reset.'
-        //             };
-        //         },
-        //         (response) => {
+                // Show the alert
+                this.showAlert = true;
+            })
+        )
+        .subscribe(
+            (response) => {
 
-        //             // Set the alert
-        //             this.alert = {
-        //                 type   : 'error',
-        //                 message: 'Something went wrong, please try again.'
-        //             };
-        //         }
-        //     );
+                // Set the alert
+                this.alert = {
+                    type   : 'success',
+                    message: 'Your password has been reset.'
+                };
+            },
+            (response) => {
+                // Set the alert
+                if (response.error.error) {
+                    this.alert = {
+                        type   : 'error',
+                        message: response.error.error + ', please try again.'
+                    };
+                } else {
+                    this.alert = {
+                        type   : 'error',
+                        message: 'Something went wrong, please try again.'
+                    };
+                }
+            }
+        );
+
     }
 }

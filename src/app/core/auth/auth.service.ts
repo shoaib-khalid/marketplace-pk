@@ -91,7 +91,7 @@ export class AuthService
             headers: new HttpHeaders().set("Authorization", this.publicToken),
             params: {
                 domain: platformName,
-                resetUrl: callbackUrl
+                reseturl: callbackUrl
             }
         };
 
