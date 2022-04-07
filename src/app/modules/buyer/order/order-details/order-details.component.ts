@@ -82,8 +82,6 @@ export class OrderDetailsComponent implements OnInit
             
             this.customerAuthenticate = response;
 
-            console.log('baboonnn', this.customerAuthenticate.session.ownerId);
-
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });
