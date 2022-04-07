@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartService } from 'app/core/cart/cart.service';
 import { ProductsService } from 'app/core/product/product.service';
@@ -7,6 +7,8 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DeliveryRiderDetails, OrderDetails } from '../order-list/order-list.type';
 import { OrderListService } from '../order-list/order-list.service';
+import { AuthService } from 'app/core/auth/auth.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 
 
 @Component({
@@ -49,16 +51,17 @@ export class OrderDetailsComponent implements OnInit
     orderDetails: any;
     rider$: any;
 
+    customerAuthenticate: CustomerAuthenticate;
+
     /**
      * Constructor
      */
     constructor(
         private _orderService: OrderListService,
         private _route: ActivatedRoute,
-        private _productsService: ProductsService,
-        private _cartService: CartService,
-        private _fuseConfirmationService: FuseConfirmationService,
-        private _router: Router
+        private _authService: AuthService,
+        private _changeDetectorRef: ChangeDetectorRef,
+
     )
     {
     }
@@ -73,7 +76,19 @@ export class OrderDetailsComponent implements OnInit
 
         this.ordersDetails$ = this._orderService.ordersDetails$;
 
-        this._orderService.getOrdersWithDetails().subscribe((response) =>{
+        // Get Customer
+        this._authService.customerAuthenticate$
+        .subscribe((response: CustomerAuthenticate) => {
+            
+            this.customerAuthenticate = response;
+
+            console.log('baboonnn', this.customerAuthenticate.session.ownerId);
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId).subscribe((response) =>{
             
             this._orderService.getOrderById(this.orderId).subscribe((response)=>{
                 this.orderDetails = response.data
