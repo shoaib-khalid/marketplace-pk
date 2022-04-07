@@ -4,6 +4,7 @@ import { Subject, timer } from 'rxjs';
 import { finalize, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AuthService } from 'app/core/auth/auth.service';
 import { DOCUMENT } from '@angular/common';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
     selector     : 'auth-sign-out',
@@ -28,7 +29,8 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
         @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
         private _router: Router,
-        private _activatedRoute: ActivatedRoute
+        private _activatedRoute: ActivatedRoute,
+        private _cookieService: CookieService
     )
     {
     }
@@ -42,11 +44,13 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-
-            
         
         // Sign out
         this._authService.signOut();
+
+        this._cookieService.delete('CustomerId');
+        this._cookieService.delete('RefreshToken');
+        this._cookieService.delete('AccessToken');
         
         // Redirect after the countdown
         timer(1000, 1000)
