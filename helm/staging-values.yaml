@@ -13,15 +13,15 @@ configProdJson:
           },
           "apiServer": {
               "flowBuilderService"  : "https://api.symplified.it/flow-builder/v1",
-              "userService"         : "https://api.symplified.services/user-service/v1",
+              "userService"         : "https://api.dev-my.symplified.ai/user-service/v1",
               "productService"      : "https://api.symplified.it/product-service/v1",
               "orderService"        : "https://api.symplified.it/order-service/v1",
               "reportService"       : "https://api.symplified.it/report-service/v1",
               "deliveryService"     : "https://api.symplified.it/delivery-service/v1",
               "paymentService"      : "https://api.symplified.it/payment-service/v1"
           },
-          "storeFrontDomain"          : ".symplified.services",
-          "marketplaceDomain"         : "customer.symplified.services",
+          "storeFrontDomain"          : ".dev-my.symplified.ai",
+          "marketplaceDomain"         : "customer.dev-my.symplified.ai",
           "merchantPortalDomain"      : "merchant.symplified.it",
           "logging": 0
       }
@@ -45,21 +45,21 @@ ingress:
   className: ""
   enabled: true
   hosts:
-  - host: customer.symplified.services
+  - host: customer.dev-my.symplified.ai
     paths:
     - path: /
       pathType: ImplementationSpecific
-  - host: customer2.symplified.services
+  - host: customer.dev-pk.symplified.ai
     paths:
     - path: /
       pathType: ImplementationSpecific
   tls:
   - hosts:
-    - customer.symplified.services
-    secretName: secret-tls-services
+    - customer.dev-my.symplified.ai
+    secretName: secret-tls-ai
   - hosts:
-    - customer2.symplified.services
-    secretName: secret-tls-services
+    - customer.dev-pk.symplified.ai
+    secretName: secret-tls-ai
 nameOverride: ""
 nodeSelector: {}
 podAnnotations: {}
