@@ -49,17 +49,17 @@ ingress:
     paths:
     - path: /
       pathType: ImplementationSpecific
-  - host: customer2.dev-my.symplified.ai
+  - host: customer.dev-pk.symplified.ai
     paths:
     - path: /
       pathType: ImplementationSpecific
   tls:
   - hosts:
     - customer.dev-my.symplified.ai
-    secretName: secret-tls-services
+    secretName: secret-tls-ai
   - hosts:
-    - customer2.dev-my.symplified.ai
-    secretName: secret-tls-services
+    - customer.dev-pk.symplified.ai
+    secretName: secret-tls-ai
 nameOverride: ""
 nodeSelector: {}
 podAnnotations: {}
