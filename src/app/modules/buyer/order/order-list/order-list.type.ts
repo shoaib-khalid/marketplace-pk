@@ -50,25 +50,25 @@ export interface Order
         trackingUrl                 : string;
         zipcode                     : string;
     }
-    paymentStatus: string;
-    paymentType: string;
-    privateAdminNotes: string;
+    paymentStatus       : string;
+    paymentType         : string;
+    privateAdminNotes   : string;
     store: {
-        id: string,
-        name: string,
-        city: string,
-        address: string,
-        clientId: string,
-        postcode: string,
-        state: string,
-        contactName: string,
-        phone: string,
-        phoneNumber: string,
-        email: string,
-        verticalCode: string,
-        serviceChargesPercentage: number,
-        paymentType: string,
-        invoiceSeqNo: number,
+        id: string;
+        name: string;
+        city: string;
+        address: string;
+        clientId: string;
+        postcode: string;
+        state: string;
+        contactName: string;
+        phone: string;
+        phoneNumber: string;
+        email: string;
+        verticalCode: string;
+        serviceChargesPercentage: number;
+        paymentType: string;
+        invoiceSeqNo: number;
         nameAbreviation: string
     }
     storeId: string;
@@ -81,170 +81,228 @@ export interface Order
 
 export interface OrderDetails
 {
-    id: string,
-    storeId: string,
-    subTotal: number,
-    deliveryCharges: number,
-    total: number,
-    completionStatus: string,
-    paymentStatus: string,
-    customerNotes: string,
-    privateAdminNotes: string,
-    cartId: string,
-    customerId: string,
-    created: string,
-    updated: string,
-    invoiceId: string,
-    totalReminderSent: string,
-    klCommission: string,
-    storeServiceCharges: string,
-    storeShare: string,
-    paymentType: string,
-    deliveryType: string,
-    appliedDiscount: string,
-    deliveryDiscount: string,
-    appliedDiscountDescription: string,
-    deliveryDiscountDescription: string,
-    beingProcess: string,
-    discountId: string,
-    discountCalculationType: string,
-    discountCalculationValue: string,
-    discountMaxAmount: string,
-    deliveryDiscountMaxAmount: string,
-    isRevised: string,
-    orderShipmentDetail: {
-        receiverName: string,
-        phoneNumber: string,
-        address: string,
-        city: string,
-        zipcode: string,
-        email: string,
-        deliveryProviderId: string,
-        state: string,
-        country: string,
-        trackingUrl: string,
-        orderId: string,
-        storePickup: string,
-        merchantTrackingUrl: string,
-        customerTrackingUrl: string,
-        trackingNumber: string,
-        deliveryType: string,
-        vehicleType: string,
-        fulfilmentType: string,
-        deliveryServiceProvider: 
-            {
-            id: string,
-            name: string
-            },
-        deliveryPeriodDetails: {
-            id: string,
-            name: string,
-            description: string
-            }
-    },
-    orderPaymentDetail: {
-        accountName: string,
-        gatewayId: string,
-        couponId: string,
-        time: string,
-        orderId: string,
-        deliveryQuotationReferenceId: string,
-        deliveryQuotationAmount: string
-    },
-    store: {
-        id: string,
-        name: string,
-        city: string,
-        address: string,
-        clientId: string,
-        postcode: string,
-        state: string,
-        contactName: string,
-        phone: string,
-        phoneNumber: string,
-        email: string,
-        verticalCode: string,
-        serviceChargesPercentage: string,
-        paymentType: string,
-        invoiceSeqNo: string,
-        nameAbreviation: string
-    },
-    customer: {
-        id: string,
-        name: string,
-        phoneNumber: string,
-        email: string,
-        created: string,
-        updated: string
-    },
-    orderRefund: [],
-    orderItemWithDetails: [
+    id                          : string;
+    storeId                     : string;
+    subTotal                    : number;
+    deliveryCharges             : number;
+    total                       : number;
+    completionStatus            : string;
+    paymentStatus               : string;
+    customerNotes               : string;
+    privateAdminNotes           : string;
+    cartId                      : string;
+    customerId                  : string;
+    created                     : string;
+    updated                     : string;
+    invoiceId                   : string;
+    totalReminderSent           : string;
+    klCommission                : string;
+    storeServiceCharges         : string;
+    storeShare                  : string;
+    paymentType                 : string;
+    deliveryType                : string;
+    appliedDiscount             : string;
+    deliveryDiscount            : string;
+    appliedDiscountDescription  : string;
+    deliveryDiscountDescription : string;
+    beingProcess                : string;
+    discountId                  : string;
+    discountCalculationType     : string;
+    discountCalculationValue    : string;
+    discountMaxAmount           : string;
+    deliveryDiscountMaxAmount   : string;
+    isRevised                   : string;
+    orderShipmentDetail         : OrderShipmentDetail;
+    orderPaymentDetail          : OrderPaymentDetail;
+    store                       : Store;
+    customer                    : Customer;
+    orderRefund                 : String;
+    orderItemWithDetails        : OrderItemWithDetails;
+}
+
+export interface OrderShipmentDetail
+{
+    receiverName        : string;
+    phoneNumber         : string;
+    address             : string;
+    city                : string;
+    zipcode             : string;
+    email               : string;
+    deliveryProviderId  : string;
+    state               : string;
+    country             : string;
+    trackingUrl         : string;
+    orderId             : string;
+    storePickup         : string;
+    merchantTrackingUrl : string;
+    customerTrackingUrl : string;
+    trackingNumber      : string;
+    deliveryType        : string;
+    vehicleType         : string;
+    fulfilmentType      : string;
+    deliveryServiceProvider: 
         {
-        id: string,
-        orderId: string,
-        productId: string,
-        price: 3,
-        productPrice: 3,
-        weight: string,
-        quantity: number,
-        itemCode: string,
-        productName: string,
-        specialInstruction: string,
-        productVariant: string,
-        discountId: string,
-        normalPrice: string,
-        discountLabel: string,
-        status: string,
-        originalQuantity: string,
-        discountCalculationType: string,
-        discountCalculationValue: string,
-        orderSubItem: string,
-        itemAssetDetails: [
-            {
-            id: string,
-            itemCode: string,
-            name: string,
-            url: string,
-            productId: string
-            }
-        ],
-        SKU:string
-        }
-    ]
+        id  : string;
+        name: string
+    };
+    deliveryPeriodDetails: {
+        id          : string;
+        name        : string;
+        description : string;
+    }
+}
+
+export interface OrderPaymentDetail {
+    accountName                 : string;
+    gatewayId                   : string;
+    couponId                    : string;
+    time                        : string;
+    orderId                     : string;
+    deliveryQuotationReferenceId: string;
+    deliveryQuotationAmount     : string
+}
+
+export interface Store 
+{
+    id                      : string;
+    name                    : string;
+    city                    : string;
+    address                 : string;
+    clientId                : string;
+    postcode                : string;
+    state                   : string;
+    contactName             : string;
+    phone                   : string;
+    phoneNumber             : string;
+    email                   : string;
+    verticalCode            : string;
+    serviceChargesPercentage: string;
+    paymentType             : string;
+    invoiceSeqNo            : string;
+    nameAbreviation         : string;
+    regionCountry: {
+        currency      :  string;
+        currencyCode  :  string;
+        currencySymbol:  string;
+        id            :  string;
+        name          :  string;
+        region        :  string;
+        timezone      :  string;
+    }
+    regionCountryId: string;
+    regionCountryStateId: string;
+    regionVertical: {
+        code: string; 
+        name: string; 
+        description: string;
+        regionId: string; 
+        thumbnailUrl: string;
+    };
+    storeAssets: {
+        assetDescription: string;
+        assetFile: string;
+        assetType: string;
+        assetUrl: string;
+        id: string;
+        storeId: string;
+    };
+    storeDeliveryDetail: {
+        storeId: string;
+        type: string; 
+        itemType: string; 
+        maxOrderQuantityForBike: number;}
+    storeDescription: string;
+    storeLogoUrl: string;
+    storeTiming:[
+    {
+        closeTime: string;
+        day: string;
+        isOff: false
+        openTime: string;
+        storeId: string;
+    }
+    ];
+    storeId: string;
+    storeServiceCharges: number;
+    storeShare: number;
+    subTotal: number;
+    total: number;
+    totalReminderSent: number;
+    updated: string;
+}
+
+export interface Customer 
+{
+    id          : string;
+    name        : string;
+    phoneNumber : string;
+    email       : string;
+    created     : string;
+    updated     : string;
 }
 
 export interface OrderItemWithDetails
 {
-    id: string,
-    orderId: string,
-    productId: string,
-    price: number,
-    productPrice: number,
-    weight: string,
-    quantity: number,
-    itemCode: string,
-    productName: string,
-    specialInstruction: string,
-    productVariant: string,
-    discountId: string,
-    normalPrice: string,
-    discountLabel: string,
-    status: string,
-    originalQuantity: string,
-    discountCalculationType: string,
-    discountCalculationValue: string,
-    orderSubItem: string,
-    SKU:string
+    id                      : string;
+    orderId                 : string;
+    productId               : string;
+    price                   : number;
+    productPrice            : number;
+    weight                  : string;
+    quantity                : number;
+    itemCode                : string;
+    productName             : string;
+    specialInstruction      : string;
+    productVariant          : string;
+    discountId              : string;
+    normalPrice             : string;
+    discountLabel           : string;
+    status                  : string;
+    originalQuantity        : string;
+    discountCalculationType : string;
+    discountCalculationValue: string;
+    orderSubItem            : string;
+    SKU                     : string;
     itemAssetDetails: [
         {
-        id: string,
-        itemCode: string,
-        name: string,
-        url: string,
-        productId: string
+        id        : string;
+        itemCode  : string;
+        name      : string;
+        url       : string;
+        productId : string;
         }
-    ],
+    ];
+    productInventory:
+    {
+        compareAtprice: number
+        itemCode: string;
+        price: number
+        product:
+        {
+            allowOutOfStockPurchases: boolean;
+            categoryId: string;
+            description: string;
+            id: string;
+            isPackage: boolean;
+            minQuantityForAlarm: number;
+            name: string;
+            region: string;
+            seoUrl: string;
+            status: string;
+            storeId: string;
+            thumbnailUrl: string;
+            trackQuantity: boolean;
+            vehicleType: string;
+            vendor: string;
+
+        }
+        productInventoryItems: []
+        quantity: number;
+        sku: string;
+    }
 }
+
+
 
 export interface OrderItem
 {

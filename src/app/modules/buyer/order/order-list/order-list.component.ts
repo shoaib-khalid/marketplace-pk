@@ -4,9 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { AuthService } from 'app/core/auth/auth.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { CartItem } from 'app/core/cart/cart.types';
-import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets } from 'app/core/store/store.types';
 import { merge, Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
@@ -16,7 +17,24 @@ import { OrderDetails, OrderItemWithDetails, OrderPagination } from './order-lis
 @Component({
     selector     : 'order-list',
     templateUrl  : './order-list.component.html',
-    encapsulation: ViewEncapsulation.None
+    styles       : [
+        `
+        /** Custom input number **/
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      
+        .custom-number-input input:focus {
+          outline: none !important;
+        }
+      
+        .custom-number-input button:focus {
+          outline: none !important;
+        }
+        `
+    ]
 })
 export class OrderListComponent implements OnInit
 {
@@ -24,19 +42,22 @@ export class OrderListComponent implements OnInit
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     currentScreenSize: string[] = [];
-    pageOfItems: Array<any>;
-    pagination: OrderPagination;
     isLoading: boolean = false;
-
-    store: Store;
-    cartItems: CartItem[] = [];
     
+    // Orders 
     ordersDetails$: Observable<OrderDetails[]>;
     orderList: OrderItemWithDetails[] = [];
-    orderProgress: any;
-    orderSlug: string;
 
+    orderCategory
+    orderCategories: any;
+    orderSlug: string;
+    
+    pagination: OrderPagination;
+    pageOfItems: Array<any>;
+
+    customerAuthenticate: CustomerAuthenticate;
     regionCountryStates: any;
+
 
     /**
     * Constructor
@@ -45,11 +66,11 @@ export class OrderListComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _orderService: OrderListService,
-        private _cartService: CartService,
-        private _storesService: StoresService,
         private _router: Router,
+        private _authService: AuthService,
         public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute
+
 
     )
     {
@@ -57,28 +78,32 @@ export class OrderListComponent implements OnInit
 
     ngOnInit() :void {
 
-        this.orderProgress = [
+        this.ordersDetails$ = this._orderService.ordersDetails$;
+
+        this.orderCategories = [
             {
-                name: "toPay",
+                name: "all-progress"
             },
             {
-                name: "toShip"
+                name: "to-pay"
+            },
+            {
+                name: "to-ship"
             },
             {
                 name: "shipping"
             },
             {
-                name: "completed"
+                name: "delivered"
             },
             {
                 name: "cancelled"
-            }
+            },
         ]
 
-        this.orderSlug = this.orderSlug ? this.orderSlug : this._activatedRoute.snapshot.paramMap.get('order-slug');
-        this.orderProgress.findIndex(item => item.name === this.orderSlug);
-
-        this.ordersDetails$ = this._orderService.ordersDetails$;
+        this.orderSlug = this.orderSlug ? this.orderSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+        let index = this.orderCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.orderSlug);
+        this.orderCategory = (index > -1) ? this.orderCategories[index] : null;
                 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -91,7 +116,24 @@ export class OrderListComponent implements OnInit
             this._changeDetectorRef.markForCheck();
         });
 
-        // Get the products pagination
+        // Get Customer
+        this._authService.customerAuthenticate$
+        .subscribe((response: CustomerAuthenticate) => {
+            
+            this.customerAuthenticate = response;
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
+        .subscribe((response) =>{
+
+            console.log('jobor', response);
+            
+        });
+
+        // Get the orders pagination
         this._orderService.pagination$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((pagination: OrderPagination) => {
@@ -99,19 +141,6 @@ export class OrderListComponent implements OnInit
             // Update the pagination
             this.pagination = pagination;
             
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });        
-
-        this._orderService.getOrdersWithDetails().subscribe((response) =>{});
-        
-        // --------------
-        // Get store
-        // --------------
-        this._storesService.store$
-        .subscribe((response: Store) => {
-            this.store = response;    
-
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });        
@@ -145,7 +174,7 @@ export class OrderListComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._orderService.getOrdersWithDetails("151c0fb8-5f43-4e7d-8a9e-457929ec08fa", 0, 12);
+                        return this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 12);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -155,22 +184,9 @@ export class OrderListComponent implements OnInit
         }, 0);
     }
 
-    changeOrderDetails(value, event = null) {
-
-        // find if categoty exists
-        this.orderProgress.findIndex(item => item.name === value);
-        // since all-product is not a real category, it will set to null
-        // catalogue slug will be use in url
-        
-        this.orderProgress = value;
-        
-        this._router.navigate(['order/' + value]);
-
-        this.reload();
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
 
     reload(){
         this._router.routeReuseStrategy.shouldReuseRoute = () => false;
@@ -186,7 +202,7 @@ export class OrderListComponent implements OnInit
             // set loading to true
             this.isLoading = true;
 
-            this._orderService.getOrdersWithDetails("151c0fb8-5f43-4e7d-8a9e-457929ec08fa",this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+            this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
                 .subscribe(()=>{
                     // set loading to false
                     this.isLoading = false;
@@ -196,16 +212,29 @@ export class OrderListComponent implements OnInit
         this._changeDetectorRef.markForCheck();
     }
 
-    goToOrderDetails(){
+    changeOrderDetails(value, event = null) {
+
+        // find if categoty exists
+        let index = this.orderCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === value);
+        // since all-product is not a real category, it will set to null
+        this.orderCategory = (index > -1) ? this.orderCategories[index] : null;
+        // catalogue slug will be use in url
+        this.orderSlug = value;
         
+        this._router.navigate(['buyer/order/' + value]);
+
+        this.reload();
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
     
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
-        } else {
-            return 'assets/branding/symplified/logo/symplified.png'
-        }
-    }
+    // displayImage(orderItemDetail: OrderDetails) {
+    //     if (orderItemDetail.itemAssetDetails) {
+    //         return orderItemDetail.itemAssetDetails.url
+    //     } else {
+    //         orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl : 'assets/branding/symplified/logo/symplified.png'
+    //     } 
+    //     return ;
+    // }
 }

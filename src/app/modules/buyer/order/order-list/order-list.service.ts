@@ -16,8 +16,9 @@ import { DeliveryRiderDetails, Order, OrderDetails, OrderItem, OrderPagination }
 export class OrderListService
 {
     private _order: BehaviorSubject<Order | null> = new BehaviorSubject(null);
-    private _orderItems: BehaviorSubject<OrderItem[] | null> = new BehaviorSubject(null);
     private _orders: BehaviorSubject<Order[] | null> = new BehaviorSubject(null);
+    
+    private _orderItems: BehaviorSubject<OrderItem[] | null> = new BehaviorSubject(null);
     private _ordersDetails: BehaviorSubject<OrderDetails[] | null> = new BehaviorSubject(null);
     private _pagination: BehaviorSubject<OrderPagination | null> = new BehaviorSubject(null);
 
@@ -60,6 +61,7 @@ export class OrderListService
     {
         return this._orders.asObservable();
     }
+    
 
     /**
     * Setter & getter for Orders details
@@ -141,7 +143,7 @@ export class OrderListService
     }
 
     
-    getOrdersWithDetails( customerId: string = "151c0fb8-5f43-4e7d-8a9e-457929ec08fa", page: number = 0, size: number = 3): 
+    getOrdersWithDetails( customerId: string, page: number = 0, size: number = 3): 
     Observable<{ pagination: OrderPagination; orders: Order[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;

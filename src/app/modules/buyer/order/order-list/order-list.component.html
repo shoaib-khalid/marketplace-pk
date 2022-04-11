@@ -240,7 +240,11 @@
                                                                 <img
                                                                 class="w-32"
                                                                 [alt]="'Product thumbnail image of ' + orderItemDetail.productName"
-                                                                [src]="orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url : 'assets/branding/symplified/logo/symplified.png'">
+                                                                [src]=
+                                                                    "orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url 
+                                                                    : orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl 
+                                                                    : orderDetails.store.storeLogoUrl ? orderDetails.store.storeLogoUrl
+                                                                    : 'assets/branding/deliverin/logo/DeliverIN-Original.jpg'">
                                                                 <div
                                                                     class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
                                                                 </div>
@@ -297,7 +301,7 @@
                                                                 >
                                                             <label 
                                                                 [routerLink]="['/buyer/order/' + orderDetails.id]"
-                                                                class="flex items-center justify-center h-10 px-2 border rounded-lg border-primary-300 bg-primary hover:border-primary-500 cursor-pointer"
+                                                                class="flex items-center justify-center h-10 px-2 rounded-lg bg-primary hover:bg-primary-600 cursor-pointer"
                                                                 for="add-to-cart-button"
                                                                 matRipple>
                                                                 <span class="text-sm font-semibold text-black">Order Details</span>

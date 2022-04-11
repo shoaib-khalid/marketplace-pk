@@ -130,7 +130,7 @@
                                     <!-- Login/SignUp -->
                                     <div class="hidden sm:block sm:flex flex-row pl-8 items-center">
                                         <ng-container *ngIf="user">
-                                            <span class="cursor-pointer">{{user.email}}</span>
+                                            <span class="cursor-pointer">{{user.username}}</span>
                                         </ng-container>
                                         <span> &nbsp; | &nbsp; </span>
                                         <span class="cursor-pointer hover:text-primary" (click)="signOut()">Sign Out</span>
@@ -236,7 +236,7 @@
         <div class="flex flex-col">
 
             <!-- customer email -->
-            <div *ngIf="user" class="font-semibold px-6 pt-4 pb-2">{{user.email}}</div>
+            <div *ngIf="user" class="font-semibold px-6 pt-4 pb-2">{{user.username}}</div>
 
             <!-- sign out button -->
             <div class="m-4">
