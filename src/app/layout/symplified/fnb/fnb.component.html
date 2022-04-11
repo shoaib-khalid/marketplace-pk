@@ -1,6 +1,6 @@
 <!-- Notification -->
 <ng-container *ngIf="notificationMessage && notificationMessage !== null">
-    <div class="absolute z-40 top-0 right-0 left-0 w-full">
+    <div class="top-0 right-0 left-0 w-full">
         <div class="bg-primary flex items-center justify-center text-black font-semibold px-4 py-3 w-full relative">
             <div class="flex flex-row items-center justify-center w-full max-w-280">
                 <marquee width="100%" direction="left">
@@ -9,7 +9,7 @@
             </div>
             <span 
                 (click)="closeNotification()"
-                class="absolute top-0 bottom-0 right-0 px-4 py-2 cursor-pointer">
+                class="relative top-0 bottom-0 right-0 px-4 py-2 cursor-pointer">
                 <mat-icon 
                     class="text-black"
                     [svgIcon]="'heroicons_solid:x'"></mat-icon>
@@ -222,8 +222,7 @@
 
 <!-- Drawer -->
 <fuse-drawer
-    class="absolute sm:hidden w-full h-full"
-    style="z-index: 99999 !important;"
+    class="sm:hidden w-full h-full"
     fixed
     [mode]="'over'"
     [transparentOverlay]="true"
@@ -234,9 +233,29 @@
     <!-- Categories -->
     <div class="flex flex-col w-full overflow-auto bg-card">
         <div class="flex flex-col">
+            <div class="flex items-center w-full p-4 pl-6">
+                <!-- Logo -->
+                <div class="flex items-center justify-center">
+                    <img
+                        class="w-14"
+                        [src]="platform.logo">
+                </div>
+                <!-- Components -->
+                <div class="flex items-center ml-auto">
+                    <notifications></notifications>
+                    <user [showAvatar]="false"></user>
+                </div>
+            </div>
+            <!-- customer email and name -->
+            <div *ngIf="user" class="flex flex-col items-center justify-center w-full mt-2">
+                <div class="w-full whitespace-nowrap overflow-ellipsis overflow-hidden text-center leading-normal font-medium">
+                    {{user.email}}
+                </div>
+                <div class="w-full mt-0.5 whitespace-nowrap overflow-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                    {{user.name}}
+                </div>
+            </div>
 
-            <!-- customer email -->
-            <div *ngIf="user" class="font-semibold px-6 pt-4 pb-2">{{user.email}}</div>
 
             <!-- sign out button -->
             <div class="m-4">

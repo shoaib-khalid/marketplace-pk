@@ -12,6 +12,8 @@ import { ProductsService } from 'app/core/product/product.service';
 import { UserService } from 'app/core/user/user.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 
 @Component({
     selector     : 'fnb-layout',
@@ -22,6 +24,7 @@ export class FnbLayoutComponent implements OnDestroy
 {
     public version: string = environment.appVersion;
     
+    platform: Platform;
     store: Store;
     storeCategories: StoreCategory[];
     storeCategory: StoreCategory;
@@ -69,7 +72,9 @@ export class FnbLayoutComponent implements OnDestroy
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
-        private _authService: AuthService
+        private _authService: AuthService,
+        private _platformsService: PlatformService,
+
     )
     {
     }
@@ -159,8 +164,16 @@ export class FnbLayoutComponent implements OnDestroy
         this._userService.get(this.customerAuthenticate.session.ownerId)
         .subscribe((response)=>{
 
-            this.user = response.data
+            this.user = response.data;
             
+            
+        });
+
+        // Subscribe to platform data
+        this._platformsService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => {
+            this.platform = platform;
         });
 
         // this._notificationService.notification$
