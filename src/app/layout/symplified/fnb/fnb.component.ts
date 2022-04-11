@@ -18,6 +18,16 @@ import { Platform } from 'app/core/platform/platform.types';
 @Component({
     selector     : 'fnb-layout',
     templateUrl  : './fnb.component.html',
+    styles         : [
+        /* language=SCSS */
+        `
+        .active{
+            background-color: #e2e8f0 !important;
+            color: #f59e0b
+        }
+
+        `
+    ],
     encapsulation: ViewEncapsulation.None
 })
 export class FnbLayoutComponent implements OnDestroy
