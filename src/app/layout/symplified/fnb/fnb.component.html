@@ -223,8 +223,7 @@
 <!-- Drawer -->
 <fuse-drawer
     class="sm:hidden w-full h-full"
-    fixed
-    [mode]="'over'"
+    [mode]="isScreenSmall ? 'over' : 'side'"
     [transparentOverlay]="true"
     [name]="'hamburgerMenu'"
     [position]="'left'"
@@ -234,6 +233,7 @@
     <div class="flex flex-col w-full overflow-auto bg-card">
         <div class="flex flex-col">
             <div class="flex items-center w-full p-4 pl-6">
+
                 <!-- Logo -->
                 <div class="flex items-center justify-center">
                     <img
@@ -244,64 +244,62 @@
                 <div class="flex items-center ml-auto">
                     <notifications></notifications>
                     <user [showAvatar]="false"></user>
+                    <button
+                    class="ml-auto"
+                    mat-icon-button
+                    (click)="hamburgerMenu.close()">
+                    <mat-icon
+                        class="text-current"
+                        [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                    </button>
                 </div>
             </div>
-            <!-- customer email and name -->
-            <div *ngIf="user" class="flex flex-col items-center justify-center w-full mt-2">
-                <div class="w-full whitespace-nowrap overflow-ellipsis overflow-hidden text-center leading-normal font-medium">
-                    {{user.email}}
-                </div>
-                <div class="w-full mt-0.5 whitespace-nowrap overflow-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
-                    {{user.name}}
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center justify-center w-full mt-2">
+      
+            <div class="flex flex-col items-start justify-start w-full mt-2">
                 <button
                 class="w-full h-10 font-medium hover:bg-gray-100 hover:text-primary"
                 [routerLink]="['/buyer-voucher/voucher-list']" 
-                routerLinkActive="active"
+                routerLinkActive="linkactive"
+                (click)="hamburgerMenu.close()"
                 >
                     Voucher
-                </button>
-                <button
-                class="w-full h-10 font-medium hover:bg-gray-100 hover:text-primary"
-                [routerLink]="['buyer/all-progress']" 
-                routerLinkActive="active"
-                >
-                    Completion Status
                 </button>
             </div>
 
 
             <!-- sign out button -->
-            <div class="m-4">
+            <!-- <div class="m-4">
                 <button 
                     class="w-full h-10 font-medium hover:bg-black hover:text-primary bg-primary rounded-full" 
                     (click)="signOut()">
                     Sign Out
                 </button>
-            </div>
+            </div> -->
 
-            <!-- Choose Category -->
-            <div class="font-semibold px-6 pt-4 pb-2">Choose Category x</div>
 
-            <!-- Categories -->
-            <ng-container *ngFor="let category of storeCategories">
+            <!-- Choose Completion Status -->
+            <div class="font-semibold px-6 pt-4 pb-2">Completion Status</div>
+
+            <!-- Status -->
+            <ng-container *ngFor="let status of completionStatus">
                 <input 
-                    [id]="'categories-btn-' + category.id" 
-                    [value]="getCategorySlug(category.name)"
+                    [id]="'status-btn-' + status.code" 
+                    [value]="status.code"
                     type="button" 
-                    class="w-0 h-0 invisible"
-                    (click)="changeCatalogue($event.target.value, $event)">
+                    class="w-0 h-0 invisible">
+                   
                 <label
-                    class="flex flex-row w-full h-full text-lg font-semibold cursor-pointer border-b pl-9 py-4 "
-                    [ngClass]="(storeCategory && storeCategory.id === category.id) ? 'bg-primary text-black' :''"
-                    [for]="'categories-btn-' + category.id"
+                    class="flex flex-row w-full h-full cursor-pointer border-b pl-9 py-4 hover:bg-gray-100 hover:text-primary"
+                    [routerLink]="['/buyer/' + status.code]"
+                    routerLinkActive="linkactive"
+                    (click)="hamburgerMenu.close()"
+                    [for]="'status-btn-' + status.code"
                 >
-                    <span class="">{{category.name}}</span>
+                    <span class="">{{status.name}}</span>
                 </label>
             </ng-container>
+
+         
         </div>
     </div>
 </fuse-drawer>

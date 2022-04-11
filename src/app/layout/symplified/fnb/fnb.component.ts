@@ -14,6 +14,8 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+
 
 @Component({
     selector     : 'fnb-layout',
@@ -21,7 +23,7 @@ import { Platform } from 'app/core/platform/platform.types';
     styles         : [
         /* language=SCSS */
         `
-        .active{
+        .linkactive{
             background-color: #e2e8f0 !important;
             color: #f59e0b
         }
@@ -71,6 +73,31 @@ export class FnbLayoutComponent implements OnDestroy
     
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    isScreenSmall: boolean;
+
+    completionStatus : any =[
+        {
+            code:'all',name:'All'
+        },
+        {
+            code:'to-pay',name:'To Pay'
+        },
+        {
+            code:'to-ship',name:'To Ship'
+        },
+        {
+            code:'shipping',name:'Shipping'
+        },
+        {
+            code:'completed',name:'Completed'
+        },
+        
+        
+        
+
+    ]    
+
+
     /**
      * Constructor
      */
@@ -84,6 +111,8 @@ export class FnbLayoutComponent implements OnDestroy
         private _userService: UserService,
         private _authService: AuthService,
         private _platformsService: PlatformService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+
 
     )
     {
@@ -185,6 +214,16 @@ export class FnbLayoutComponent implements OnDestroy
         .subscribe((platform: Platform) => {
             this.platform = platform;
         });
+
+        // Subscribe to media changes
+        this._fuseMediaWatcherService.onMediaChange$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(({matchingAliases}) => {
+
+            // Check if the screen is small
+            this.isScreenSmall = !matchingAliases.includes('md');
+        });
+
 
         // this._notificationService.notification$
         //     .pipe(takeUntil(this._unsubscribeAll))
@@ -444,6 +483,17 @@ export class FnbLayoutComponent implements OnDestroy
         this.catalogueSlug = value;
         
         this._router.navigate(['catalogue/' + value]);
+
+        this.reload();
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    changeCompletionStatus(value, event = null) {
+
+
+        this._router.navigate(['buyer/' + value]);
 
         this.reload();
 
