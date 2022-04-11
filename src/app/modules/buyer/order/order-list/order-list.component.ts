@@ -8,9 +8,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { CartItem } from 'app/core/cart/cart.types';
-import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets } from 'app/core/store/store.types';
-import { UserService } from 'app/core/user/user.service';
 import { merge, Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { OrderListService } from './order-list.service';
@@ -19,7 +17,24 @@ import { OrderDetails, OrderItemWithDetails, OrderPagination } from './order-lis
 @Component({
     selector     : 'order-list',
     templateUrl  : './order-list.component.html',
-    encapsulation: ViewEncapsulation.None
+    styles       : [
+        `
+        /** Custom input number **/
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      
+        .custom-number-input input:focus {
+          outline: none !important;
+        }
+      
+        .custom-number-input button:focus {
+          outline: none !important;
+        }
+        `
+    ]
 })
 export class OrderListComponent implements OnInit
 {
@@ -27,20 +42,21 @@ export class OrderListComponent implements OnInit
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     currentScreenSize: string[] = [];
-    pageOfItems: Array<any>;
-    pagination: OrderPagination;
     isLoading: boolean = false;
-
-    store: Store;
-    cartItems: CartItem[] = [];
     
+    // Orders 
     ordersDetails$: Observable<OrderDetails[]>;
     orderList: OrderItemWithDetails[] = [];
-    orderSlug: string;
 
-    regionCountryStates: any;
+    orderCategory
+    orderCategories: any;
+    orderSlug: string;
+    
+    pagination: OrderPagination;
+    pageOfItems: Array<any>;
 
     customerAuthenticate: CustomerAuthenticate;
+    regionCountryStates: any;
 
 
     /**
@@ -52,7 +68,9 @@ export class OrderListComponent implements OnInit
         private _orderService: OrderListService,
         private _router: Router,
         private _authService: AuthService,
-        public _dialog: MatDialog
+        public _dialog: MatDialog,
+        private _activatedRoute: ActivatedRoute
+
 
     )
     {
@@ -61,6 +79,31 @@ export class OrderListComponent implements OnInit
     ngOnInit() :void {
 
         this.ordersDetails$ = this._orderService.ordersDetails$;
+
+        this.orderCategories = [
+            {
+                name: "all-progress"
+            },
+            {
+                name: "to-pay"
+            },
+            {
+                name: "to-ship"
+            },
+            {
+                name: "shipping"
+            },
+            {
+                name: "delivered"
+            },
+            {
+                name: "cancelled"
+            },
+        ]
+
+        this.orderSlug = this.orderSlug ? this.orderSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+        let index = this.orderCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.orderSlug);
+        this.orderCategory = (index > -1) ? this.orderCategories[index] : null;
                 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -83,7 +126,12 @@ export class OrderListComponent implements OnInit
             this._changeDetectorRef.markForCheck();
         });
 
-        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId).subscribe((response) =>{});
+        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
+        .subscribe((response) =>{
+
+            console.log('jobor', response);
+            
+        });
 
         // Get the orders pagination
         this._orderService.pagination$
@@ -136,6 +184,9 @@ export class OrderListComponent implements OnInit
         }, 0);
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
 
     reload(){
         this._router.routeReuseStrategy.shouldReuseRoute = () => false;
@@ -147,7 +198,7 @@ export class OrderListComponent implements OnInit
         // update current page of items
         this.pageOfItems = pageOfItems;
         
-        if (this.pageOfItems['currentPage'] !== this.pagination.page) {
+        if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
             // set loading to true
             this.isLoading = true;
 
@@ -160,13 +211,30 @@ export class OrderListComponent implements OnInit
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
-    
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
-        } else {
-            return 'assets/branding/symplified/logo/symplified.png'
-        }
+
+    changeOrderDetails(value, event = null) {
+
+        // find if categoty exists
+        let index = this.orderCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === value);
+        // since all-product is not a real category, it will set to null
+        this.orderCategory = (index > -1) ? this.orderCategories[index] : null;
+        // catalogue slug will be use in url
+        this.orderSlug = value;
+        
+        this._router.navigate(['buyer/order/' + value]);
+
+        this.reload();
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
+    
+    // displayImage(orderItemDetail: OrderDetails) {
+    //     if (orderItemDetail.itemAssetDetails) {
+    //         return orderItemDetail.itemAssetDetails.url
+    //     } else {
+    //         orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl : 'assets/branding/symplified/logo/symplified.png'
+    //     } 
+    //     return ;
+    // }
 }
