@@ -14,10 +14,13 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
 import {MatTabsModule} from '@angular/material/tabs'
 import { voucherRoutes } from './voucher.routing';
 import { VoucherListComponent } from './voucher-list/voucher-list.component';
+import { FuseCardModule } from '@fuse/components/card';
+import { VoucherModalComponent } from './voucher-modal/voucher-modal.component';
 
 @NgModule({
     declarations: [
-        VoucherListComponent
+        VoucherListComponent,
+        VoucherModalComponent
     ],
     imports     : [
         RouterModule.forChild(voucherRoutes),
@@ -31,7 +34,9 @@ import { VoucherListComponent } from './voucher-list/voucher-list.component';
         MatMenuModule,
         PaginationModule,
         SharedModule,
-        MatTabsModule
+        MatTabsModule,
+        FuseCardModule,
+
     ],
     bootstrap   : [
     ]

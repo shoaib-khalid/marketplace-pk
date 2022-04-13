@@ -33,7 +33,7 @@ export class AddAddressComponent implements OnInit {
     private _checkoutService: CheckoutService,
     private _authService: AuthService,
     private _userService: UserService,
-    private _plateformService : PlatformService,
+    private _platformService : PlatformService,
     private _platformLocation: PlatformLocation,
 
 
@@ -68,7 +68,7 @@ export class AddAddressComponent implements OnInit {
 
         this.user = response.data
     
-        this._plateformService.set()
+        this._platformService.set()
         .subscribe((response) =>{
 
           this.state = response.country

@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { VoucherListComponent } from './voucher-list/voucher-list.component';
+import { VoucherResolver } from './voucher.resolver';
 
 
 export const voucherRoutes: Route[] = [
@@ -12,7 +13,7 @@ export const voucherRoutes: Route[] = [
             {
                 path: '',
                 resolve  : {
-                    // products: ProductsResolver,
+                    address: VoucherResolver,
                     // categories: StoreCategoriesResolver
                 },
                 data: {

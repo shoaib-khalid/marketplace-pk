@@ -1,92 +1,207 @@
 <!-- Voucher List -->
 <div class="relative flex flex-col items-center w-full h-full">
     <!-- Main menu -->
-    <div class="flex flex-col items-center w-full h-auto my-5 px-5">
-        <!-- Container -->
-        <div class="flex flex-col md:flex-row justify-between mt-4 w-full max-w-280">
+    <div class="flex flex-col items-center w-full h-auto my-3 px-5">
 
-            <!--  Voucher -->
-            <div class="flex flex-row w-full">
-           
-                <div class="flex flex-col pr-6">
-                    <h1>My Voucher</h1>
-                </div>
-                <div class="flex flex-col w-full px-2">
-                    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
+        <mat-tab-group [color]="'primary'" mat-stretch-tabs mat-align-tabs="center" class="w-full justify-between max-w-280">
                 
-                    <input
-                        matInput
-                        [autocomplete]="'off'"
-                        [(ngModel)] ="inputPromoCode"
-                        [placeholder]="'Input Promo Code '">
-                    </mat-form-field>
+            <mat-tab label="Current"> 
+                <!--  Voucher -->
+                <div class="flex flex-col w-full">
 
+                    <!-- Input Promo Code -->
+                    <div class="flex flex-col w-full pt-4">
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+                            <mat-icon class="text-gray-400" svgIcon="heroicons_outline:ticket"></mat-icon>
+                            <input
+                                class="pl-4"
+                                matInput
+                                [autocomplete]="'off'"
+                                [(ngModel)] ="inputPromoCode"
+                                [placeholder]="'Enter Promo Code '">
+                            <!-- Add Promo button -->
+                            <div class="hidden sm:block w-36 py-2">
+                                <input
+                                    id="add-voucher-button"
+                                    type="button"
+                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                    mat-button
+                                    >
+                                <label 
+                                    class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
+                                    for="add-voucher-button"
+                                    (click)="enterPromoCode()"
+                                    matRipple>
+                                    <mat-icon class="pr-2 text-black" svgIcon="add"></mat-icon>
+                                    <span class="text-sm font-semibold text-black">Add</span>
+                                </label>
+                            </div>
+                        </mat-form-field>
+                        <h3 class="text-xs pt-2 text-gray-400">Redeem your voucher if you received any Promo Code</h3>
+                    </div>
+
+                    <!-- Add Promo button for xs view-->
+                    <div class="w-full sm:hidden py-2 sm:py-0">
+                        <input
+                            id="add-voucher-button"
+                            type="button"
+                            class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                            mat-button
+                            >
+                        <label 
+                            class="flex items-center justify-center h-10 px-2 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
+                            for="add-voucher-button"
+                            (click)="enterPromoCode()"
+                            matRipple>
+                            <span class="text-sm font-semibold text-black">Add</span>
+                        </label>
+                    </div>
+        
                 </div>
-
-                <div class="w-24">
-                    <input
-                        id="add-voucher-button"
-                        type="button"
-                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                        mat-button
-                        >
-                    <label 
-                        class="flex items-center justify-center h-10 px-2 border rounded-lg border-primary-300 bg-primary hover:border-primary-500 cursor-pointer"
-                        for="add-to-cart-button"
-                        (click)="searchPromoCode()"
-                        matRipple>
-                        <span class="text-sm font-semibold text-black">Add</span>
-                    </label>
-                </div>
-            
-    
-            </div>
-
-    
-        </div>
-
-        <div class="flex flex-col w-full items-center py-2">
-         
-
-                <mat-tab-group class="border border-gray-300">
-                        
-                        <mat-tab label="All"> 
-                            <div class="grid grid-cols-2 grid-flow-row gap-3">
-
-                        
-                                <ng-container *ngFor="let categoryList of [].constructor(6); let i = index;">
-                                    <div class="flex flex-col items-center">
-                                        <div class="box-border border-primary h-32 w-72 p-4 border-1 ml-2 shadow-lg border hover:border-2 rounded-lg overflow-hidden cursor-pointer"
-                                            (click)="openVoucherDetails(i)"
-                                        >
-                                        <p class="text-primary">Voucher  {{i}}</p>
+                <!-- active voucher list -->
+                <div class="flex flex-col w-full my-1 max-w-280">
+                    <div class="flex flex-row my-2">
+                        <div class="pr-2">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 0H2C0.89 0 0 0.89 0 2V13C0 14.11 0.89 15 2 
+                                    15H6V20L10 18L14 20V15H18C19.11 15 20 14.11 20 13V2C20 
+                                    0.89 19.11 0 18 0ZM18 13H2V11H18V13ZM18 8H2V2H18V8Z" fill="#FFC12F"/>
+                            </svg>   
+                        </div>
+                        <span class="font-bold">Vouchers</span> 
+                    </div>
+                    <!-- display  if there's no voucher-->
+                    <ng-container *ngIf="customerVoucher.length < 1">
+                        <div class="flex flex-row border border-gray-300 rounded-lg cursor-pointer p-2">
+                            <div class="w-11 h-11 border border-gray-400 rounded mr-2">
+                                <div class="pl-3 pt-3">
+                                    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16.868 0.289551H2.13117C1.1088 0.289551 0.289062
+                                            1.10929 0.289062 2.13166V12.2632C0.289062 13.2856 1.1088 
+                                            14.1053 2.13117 14.1053H5.81538V18.7106L9.49959 16.8685L13.1838 
+                                            18.7106V14.1053H16.868C17.8904 14.1053 18.7101 13.2856 18.7101 
+                                            12.2632V2.13166C18.7101 1.10929 17.8904 0.289551 16.868 
+                                            0.289551ZM16.868 12.2632H2.13117V10.4211H16.868V12.2632ZM16.868 
+                                            7.65797H2.13117V2.13166H16.868V7.65797Z" fill="#AAAAAA"/>
+                                    </svg>     
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <h3 class="text-gray-400">You don't have any vouchers yet.</h3>
+                                <h3 class="text-xs text-gray-400">Redeem your voucher if you received any Promo Code</h3>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!-- display current active voucher -->
+                    <div class="grid grid-cols-4 gap-1 w-full">
+                        <ng-container *ngFor="let voucher of customerVoucher">
+                            <div class="col-span-4 sm:col-span-2 pt-2 sm:px-1">
+                                <div class="w-full flex flex-col border border-primary rounded-lg hover:border-2 cursor-pointer p-2">
+                                    <div class="w-full flex flex-row pb-2 border-dashed border-b border-gray-300">
+                                        <div class="relative w-12 h-11 rounded mr-2">
+                                            <img 
+                                                class="w-full h-full rounded object-contain shadow p-0.5"
+                                                [src]="platform.logo" 
+                                                alt="">
+                                        </div>
+                                        <div class="flex flex-col w-full">
+                                            <h3 *ngIf="voucher.voucher.calculationType === 'FIX'" class="text-primary">{{voucher.voucher.discountValue | currency: voucher.voucher.currencyLabel}} off on {{voucher.voucher.name}}</h3>
+                                            <h3 *ngIf="voucher.voucher.calculationType === 'PERCENT'" class="text-primary">{{voucher.voucher.discountValue}}% off on {{voucher.voucher.name}}</h3>
+                                            <div class="flex flex-row justify-between w-full">
+                                                <div class="flex flex-row">
+                                                    <h3 class="text-sm text-gray-400">{{voucher.voucher.maxDiscountAmount | currency: voucher.voucher.currencyLabel}}</h3>
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400">minimum spend</h3>
+                                                </div>
+                                                <div class="flex flex-row sm:flex-col text-right">
+                                                    <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400">Valid Until</h3>
+                                                    <h3 class="text-sm text-gray-400">{{voucher.voucher.endDate | date:'dd-MM-yyyy' }}</h3>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </ng-container>
-                
-                            </div> 
-                        </mat-tab>
-    
-                        <mat-tab label="Used"> 
-                            <div class="grid grid-cols-2 grid-flow-row gap-3">
+                                    <span 
+                                        (click)="openVoucherModal('mat_solid:info','Voucher\'s Terms & Conditions', null, voucher)" 
+                                        class="pt-1 text-right text-primary font-semibold hover:text-primary-700">T&C Applied</span>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div> 
+            </mat-tab>
 
-                        
-                                <ng-container *ngFor="let categoryList of [].constructor(6); let i = index;">
-                                    <div class="flex flex-col items-center">
-                                        <div class="box-border border-primary h-32 w-72 p-4 border-1 ml-2 shadow-lg border hover:border-2 rounded-lg overflow-hidden cursor-pointer"
-                                            (click)="openVoucherDetails(i)"
-                                        >
-                                        <p class="text-primary">Voucher  {{i}}</p>
+            <mat-tab label="Past"> 
+                <!-- past voucher list -->
+                <div class="flex flex-col w-full my-1 max-w-280">
+                    <div class="flex flex-row my-4">
+                        <div class="pr-2">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 0H2C0.89 0 0 0.89 0 2V13C0 14.11 0.89 15 2 
+                                    15H6V20L10 18L14 20V15H18C19.11 15 20 14.11 20 13V2C20 
+                                    0.89 19.11 0 18 0ZM18 13H2V11H18V13ZM18 8H2V2H18V8Z" fill="#FFC12F"/>
+                            </svg>   
+                        </div>
+                        <span class="font-bold">Vouchers</span> 
+                    </div>
+                    <!-- display  if there's no history used voucher-->
+                    <ng-container *ngIf="usedCustomerVoucher.length < 1">
+                        <div class="flex flex-row border border-gray-300 rounded-lg cursor-pointer p-2">
+                            <div class="w-11 h-11 border border-gray-400 rounded mr-2">
+                                <div class="pl-3 pt-3">
+                                    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16.868 0.289551H2.13117C1.1088 0.289551 0.289062
+                                            1.10929 0.289062 2.13166V12.2632C0.289062 13.2856 1.1088 
+                                            14.1053 2.13117 14.1053H5.81538V18.7106L9.49959 16.8685L13.1838 
+                                            18.7106V14.1053H16.868C17.8904 14.1053 18.7101 13.2856 18.7101 
+                                            12.2632V2.13166C18.7101 1.10929 17.8904 0.289551 16.868 
+                                            0.289551ZM16.868 12.2632H2.13117V10.4211H16.868V12.2632ZM16.868 
+                                            7.65797H2.13117V2.13166H16.868V7.65797Z" fill="#AAAAAA"/>
+                                    </svg>     
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <h3 class="text-gray-400">There's no history of used voucher.</h3>
+                                <h3 class="text-xs text-gray-400">Redeem your voucher if you received any Promo Code</h3>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!-- display pst used voucher -->
+                    <div class="grid grid-cols-4 gap-1 w-full">
+                        <ng-container *ngFor="let usedVoucher of usedCustomerVoucher">
+                            <div class="col-span-4 sm:col-span-2 pt-2 sm:px-1">
+                                <div class="w-full flex flex-col border border-primary rounded-lg hover:border-2 cursor-pointer p-2">
+                                    <div class="w-full flex flex-row pb-2 border-dashed border-b border-gray-300">
+                                        <div class="relative w-12 h-11 rounded mr-2">
+                                            <img 
+                                                class="w-full h-full rounded object-contain shadow p-0.5"
+                                                [src]="platform.logo" 
+                                                alt="">
+                                        </div>
+                                        <div class="flex flex-col w-full">
+                                            <h3 *ngIf="usedVoucher.voucher.calculationType === 'FIX'" class="text-primary">{{usedVoucher.voucher.discountValue | currency: usedVoucher.voucher.currencyLabel}} off on {{usedVoucher.voucher.name}}</h3>
+                                            <h3 *ngIf="usedVoucher.voucher.calculationType === 'PERCENT'" class="text-primary">{{usedVoucher.voucher.discountValue}}% off on {{usedVoucher.voucher.name}}</h3>
+                                            <div class="flex flex-row justify-between w-full">
+                                                <div class="flex flex-row">
+                                                    <h3 class="text-sm text-gray-400">{{usedVoucher.voucher.maxDiscountAmount | currency: usedVoucher.voucher.currencyLabel}}</h3>
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400">minimum spend</h3>
+                                                </div>
+                                                <div class="flex flex-row sm:flex-col text-right">
+                                                    <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400">Valid Until</h3>
+                                                    <h3 class="text-sm text-gray-400">{{usedVoucher.voucher.endDate | date:'dd-MM-yyyy' }}</h3>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </ng-container>
-                
-                            </div> 
-                        </mat-tab>
-    
-    
-                </mat-tab-group>
-        </div>
+                                    <span 
+                                        (click)="openVoucherModal('mat_solid:info','Voucher\'s Terms & Conditions', null, usedVoucher)" 
+                                        class="pt-1 text-right text-primary font-semibold hover:text-primary-700">T&C Applied</span>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div> 
+            </mat-tab>
+
+        </mat-tab-group>
         
     </div>
 </div>
