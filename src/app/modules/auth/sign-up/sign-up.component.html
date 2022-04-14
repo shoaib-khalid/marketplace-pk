@@ -29,7 +29,6 @@
                         <input
                             id="email"
                             matInput
-                            [(ngModel)]="existedEmail"
                             [formControlName]="'email'"
                             placeholder="Email" class="px-2" >
                         <mat-error *ngIf="signUpForm.get('email').hasError('required')">

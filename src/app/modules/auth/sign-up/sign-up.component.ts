@@ -22,7 +22,7 @@ export class AuthSignUpComponent implements OnInit
     signUpForm: FormGroup;
     showAlert: boolean = false;
     isError: boolean = false;
-    existedEmail: string =''
+    existedEmail: string = ''
 
 
     //to be display the text
@@ -64,7 +64,7 @@ export class AuthSignUpComponent implements OnInit
         this.signUpForm = this._formBuilder.group({
                 name      : ['', Validators.required],
                 username  : ['', Validators.required],
-                email     : ['', [Validators.required, Validators.email]],
+                email     : [ this.existedEmail, [Validators.required, Validators.email]],
                 password  : ['', Validators.required],
                 agreements: ['', Validators.requiredTrue]
             }
