@@ -30,11 +30,12 @@ export interface CustomerAddress
     country: string;
     customerId: string;
     email: string;
-    id: string;
+    id?: string;
     name: string;
     phoneNumber: string;
     postCode: string;
     state: string;
+    isDefault: boolean;
 }
 
 export interface Client

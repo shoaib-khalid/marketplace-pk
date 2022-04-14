@@ -97,12 +97,15 @@
 
         <div class="flex flex-col">
             <!-- Actions -->
-            <div class="flex items-center justify-end py-4">
-                <!-- <button
-                    mat-stroked-button
-                    type="button">
+            <div class="flex items-center justify-between py-4">
+                <button
+                    class="ml-4"
+                    mat-flat-button
+                    type="button"
+                    (click)="closeDialog()"
+                    >
                     Cancel
-                </button> -->
+                </button>
                 <button
                     class="ml-4"
                     mat-flat-button

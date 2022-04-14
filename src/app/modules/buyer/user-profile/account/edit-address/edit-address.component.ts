@@ -41,26 +41,24 @@ export class EditAddressComponent implements OnInit {
       state: ['', Validators.required]
     });
 
-    this.addressForm.patchValue(this.data);
-    console.log('this.addressForm',this.addressForm.value);
-    
+    if(this.data ==='create'){
+      this.addressForm.get('isDefault').setValue(false);
 
+    }
+    else{
+      this.addressForm.patchValue(this.data);
+
+    }
+    
   }
 
   updateAddress(){
 
     this.dialogRef.close(this.addressForm.value);
+  }
 
-    //Customer Addresses
-    // this._userService.putCustomerAddressById(this.addressForm.value).subscribe(
-    //   (res)=>{
-
-    //     console.log('check lepadd put ,',res);
-        
-     
-    //     }
-    //   )
-
+  closeDialog(){
+    this.dialogRef.close();
   }
 
 }

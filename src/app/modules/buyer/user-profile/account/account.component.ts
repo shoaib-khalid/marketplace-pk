@@ -24,7 +24,9 @@ export class EditAccountComponent implements OnInit
     accountForm: FormGroup;
     clientId: string;
     customerAddress:any=[];
-    // customerAddress$: Observable<CustomerAddress[]>;
+
+    customersAddress$: Observable<CustomerAddress[]>;
+    setCustomerDefaultAddress:any;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -78,17 +80,11 @@ export class EditAccountComponent implements OnInit
             this.accountForm.patchValue(resp.data);
         })
 
-        //Customer Addresses
-        this._userService.getCustomerAddress().subscribe(
-            (res)=>{
-     
-            this.customerAddress = res.data.content;
-            this._changeDetectorRef.markForCheck();
+        // Get the discounts
+        this.customersAddress$ = this._userService.customersAddress$;
 
-            // Fill the form
-            return  this.customerAddress;
-            }
-        )
+        // Customer Addresses
+        this._userService.getCustomerAddress().subscribe();
 
         this._fuseMediaWatcherService.onMediaChange$
         .pipe(takeUntil(this._unsubscribeAll))
@@ -174,41 +170,103 @@ export class EditAccountComponent implements OnInit
                 });
             
         dialogRef.afterClosed().subscribe(result=>{
+    
+            if(result){
+                //Customer Addresses
+                this._userService.putCustomerAddressById(result).subscribe(
+                  (res)=>{
+         
+                    }
+                  )
+            }
 
-            //Customer Addresses
-            this._userService.putCustomerAddressById(result).subscribe(
-              (res)=>{
-
-                // Show a success message (it can also be an error message)
-                if(res.status === 202)
-                {
-                    const confirmation = this._fuseConfirmationService.open({
-                        title  : 'Success',
-                        message: 'Your address has been updated successfully!',
-                        icon: {
-                            show: true,
-                            name: "heroicons_outline:check",
-                            color: "success"
-                        },
-                        actions: {
-                            confirm: {
-                                label: 'Ok',
-                                color: "primary",
-                            },
-                            cancel: {
-                                show: false,
-                            },
-                        }
-                    });
-                }
-                
-                
-                }
-              )
             
         });
     
     
         
     }
+
+    deleteAddress(customerAddressId){
+
+        // Open the confirmation dialog
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete Address',
+            message: 'Are you sure you want to remove this address? This action cannot be undone!',
+            actions: {
+                confirm: {
+                    label: 'Delete'
+                }
+            }
+        });
+
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+
+                // Delete the customer on the server
+                this._userService.deleteCustomerAddressById(customerAddressId).subscribe(() => {
+
+                });
+            }
+        });
+        
+    }
+
+    addAddress(){
+
+        const dialogRef = this._dialog.open(
+            EditAddressComponent, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                // disableClose: true,
+                data: 'create',
+                });
+        
+                          
+        dialogRef.afterClosed().subscribe(result=>{
+            
+            if(result){
+
+                //Customer Addresses
+                this._userService.createCustomerAddress(result).subscribe(
+                    (res)=>{
+        
+                    
+                    }
+                )
+            }
+           
+        });
+    }
+
+    setAsDefault(customerbody){
+
+        // this.setCustomerDefaultAddress =customerbody;
+        // this.setCustomerDefaultAddress.isDefault = true;
+    
+        console.log('dddd',customerbody);
+
+  
+        // const defaultPayload = customerbody;
+        // defaultPayload.isDefault = true;
+        // console.log('dddd',defaultPayload);
+        // console.log('rerrer',customerbody);
+
+        
+        //Customer Addresses
+        // this._userService.putCustomerAddressById(this.setCustomerDefaultAddress).subscribe(
+        // (res)=>{
+
+        //     }
+        // )
+
+
+    }
+    
 }
