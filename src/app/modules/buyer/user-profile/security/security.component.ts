@@ -40,8 +40,8 @@ export class EditSecurityComponent implements OnInit
             currentPassword    : ['', Validators.required],
             newPassword        : ['', Validators.required],
             confirmNewPassword : ['', Validators.required],
-            twoStep            : [true],
-            askPasswordChange  : [false]
+            // twoStep            : [true],
+            // askPasswordChange  : [false]
         });
     }
 
@@ -63,16 +63,14 @@ export class EditSecurityComponent implements OnInit
         // Hide the alert
         this.alert = false;
 
-        /**
-         * 
-         * Register Store Section
-         * 
-         */
+
+         this.securityForm.value
         // Disable the form
         this.securityForm.disable();
+        
 
-        // update profile
-        // this._userService.updatePasswordProfile(this.securityForm.value)
+        // // update profile
+        // this._userService.changePasswordCustomerById(this.securityForm.value)
         //     .subscribe((response) => {
 
         //         // Show a success message (it can also be an error message)
@@ -100,9 +98,9 @@ export class EditSecurityComponent implements OnInit
 
         //     });
 
-        setTimeout(() => {
-            this.alert = null;
-        }, 7000);
+        // setTimeout(() => {
+        //     this.alert = null;
+        // }, 7000);
 
         // Enable the form
         this.securityForm.enable();

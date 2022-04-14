@@ -322,4 +322,28 @@ export class UserService
             ))
         );
     }
+
+    changePasswordCustomerById(changePwdPayload)
+    {
+
+        let userService = this._apiServer.settings.apiServer.userService;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+   
+        return this.client$.pipe(
+            take(1),
+            switchMap(client => this._httpClient.put<any>(userService + '/customers/' + this.customerId + '/changepassword', changePwdPayload , header).pipe(
+                map((response) => {
+
+                    this._logging.debug("Response from StoresService (chnagePasswordCustomerById)",response);
+
+                    // Return the new product
+                    return response["data"];
+                })  
+            )) 
+        );
+    }
 }
