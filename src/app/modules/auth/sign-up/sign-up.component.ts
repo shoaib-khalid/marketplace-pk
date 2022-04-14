@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -22,12 +22,12 @@ export class AuthSignUpComponent implements OnInit
     signUpForm: FormGroup;
     showAlert: boolean = false;
     isError: boolean = false;
+    existedEmail: string = ''
 
 
     //to be display the text
-    titleText:string ='Sign Up';
-    descriptionText:string ='Please enter the following details to create your account';
-
+    titleText: string ='Sign Up';
+    descriptionText: string ='Please enter the following details to create your account';
 
     /**
      * Constructor
@@ -35,7 +35,8 @@ export class AuthSignUpComponent implements OnInit
     constructor(
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
-        private _router: Router
+        private _router: Router,
+        private _route: ActivatedRoute,
     )
     {
     }
@@ -49,11 +50,21 @@ export class AuthSignUpComponent implements OnInit
      */
     ngOnInit(): void
     {
+        this._route.queryParams.subscribe(params => {
+            this.existedEmail = params['email'];
+
+            if (this.existedEmail) {
+                this.titleText = 'Account Activation'
+                this.descriptionText = 'Please enter the following details to active your account'
+            }
+            
+        });
+
         // Create the form
         this.signUpForm = this._formBuilder.group({
                 name      : ['', Validators.required],
-                username      : ['', Validators.required],
-                email     : ['', [Validators.required, Validators.email]],
+                username  : ['', Validators.required],
+                email     : [ this.existedEmail, [Validators.required, Validators.email]],
                 password  : ['', Validators.required],
                 agreements: ['', Validators.requiredTrue]
             }
