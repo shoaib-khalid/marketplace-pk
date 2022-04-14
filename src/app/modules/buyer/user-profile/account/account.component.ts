@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { UserService } from 'app/core/user/user.service';
+import { CustomerAddress, HttpResponsePagination } from 'app/core/user/user.types';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { EditAddressComponent } from './edit-address/edit-address.component';
 // import { Client } from '../edit-profile/edit-profile.types';
 
 @Component({
@@ -15,6 +19,12 @@ export class EditAccountComponent implements OnInit
     alert: any;
     accountForm: FormGroup;
     clientId: string;
+    customerAddress:any=[];
+    // customerAddress$: Observable<CustomerAddress[]>;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    
     // client: Client;
 
     /**
@@ -24,7 +34,9 @@ export class EditAccountComponent implements OnInit
         private _formBuilder: FormBuilder,
         private _userService: UserService,
         private _fuseConfirmationService: FuseConfirmationService,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        public _dialog: MatDialog,
+
     )
     {
     }
@@ -52,16 +64,24 @@ export class EditAccountComponent implements OnInit
         });
 
     
-    // ----------------------
-    // Get client Details
-    // ----------------------
+        // ----------------------
+        // Get client Details
+        // ----------------------
 
-    this._userService.client$.subscribe(
-        (response) => {            
+        //dapat
+        this._userService.getCustomerAddress().subscribe(
+            (res)=>{
+     
+            this.customerAddress = res.data.content;
+            this._changeDetectorRef.markForCheck();
+
             // Fill the form
-            this.accountForm.patchValue(response);
-        } 
-    );
+            return  this.customerAddress;
+            }
+        )
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
 
     }
 
@@ -152,5 +172,23 @@ export class EditAccountComponent implements OnInit
 
         // Enable the form
         this.accountForm.enable();
+    }
+
+    editAddress(customerid:string){
+        
+        console.log('customerid',customerid);
+        
+         const dialogRef = this._dialog.open(
+            EditAddressComponent, {
+                width:'100%',
+                height:'100%',
+                maxWidth:'100vw',  
+                maxHeight:'100vh',
+                });
+            
+            dialogRef.afterClosed().subscribe();
+    
+    
+        
     }
 }

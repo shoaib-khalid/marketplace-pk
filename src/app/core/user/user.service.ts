@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { Client, Customer, User } from 'app/core/user/user.types';
+import { Client, Customer, CustomerAddress, HttpResponse, HttpResponsePagination, User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -16,7 +16,12 @@ export class UserService
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
     private _customer: BehaviorSubject<Customer | null> = new BehaviorSubject(null);
     private _client: BehaviorSubject<Client | null> = new BehaviorSubject(null);
+    private _customerAddress: BehaviorSubject<HttpResponsePagination<CustomerAddress> | null> = new BehaviorSubject(null);
 
+    private _customersAddress: BehaviorSubject<HttpResponsePagination<CustomerAddress[]> | null> = new BehaviorSubject(null);
+
+
+    
     /**
      * Constructor
      */
@@ -66,7 +71,7 @@ export class UserService
             return this._customer.asObservable();
         }
 
-                /**
+    /**
      * Setter & getter for user
      *
      * @param value
@@ -80,6 +85,22 @@ export class UserService
     get client$(): Observable<Client>
     {
         return this._client.asObservable();
+    }
+
+    /**
+     * Setter & getter for user
+     *
+     * @param value
+     */
+    set customerAddress(value: HttpResponsePagination<CustomerAddress>)
+    {
+        // Store the value
+        this._customerAddress.next(value);
+    }
+
+    get customerAddress$(): Observable<HttpResponsePagination<CustomerAddress[]>>
+    {
+        return this._customersAddress.asObservable();
     }
          
 
@@ -119,4 +140,21 @@ export class UserService
             })
         );
     }
+
+   getCustomerAddress(){
+        let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.get<HttpResponsePagination<CustomerAddress[]>>(userService + "/customer/" + customerId +'/address', header)
+            .pipe(
+                tap((address:HttpResponsePagination<CustomerAddress[]>) => {
+                    this._logging.debug("Response from UserService (getCustomerAddress)",address);
+                    // this._customersAddress.next(address);
+                })
+            );
+   }
 }

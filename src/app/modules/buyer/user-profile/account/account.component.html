@@ -5,87 +5,12 @@
 
         <!-- Section -->
         <div class="w-full">
-            <div class="text-xl">Profile</div>
-            <div class="text-secondary">Following information is publicly displayed, be careful!</div>
-        </div>
-        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
-            <!-- Name -->
-            <div class="sm:col-span-4">
-                <mat-form-field class="fuse-mat-emphasized-affix w-full">
-                    <mat-label>Name</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:user'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'name'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Username -->
-            <div class="sm:col-span-4">
-                <mat-form-field class="fuse-mat-no-subscript fuse-mat-emphasized-affix w-full">
-                    <mat-label>Username</mat-label>
-                    <mat-icon
-                    class="icon-size-5"
-                    [svgIcon]="'heroicons_solid:user'"
-                    matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'username'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Title -->
-            <!-- <div class="sm:col-span-2">
-                <mat-form-field class="fuse-mat-no-subscript w-full">
-                    <mat-label>Title</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:briefcase'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'title'"
-                        matInput>
-                </mat-form-field>
-            </div> -->
-            <!-- Company -->
-            <!-- <div class="sm:col-span-2">
-                <mat-form-field class="fuse-mat-no-subscript w-full">
-                    <mat-label>Company</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:office-building'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'company'"
-                        matInput>
-                </mat-form-field>
-            </div> -->
-            <!-- About -->
-            <!-- <div class="sm:col-span-4">
-                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
-                    <mat-label>About</mat-label>
-                    <textarea
-                        matInput
-                        [formControlName]="'about'"
-                        cdkTextareaAutosize
-                        [cdkAutosizeMinRows]="5"></textarea>
-                </mat-form-field>
-                <div class="mt-1 text-md text-hint">Brief description for your profile. Basic HTML and Emoji are allowed.</div>
-            </div> -->
-        </div>
-
-        <!-- Divider -->
-        <div class="my-10 border-t"></div>
-
-        <!-- Section -->
-        <div class="w-full">
             <div class="text-xl">Personal Information</div>
             <div class="text-secondary">Communication details in case we want to connect with you. These will be kept private.</div>
         </div>
         <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
             <!-- Email -->
-            <div class="sm:col-span-2">
+            <div class="sm:col-span-4">
                 <mat-form-field class="fuse-mat-emphasized-affix w-full">
                     <mat-label>Email</mat-label>
                     <mat-icon
@@ -98,104 +23,109 @@
                         matInput>
                 </mat-form-field>
             </div>
-            <!-- Phone -->
-            <!-- <div class="sm:col-span-2">
-                <mat-form-field class="fuse-mat-emphasized-affix w-full">
-                    <mat-label>Phone</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:phone'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'phone'"
-                        matInput>
-                </mat-form-field>
-            </div> -->
-            <!-- Country -->
-            <!-- <div class="sm:col-span-2">
-                <mat-form-field class="fuse-mat-emphasized-affix w-full">
-                    <mat-label>Country</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:location-marker'"
-                        matPrefix></mat-icon>
-                    <mat-select [formControlName]="'country'">
-                        <mat-option [value]="'malaysia'">Malaysia</mat-option>
-                        <mat-option [value]="'pakistan'">Pakistan</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div> -->
-            <!-- Language -->
-            <!-- <div class="sm:col-span-2">
-                <mat-form-field class="fuse-mat-emphasized-affix w-full">
-                    <mat-label>Language</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:globe-alt'"
-                        matPrefix></mat-icon>
-                    <mat-select [formControlName]="'language'">
-                        <mat-option [value]="'english'">English</mat-option>
-                        <mat-option [value]="'malay'">Bahasa Malaysia</mat-option>
-                        <mat-option [value]="'urdhu'">Urdhu</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div> -->
         </div>
 
         <!-- Divider -->
-        <div class="mt-11 mb-10 border-t"></div>
+        <div class="mt-4 mb-8 border-t"></div>
         <!-- Section -->
         <div class="w-full">
             <div class="text-xl">Address</div>
             <div class="text-secondary">Set the delivery address</div>
         </div>
 
-        <div class="flex flex-col bg-white p-4 border-b">
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Full Name</div>
-                <div class="text-secondary w-4/6">Nur Iman Nazirah</div>
-                <div class="text-secondary w-1/6 justify-end">
-                    <button>
-                        <p class="underline underline-offset-2">Edit</p>
-                    </button>
+        <div class="flex flex-col bg-white">
+            <div class="flex flex-col p-4 border-b" *ngFor="let customer of customerAddress;let i = index;">
+                <div class="flex flex-row">
+                    
+                    <div class="flex flex-col text-secondary w-5/6">
+                        
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Full Name
+                            </div>
+                            <div class="w-3/6">
+                                {{customer.name}}
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Phone No
+                            </div>
+                            <div class="w-3/6">
+                                {{customer.phoneNumber}}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Address
+                            </div>
+                            <div class="w-3/6">
+                                {{customer.address}}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="text-secondary w-1/6">
+                        <button
+                            (click)="editAddress(customer.id)">
+                            <p class="underline underline-offset-2">Edit</p>
+                        </button>
+                    </div>
+
                 </div>
-            </div>
-
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Phone Number</div>                                        
-                <div class="text-secondary">0196466793</div>
-            </div>
-
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Full Address</div>                                        
-                <div class="text-secondary">No 21 , Jalan Mawar, Taman Mawar, Jasin , 77300, Melaka</div>
+                
             </div>
         </div>
-        <div class="flex flex-col bg-white p-4 border-b">
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Full Name</div>
-                <div class="text-secondary w-4/6">Iman Nazirah</div>
-                <div class="text-secondary w-1/6 justify-end">
-                    <button>
-                        <p class="underline underline-offset-2">Edit</p>
-                    </button>
+
+        <!-- <div class="flex flex-col bg-white">
+            <div class="flex flex-col p-4 border-b">
+                <div class="flex flex-row">
+                    
+                    <div class="flex flex-col text-secondary w-5/6">
+                        
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Full Name
+                            </div>
+                            <div class="w-3/6">
+                                Iman Nazirah
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Phone No
+                            </div>
+                            <div class="w-3/6">
+                                019238494
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row">
+                            <div class="w-2/6">
+                                Address
+                            </div>
+                            <div class="w-3/6">
+                                Jlaan Debunga 6 taman debunga
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="text-secondary w-1/6">
+                        <button
+                            click="editAddress()">
+                            <p class="underline underline-offset-2">Edit</p>
+                        </button>
+                    </div>
+
                 </div>
+                
             </div>
-
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Phone Number</div>                                        
-                <div class="text-secondary">0196496793</div>
-            </div>
-
-            <div class="flex flex-row">
-                <div class="text-secondary w-1/6">Full Address</div>                                        
-                <div class="text-secondary">No 24 , Jalan Mawar, Taman Mawar, Jasin , 77300, Melaka</div>
-            </div>
-        </div>
-
-
- 
-        
+        </div> -->
 
         <!-- Actions -->
         <div class="flex items-center justify-end py-4">
