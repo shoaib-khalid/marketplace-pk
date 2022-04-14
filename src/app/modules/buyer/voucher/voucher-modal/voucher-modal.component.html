@@ -19,11 +19,13 @@
                     <span class="font-medium">Voucher Name:</span>
                     <span class="font-medium text-primary pl-1">{{voucher.voucher.name}}</span>
                 </div>
-                <div class="flex flex-row">
+                <div class="flex flex-row w-full items-center justify-center">
                     <span class="font-medium">Valid Date:</span>
-                    <span class="text-sm sm:text-md font-medium text-primary pl-1">{{voucher.voucher.startDate | date:'dd-MM-yyyy' }}</span>
-                    <span class="text-sm sm:text-md font-medium text-primary pl-1">to</span>
-                    <span class="text-sm sm:text-md font-medium text-primary pl-1">{{voucher.voucher.endDate | date:'dd-MM-yyyy' }}</span>
+                    <div class="flex flex-row pt-0.5">
+                        <span class="text-sm sm:text-md font-medium text-primary pl-1">{{voucher.voucher.startDate | date:'dd-MM-yyyy' }}</span>
+                        <span class="text-sm sm:text-md font-medium text-primary pl-1">to</span>
+                        <span class="text-sm sm:text-md font-medium text-primary pl-1">{{voucher.voucher.endDate | date:'dd-MM-yyyy' }}</span>
+                    </div>
                 </div>
                 <div class="flex flex-col pt-2">
                     <span *ngIf="voucher.voucher.voucherTerms.length > 0" class="font-semibold">Terms & Conditions</span>

@@ -126,6 +126,15 @@
                             </div>
                         </ng-container>
                     </div>
+                    <div class="flex flex-row w-full mt-4 items-center justify-center">
+                        <pagination
+                            *ngIf="customerVoucherPagination"
+                            [itemLength]="customerVoucherPagination.length" 
+                            [initialPage]="customerVoucherPagination.page + 1"
+                            [pageSize]="customerVoucherPagination.size"
+                            (changePage)="onChangePage($event)"
+                            #customerVoucher></pagination>
+                    </div>
                 </div> 
             </mat-tab>
 
@@ -143,7 +152,7 @@
                         <span class="font-bold">Vouchers</span> 
                     </div>
                     <!-- display  if there's no history used voucher-->
-                    <ng-container *ngIf="usedCustomerVoucher.length < 1">
+                    <ng-container *ngIf="usedCustomerVoucher.length < 1 && usedCustomerVoucherPagination">
                         <div class="flex flex-row border border-gray-300 rounded-lg cursor-pointer p-2">
                             <div class="w-11 h-11 border border-gray-400 rounded mr-2">
                                 <div class="pl-3 pt-3">
@@ -164,7 +173,7 @@
                             </div>
                         </div>
                     </ng-container>
-                    <!-- display pst used voucher -->
+                    <!-- display past used voucher -->
                     <div class="grid grid-cols-4 gap-1 w-full">
                         <ng-container *ngFor="let usedVoucher of usedCustomerVoucher">
                             <div class="col-span-4 sm:col-span-2 pt-2 sm:px-1">
@@ -197,6 +206,15 @@
                                 </div>
                             </div>
                         </ng-container>
+                    </div>
+                    <div class="flex w-full mt-4 items-center justify-center">
+                        <pagination
+                            *ngIf="usedCustomerVoucherPagination"
+                            [itemLength]="usedCustomerVoucherPagination.length" 
+                            [initialPage]="usedCustomerVoucherPagination.page + 1"
+                            [pageSize]="usedCustomerVoucherPagination.size"
+                            (changePage)="onChangePage($event)"
+                            #usedCustomerVoucher></pagination>
                     </div>
                 </div> 
             </mat-tab>

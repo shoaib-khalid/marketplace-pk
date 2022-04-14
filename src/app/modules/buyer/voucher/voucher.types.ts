@@ -25,3 +25,24 @@ export interface CustomerVoucher
     created     : string;
     voucher     : Voucher;
 }
+
+export interface CustomerVoucherPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
+}
+
+export interface UsedCustomerVoucherPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
+}
+

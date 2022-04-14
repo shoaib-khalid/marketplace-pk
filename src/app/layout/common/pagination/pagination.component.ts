@@ -13,11 +13,11 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PaginationComponent implements OnInit, OnDestroy
 {
-    @Input() itemLength = 0;
+    @Input() itemLength: number = 0;
     @Output() changePage = new EventEmitter<any>(true);
-    @Input() initialPage = 1;
-    @Input() pageSize = 10;
-    @Input() maxPages = 10;
+    @Input() initialPage: number = 1;
+    @Input() pageSize: number = 10;
+    @Input() maxPages: number = 10;
 
     @Input() set _itemLength(value: number) {
         this.itemLength = value;
@@ -48,7 +48,6 @@ export class PaginationComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-
         this.fuseMediaChanges(this.pageSize);
 
         // Mark for check
@@ -64,6 +63,7 @@ export class PaginationComponent implements OnInit, OnDestroy
 
     ngOnChanges(){
         if (this.itemLength) {
+            
             this.setPage(this.initialPage);
         }
     }

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from 'app/core/auth/auth.service';
-import { CustomerVoucher, Voucher } from './voucher.types';
+import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from './voucher.types';
 
 @Injectable({
     providedIn: 'root'
@@ -21,6 +21,9 @@ export class VoucherService
 
     private _usedCustomerVoucher: ReplaySubject<CustomerVoucher> = new ReplaySubject<CustomerVoucher>(1);
     private _usedCustomerVouchers: ReplaySubject<CustomerVoucher[]> = new ReplaySubject<CustomerVoucher[]>(1);
+
+    private _customerVoucherPagination: BehaviorSubject<CustomerVoucherPagination | null> = new BehaviorSubject(null);
+    private _usedCustomerVoucherPagination: BehaviorSubject<UsedCustomerVoucherPagination | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -78,6 +81,22 @@ export class VoucherService
         return this._usedCustomerVouchers.asObservable();
     }
 
+    /**
+    * Getter for cust voucher pagination
+    */
+    get customerVoucherPagination$(): Observable<CustomerVoucherPagination>
+    {
+        return this._customerVoucherPagination.asObservable();
+    }
+
+    /**
+    * Getter for cust voucher pagination
+    */
+    get usedCustomerVoucherPagination$(): Observable<UsedCustomerVoucherPagination>
+    {
+        return this._usedCustomerVoucherPagination.asObservable();
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -108,7 +127,9 @@ export class VoucherService
             );
     }
 
-    getAvailableCustomerVoucher (isUsed: boolean) {
+    getAvailableCustomerVoucher (isUsed: boolean, page: number = 0, size: number = 2) : 
+    Observable<{ customerVoucherPagination: CustomerVoucherPagination; usedCustomerVoucherPagination: UsedCustomerVoucherPagination; vouchers: CustomerVoucher[] }>
+    {
         let orderService = this._apiServer.settings.apiServer.orderService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
         let accessToken = "accessToken";
@@ -117,7 +138,9 @@ export class VoucherService
         const header = {  
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params : {
-                isUsed
+                isUsed,
+                page       : '' + page,
+                pageSize   : '' + size
             }
         };
 
@@ -127,12 +150,37 @@ export class VoucherService
                     this._logging.debug("Response from OrderService (getAvailableCustomerVoucher) isUsed: " + isUsed ,response);
 
                     if(isUsed){
+                        let usedCustomerVoucherPagination = {
+                            
+                            length: response.data.totalElements,
+                            size: response.data.size,
+                            page: response.data.number,
+                            lastPage: response.data.totalPages,
+                            startIndex: response.data.pageable.offset,
+                            endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                        }
+                        this._usedCustomerVoucherPagination.next(usedCustomerVoucherPagination); 
+                                                
                         this._usedCustomerVouchers.next(response["data"].content);
+                        
+                        return response["data"].content
+
                     } else {
+                        let customerVoucherPagination = {
+
+                            length: response.data.totalElements,
+                            size: response.data.size,
+                            page: response.data.number,
+                            lastPage: response.data.totalPages,
+                            startIndex: response.data.pageable.offset,
+                            endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                        }
+                        this._customerVoucherPagination.next(customerVoucherPagination); 
+                        
                         this._customerVouchers.next(response["data"].content);
-                    }
-                    
-                    // return response["data"].content
+
+                        return response["data"].content
+                    }     
                 })
             );
     }

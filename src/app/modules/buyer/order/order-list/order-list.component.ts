@@ -71,7 +71,6 @@ export class OrderListComponent implements OnInit
         public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute
 
-
     )
     {
     }
@@ -128,8 +127,6 @@ export class OrderListComponent implements OnInit
 
         this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
         .subscribe((response) =>{
-
-            console.log('jobor', response);
             
         });
 
@@ -207,6 +204,7 @@ export class OrderListComponent implements OnInit
                     // set loading to false
                     this.isLoading = false;
                 });
+
         }
         // Mark for check
         this._changeDetectorRef.markForCheck();
