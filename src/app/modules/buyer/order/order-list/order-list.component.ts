@@ -226,13 +226,11 @@ export class OrderListComponent implements OnInit
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
+
+    redirect(pagename: string) {
+
+        // this._route.snapshot.paramMap.get(pagename)
+        this._router.navigate([window.location.href = pagename]);
+    }
     
-    // displayImage(orderItemDetail: OrderDetails) {
-    //     if (orderItemDetail.itemAssetDetails) {
-    //         return orderItemDetail.itemAssetDetails.url
-    //     } else {
-    //         orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl : 'assets/branding/symplified/logo/symplified.png'
-    //     } 
-    //     return ;
-    // }
 }
