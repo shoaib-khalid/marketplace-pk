@@ -71,7 +71,7 @@ export enum UserRole {
 
 export interface HttpResponsePagination<T>{
     message?: string;
-    data?:{content:[T]}
+    data?:{content:T}
     path : string;
     status: number;
     timestamp:string;
@@ -79,7 +79,7 @@ export interface HttpResponsePagination<T>{
 
 export interface HttpResponse<T>{
     message?: string;
-    data?:[T]
+    data?:T
     path : string;
     status: number;
     timestamp:string;

@@ -23,6 +23,34 @@
                         matInput>
                 </mat-form-field>
             </div>
+
+            <!-- Username -->
+            <div class="sm:col-span-4">
+            <mat-form-field class="fuse-mat-emphasized-affix w-full">
+                <mat-label>Username</mat-label>
+                <mat-icon
+                    class="icon-size-5"
+                    [svgIcon]="'heroicons_solid:mail'"
+                    matPrefix></mat-icon>
+                <input
+                    readonly
+                    [formControlName]="'username'"
+                    matInput>
+            </mat-form-field>
+            </div>
+            <!-- Email -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="fuse-mat-emphasized-affix w-full">
+                    <mat-label>Name</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:mail'"
+                        matPrefix></mat-icon>
+                    <input
+                        [formControlName]="'name'"
+                        matInput>
+                </mat-form-field>
+            </div>
         </div>
 
         <!-- Divider -->
@@ -33,7 +61,7 @@
             <div class="text-secondary">Set the delivery address</div>
         </div>
 
-        <div class="flex flex-col bg-white">
+        <div class="flex flex-col bg-white mt-8">
             <div class="flex flex-col p-4 border-b" *ngFor="let customer of customerAddress;let i = index;">
                 <div class="flex flex-row">
                     
@@ -70,7 +98,7 @@
 
                     <div class="text-secondary w-1/6">
                         <button
-                            (click)="editAddress(customer.id)">
+                            (click)="editAddress(customer)">
                             <p class="underline underline-offset-2">Edit</p>
                         </button>
                     </div>

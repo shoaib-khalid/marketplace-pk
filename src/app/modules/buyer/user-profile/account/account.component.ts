@@ -2,11 +2,15 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEnca
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { AuthService } from 'app/core/auth/auth.service';
+import { JwtService } from 'app/core/jwt/jwt.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress, HttpResponsePagination } from 'app/core/user/user.types';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { EditAddressComponent } from './edit-address/edit-address.component';
 // import { Client } from '../edit-profile/edit-profile.types';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+
 
 @Component({
     selector       : 'settings-account',
@@ -24,7 +28,8 @@ export class EditAccountComponent implements OnInit
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    
+    currentScreenSize: string[] = [];
+
     // client: Client;
 
     /**
@@ -36,6 +41,10 @@ export class EditAccountComponent implements OnInit
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
         public _dialog: MatDialog,
+        private _jwtService: JwtService,
+        private _authService: AuthService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+
 
     )
     {
@@ -54,13 +63,8 @@ export class EditAccountComponent implements OnInit
         this.accountForm = this._formBuilder.group({
             name    : ['', Validators.required],
             username: ['', Validators.required],
-            title   : ['Senior Frontend Developer'],
-            company : ['YXZ Software'],
-            about   : ['Hey! This is Brian; husband, father and gamer. I\'m mostly passionate about bleeding edge tech and chocolate! 🍫'],
             email   : ['', [Validators.required, Validators.email]],
-            phone   : ['121-490-33-12'],
-            country : ['malaysia'],
-            language: ['english']
+       
         });
 
     
@@ -68,7 +72,13 @@ export class EditAccountComponent implements OnInit
         // Get client Details
         // ----------------------
 
-        //dapat
+        //Customer Details
+        this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
+        .subscribe((resp)=>{
+            this.accountForm.patchValue(resp.data);
+        })
+
+        //Customer Addresses
         this._userService.getCustomerAddress().subscribe(
             (res)=>{
      
@@ -79,6 +89,16 @@ export class EditAccountComponent implements OnInit
             return  this.customerAddress;
             }
         )
+
+        this._fuseMediaWatcherService.onMediaChange$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(({matchingAliases}) => {               
+
+            this.currentScreenSize = matchingAliases;                
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
@@ -99,72 +119,39 @@ export class EditAccountComponent implements OnInit
         // Hide the alert
         this.alert = false;
 
-        /**
-         * 
-         * Register Store Section
-         * 
-         */
         // Disable the form
         this.accountForm.disable();
 
         // update profile
+        this._userService.putCustomerById(this.accountForm.value)
+        .subscribe((response)=>{
+            // Show a success message (it can also be an error message)
+            if(response.status === 202)
+            {
+                const confirmation = this._fuseConfirmationService.open({
+                    title  : 'Success',
+                    message: 'Your profile has been updated successfully!',
+                    icon: {
+                        show: true,
+                        name: "heroicons_outline:check",
+                        color: "success"
+                    },
+                    actions: {
+                        confirm: {
+                            label: 'Ok',
+                            color: "primary",
+                        },
+                        cancel: {
+                            show: false,
+                        },
+                    }
+                });
+            }
 
-        // this._userService.updateClientProfile(this.accountForm.value)
-        //     .subscribe((response) => {
-
-        //         let clientId = response.id;
-
-        //         // Show a success message (it can also be an error message)
-        //         const confirmation = this._fuseConfirmationService.open({
-        //             title  : 'Success',
-        //             message: 'Your profile has been updated successfully!',
-        //             icon: {
-        //                 show: true,
-        //                 name: "heroicons_outline:check",
-        //                 color: "success"
-        //             },
-        //             actions: {
-        //                 confirm: {
-        //                     label: 'Ok',
-        //                     color: "primary",
-        //                 },
-        //                 cancel: {
-        //                     show: false,
-        //                 },
-        //             }
-        //         });
-
-        //          // Mark for check
-        //          this._changeDetectorRef.markForCheck();
-        //     });
-
-            // this._storesService.getStoreById(storeId)
-            // .subscribe((store: Store)=>{
-            //     this._storesService.store = store;
-            //     this.store = store;
-
-            //     this.storeLogo = (this.store.storeAsset) ? this.store.storeAsset.logoUrl : null;
-
-            //     // Mark for check
-            //     this._changeDetectorRef.markForCheck();
-            // });
-        // let newBody = {
-        //     bankAccountNumber: this.editProfileForm.get('bankAccountNumber').value,
-        //     bankName : this.editProfileForm.get('bankName').value,
-        //     bankAccountTitle : this.editProfileForm.get('bankAccountTitle').value
-        // };
-
-        // if(this.clientPaymentId !==null){
-        //     this._userService.updatePaymentProfile(this.clientPaymentId, newBody)
-        //     .subscribe((response) => {
-
-        //     });
-        // } else {
-        //     this._userService.createPaymentProfile(newBody)
-        //     .subscribe((response) => {
-
-        //     });
-        // }
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+            
+        })
 
         setTimeout(() => {
             this.alert = null;
@@ -174,19 +161,52 @@ export class EditAccountComponent implements OnInit
         this.accountForm.enable();
     }
 
-    editAddress(customerid:string){
+    editAddress(customerAddress:CustomerAddress){
         
-        console.log('customerid',customerid);
-        
-         const dialogRef = this._dialog.open(
+        const dialogRef = this._dialog.open(
             EditAddressComponent, {
-                width:'100%',
-                height:'100%',
-                maxWidth:'100vw',  
-                maxHeight:'100vh',
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                // disableClose: true,
+                data: customerAddress,
                 });
             
-            dialogRef.afterClosed().subscribe();
+        dialogRef.afterClosed().subscribe(result=>{
+
+            //Customer Addresses
+            this._userService.putCustomerAddressById(result).subscribe(
+              (res)=>{
+
+                // Show a success message (it can also be an error message)
+                if(res.status === 202)
+                {
+                    const confirmation = this._fuseConfirmationService.open({
+                        title  : 'Success',
+                        message: 'Your address has been updated successfully!',
+                        icon: {
+                            show: true,
+                            name: "heroicons_outline:check",
+                            color: "success"
+                        },
+                        actions: {
+                            confirm: {
+                                label: 'Ok',
+                                color: "primary",
+                            },
+                            cancel: {
+                                show: false,
+                            },
+                        }
+                    });
+                }
+                
+                
+                }
+              )
+            
+        });
     
     
         

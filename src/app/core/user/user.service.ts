@@ -16,9 +16,9 @@ export class UserService
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
     private _customer: BehaviorSubject<Customer | null> = new BehaviorSubject(null);
     private _client: BehaviorSubject<Client | null> = new BehaviorSubject(null);
-    private _customerAddress: BehaviorSubject<HttpResponsePagination<CustomerAddress> | null> = new BehaviorSubject(null);
 
-    private _customersAddress: BehaviorSubject<HttpResponsePagination<CustomerAddress[]> | null> = new BehaviorSubject(null);
+    private _customerAddress: BehaviorSubject<CustomerAddress | null> = new BehaviorSubject(null);
+    private _customersAddress: BehaviorSubject<CustomerAddress[] | null> = new BehaviorSubject(null);
 
 
     
@@ -87,20 +87,21 @@ export class UserService
         return this._client.asObservable();
     }
 
-    /**
-     * Setter & getter for user
-     *
-     * @param value
-     */
-    set customerAddress(value: HttpResponsePagination<CustomerAddress>)
-    {
-        // Store the value
-        this._customerAddress.next(value);
-    }
 
-    get customerAddress$(): Observable<HttpResponsePagination<CustomerAddress[]>>
+    get customersAddress$(): Observable<CustomerAddress[]>
     {
         return this._customersAddress.asObservable();
+    }
+
+    get customerAddress$(): Observable<CustomerAddress>
+    {
+        return this._customerAddress.asObservable();
+    }
+
+
+    get customerId()
+    {
+        return this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
     }
          
 
@@ -127,6 +128,22 @@ export class UserService
             );
     }
 
+    putCustomerById(payloadBody){
+        let userService = this._apiServer.settings.apiServer.userService;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.put<HttpResponse<Customer>>(userService + "/customers/" + this.customerId, payloadBody, header)
+            .pipe(
+                tap((update:HttpResponse<Customer>) => {
+                    this._logging.debug("Response from UserService (putCustomerById)",update);
+                }
+            )
+        );
+    }
+
     /**
      * Update the user
      *
@@ -141,20 +158,62 @@ export class UserService
         );
     }
 
-   getCustomerAddress(){
+    /**
+     * ========================================
+     *Customer Address Controller
+     ===========================================
+     */
+    getCustomerAddress(){
         let userService = this._apiServer.settings.apiServer.userService;
-        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this._httpClient.get<HttpResponsePagination<CustomerAddress[]>>(userService + "/customer/" + customerId +'/address', header)
+        return this._httpClient.get<HttpResponsePagination<CustomerAddress[]>>(userService + "/customer/" + this.customerId +'/address', header)
             .pipe(
                 tap((address:HttpResponsePagination<CustomerAddress[]>) => {
                     this._logging.debug("Response from UserService (getCustomerAddress)",address);
-                    // this._customersAddress.next(address);
-                })
-            );
-   }
+                    this._customersAddress.next(address.data.content);
+
+                }
+            )
+        );
+    }
+
+    getCustomerAddressById(id:string){
+        let userService = this._apiServer.settings.apiServer.userService;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.get<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address'+ id, header)
+            .pipe(
+                tap((address:HttpResponse<CustomerAddress>) => {
+                    this._logging.debug("Response from UserService (getCustomerAddressById)",address);
+                    this._customerAddress.next(address.data);
+
+                }
+            )
+        );
+    }
+
+    
+    putCustomerAddressById(customerAddressBody:CustomerAddress){
+        let userService = this._apiServer.settings.apiServer.userService;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header)
+            .pipe(
+                tap((address:HttpResponse<CustomerAddress>) => {
+                    this._logging.debug("Response from UserService (putCustomerAddressById)",address);
+                    this._customerAddress.next(address.data);
+                }
+            )
+        );
+    }
 }
