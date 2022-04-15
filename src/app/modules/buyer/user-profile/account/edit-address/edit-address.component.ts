@@ -24,7 +24,9 @@ export class EditAddressComponent implements OnInit {
   platform: Platform;
 
   countryCode : string = '';
-  countryName: string =';'
+  countryName: string ='';
+
+  displayToogleNotDefault:boolean = false;
 
 
   constructor(
@@ -87,8 +89,8 @@ export class EditAddressComponent implements OnInit {
     else{
 
       this.addressForm.patchValue(this.data);
-
-
+      this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
+      
     }
     
   }

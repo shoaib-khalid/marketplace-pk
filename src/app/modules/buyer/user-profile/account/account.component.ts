@@ -80,7 +80,7 @@ export class EditAccountComponent implements OnInit
             this.accountForm.patchValue(resp.data);
         })
 
-        // Get the discounts
+        // Observable adress
         this.customersAddress$ = this._userService.customersAddress$;
 
         // Customer Addresses
@@ -246,25 +246,13 @@ export class EditAccountComponent implements OnInit
     }
 
     setAsDefault(customerbody){
-
-        // this.setCustomerDefaultAddress =customerbody;
-        // this.setCustomerDefaultAddress.isDefault = true;
-    
-        console.log('dddd',customerbody);
-
-  
-        // const defaultPayload = customerbody;
-        // defaultPayload.isDefault = true;
-        // console.log('dddd',defaultPayload);
-        // console.log('rerrer',customerbody);
-
-        
+       
         //Customer Addresses
-        // this._userService.putCustomerAddressById(this.setCustomerDefaultAddress).subscribe(
-        // (res)=>{
+        this._userService.setDefaultCustomerAddressById(customerbody).subscribe(
+        (res)=>{
 
-        //     }
-        // )
+            }
+        )
 
 
     }

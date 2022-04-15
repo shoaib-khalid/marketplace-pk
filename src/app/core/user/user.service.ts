@@ -249,7 +249,6 @@ export class UserService
 
                     this._logging.debug("Response from addressService (putCustomerAddressById)", updatedAddress);
 
-
                     // Find the index of the updated address
                     const index = address.findIndex(item => item.id === customerAddressBody.id);
 
@@ -264,6 +263,60 @@ export class UserService
                             findDefaultTrue.isDefault =false;
                             address[indexDefaultTrue] = { ...address[indexDefaultTrue], ...findDefaultTrue};
                         }
+                    }
+
+                    // Update the address
+                    address[index] = { ...address[index], ...updatedAddress.data};
+
+                    this._customersAddress.next(address); 
+            
+                    // Return the updated address
+                    return updatedAddress["data"];
+                }),
+                switchMap(updatedAddress => this.customerAddress$.pipe(
+                    take(1),
+                    filter(item => item && item.id === customerAddressBody.id),
+                    tap(() => {
+
+                        // Update the address if it's selected
+                        this._customerAddress.next(updatedAddress["data"]);
+
+                        // Return the updated address
+                        return updatedAddress["data"];
+                    })
+                ))
+            ))
+        );
+    }
+
+    setDefaultCustomerAddressById(customerAddressBody:CustomerAddress){
+        let userService = this._apiServer.settings.apiServer.userService;
+
+        customerAddressBody.isDefault = true;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this.customersAddress$.pipe(
+            take(1),
+            switchMap(address => this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header).pipe(
+                map((updatedAddress) => {
+
+                    this._logging.debug("Response from addressService (setDefaultCustomerAddressById)", updatedAddress);
+
+
+                    // Find the index of the updated address
+                    const index = address.findIndex(item => item.id === customerAddressBody.id);
+
+                    const isSetDefault = address.find(item => item.isDefault === true && item.id === customerAddressBody.id);
+
+                    //if current set to default === true we need to chnage the existing one that to false
+                    if(isSetDefault){
+                            const findExistDefaultTrue = address.find(item => item.isDefault === true && item.id !== customerAddressBody.id);
+                            const indexDefaultTrue = address.findIndex(item => item.isDefault === true && item.id !== customerAddressBody.id);
+                            findExistDefaultTrue.isDefault =false;
+                            address[indexDefaultTrue] = { ...address[indexDefaultTrue], ...findExistDefaultTrue};
                     }
 
                     // Update the address

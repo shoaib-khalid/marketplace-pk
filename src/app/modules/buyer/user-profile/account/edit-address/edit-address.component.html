@@ -109,14 +109,34 @@
             </div>
 
             <!-- Set as default -->
-            <div>
+            <!-- <div>
                 <mat-slide-toggle
                     [formControlName]="'isDefault'"
                     [color]="'primary'"
                     class="pr-2"
                 >Set as Default
                 </mat-slide-toggle>
+            </div> -->
+
+            <div *ngIf ="data === 'create'; else editdata">
+                <mat-slide-toggle
+                [formControlName]="'isDefault'"
+                [color]="'primary'"
+                class="pr-2"
+                >Set as Default
+                </mat-slide-toggle>
             </div>
+
+            <ng-template #editdata>
+                <div *ngIf ="displayToogleNotDefault">
+                    <mat-slide-toggle
+                    [formControlName]="'isDefault'"
+                    [color]="'primary'"
+                    class="pr-2"
+                    >Set as Default
+                    </mat-slide-toggle>
+                </div>
+            </ng-template>
 
         </div>
 

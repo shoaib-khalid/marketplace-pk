@@ -30,7 +30,7 @@
                 <mat-label>Username</mat-label>
                 <mat-icon
                     class="icon-size-5"
-                    [svgIcon]="'heroicons_solid:mail'"
+                    [svgIcon]="'heroicons_solid:user'"
                     matPrefix></mat-icon>
                 <input
                     readonly
@@ -44,7 +44,7 @@
                     <mat-label>Name</mat-label>
                     <mat-icon
                         class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:mail'"
+                        [svgIcon]="'heroicons_solid:user'"
                         matPrefix></mat-icon>
                     <input
                         [formControlName]="'name'"
@@ -131,22 +131,29 @@
                                 <button
                                 mat-flat-button
                                 (click)="editAddress(customer)">
-                                <p class="underline underline-offset-2">Edit</p>
+                                <p class="underline underline-offset-2 text-sm">Edit</p>
                                 </button>
                                 <button
                                 mat-flat-button
                                 *ngIf = "!customer.isDefault"
                                 (click)="deleteAddress(customer.id)"
                                 >
-                                <p class="underline underline-offset-2">Delete</p>
+                                <p class="underline underline-offset-2 text-sm">Delete</p>
                                 </button>
                                 <button
                                 *ngIf = "!customer.isDefault"
                                 (click)="setAsDefault(customer)"
                                 mat-flat-button
                                 >
-                                <p class="underline underline-offset-2">Default</p>
+                                <p class="underline underline-offset-2 text-sm">Set Default</p>
                                 </button>
+                                <div
+                                *ngIf = "customer.isDefault"
+                                class="w-full"
+                                >
+                                <p class="text-medium text-bold text-primary-500">Default</p>
+                                </div>
+                                
                             </div>
                         
                         </div>
