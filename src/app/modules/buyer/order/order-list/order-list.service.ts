@@ -8,7 +8,7 @@ import { LogService } from 'app/core/logging/log.service';
 import { StoresService } from 'app/core/store/store.service';
 import { Customer } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
-import { DeliveryRiderDetails, Order, OrderDetails, OrderItem, OrderPagination } from './order-list.type';
+import { DeliveryRiderDetails, Order, OrderDetails, OrderItem, OrderPagination, OrdersCountSummary } from './order-list.type';
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +17,8 @@ export class OrderListService
 {
     private _order: BehaviorSubject<Order | null> = new BehaviorSubject(null);
     private _orders: BehaviorSubject<Order[] | null> = new BehaviorSubject(null);
+    private _ordersCountSummary: BehaviorSubject<OrdersCountSummary[] | null> = new BehaviorSubject(null);
+
     
     private _orderItems: BehaviorSubject<OrderItem[] | null> = new BehaviorSubject(null);
     private _ordersDetails: BehaviorSubject<OrderDetails[] | null> = new BehaviorSubject(null);
@@ -62,6 +64,13 @@ export class OrderListService
         return this._orders.asObservable();
     }
     
+    /**
+    * Getter for orders
+    */
+    get ordersCountSummary$(): Observable<any>
+    {
+        return this._ordersCountSummary.asObservable();
+    }
 
     /**
     * Setter & getter for Orders details
@@ -143,7 +152,7 @@ export class OrderListService
     }
 
     
-    getOrdersWithDetails( customerId: string, page: number = 0, size: number = 3): 
+    getOrdersWithDetails( customerId: string, page: number = 0, size: number = 3,  completionStatus: string[] = ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE"]): 
     Observable<{ pagination: OrderPagination; orders: Order[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;

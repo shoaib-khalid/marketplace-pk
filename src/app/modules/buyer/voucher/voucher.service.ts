@@ -127,7 +127,7 @@ export class VoucherService
             );
     }
 
-    getAvailableCustomerVoucher (isUsed: boolean, page: number = 0, size: number = 2) : 
+    getAvailableCustomerVoucher (isUsed: boolean, page: number = 0, size: number = 10) : 
     Observable<{ customerVoucherPagination: CustomerVoucherPagination; usedCustomerVoucherPagination: UsedCustomerVoucherPagination; vouchers: CustomerVoucher[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;

@@ -345,3 +345,9 @@ export interface OrderPagination
     endIndex: number;
 }
 
+export interface OrdersCountSummary
+{
+    label?: string;
+    completionStatus: string;
+    count: number;
+}
