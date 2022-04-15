@@ -131,27 +131,27 @@
                                 <button
                                 mat-flat-button
                                 (click)="editAddress(customer)">
-                                <p class="underline underline-offset-2 text-sm">Edit</p>
+                                <p class="underline underline-offset-2 text-sm sm:text-md">Edit</p>
                                 </button>
                                 <button
                                 mat-flat-button
                                 *ngIf = "!customer.isDefault"
                                 (click)="deleteAddress(customer.id)"
                                 >
-                                <p class="underline underline-offset-2 text-sm">Delete</p>
+                                <p class="underline underline-offset-2 text-sm sm:text-md">Delete</p>
                                 </button>
                                 <button
                                 *ngIf = "!customer.isDefault"
                                 (click)="setAsDefault(customer)"
                                 mat-flat-button
                                 >
-                                <p class="underline underline-offset-2 text-sm">Set Default</p>
+                                <p class="underline underline-offset-2 text-sm sm:text-md">Set Default</p>
                                 </button>
                                 <div
                                 *ngIf = "customer.isDefault"
                                 class="w-full"
                                 >
-                                <p class="text-medium text-bold text-primary-500">Default</p>
+                                <p class="text-sm sm:text-md text-bold text-primary-500 text-center">Default</p>
                                 </div>
                                 
                             </div>

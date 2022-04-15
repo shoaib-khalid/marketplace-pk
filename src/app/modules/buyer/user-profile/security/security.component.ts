@@ -70,37 +70,37 @@ export class EditSecurityComponent implements OnInit
         
 
         // // update profile
-        // this._userService.changePasswordCustomerById(this.securityForm.value)
-        //     .subscribe((response) => {
+        this._userService.changePasswordCustomerById(this.securityForm.value)
+            .subscribe((response) => {
 
-        //         // Show a success message (it can also be an error message)
-        //         const confirmation = this._fuseConfirmationService.open({
-        //             title  : 'Success',
-        //             message: 'Your password has been updated successfully!',
-        //             icon: {
-        //                 show: true,
-        //                 name: "heroicons_outline:check",
-        //                 color: "success"
-        //             },
-        //             actions: {
-        //                 confirm: {
-        //                     label: 'Ok',
-        //                     color: "primary",
-        //                 },
-        //                 cancel: {
-        //                     show: false,
-        //                 },
-        //             }
-        //         });
+                // Show a success message (it can also be an error message)
+                const confirmation = this._fuseConfirmationService.open({
+                    title  : 'Success',
+                    message: 'Your password has been updated successfully!',
+                    icon: {
+                        show: true,
+                        name: "heroicons_outline:check",
+                        color: "success"
+                    },
+                    actions: {
+                        confirm: {
+                            label: 'Ok',
+                            color: "primary",
+                        },
+                        cancel: {
+                            show: false,
+                        },
+                    }
+                });
 
-        //          // Mark for check
-        //          this._changeDetectorRef.markForCheck();
+                 // Mark for check
+                 this._changeDetectorRef.markForCheck();
 
-        //     });
+            });
 
-        // setTimeout(() => {
-        //     this.alert = null;
-        // }, 7000);
+        setTimeout(() => {
+            this.alert = null;
+        }, 7000);
 
         // Enable the form
         this.securityForm.enable();
