@@ -4,10 +4,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
-import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { CustomerAuthenticate, ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
 import { DOCUMENT } from '@angular/common';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { takeUntil } from 'rxjs/operators';
+import { Platform } from 'app/core/platform/platform.types';
+import { Subject } from 'rxjs';
+import { AppleLoginProvider } from './apple.provider';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -31,6 +37,15 @@ export class AuthSignInComponent implements OnInit
     titleText:string ='Sign In';
     descriptionText:string ='Stay signed in with your account to make searching easier';
 
+    //validate Payload
+    validateOauthRequest : ValidateOauthRequest;
+    countryCode : string = '';
+
+
+    platform: Platform;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
     /**
      * Constructor
      */
@@ -41,7 +56,11 @@ export class AuthSignInComponent implements OnInit
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
         private _apiServer: AppConfig,
-        private _router: Router
+        private _router: Router,
+        private _socialAuthService: SocialAuthService,
+        private _platformsService: PlatformService,
+
+
     )
     {
     }
@@ -65,6 +84,17 @@ export class AuthSignInComponent implements OnInit
 
         let domain = this._apiServer.settings.storeFrontDomain;
         this.signInForm.get('domain').patchValue(domain);
+
+        
+        // Subscribe to platform data
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                this.platform = platform;
+
+                this.countryCode = this.platform.country;
+
+        });
 
         // We need to check first the location before we proceed to send the payload
         // this.signInForm.disable();
@@ -116,16 +146,6 @@ export class AuthSignInComponent implements OnInit
                                 this._userService.user = user;
                             });
                             
-                            // Set the redirect url.
-                            // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                            // to the correct page after a successful sign in. This way, that url can be set via
-                            // routing file and we don't have to touch here.
-                            // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
-        
-                            // // Navigate to the redirect url
-                            // this._router.navigateByUrl(redirectURL);
-                            
-
                             // Navigate to the redirect url
                             this._activatedRoute.queryParams.subscribe(param => {
                                     const redirectUrl = param['redirectUrl'];     
@@ -159,5 +179,64 @@ export class AuthSignInComponent implements OnInit
                     this.showAlert = true;
                 }
             );
+    }
+
+    signInWithGoogle(): void {
+        this._socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
+            .then(userData => {
+                this.validateOauthRequest = new ValidateOauthRequest();
+                this.validateOauthRequest.country = this.countryCode;
+                this.validateOauthRequest.email = userData.email;
+                this.validateOauthRequest.loginType = "GOOGLE";
+                this.validateOauthRequest.name = userData.name;
+                this.validateOauthRequest.token = userData.idToken;
+                
+                this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
+                    .subscribe(() => {
+                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+
+                        // // Navigate to the redirect url
+                        // this._router.navigateByUrl(redirectURL);
+
+                        this._router.navigate(['/stores' ]);
+                    },
+                    exception => {
+                        console.error("An error has occured : ",exception);
+                    });
+            });
+    }
+    
+    signInWithFB(): void {
+        this._socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID)
+            .then(userData => {
+                this.validateOauthRequest = new ValidateOauthRequest();
+                this.validateOauthRequest.country = this.countryCode;
+                this.validateOauthRequest.email = userData.email
+                this.validateOauthRequest.loginType = "FACEBOOK";
+                this.validateOauthRequest.name = userData.name;
+                this.validateOauthRequest.token = userData.authToken;
+                this.validateOauthRequest.userId = userData.id;
+                
+                this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
+                    .subscribe(() => {                    
+                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+
+                        // // Navigate to the redirect url
+                        // this._router.navigateByUrl(redirectURL);
+
+                        this._router.navigate(['/stores' ]);
+                    },
+                    exception => {
+                        console.log("exception ::::",exception);
+
+                    });
+            });
+    }
+
+    signInWithApple(): void {
+        this._socialAuthService.signIn(AppleLoginProvider.PROVIDER_ID)
+            .then(userData => {
+
+            });
     }
 }

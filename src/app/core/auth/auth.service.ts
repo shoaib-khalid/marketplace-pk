@@ -7,7 +7,7 @@ import { UserService } from 'app/core/user/user.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service'
-import { CustomerAuthenticate } from './auth.types';
+import { CustomerAuthenticate, ValidateOauthRequest } from './auth.types';
 import { UserRole } from '../user/user.types';
 
 @Injectable()
@@ -28,6 +28,14 @@ export class AuthService
     )
     {        
     }
+
+    socialOptions = {
+        headers: new HttpHeaders({
+          "Content-Type": "application/json"
+        }),
+        withCredentials : true
+      
+    };
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -74,6 +82,12 @@ export class AuthService
     {
         return "Bearer accessToken";
     }
+
+    get userService$()
+    {
+        return this._apiServer.settings.apiServer.userService;
+    }
+
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
@@ -317,5 +331,51 @@ export class AuthService
 
         // If the access token exists and it didn't expire, sign in using it
         return this.signInUsingToken();
+    }
+
+    /**
+     * Sign in with google, fb,apple
+     */
+
+    loginOauth(authRequest:ValidateOauthRequest, origin: string):Observable<any> {  
+        // Throw error, if the user is already logged in
+        if ( this._authenticated )
+        {
+            return throwError('User is already logged in.');
+        }
+    
+        return this._httpClient.post<any>(this.userService$ +'/clients/loginoauth', authRequest, this.socialOptions).pipe(
+            switchMap(async (response: any) => {
+    
+                this._logging.debug("Response from AuthService (loginOauth)",response);
+
+                // Generate jwt manually since Kalsym User Service does not have JWT
+                let jwtPayload = {
+                    iat: Date.parse(response.data.session.created),
+                    iss: 'Fuse',
+                    exp: Date.parse(response.data.session.expiry),
+                    role: response.data.role,
+                    act: response.data.session.accessToken,
+                    rft: response.data.session.refreshToken,
+                    uid: response.data.session.ownerId
+                }
+
+                // this._genJwt.generate(jwtheader,jwtpayload,secret)
+                let token = this._jwt.generate({ alg: "HS256", typ: "JWT"},jwtPayload,response.data.session.accessToken);
+
+                // Store the access token in the local storage
+                this.jwtAccessToken = token;
+
+                // Set the authenticated flag to true
+                this._authenticated = true;
+
+                // Store Authentication
+                this._customerAuthenticate.next(response.data);
+
+                // Return true
+                return response.data;
+    
+            })
+        );            
     }
 }
