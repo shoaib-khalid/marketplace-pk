@@ -9,7 +9,7 @@ configProdJson:
     config.prod.json: |
       {
           "env": {
-              "name": "dev"
+              "name": "staging"
           },
           "apiServer": {
               "flowBuilderService"  : "https://api.symplified.it/flow-builder/v1",
@@ -22,7 +22,7 @@ configProdJson:
           },
           "storeFrontDomain"          : ".dev-my.symplified.ai",
           "marketplaceDomain"         : "customer.dev-my.symplified.ai",
-          "merchantPortalDomain"      : "merchant.symplified.it",
+          "merchantPortalDomain"      : "merchant.dev-my.symplified.ai",
           "logging": 0
       }
   volumeMount:
@@ -37,7 +37,7 @@ fullnameOverride: ""
 image:
   pullPolicy: Always
   repository: kalsym/marketplace
-  tag: 0.0.3
+  tag: 0.1.0
 imagePullSecrets:
 - name: kalsym-docker-hub
 ingress:
