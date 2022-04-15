@@ -4,6 +4,10 @@ import { BooleanInput } from '@angular/cdk/coercion';
 import { Subject, takeUntil } from 'rxjs';
 import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { AuthService } from 'app/core/auth/auth.service';
+
+
 
 @Component({
     selector       : 'user',
@@ -21,6 +25,10 @@ export class UserComponent implements OnInit, OnDestroy
     @Input() showAvatar: boolean = true;
     user: User;
 
+    customer:any;
+    customerAuthenticate: CustomerAuthenticate;
+
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -29,7 +37,9 @@ export class UserComponent implements OnInit, OnDestroy
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _authService: AuthService,
+
     )
     {
     }
@@ -52,6 +62,24 @@ export class UserComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        this._authService.customerAuthenticate$
+        .subscribe((response: CustomerAuthenticate) => {
+            
+            this.customerAuthenticate = response;
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._userService.get(this.customerAuthenticate.session.ownerId)
+        .subscribe((response)=>{
+
+            this.customer = response.data;
+            
+            
+        });
+
     }
 
     /**
@@ -95,4 +123,14 @@ export class UserComponent implements OnInit, OnDestroy
     {
         this._router.navigate(['/sign-out']);
     }
+
+    /**
+     * Edit Profile
+     */
+
+    editProfile(): void
+    {
+        this._router.navigate(['/profile']);
+    }
+    
 }

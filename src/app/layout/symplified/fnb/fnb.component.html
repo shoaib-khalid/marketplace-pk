@@ -1,6 +1,6 @@
 <!-- Notification -->
 <ng-container *ngIf="notificationMessage && notificationMessage !== null">
-    <div class="absolute z-40 top-0 right-0 left-0 w-full">
+    <div class="top-0 right-0 left-0 w-full">
         <div class="bg-primary flex items-center justify-center text-black font-semibold px-4 py-3 w-full relative">
             <div class="flex flex-row items-center justify-center w-full max-w-280">
                 <marquee width="100%" direction="left">
@@ -9,7 +9,7 @@
             </div>
             <span 
                 (click)="closeNotification()"
-                class="absolute top-0 bottom-0 right-0 px-4 py-2 cursor-pointer">
+                class="relative top-0 bottom-0 right-0 px-4 py-2 cursor-pointer">
                 <mat-icon 
                     class="text-black"
                     [svgIcon]="'heroicons_solid:x'"></mat-icon>
@@ -17,6 +17,71 @@
         </div>
     </div>
 </ng-container>
+
+<!-- Drawer -->
+<fuse-drawer
+    class="w-full h-full z-999"
+    [mode]="isScreenSmall ? 'over' : 'side'"
+    [transparentOverlay]="false"
+    [name]="'hamburgerMenu'"
+    [position]="'left'"
+    #hamburgerMenu>
+
+    <!-- Categories -->
+    <div class="flex flex-col w-full overflow-auto bg-card">
+        <div class="flex flex-col">
+            <div class="flex items-center w-full p-4 pl-6">
+
+                <!-- Logo -->
+                <div class="flex items-center justify-center">
+                    <img
+                        class="w-14"
+                        [src]="platform.logo">
+                </div>
+                <!-- Components -->
+                <div class="flex items-center ml-auto">
+                    <notifications></notifications>
+                    <user [showAvatar]="false"></user>
+                </div>
+            </div>
+      
+            <div class="flex flex-col items-center justify-center w-full">
+                <button
+                class="w-full h-full font-medium hover:bg-gray-100 hover:text-primary text-left px-6 pt-4 py-4 "
+                [routerLink]="['/buyer-voucher/voucher-list']" 
+                routerLinkActive="linkactive"
+                (click)="hamburgerMenu.close()"
+                >
+                    Voucher
+                </button>
+            </div>
+
+            <!-- Choose Completion Status -->
+            <div class="font-semibold px-6 pt-4 pb-2">Completion Status</div>
+
+            <!-- Status -->
+            <ng-container *ngFor="let status of completionStatus">
+                <input 
+                    [id]="'status-btn-' + status.code" 
+                    [value]="status.code"
+                    type="button" 
+                    class="w-0 h-0 invisible">
+                   
+                <label
+                    class="flex flex-row w-full h-full cursor-pointer border-b pl-9 py-4 hover:bg-gray-100 hover:text-primary"
+                    [routerLink]="['/buyer/' + status.code]"
+                    routerLinkActive="linkactive"
+                    (click)="hamburgerMenu.close()"
+                    [for]="'status-btn-' + status.code"
+                >
+                    <span class="">{{status.name}}</span>
+                </label>
+            </ng-container>
+
+         
+        </div>
+    </div>
+</fuse-drawer>
 
 <!-- Containers -->
 <ng-container>
@@ -53,7 +118,7 @@
                     <div class="top-0 sticky sm:relative z-30 flex flex-col items-center w-full h-16 sm:h-28 bg-black px-5">
                         <div class="flex flex-row justify-between max-w-280 h-full w-full">
                             <!-- Hamburger Menu -->
-                            <div class="flex flex-col justify-center items-center sm:hidden">
+                            <div class="flex flex-col justify-center items-center">
                                 <!-- Hamburger Menu Open -->
                                 <input
                                     id="burger-menu-button"
@@ -84,7 +149,7 @@
                                     matRipple>
                                     <mat-icon
                                         class="text-primary"
-                                        [svgIcon]="'arrow_back_ios'"></mat-icon>
+                                        [svgIcon]="'mat_solid:menu'"></mat-icon>
                                 </label>
                             </div>
                             <!-- Logo -->
@@ -128,13 +193,13 @@
                                         </label>
                                     </div>
                                     <!-- Login/SignUp -->
-                                    <div class="hidden sm:block sm:flex flex-row pl-8 items-center">
+                                    <!-- <div class="hidden sm:block sm:flex flex-row pl-8 items-center">
                                         <ng-container *ngIf="user">
                                             <span class="cursor-pointer">{{user.username}}</span>
                                         </ng-container>
                                         <span> &nbsp; | &nbsp; </span>
                                         <span class="cursor-pointer hover:text-primary" (click)="signOut()">Sign Out</span>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -218,54 +283,3 @@
 <ng-template #noStore>
     <error-404></error-404>
 </ng-template>
-
-
-<!-- Drawer -->
-<fuse-drawer
-    class="absolute sm:hidden w-full h-full"
-    style="z-index: 99999 !important;"
-    fixed
-    [mode]="'over'"
-    [transparentOverlay]="true"
-    [name]="'hamburgerMenu'"
-    [position]="'left'"
-    #hamburgerMenu>
-
-    <!-- Categories -->
-    <div class="flex flex-col w-full overflow-auto bg-card">
-        <div class="flex flex-col">
-
-            <!-- customer email -->
-            <div *ngIf="user" class="font-semibold px-6 pt-4 pb-2">{{user.username}}</div>
-
-            <!-- sign out button -->
-            <div class="m-4">
-                <button 
-                    class="w-full h-10 font-medium hover:bg-black hover:text-primary bg-primary rounded-full" 
-                    (click)="signOut()">
-                    Sign Out
-                </button>
-            </div>
-
-            <!-- Choose Category -->
-            <div class="font-semibold px-6 pt-4 pb-2">Choose Category x</div>
-
-            <!-- Categories -->
-            <ng-container *ngFor="let category of storeCategories">
-                <input 
-                    [id]="'categories-btn-' + category.id" 
-                    [value]="getCategorySlug(category.name)"
-                    type="button" 
-                    class="w-0 h-0 invisible"
-                    (click)="changeCatalogue($event.target.value, $event)">
-                <label
-                    class="flex flex-row w-full h-full text-lg font-semibold cursor-pointer border-b pl-9 py-4 "
-                    [ngClass]="(storeCategory && storeCategory.id === category.id) ? 'bg-primary text-black' :''"
-                    [for]="'categories-btn-' + category.id"
-                >
-                    <span class="">{{category.name}}</span>
-                </label>
-            </ng-container>
-        </div>
-    </div>
-</fuse-drawer>

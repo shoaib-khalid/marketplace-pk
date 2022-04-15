@@ -30,11 +30,12 @@ export interface CustomerAddress
     country: string;
     customerId: string;
     email: string;
-    id: string;
+    id?: string;
     name: string;
     phoneNumber: string;
     postCode: string;
     state: string;
+    isDefault: boolean;
 }
 
 export interface Client
@@ -67,4 +68,20 @@ export enum UserRole {
     Admin = 'SUPER_USER',
     Merchant = 'STORE_OWNER',
     Customer ='CUSTOMER'
+}
+
+export interface HttpResponsePagination<T>{
+    message?: string;
+    data?:{content:T}
+    path : string;
+    status: number;
+    timestamp:string;
+}
+
+export interface HttpResponse<T>{
+    message?: string;
+    data?:T
+    path : string;
+    status: number;
+    timestamp:string;
 }

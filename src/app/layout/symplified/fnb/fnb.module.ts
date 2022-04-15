@@ -8,6 +8,8 @@ import { DatePipe } from '@angular/common';
 import { FuseDrawerModule } from '@fuse/components/drawer';
 import { MatButtonModule } from '@angular/material/button';
 import { Error404Component } from 'app/shared/error-404/error-404.component';
+import { NotificationsModule } from 'app/layout/common/notifications/notifications.module';
+import { UserModule } from 'app/layout/common/user/user.module';
 
 @NgModule({
     declarations: [
@@ -21,7 +23,9 @@ import { Error404Component } from 'app/shared/error-404/error-404.component';
         MatIconModule,
         FuseAlertModule,
         FuseDrawerModule,
-        MatButtonModule
+        MatButtonModule,
+        NotificationsModule,
+        UserModule
     ],
     exports     : [
         FnbLayoutComponent,

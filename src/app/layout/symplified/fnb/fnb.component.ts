@@ -12,16 +12,31 @@ import { ProductsService } from 'app/core/product/product.service';
 import { UserService } from 'app/core/user/user.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+
 
 @Component({
     selector     : 'fnb-layout',
     templateUrl  : './fnb.component.html',
+    styles         : [
+        /* language=SCSS */
+        `
+        .linkactive{
+            background-color: #e2e8f0 !important;
+            color: #f59e0b
+        }
+
+        `
+    ],
     encapsulation: ViewEncapsulation.None
 })
 export class FnbLayoutComponent implements OnDestroy
 {
     public version: string = environment.appVersion;
     
+    platform: Platform;
     store: Store;
     storeCategories: StoreCategory[];
     storeCategory: StoreCategory;
@@ -58,6 +73,31 @@ export class FnbLayoutComponent implements OnDestroy
     
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    isScreenSmall: boolean;
+
+    completionStatus : any =[
+        {
+            code:'all',name:'All'
+        },
+        {
+            code:'to-pay',name:'To Pay'
+        },
+        {
+            code:'to-ship',name:'To Ship'
+        },
+        {
+            code:'shipping',name:'Shipping'
+        },
+        {
+            code:'completed',name:'Completed'
+        },
+        
+        
+        
+
+    ]    
+
+
     /**
      * Constructor
      */
@@ -69,7 +109,11 @@ export class FnbLayoutComponent implements OnDestroy
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
-        private _authService: AuthService
+        private _authService: AuthService,
+        private _platformsService: PlatformService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+
+
     )
     {
     }
@@ -159,9 +203,27 @@ export class FnbLayoutComponent implements OnDestroy
         this._userService.get(this.customerAuthenticate.session.ownerId)
         .subscribe((response)=>{
 
-            this.user = response.data
+            this.user = response.data;
+            
             
         });
+
+        // Subscribe to platform data
+        this._platformsService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => {
+            this.platform = platform;
+        });
+
+        // Subscribe to media changes
+        this._fuseMediaWatcherService.onMediaChange$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(({matchingAliases}) => {
+
+            // Check if the screen is small
+            this.isScreenSmall = !matchingAliases.includes('md');
+        });
+
 
         // this._notificationService.notification$
         //     .pipe(takeUntil(this._unsubscribeAll))
@@ -421,6 +483,17 @@ export class FnbLayoutComponent implements OnDestroy
         this.catalogueSlug = value;
         
         this._router.navigate(['catalogue/' + value]);
+
+        this.reload();
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    changeCompletionStatus(value, event = null) {
+
+
+        this._router.navigate(['buyer/' + value]);
 
         this.reload();
 
