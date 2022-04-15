@@ -82,12 +82,12 @@
         </div>
 
         <!-- Container -->
-        <div class="flex flex-col md:flex-row justify-between mt-4 w-full max-w-280">
+        <div class="flex flex-col justify-between mt-4 w-full max-w-280">
             <!-- Search & Filter -->
             <ng-container *ngIf="currentScreenSize.includes('md')">
                 <div class="flex flex-col pr-6">
                     <!-- Search for large screen -->
-                    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
+                    <!-- <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
                         <mat-icon
                             class="icon-size-4 text-primary"
                             matPrefix
@@ -96,10 +96,10 @@
                             matInput
                             [autocomplete]="'off'"
                             [placeholder]="'Search products'">
-                    </mat-form-field>
+                    </mat-form-field> -->
     
                     <!-- Filter -->
-                    <div class="flex flex-col mt-2 border border-gray-300 rounded-lg py-2 px-4 mb-4">
+                    <!-- <div class="flex flex-col mt-2 border border-gray-300 rounded-lg py-2 px-4 mb-4">
                         <div class="flex flex-col">
                             <div class="m-3 items-center w-full">
                                 <h3 class="font-semibold">Progress</h3>
@@ -164,9 +164,22 @@
                                 </mat-checkbox>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </ng-container>
+
+            <!-- Order Status Tabs -->
+            <ul class="flex mb-0 list-none flex-wrap pb-4 px-4 flex-row">
+                <ng-container *ngFor="let orderStatus of orderCategories">
+                    <li class="-mb-px mr-2 pb-2 last:mr-0 flex-auto text-center">
+                        <a class="text-xs font-bold uppercase px-5 py-3 border cursor-pointer	shadow-lg rounded block leading-normal" 
+                            (click)="changeOrderDetails(orderStatus.name, event$)" 
+                            [ngClass]="{'text-primary bg-white': openTab !== orderStatus.name, 'text-white bg-primary': openTab === orderStatus.name}">
+                            <i class="text-base mr-1"></i> {{orderStatus.label}} ({{orderStatus.count}}) 
+                        </a>
+                    </li>
+                </ng-container>
+            </ul>
 
             <!-- Order Details -->
             <div class="flex flex-col w-full">
@@ -175,7 +188,12 @@
                         <div class="container mx-auto w-full">
                             <div class="w-full">
                                 <!-- orders -->
-                                <ng-container *ngFor="let orderDetails of ordersDetails">
+                                <ng-container 
+                                    #recentOrderProgress
+                                    matSort
+                                    matSortDisableClear
+
+                                    *ngFor="let orderDetails of ordersDetails">
                                     <!-- Order Header -->
                                     <div class="w-full border border-gray-300 rounded-lg py-2 px-4 mb-4">
                                         <div class="flex flex-col w-full">
@@ -183,12 +201,12 @@
                                                 <div class="flex flex-row">
                                                     <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                                     <div class="flex flex-col pl-2">
-                                                        <h3 class="font-semibold text-xl">{{orderDetails.store.name}}</h3>
-                                                        <h3 class="text-gray-400 text-sm">Order ID : {{orderDetails.invoiceId}}</h3>
-                                                        <h3 class="text-gray-400 text-sm">Order Placed : {{orderDetails.created | date:'MMM dd, h:mm a' }}</h3>
+                                                        <h3 class="font-bold">{{orderDetails.store.name}}</h3>
+                                                        <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
+                                                        <h3 class="text-gray-400 text-xs">Order Placed : {{orderDetails.created | date:'MMM dd, h:mm a' }}</h3>
                                                     </div>
                                                 </div>
-                                                <button class="flex flex-row m-2 justify-center w-32 border border-primary p-2 rounded">
+                                                <button class="flex flex-row m-2 items-center justify-center w-24 border border-primary p-2 rounded">
                                                     <!-- Progress Status Icon -->
                                                     <mat-icon 
                                                         *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED'" 
@@ -197,8 +215,8 @@
                                                     </mat-icon>
                                                     <mat-icon 
                                                         *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED' || orderDetails.completionStatus === 'AWAITING_PICKUP'" 
-                                                        class="text-green-500" 
-                                                        svgIcon="local_shipping">
+                                                        class="text-green-500"
+                                                        svgIcon="mat_solid:local_shipping">
                                                     </mat-icon>
                                                     <mat-icon 
                                                         *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER' || orderDetails.completionStatus === 'RECEIVED_AT_STORE'"
@@ -214,19 +232,19 @@
                                                     <!-- Progress Status -->
                                                     <span 
                                                         *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED'" 
-                                                        class="font-semibold items-center pl-2">To Ship
+                                                        class="font-semibold items-center text-sm pl-2">To Ship
                                                     </span>
                                                     <span 
                                                         *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED' || orderDetails.completionStatus === 'AWAITING_PICKUP'" 
-                                                        class="font-semibold items-center pl-2">Shipping
+                                                        class="font-semibold items-center text-sm pl-2">Shipping
                                                     </span>
                                                     <span 
                                                         *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER' || orderDetails.completionStatus === 'RECEIVED_AT_STORE'" 
-                                                        class="font-semibold items-center pl-2">Delivered
+                                                        class="font-semibold items-center text-sm pl-2">Delivered
                                                     </span>
                                                     <span 
                                                         *ngIf="orderDetails.completionStatus === 'CANCELED_BY_CUSTOMER' || orderDetails.completionStatus === 'CANCELED_BY_MERCHANT'" 
-                                                        class="font-semibold items-center pl-2">Cancelled
+                                                        class="font-semibold items-center text-sm pl-2">Cancelled
                                                     </span>
 
                                                 </button>
@@ -235,10 +253,10 @@
                                                 <div class="border-t w-full"></div>
                                                 <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails">
                                                     <div class="flex flex-row justify-between w-full py-2">
-                                                        <div class="w-full">
-                                                            <div class="relative flex flex-0 items-center justify-center w-16 h-16 mr-4 rounded overflow-hidden border">
+                                                        <div class="w-full flex flex-row">
+                                                            <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
                                                                 <img
-                                                                class="w-32"
+                                                                class="w-full"
                                                                 [alt]="'Product thumbnail image of ' + orderItemDetail.productName"
                                                                 [src]=
                                                                     "orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url 
@@ -249,17 +267,17 @@
                                                                     class="flex items-center justify-center w-full h-full text-xs font-semibold leading-none text-center uppercase">
                                                                 </div>
                                                             </div>
+                                                            <div class="w-full">
+                                                                <h3 (click)="redirect(orderItemDetail.productInventory.product.seoUrl)" class="font-semibold text-sm hover:text-primary cursor-pointer">{{orderItemDetail.productName}}</h3>
+                                                                <h3 class="text-gray-400 text-sm">{{orderItemDetail.productVariant}}</h3>
+                                                            </div>
                                                         </div>
-                                                        <div class="w-full">
-                                                            <h3 (click)="redirect(orderItemDetail.productInventory.product.seoUrl)" class="font-bold hover:text-primary cursor-pointer">{{orderItemDetail.productName}}</h3>
-                                                            <h3 class="text-gray-400">{{orderItemDetail.productVariant}}</h3>
-                                                        </div>
-                                                        <div class="items-center justify-center">
-                                                            <h3 class="text-gray-400">x{{orderItemDetail.quantity}}</h3>
-                                                        </div>
-                                                        <div class="items-end w-full flex flex-col">
+                                                        <!-- <div class="items-center justify-center pl-4">
+                                                        </div> -->
+                                                        <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
+                                                            <h3 class="text-gray-400 items-center text-sm">x{{orderItemDetail.quantity}}</h3>
                                                             <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
-                                                            <h3 class="font-bold text-primary">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                                            <h3 class="font-bold text-primary text-sm">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                                         </div>
                                                     </div>
                                                     <!-- <div class="flex flex-row justify-between w-full py-2">
@@ -324,8 +342,8 @@
                                                         </div> -->
                                                     </div>
                                                     <div class="flex flex-row w-40 justify-between mb-6">
-                                                        <p class="items-center font-semibold text-gray-400">Total Order :</p> 
-                                                        <h3 class="w-fulltext-lg font-semibold">{{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                                        <p class="items-center font-semibold text-gray-400 text-sm">Total Order :</p> 
+                                                        <h3 class="w-fulltext-lg font-semibold text-sm">{{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                                     </div>
                                                 </div>
                                             </div>
