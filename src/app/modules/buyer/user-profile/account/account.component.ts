@@ -165,7 +165,7 @@ export class EditAccountComponent implements OnInit
                 height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
                 maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-                // disableClose: true,
+                disableClose: true,
                 data: customerAddress,
                 });
             
@@ -224,7 +224,7 @@ export class EditAccountComponent implements OnInit
                 height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
                 maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-                // disableClose: true,
+                disableClose: true,
                 data: 'create',
                 });
         
