@@ -64,21 +64,46 @@
             </div>
 
             <!-- State -->
-            <div class="sm:col-span-4">
+            <!-- <div class="sm:col-span-4">
                 <mat-form-field class="fuse-mat-emphasized-affix w-full">
                     <mat-label>State</mat-label>
                     <input
                         [formControlName]="'state'"
                         matInput>
                 </mat-form-field>
-            </div>
+            </div> -->
 
+            <!-- State -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>State</mat-label>
+                    <mat-select 
+                        [formControlName]="'state'"
+                        [required]="true"
+                        [placeholder]="'Select State'"
+                        #stateSelector="matSelect">
+                        <mat-select-trigger>
+                            <span class="flex items-center">
+                                <span>{{ stateSelector.triggerValue }}</span>
+                            </span>
+                        </mat-select-trigger>
+                        <div *ngFor="let state of storeStates">
+                            <mat-option [value]="state.id">{{state.name}}</mat-option>
+                        </div>
+                    </mat-select>
+                    <mat-error *ngIf="addressForm.get('state').hasError('required')">
+                        Required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            
             <!-- Country -->
             <div class="sm:col-span-4">
                 <mat-form-field class="fuse-mat-emphasized-affix w-full">
                     <mat-label>Country</mat-label>
                     <input
                         [formControlName]="'country'"
+                        readonly
                         matInput>
                 </mat-form-field>
             </div>
