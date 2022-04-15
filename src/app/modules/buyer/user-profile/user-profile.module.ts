@@ -20,6 +20,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { FuseCardModule } from '@fuse/components/card';
 import { FuseAlertModule } from '@fuse/components/alert';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 import { userProfileRoutes } from './user-profile.routing';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
@@ -54,7 +56,8 @@ import { EditAddressComponent } from './account/edit-address/edit-address.compon
         MatToolbarModule,
         MatListModule,
         FuseCardModule,
-        FuseAlertModule
+        FuseAlertModule,
+        MatDialogModule
     ],
     providers: [
         // GraphHelper
