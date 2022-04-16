@@ -23,7 +23,7 @@ export const appRoutes: Route[] = [
     // ]},
     // {path: 'coming-soon', loadChildren: () => import('app/shared/coming-soon/coming-soon.module').then(m => m.ComingSoonModule)},
 
-    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'redirect'},
+    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'orders'},
 
     // Redirect signed in user to the '/example'
     //
@@ -90,7 +90,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'fnb',
+            layout: 'marketplace',
             roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -98,12 +98,7 @@ export const appRoutes: Route[] = [
             platformSetup: PlatformSetupResolver
         },
         children   : [
-            {path: 'buyer', loadChildren: () => import('app/modules/buyer/order/order.module').then(m => m.OrderModule)},
-            {path: 'checkout', loadChildren: () => import('app/modules/buyer/checkout/checkout.module').then(m => m.BuyerCheckoutModule)},
-            {path: 'buyer-voucher', loadChildren: () => import('app/modules/buyer/voucher/voucher.module').then(m => m.VoucherModule)},
-            {path: 'profile', loadChildren: () => import('app/modules/buyer/user-profile/user-profile.module').then(m => m.UserProfileModule)},
-
-
+            {path: '', loadChildren: () => import('app/modules/buyer/buyer.module').then(m => m.BuyerModule)},
         ]
     }, 
 

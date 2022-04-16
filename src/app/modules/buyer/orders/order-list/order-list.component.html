@@ -1,0 +1,198 @@
+<!-- Order List -->
+<div class="relative flex flex-col items-center bg-card w-full h-full">
+    <!-- Main menu -->
+    <div class="flex flex-col items-center w-full h-auto my-5 px-3 sm:px-5">
+        <!-- Search For xs view Mobile -->
+        <ng-container>
+            <mat-form-field class="w-full fuse-mat-emphasized-affix min-w-64">
+                <input
+                    matInput
+                    [autocomplete]="'off'"
+                    [placeholder]="'Search for products, shops etc.'">
+                <mat-icon
+                class="icon-size-6 text-primary"
+                matSuffix
+                [svgIcon]="'mat_solid:search'"></mat-icon>
+            </mat-form-field>
+        </ng-container>
+        <!-- categories for xs view mobile -->
+        <div class="w-full truncate">
+            <div class="flex flex-nowrap items-center justify-start sm:justify-around overflow-x-scroll sm:overflow-x-hidden">
+                <ng-container *ngFor="let orderStatus of _orderCountSummary">
+                    <div class="flex flex-wrap items-center p-1 text-center">
+                        <input 
+                            [id]="orderStatus.id + '-btn'"
+                            [disabled]="openTab === orderStatus.id"
+                            (click)="toggleTabs(orderStatus.id)"
+                            type="button" 
+                            class="w-0 h-0 invisible">
+                        <label
+                            class="p-1 sm:p-2 w-24 sm:w-26 rounded-full cursor-pointer"
+                            [ngClass]="{'bg-gray-300 hover:bg-gray-400': openTab !== orderStatus.id, 'bg-primary font-semibold cursor-auto': openTab === orderStatus.id}"
+                            [for]="orderStatus.id + '-btn'"
+                        >
+                            <span class="text-sm sm:text-base">{{orderStatus.label}}</span>
+                        </label>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+
+        <!-- Container -->
+        <div class="flex flex-col justify-center mt-4 w-full">
+            <!-- Order Details -->
+            <div class="flex flex-col w-full">
+                <!-- Orders -->
+                <ng-container *ngIf="(ordersDetails$ | async) as ordersDetails">
+                    <ng-container *ngIf="ordersDetails.length > 0; else noOrder">
+                        <ng-container *ngFor="let orderDetails of ordersDetails">
+                            <!-- Orders -->
+                            <div class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-4 mb-4">
+                                <div class="flex flex-col w-full">
+                                    <!-- Header -->
+                                    <div class="flex flex-row my-3 items-start justify-between w-full">
+                                        <!-- Store Details -->
+                                        <div class="flex flex-row">
+                                            <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
+                                            <div class="flex flex-col pl-2">
+                                                <h3 class="font-bold">{{orderDetails.store.name}}</h3>
+                                                <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
+                                                <h3 class="text-gray-400 text-xs">Order Placed : {{orderDetails.created | date:'MMM dd, h:mm a' }}</h3>
+                                            </div>
+                                        </div>
+                                        <!-- Progress Status Icon -->
+                                        <div class="flex flex-row items-center justify-center min-w-24 border border-primary p-1 sm:p-2 rounded">
+                                            <mat-icon 
+                                                *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED'" 
+                                                class="text-green-500" 
+                                                svgIcon="heroicons_solid:clock">
+                                            </mat-icon>
+                                            <mat-icon 
+                                                *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED' || orderDetails.completionStatus === 'AWAITING_PICKUP'" 
+                                                class="text-green-500"
+                                                svgIcon="mat_solid:local_shipping">
+                                            </mat-icon>
+                                            <mat-icon 
+                                                *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER' || orderDetails.completionStatus === 'RECEIVED_AT_STORE'"
+                                                class="text-green-500" 
+                                                svgIcon="heroicons_solid:check-circle">
+                                            </mat-icon>
+                                            <mat-icon 
+                                                *ngIf="orderDetails.completionStatus === 'CANCELED_BY_CUSTOMER' || orderDetails.completionStatus === 'CANCELED_BY_MERCHANT'"
+                                                class="text-red-600" 
+                                                svgIcon="heroicons_solid:x-circle">
+                                            </mat-icon>
+
+                                            <!-- Progress Status -->
+                                            <span 
+                                                *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED'" 
+                                                class="font-semibold items-center text-sm pl-2">To Ship
+                                            </span>
+                                            <span 
+                                                *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED' || orderDetails.completionStatus === 'AWAITING_PICKUP'" 
+                                                class="font-semibold items-center text-sm pl-2">Shipping
+                                            </span>
+                                            <span 
+                                                *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER' || orderDetails.completionStatus === 'RECEIVED_AT_STORE'" 
+                                                class="font-semibold items-center text-sm pl-2">Delivered
+                                            </span>
+                                            <span 
+                                                *ngIf="orderDetails.completionStatus === 'CANCELED_BY_CUSTOMER' || orderDetails.completionStatus === 'CANCELED_BY_MERCHANT'" 
+                                                class="font-semibold items-center text-sm pl-2">Cancelled
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Border -->
+                                    <div class="border-t w-full"></div>
+                                    
+                                    <!-- Body -->
+                                    <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails">
+                                        <div class="flex flex-row items-center justify-around w-full py-2">
+                                            <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
+                                                <img
+                                                    class="w-full"
+                                                    [alt]="'Product thumbnail image of ' + orderItemDetail.productName"
+                                                    [src]=
+                                                        "orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url 
+                                                        : orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl 
+                                                        : orderDetails.store.storeLogoUrl ? orderDetails.store.storeLogoUrl
+                                                        : 'assets/branding/deliverin/logo/DeliverIN-Original.jpg'">
+                                            </div>
+                                            <div class="w-full md:pl-50">
+                                                <h3 (click)="redirect(orderItemDetail.productInventory.product.seoUrl)" 
+                                                    class="font-semibold text-sm hover:text-primary cursor-pointer">
+                                                    {{orderItemDetail.productName}}
+                                                </h3>
+                                                <h3 class="text-gray-400 text-sm">{{orderItemDetail.productVariant}}</h3>
+                                            </div>
+                                            <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
+                                                <h3 class="text-gray-400 items-center text-sm">x{{orderItemDetail.quantity}}</h3>
+                                                <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
+                                                <h3 class="font-bold text-primary text-sm">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                    <!-- Border -->
+                                    <div class="border-b w-full"></div>
+                                    
+                                    <!-- Footer -->
+                                    <div class="flex flex-row justify-between w-full py-2">
+                                        <!-- Order Details Button -->
+                                        <div class="flex flex-row">
+                                            <div class="w-24">
+                                                <input
+                                                    id="order-list-button"
+                                                    type="button"
+                                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                                    mat-button
+                                                    >
+                                                <label 
+                                                    [routerLink]="['/orders/details/' + orderDetails.id]"
+                                                    class="flex items-center justify-center h-8 sm:h-10 px-1 sm:px-2 rounded-lg bg-primary hover:bg-primary-600 cursor-pointer"
+                                                    for="add-to-cart-button"
+                                                    matRipple>
+                                                    <span class="text-sm font-semibold text-black">Order Details</span>
+                                                </label>
+                                            </div>
+                                            <!-- <div class="w-20 pl-2">
+                                                <input
+                                                    id="order-list-button"
+                                                    type="button"
+                                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                                    mat-button
+                                                    >
+                                                <label 
+                                                    (click)="viewDetails(orderDetails.id)"
+                                                    class="flex items-center justify-center h-10 w-10 rounded-full bg-primary hover:border-primary-500 cursor-pointer"
+                                                    for="add-to-cart-button"
+                                                    matRipple>
+                                                    <mat-icon class="text-black" svgIcon="mat_outline:receipt_long"></mat-icon>
+                                                </label>
+                                            </div> -->
+                                        </div>
+                                        <div class="flex flex-row w-40 justify-between">
+                                            <p class="items-center font-semibold text-gray-400 text-sm">Total Order :</p> 
+                                            <h3 class="w-fulltext-lg font-semibold text-sm">{{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>    
+                </ng-container>
+
+                <div class="flex w-full mt-4 items-center justify-center">
+                    <pagination 
+                        *ngIf="pagination"
+                        [itemLength]="pagination.length" 
+                        [initialPage]="pagination.page + 1"
+                        [pageSize]="pagination.size"
+                        (changePage)="onChangePage($event)"></pagination>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

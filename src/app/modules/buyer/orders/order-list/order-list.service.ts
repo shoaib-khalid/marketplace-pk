@@ -152,7 +152,7 @@ export class OrderListService
     }
 
     
-    getOrdersWithDetails( customerId: string, page: number = 0, size: number = 3,  completionStatus: string[] = ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE"]): 
+    getOrdersWithDetails(customerId: string, page: number = 0, size: number = 3,  completionStatus: string[] = []): 
     Observable<{ pagination: OrderPagination; orders: Order[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
@@ -162,11 +162,14 @@ export class OrderListService
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params: {
+                completionStatus,
                 customerId : '' + customerId,
                 page       : '' + page,
                 pageSize   : '' + size,
             }
         };
+
+        if (!completionStatus) { delete header.params.completionStatus; }
 
         return this._httpClient.get<any>(orderService + '/orders/details' , header)
         .pipe(

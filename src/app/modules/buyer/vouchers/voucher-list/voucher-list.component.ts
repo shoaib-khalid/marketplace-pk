@@ -9,8 +9,8 @@ import { Platform } from 'app/core/platform/platform.types';
 import { merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { VoucherModalComponent } from '../voucher-modal/voucher-modal.component';
-import { VoucherService } from '../voucher.service';
-import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from '../voucher.types';
+import { VouchersService } from '../vouchers.service';
+import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from '../vouchers.types';
 
 @Component({
     selector     : 'voucher-list',
@@ -104,7 +104,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
         public _dialog: MatDialog,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _voucherService: VoucherService,
+        private _vouchersService: VouchersService,
         private _authService: AuthService,
         private _platformService : PlatformService,
     )
@@ -121,7 +121,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
         // don't display this, if you do, customer will see all the voucher code and get free item all the time la
-        // this._voucherService.getAvailableVoucher().subscribe(response => {});
+        // this._vouchersService.getAvailableVoucher().subscribe(response => {});
 
         // Get customer Authenticate to get customer id
         this._authService.customerAuthenticate$
@@ -134,7 +134,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
         });
 
         // Get used customer voucher
-        this._voucherService.customerVouchers$
+        this._vouchersService.customerVouchers$
         .subscribe((response: CustomerVoucher[]) => {
 
             this.customerVoucher = response;
@@ -144,7 +144,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
         });
 
         // Get customer voucher pagination, isUsed = false 
-        this._voucherService.customerVoucherPagination$
+        this._vouchersService.customerVoucherPagination$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((response: CustomerVoucherPagination) => {
 
@@ -155,7 +155,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
         });
 
         // Get used customer voucher pagination, isUsed = true 
-        this._voucherService.usedCustomerVoucherPagination$
+        this._vouchersService.usedCustomerVoucherPagination$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((response: UsedCustomerVoucherPagination) => {
 
@@ -196,7 +196,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 merge(this._customerVoucherPagination.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._voucherService.getAvailableCustomerVoucher(false, 0, 10);
+                        return this._vouchersService.getAvailableCustomerVoucher(false, 0, 10);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -213,7 +213,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 merge(this._usedCustomerVoucherPagination.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._voucherService.getAvailableCustomerVoucher(true, 0, 10);
+                        return this._vouchersService.getAvailableCustomerVoucher(true, 0, 10);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -245,7 +245,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 // set loading to true
                 this.isLoading = true;
     
-                this._voucherService.getAvailableCustomerVoucher(false,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._vouchersService.getAvailableCustomerVoucher(false,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
                     .subscribe((response)=>{
                             
                         // set loading to false
@@ -261,7 +261,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 // set loading to true
                 this.isLoading = true;
     
-                this._voucherService.getAvailableCustomerVoucher(true,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._vouchersService.getAvailableCustomerVoucher(true,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
                     .subscribe((response)=>{
                         
                         // set loading to false
@@ -276,7 +276,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
 
     enterPromoCode(){
 
-        this._voucherService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
+        this._vouchersService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
         .subscribe((response) => {
             // if voucher is valid
             this.openVoucherModal('mat_solid:check_circle','Congratulations', 'Promo code successfully added', null);

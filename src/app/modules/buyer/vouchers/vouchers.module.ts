@@ -12,7 +12,7 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
 import { MatMenuModule } from '@angular/material/menu';
 import { SharedModule } from 'app/shared/shared.module';
 import { MatTabsModule } from '@angular/material/tabs'
-import { voucherRoutes } from './voucher.routing';
+import { voucherRoutes } from './vouchers.routing';
 import { VoucherListComponent } from './voucher-list/voucher-list.component';
 import { FuseCardModule } from '@fuse/components/card';
 import { VoucherModalComponent } from './voucher-modal/voucher-modal.component';
@@ -40,6 +40,6 @@ import { VoucherModalComponent } from './voucher-modal/voucher-modal.component';
     bootstrap   : [
     ]
 })
-export class VoucherModule
+export class VouchersModule
 {
 }

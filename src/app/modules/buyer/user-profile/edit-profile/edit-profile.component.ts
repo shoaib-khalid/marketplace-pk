@@ -2,6 +2,8 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } fr
 import { FormArray, FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { fuseAnimations } from '@fuse/animations';
 import { MatDrawer } from '@angular/material/sidenav';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { Subject, takeUntil } from 'rxjs';
 
 
 @Component({
@@ -20,12 +22,16 @@ export class EditProfileComponent implements OnInit
 
     panels: any[] = [];
     selectedPanel: string = 'account';
+    currentScreenSize: any;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
     constructor(
- 
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _changeDetectorRef: ChangeDetectorRef
     )
     {
         // this.checkExistingURL = debounce(this.checkExistingURL, 300);
@@ -51,18 +57,36 @@ export class EditProfileComponent implements OnInit
                 description: 'Manage your public profile and private information'
             },
             {
+                id         : 'delivery-address',
+                icon       : 'heroicons_outline:map',
+                title      : 'Delivery Address',
+                description: 'Manage and set default for delivery address'
+            },
+            {
                 id         : 'security',
                 icon       : 'heroicons_outline:lock-closed',
                 title      : 'Security',
                 description: 'Manage your password and 2-step verification preferences'
             },
-            // {
-            //     id         : 'plan-billing',
-            //     icon       : 'heroicons_outline:credit-card',
-            //     title      : 'Plan & Billing',
-            //     description: 'Manage your subscription plan, payment method and billing information'
-            // },
-        ]
+        ];
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;
+                
+                if (this.currentScreenSize.includes('md')) {
+                    this.drawerMode = 'side';
+                } else if (this.currentScreenSize.includes('sm')) {
+                    this.drawerMode = 'over';
+                } else {
+                    this.drawerMode = 'over';
+                }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     ngAfterViewInit(): void{
@@ -87,5 +111,16 @@ export class EditProfileComponent implements OnInit
         {
             this.drawer.close();
         }
+    }
+
+    /**
+    * Track by function for ngFor loops
+    *
+    * @param index
+    * @param item
+    */
+    trackByFn(index: number, item: any): any
+    {
+        return item.id || index;
     }
 }

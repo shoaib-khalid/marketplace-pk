@@ -70,14 +70,6 @@ export enum UserRole {
     Customer ='CUSTOMER'
 }
 
-export interface HttpResponsePagination<T>{
-    message?: string;
-    data?:{content:T}
-    path : string;
-    status: number;
-    timestamp:string;
-}
-
 export interface HttpResponse<T>{
     message?: string;
     data?:T

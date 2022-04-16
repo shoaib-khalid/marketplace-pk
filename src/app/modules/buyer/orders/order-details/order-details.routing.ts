@@ -14,7 +14,7 @@ export const orderDetailsRoutes: Route[] = [
     },
     {
         path     : '',
-        redirectTo: '/buyer/order',
+        redirectTo: '/buyers/order',
         component: OrderDetailsComponent
     }
 ];

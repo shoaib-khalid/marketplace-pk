@@ -7,23 +7,27 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { EditAddressDialog } from './edit-address/edit-address.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 
 @Component({
-    selector       : 'settings-account',
-    templateUrl    : './account.component.html',
+    selector       : 'settings-delivery-address',
+    templateUrl    : './delivery-address.component.html',
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditAccountComponent implements OnInit
+export class EditDeliveryAddressComponent implements OnInit
 {
     alert: any;
     accountForm: FormGroup;
-    clientId: string;
+    customerId: string;
+    customersAddresses$: Observable<CustomerAddress[]>;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     currentScreenSize: string[] = [];
 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    // client: Client;
 
     /**
      * Constructor
@@ -57,27 +61,30 @@ export class EditAccountComponent implements OnInit
             email   : ['', [Validators.required, Validators.email]],
        
         });
-    
+
         // ----------------------
         // Get client Details
         // ----------------------
 
+
         // Customer Details
         this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
-            .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response)=>{
                 this.accountForm.patchValue(response.data);
-            });
+            })
+
+        // Observable adress
+        this.customersAddresses$ = this._userService.customersAddresses$;
 
         this._fuseMediaWatcherService.onMediaChange$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(({matchingAliases}) => {               
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(({matchingAliases}) => {               
 
-                this.currentScreenSize = matchingAliases;                
+            this.currentScreenSize = matchingAliases;                
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
@@ -138,6 +145,80 @@ export class EditAccountComponent implements OnInit
 
         // Enable the form
         this.accountForm.enable();
+    }
+
+    editAddress(customerAddress: CustomerAddress){
+        const dialogRef = this._dialog.open(
+            EditAddressDialog, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data: {
+                    type: "edit",
+                    customerAddress: customerAddress
+                }
+            }
+        );
+        dialogRef.afterClosed().subscribe(result => {
+            if(result){
+                // Customer Addresses
+                this._userService.putCustomerAddressById(result).subscribe(()=>{});
+            } 
+        });        
+    }
+
+    deleteAddress(customerAddressId) {
+        // Open the confirmation dialog
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete Address',
+            message: 'Are you sure you want to remove this address? This action cannot be undone!',
+            actions: {
+                confirm: {
+                    label: 'Delete'
+                }
+            }
+        });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+                // Delete the customer on the server
+                this._userService.deleteCustomerAddressById(customerAddressId)
+                .subscribe(() => {});
+            }
+        });
+    }
+
+    addAddress() {
+        const dialogRef = this._dialog.open( 
+            EditAddressDialog, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data: {
+                    type: "create",
+                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid
+                },
+            }
+        );    
+        dialogRef.afterClosed().subscribe(result=>{
+            if (result) {
+                //Customer Addresses
+                this._userService.createCustomerAddress(result)
+                    .subscribe(()=>{});
+            }
+        });
+    }
+
+    setAsDefault(customerbody){
+        // Customer Addresses
+        this._userService.setDefaultCustomerAddressById(customerbody)
+            .subscribe(()=>{});
     }
     
 }

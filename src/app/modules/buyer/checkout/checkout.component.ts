@@ -209,8 +209,6 @@ export class BuyerCheckoutComponent implements OnInit
         this.displayLat = this.currentLat;
         this.displayLong = this.currentLong;
 
-        console.log('mahu check',this.currentLat);
-
         this.displayLatitude.next(this.displayLat.toString());
         this.displayLongtitude.next(this.displayLong.toString());
         // implement google maos
@@ -220,18 +218,13 @@ export class BuyerCheckoutComponent implements OnInit
             
         })
 
-        //  hardcode value first
-        // console.log('fetch value from server::::::::::::::',this.store);
-        
+        //  hardcode value first        
         this.location = {
             lat: this.displayLat,
             lng: this.displayLong,  
         };
         
-        console.log('location value::::::::::::::',this.location);
-
         loader.load().then(() => {
-            
             this.map = new google.maps.Map(document.getElementById("map"), {
                 center: this.location,
                 zoom: 15,
@@ -283,10 +276,8 @@ export class BuyerCheckoutComponent implements OnInit
         
                 places.forEach((place) => {
         
-                    console.log('Place',place);
                     let coordinateStringify = JSON.stringify(place?.geometry?.location);
                     let coordinateParse = JSON.parse(coordinateStringify);
-                    console.log('coordinate1',coordinateParse);
         
                     this.displayLat = coordinateParse.lat;
                     this.displayLong = coordinateParse.lng;
@@ -296,16 +287,15 @@ export class BuyerCheckoutComponent implements OnInit
 
 
                     this.location = {
-                    lat: coordinateParse.lat,
-                    lng: coordinateParse.lng,
+                        lat: coordinateParse.lat,
+                        lng: coordinateParse.lng,
                     };
         
                     this.fullAddress = place.address_components.map((data)=>data.long_name)
-                    console.log('fullAddress ',this.fullAddress)
                 
                     if (!place.geometry || !place.geometry.location) {
-                    console.log("Returned place contains no geometry");
-                    return;
+                        // console.info("Returned place contains no geometry");
+                        return;
                     }
             
                     // const icon = {
@@ -315,23 +305,22 @@ export class BuyerCheckoutComponent implements OnInit
                     //   anchor: new google.maps.Point(17, 34),
                     //   scaledSize: new google.maps.Size(25, 25),
                     // };
-                    console.log('this.map search',this.map);
         
                     // Create a marker for each place.
                     markers.push(
-                    new google.maps.Marker({
-                        map:this.map,
-                        // icon,
-                        title: place.name,
-                        position: place.geometry.location,
-                    })
+                        new google.maps.Marker({
+                            map:this.map,
+                            // icon,
+                            title: place.name,
+                            position: place.geometry.location,
+                        })
                     );
             
                     if (place.geometry.viewport) {
-                    // Only geocodes have viewport.
-                    bounds.union(place.geometry.viewport);
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport);
                     } else {
-                    bounds.extend(place.geometry.location);
+                        bounds.extend(place.geometry.location);
                     }
                 });
                 this.map.fitBounds(bounds);
@@ -348,8 +337,6 @@ export class BuyerCheckoutComponent implements OnInit
                     lat: coordinateClickParse.lat,
                     lng: coordinateClickParse.lng,
                 };
-                console.log('new location::::',this.location);
-
     
                 // Clear out the old markers.
                 markers.forEach((marker) => {

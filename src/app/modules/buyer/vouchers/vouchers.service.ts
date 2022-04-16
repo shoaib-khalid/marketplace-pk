@@ -6,12 +6,12 @@ import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from 'app/core/auth/auth.service';
-import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from './voucher.types';
+import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from './vouchers.types';
 
 @Injectable({
     providedIn: 'root'
 })
-export class VoucherService
+export class VouchersService
 {
     private _voucher: ReplaySubject<Voucher> = new ReplaySubject<Voucher>(1);
     private _vouchers: ReplaySubject<Voucher[]> = new ReplaySubject<Voucher[]>(1);
@@ -201,7 +201,7 @@ export class VoucherService
             switchMap( customerVouchers => this._httpClient.post<any>(orderService + '/voucher/claim/' + id + '/' + voucherCode, header)
             .pipe(
                 map((response) => {
-                    this._logging.debug("Response from VoucherService (postCustomerClaimVoucher)",response);
+                    this._logging.debug("Response from VouchersService (postCustomerClaimVoucher)",response);
 
                     const updatedCustomerVouchers = customerVouchers;
 
@@ -217,7 +217,7 @@ export class VoucherService
         // return this._httpClient.post<any>(orderService + '/voucher/claim/' + id + '/' + voucherCode, header)
         //     .pipe(
         //         map((response) => {
-        //             this._logging.debug("Response from VoucherService (postCustomerClaimVoucher)",response);
+        //             this._logging.debug("Response from VouchersService (postCustomerClaimVoucher)",response);
 
         //             return response["data"];
         //         })

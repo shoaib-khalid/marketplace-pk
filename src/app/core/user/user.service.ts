@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
-import { Client, Customer, CustomerAddress, HttpResponse, HttpResponsePagination, User } from 'app/core/user/user.types';
+import { Client, Customer, CustomerAddress, HttpResponse, User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -18,9 +18,7 @@ export class UserService
     private _client: BehaviorSubject<Client | null> = new BehaviorSubject(null);
 
     private _customerAddress: BehaviorSubject<CustomerAddress | null> = new BehaviorSubject(null);
-    private _customersAddress: BehaviorSubject<CustomerAddress[] | null> = new BehaviorSubject(null);
-
-
+    private _customerAddresses: BehaviorSubject<CustomerAddress[] | null> = new BehaviorSubject(null);
     
     /**
      * Constructor
@@ -55,21 +53,21 @@ export class UserService
         return this._user.asObservable();
     }
 
-        /**
+    /**
      * Setter & getter for user
      *
      * @param value
      */
-        set customer(value: Customer)
-        {
-            // Store the value
-            this._customer.next(value);
-        }
-    
-        get customer$(): Observable<Customer>
-        {
-            return this._customer.asObservable();
-        }
+    set customer(value: Customer)
+    {
+        // Store the value
+        this._customer.next(value);
+    }
+
+    get customer$(): Observable<Customer>
+    {
+        return this._customer.asObservable();
+    }
 
     /**
      * Setter & getter for user
@@ -87,21 +85,36 @@ export class UserService
         return this._client.asObservable();
     }
 
-
-    get customersAddress$(): Observable<CustomerAddress[]>
+    /**
+     * Setter & getter for customersAddresses
+     *
+     * @param value
+     */
+    get customersAddresses$(): Observable<CustomerAddress[]>
     {
-        return this._customersAddress.asObservable();
+        return this._customerAddresses.asObservable();
     }
 
+    set customersAddresses(value: CustomerAddress[])
+    {
+        // Store the value
+        this._customerAddresses.next(value);
+    }
+
+    /**
+     * Setter & getter for customersAddress
+     *
+     * @param value
+     */
     get customerAddress$(): Observable<CustomerAddress>
     {
         return this._customerAddress.asObservable();
     }
 
-
-    get customerId()
+    set customersAddress(value: CustomerAddress)
     {
-        return this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
+        // Store the value
+        this._customerAddress.next(value);
     }
          
 
@@ -115,6 +128,8 @@ export class UserService
     get(ownerId: string): Observable<any>
     {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
+
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
@@ -128,14 +143,16 @@ export class UserService
             );
     }
 
-    putCustomerById(payloadBody){
+    putCustomerById(payloadBody)
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this._httpClient.put<HttpResponse<Customer>>(userService + "/customers/" + this.customerId, payloadBody, header)
+        return this._httpClient.put<HttpResponse<Customer>>(userService + "/customers/" + customerId, payloadBody, header)
             .pipe(
                 tap((update:HttpResponse<Customer>) => {
                     this._logging.debug("Response from UserService (putCustomerById)",update);
@@ -163,32 +180,35 @@ export class UserService
      *Customer Address Controller
      ===========================================
      */
-    getCustomerAddress(){
+    getCustomerAddress()
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this._httpClient.get<HttpResponsePagination<CustomerAddress[]>>(userService + "/customer/" + this.customerId +'/address', header)
+        return this._httpClient.get<any>(userService + "/customer/" + customerId +'/address', header)
             .pipe(
-                tap((address:HttpResponsePagination<CustomerAddress[]>) => {
+                tap((address: CustomerAddress) => {
                     this._logging.debug("Response from UserService (getCustomerAddress)",address);
-                    this._customersAddress.next(address.data.content);
-
+                    this._customerAddresses.next(address["data"].content);
                 }
             )
         );
     }
 
-    getCustomerAddressById(id:string){
+    getCustomerAddressById(id:string)
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this._httpClient.get<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address'+ id, header)
+        return this._httpClient.get<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address'+ id, header)
             .pipe(
                 tap((address:HttpResponse<CustomerAddress>) => {
                     this._logging.debug("Response from UserService (getCustomerAddressById)",address);
@@ -202,30 +222,34 @@ export class UserService
     createCustomerAddress(body: CustomerAddress): Observable<CustomerAddress>
     {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this.customersAddress$.pipe(
+        return this.customersAddresses$.pipe(
             take(1),
             // switchMap(address => this._httpClient.post<InventoryDiscount>('api/apps/ecommerce/inventory/discount', {}).pipe(
-            switchMap(address => this._httpClient.post<CustomerAddress>(userService + "/customer/" + this.customerId +'/address',body, header).pipe(
+            switchMap(addresses => this._httpClient.post<CustomerAddress>(userService + "/customer/" + customerId +'/address',body, header).pipe(
                 map((newAddress) => {
 
                     this._logging.debug("Response from addressService (createAddress)",newAddress);
 
-
                     //If newly data is set to default address
                     if(newAddress["data"].isDefault === true){
-                        const findDefaultTrue = address.find(item => item.isDefault === true);
-                        const indexDefaultTrue = address.findIndex(item => item.isDefault === true);
-                        findDefaultTrue.isDefault =false;
-                        address[indexDefaultTrue] = { ...address[indexDefaultTrue], ...findDefaultTrue};
+                        const findDefaultTrue = addresses.find(item => item.isDefault === true);
+                        const indexDefaultTrue = addresses.findIndex(item => item.isDefault === true);
+                        findDefaultTrue.isDefault = false;
+                        addresses[indexDefaultTrue] = { ...addresses[indexDefaultTrue], ...findDefaultTrue};
                     }
-
-                    // Update the address with the new discount
-                    this._customersAddress.next([newAddress["data"], ...address]);
+                    
+                    if (addresses) {
+                        // Update the address with the new discount
+                        this._customerAddresses.next([newAddress["data"], ...addresses]);
+                    } else {
+                        this._customerAddresses.next([newAddress["data"]]);
+                    }
 
                     // Return the new discount
                     return newAddress;
@@ -235,16 +259,18 @@ export class UserService
     }
 
     
-    putCustomerAddressById(customerAddressBody:CustomerAddress){
+    putCustomerAddressById(customerAddressBody:CustomerAddress)
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this.customersAddress$.pipe(
+        return this.customersAddresses$.pipe(
             take(1),
-            switchMap(address => this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header).pipe(
+            switchMap(address => this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header).pipe(
                 map((updatedAddress) => {
 
                     this._logging.debug("Response from addressService (putCustomerAddressById)", updatedAddress);
@@ -268,7 +294,7 @@ export class UserService
                     // Update the address
                     address[index] = { ...address[index], ...updatedAddress.data};
 
-                    this._customersAddress.next(address); 
+                    this._customerAddresses.next(address); 
             
                     // Return the updated address
                     return updatedAddress["data"];
@@ -289,8 +315,10 @@ export class UserService
         );
     }
 
-    setDefaultCustomerAddressById(customerAddressBody:CustomerAddress){
+    setDefaultCustomerAddressById(customerAddressBody:CustomerAddress)
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         customerAddressBody.isDefault = true;
 
@@ -298,9 +326,9 @@ export class UserService
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this.customersAddress$.pipe(
+        return this.customersAddresses$.pipe(
             take(1),
-            switchMap(address => this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header).pipe(
+            switchMap(address => this._httpClient.put<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address/'+ customerAddressBody.id, customerAddressBody, header).pipe(
                 map((updatedAddress) => {
 
                     this._logging.debug("Response from addressService (setDefaultCustomerAddressById)", updatedAddress);
@@ -322,7 +350,7 @@ export class UserService
                     // Update the address
                     address[index] = { ...address[index], ...updatedAddress.data};
 
-                    this._customersAddress.next(address); 
+                    this._customerAddresses.next(address); 
             
                     // Return the updated address
                     return updatedAddress["data"];
@@ -343,17 +371,21 @@ export class UserService
         );
     }
 
-    deleteCustomerAddressById(customerAddressId:string){
+    deleteCustomerAddressById(customerAddressId:string)
+    {
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this.customersAddress$.pipe(
+        return this.customersAddresses$.pipe(
             take(1),
-            switchMap(address => this._httpClient.delete<HttpResponse<CustomerAddress>>(userService + "/customer/" + this.customerId +'/address/'+ customerAddressId, header).pipe(
+            switchMap(address => this._httpClient.delete<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address/'+ customerAddressId, header).pipe(
                 map((status:any) => {
+
+                    this._logging.debug("Response from addressService (deleteCustomerAddressById)", status);
 
                     // Find the index of the deleted address
                     const index = address.findIndex(item => item.id === customerAddressId);
@@ -362,7 +394,7 @@ export class UserService
                     address.splice(index, 1);
 
                     // Update the address
-                    this._customersAddress.next(address);
+                    this._customerAddresses.next(address);
 
                     let isDeleted:boolean = false;
                     if (status === 200) {
@@ -380,6 +412,7 @@ export class UserService
     {
 
         let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
@@ -388,7 +421,7 @@ export class UserService
    
         return this.client$.pipe(
             take(1),
-            switchMap(client => this._httpClient.put<any>(userService + '/customers/' + this.customerId + '/changepassword', changePwdPayload , header).pipe(
+            switchMap(client => this._httpClient.put<any>(userService + '/customers/' + customerId + '/changepassword', changePwdPayload , header).pipe(
                 map((response) => {
 
                     this._logging.debug("Response from StoresService (chnagePasswordCustomerById)",response);

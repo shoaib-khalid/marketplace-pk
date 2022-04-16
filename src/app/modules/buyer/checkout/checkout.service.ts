@@ -254,10 +254,7 @@ export class CheckoutService
 
                     const updatedAddresses = addresses;
 
-                    updatedAddresses.unshift(response["data"]);
-
-                    console.log("updatedAddresses",updatedAddresses);
-                    
+                    updatedAddresses.unshift(response["data"]);                    
                     
                     this._addresses.next(updatedAddresses);
 
@@ -327,10 +324,7 @@ export class CheckoutService
 
         const header = {  
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
-        };
-
-        console.log('taok');
-        
+        };        
 
         return this.customerAddresses$.pipe(
             take(1),

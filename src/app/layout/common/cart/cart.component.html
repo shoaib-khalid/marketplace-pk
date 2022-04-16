@@ -1,23 +1,40 @@
 <!-- Button -->
-<button
+<!-- <button
     mat-icon-button
-    [matMenuTriggerFor]="userActions">
+    [matMenuTriggerFor]="userActions"> -->
+<button
+    class="cursor-pointer"
+    mat-icon-button>
     <span class="relative">
-        <img
+        <!-- <img
             class="w-7 h-7 rounded-full"
             *ngIf="showAvatar && user.avatar"
-            [src]="user.avatar">
-        <mat-icon
-            *ngIf="!showAvatar || !user.avatar"
-            [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
-        <span
+            [src]="user.avatar"> -->
+        <!-- <input
+            id="shopping-cart-button"
+            class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+            type="button"
+            [routerLink]="'/checkout'"
+            mat-icon-button> -->
+        <input
+            id="shopping-cart-button"
+            class="absolute h-0 w-0 opacity-0 invisible cursor-pointer"
+            type="button"
+            mat-icon-button>
+        <label 
+            for="shopping-cart-button"
+            matRipple>
+            <mat-icon
+                class="icon-size-5 cursor-pointer"
+                [svgIcon]="'heroicons_solid:shopping-cart'"></mat-icon>
+        </label>
+        <!-- <span
             class="absolute right-0 bottom-0 w-2 h-2 rounded-full"
             [ngClass]="{'mr-px mb-px': !showAvatar || !user.avatar,
                           'bg-green-500': user.status === 'online',
                           'bg-amber-500': user.status === 'away',
                           'bg-red-500': user.status === 'busy',
-                          'bg-gray-400': user.status === 'not-visible'}"
-        ></span>
+                          'bg-gray-400': user.status === 'not-visible'}"></span> -->
     </span>
 </button>
 

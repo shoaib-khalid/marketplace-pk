@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SharedModule } from 'app/shared/shared.module';
 import { OrderListComponent } from './order-list/order-list.component';
 import { OrderDetailsComponent } from './order-details/order-details.component';
-import { orderRoutes } from './order.routing';
+import { ordersRoutes } from './orders.routing';
 
 
 @NgModule({
@@ -22,7 +22,7 @@ import { orderRoutes } from './order.routing';
         OrderDetailsComponent
     ],
     imports     : [
-        RouterModule.forChild(orderRoutes),
+        RouterModule.forChild(ordersRoutes),
         MatButtonModule,
         MatIconModule,
         MatSelectModule,
@@ -37,6 +37,6 @@ import { orderRoutes } from './order.routing';
     bootstrap   : [
     ]
 })
-export class OrderModule
+export class OrdersModule
 {
 }

@@ -13,7 +13,8 @@ import { FuturisticLayoutModule } from 'app/layout/layouts/vertical/futuristic/f
 import { ThinLayoutModule } from 'app/layout/layouts/vertical/thin/thin.module';
 import { SettingsModule } from 'app/layout/common/settings/settings.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { FnbLayoutModule } from './symplified/fnb/fnb.module';
+import { FnbLayoutModule } from 'app/layout/symplified/fnb/fnb.module';
+import { MarketplaceLayoutModule } from 'app/layout/symplified/marketplace/marketplace.module';
 
 const layoutModules = [
     // Empty
@@ -32,7 +33,10 @@ const layoutModules = [
     DenseLayoutModule,
     FuturisticLayoutModule,
     ThinLayoutModule,
-    FnbLayoutModule
+
+    // Symplified 
+    FnbLayoutModule,
+    MarketplaceLayoutModule
 ];
 
 @NgModule({

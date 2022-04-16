@@ -24,17 +24,20 @@ import { MatDialogModule } from '@angular/material/dialog';
 
 
 import { userProfileRoutes } from './user-profile.routing';
+
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { EditAccountComponent } from './account/account.component';
 import { EditSecurityComponent } from './security/security.component';
-import { EditAddressComponent } from './account/edit-address/edit-address.component';
+import { EditDeliveryAddressComponent } from './delivery-address/delivery-address.component';
+import { EditAddressDialog } from './delivery-address/edit-address/edit-address.component';
 
 @NgModule({
     declarations: [
         EditProfileComponent,
         EditAccountComponent,
         EditSecurityComponent,
-        EditAddressComponent,
+        EditDeliveryAddressComponent,
+        EditAddressDialog
     ],
     imports     : [
         RouterModule.forChild(userProfileRoutes),

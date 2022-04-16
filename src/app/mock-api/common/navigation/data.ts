@@ -3,17 +3,24 @@ import { FuseNavigationItem } from '@fuse/components/navigation';
 
 export const defaultNavigation: FuseNavigationItem[] = [
     {
-        id   : 'example',
-        title: 'Example',
+        id   : 'orders',
+        title: 'My Orders',
         type : 'basic',
-        icon : 'heroicons_outline:chart-pie',
-        link : '/example'
+        icon : 'heroicons_outline:shopping-cart',
+        link : '/orders'
+    },
+    {
+        id   : 'vouchers',
+        title: 'My Vouchers',
+        type : 'basic',
+        icon : 'heroicons_outline:ticket',
+        link : '/vouchers'
     }
 ];
 export const compactNavigation: FuseNavigationItem[] = [
     {
         id   : 'example',
-        title: 'Example',
+        title: 'Example 2',
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
@@ -22,7 +29,7 @@ export const compactNavigation: FuseNavigationItem[] = [
 export const futuristicNavigation: FuseNavigationItem[] = [
     {
         id   : 'example',
-        title: 'Example',
+        title: 'Example 3',
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
@@ -30,10 +37,17 @@ export const futuristicNavigation: FuseNavigationItem[] = [
 ];
 export const horizontalNavigation: FuseNavigationItem[] = [
     {
-        id   : 'example',
-        title: 'Example',
+        id   : 'orders',
+        title: 'My Orders',
         type : 'basic',
-        icon : 'heroicons_outline:chart-pie',
-        link : '/example'
+        icon : 'heroicons_outline:shopping-cart',
+        link : '/orders'
+    },
+    {
+        id   : 'vouchers',
+        title: 'My Vouchers',
+        type : 'basic',
+        icon : 'heroicons_outline:ticket',
+        link : '/vouchers'
     }
 ];

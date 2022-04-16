@@ -145,20 +145,15 @@ export class AuthSignInComponent implements OnInit
     
                                 this._userService.user = user;
                             });
+
+                            // Set the redirect url.
+                            // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
+                            // to the correct page after a successful sign in. This way, that url can be set via
+                            // routing file and we don't have to touch here.
+                            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
                             
                             // Navigate to the redirect url
-                            this._activatedRoute.queryParams.subscribe(param => {
-                                    const redirectUrl = param['redirectUrl'];     
-
-                                    if (redirectUrl) {
-                                        this._document.location.href = redirectUrl;
-                                        
-                                    }
-                                    else {
-                                        this._router.navigateByUrl('/signed-in-redirect');
-                                        
-                                    }
-                            })
+                            this._router.navigateByUrl(redirectURL);
                     }
                 },
                 (error) => {
@@ -227,7 +222,7 @@ export class AuthSignInComponent implements OnInit
                         this._router.navigate(['/stores' ]);
                     },
                     exception => {
-                        console.log("exception ::::",exception);
+                        console.error("An error has occur : ",exception);
 
                     });
             });

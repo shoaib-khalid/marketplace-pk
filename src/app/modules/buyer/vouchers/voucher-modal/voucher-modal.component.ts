@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { CustomerVoucher } from '../voucher.types';
+import { CustomerVoucher } from '../vouchers.types';
 
 @Component({
   selector: 'voucher-moal',
