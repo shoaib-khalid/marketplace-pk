@@ -6,7 +6,7 @@
         <mat-tab-group [color]="'primary'" mat-stretch-tabs mat-align-tabs="center" class="w-full justify-between">
                 
             <mat-tab label="Current"> 
-                <!--  Voucher -->
+                <!--  Voucher Input -->
                 <div class="flex flex-col w-full">
 
                     <!-- Input Promo Code -->
@@ -59,7 +59,7 @@
         
                 </div>
                 <!-- active voucher list -->
-                <div class="flex flex-col w-full my-1 max-w-280">
+                <div class="flex flex-col w-full my-1">
                     <div class="flex flex-row my-2">
                         <div class="pr-2">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -70,7 +70,7 @@
                         </div>
                         <span class="font-bold">Vouchers</span> 
                     </div>
-                    <!-- display  if there's no voucher-->
+                    <!-- display if there's no voucher-->
                     <ng-container *ngIf="customerVoucher.length < 1">
                         <div class="flex flex-row border border-gray-300 rounded-lg cursor-pointer p-2">
                             <div class="w-11 h-11 border border-gray-400 rounded mr-2">
@@ -96,36 +96,36 @@
                     <div class="grid grid-cols-4 gap-1 w-full">
                         <ng-container *ngFor="let voucher of customerVoucher">
                             <div class="col-span-4 sm:col-span-2 pt-2 sm:px-1">
-                                <div class="w-full flex flex-col border border-primary rounded-lg hover:border-2 cursor-pointer p-2">
+                                <div class="w-full flex flex-col border border-primary rounded-lg group hover:bg-primary cursor-pointer p-2"
+                                    (click)="openVoucherModal('mat_solid:info','Voucher\'s Terms & Conditions', null, voucher)" >
                                     <div class="w-full flex flex-row pb-2 border-dashed border-b border-gray-300">
                                         <div class="relative w-12 h-11 rounded mr-2">
                                             <img 
-                                                class="w-full h-full rounded object-contain shadow p-0.5"
+                                                class="w-full h-full rounded object-contain shadow p-0.5 bg-white"
                                                 [src]="platform.logo" 
                                                 alt="">
                                         </div>
                                         <div class="flex flex-col w-full">
-                                            <h3 *ngIf="voucher.voucher.calculationType === 'FIX'" class="text-primary">{{voucher.voucher.discountValue | currency: voucher.voucher.currencyLabel}} off on {{voucher.voucher.name}}</h3>
-                                            <h3 *ngIf="voucher.voucher.calculationType === 'PERCENT'" class="text-primary">{{voucher.voucher.discountValue}}% off on {{voucher.voucher.name}}</h3>
+                                            <h3 *ngIf="voucher.voucher.calculationType === 'FIX'" class="text-primary group-hover:text-white">{{voucher.voucher.discountValue | currency: voucher.voucher.currencyLabel}} off on {{voucher.voucher.name}}</h3>
+                                            <h3 *ngIf="voucher.voucher.calculationType === 'PERCENT'" class="text-primary group-hover:text-white">{{voucher.voucher.discountValue}}% off on {{voucher.voucher.name}}</h3>
                                             <div class="flex flex-row justify-between w-full">
                                                 <div class="flex flex-row">
-                                                    <h3 class="text-sm text-gray-400">{{voucher.voucher.maxDiscountAmount | currency: voucher.voucher.currencyLabel}}</h3>
-                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400">minimum spend</h3>
+                                                    <h3 class="text-sm text-gray-400 group-hover:text-black">{{voucher.voucher.maxDiscountAmount | currency: voucher.voucher.currencyLabel}}</h3>
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">minimum spend</h3>
                                                 </div>
                                                 <div class="flex flex-row sm:flex-col text-right">
-                                                    <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400">Valid Until</h3>
-                                                    <h3 class="text-sm text-gray-400">{{voucher.voucher.endDate | date:'dd-MM-yyyy' }}</h3>
+                                                    <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400 group-hover:text-black">Valid Until</h3>
+                                                    <h3 class="text-sm text-gray-400 group-hover:text-black">{{voucher.voucher.endDate | date:'dd-MM-yyyy' }}</h3>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <span 
-                                        (click)="openVoucherModal('mat_solid:info','Voucher\'s Terms & Conditions', null, voucher)" 
-                                        class="pt-1 text-right text-primary font-semibold hover:text-primary-700">T&C Applied</span>
+                                    <span class="pt-1 text-right text-primary font-semibold group-hover:text-white">T&C Applied</span>
                                 </div>
                             </div>
                         </ng-container>
                     </div>
+                    <!-- Pagination -->
                     <div class="flex flex-row w-full mt-4 items-center justify-center">
                         <pagination
                             *ngIf="customerVoucherPagination"
@@ -140,7 +140,7 @@
 
             <mat-tab label="Past"> 
                 <!-- past voucher list -->
-                <div class="flex flex-col w-full my-1 max-w-280">
+                <div class="flex flex-col w-full my-1">
                     <div class="flex flex-row my-4">
                         <div class="pr-2">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
