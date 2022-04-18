@@ -28,7 +28,6 @@ export class UserComponent implements OnInit, OnDestroy
     customer:any;
     customerAuthenticate: CustomerAuthenticate;
 
-
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -39,7 +38,6 @@ export class UserComponent implements OnInit, OnDestroy
         private _router: Router,
         private _userService: UserService,
         private _authService: AuthService,
-
     )
     {
     }
@@ -57,6 +55,7 @@ export class UserComponent implements OnInit, OnDestroy
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user: User) => {
+                
                 this.user = user;
 
                 // Mark for check
@@ -64,21 +63,19 @@ export class UserComponent implements OnInit, OnDestroy
             });
 
         this._authService.customerAuthenticate$
-        .subscribe((response: CustomerAuthenticate) => {
-            
-            this.customerAuthenticate = response;
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerAuthenticate) => {
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+                this.customerAuthenticate = response;
 
-        this._userService.get(this.customerAuthenticate.session.ownerId)
-        .subscribe((response)=>{
-
-            this.customer = response.data;
-            
-            
-        });
+                this._userService.get(this.customerAuthenticate.session.ownerId)
+                    .subscribe((response)=>{
+                        this.customer = response.data;
+                    });
+                    
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
     }
 
