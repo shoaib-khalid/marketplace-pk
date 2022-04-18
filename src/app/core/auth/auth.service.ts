@@ -344,7 +344,7 @@ export class AuthService
             return throwError('User is already logged in.');
         }
     
-        return this._httpClient.post<any>(this.userService$ +'/clients/loginoauth', authRequest, this.socialOptions).pipe(
+        return this._httpClient.post<any>(this.userService$ +'/customers/loginoauth', authRequest, this.socialOptions).pipe(
             switchMap(async (response: any) => {
     
                 this._logging.debug("Response from AuthService (loginOauth)",response);
