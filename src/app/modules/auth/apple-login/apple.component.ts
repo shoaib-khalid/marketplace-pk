@@ -77,7 +77,7 @@ export class AppleLoginComponent
                     switchMap((resp:ValidateOauthRequest)=>this._authService.loginOauth(resp, "apple comp")),
                 )
                 .subscribe(() => {
-                    this._router.navigate(['/stores' ]);
+                    this._router.navigate(['/orders' ]);
                 });
           });
      } 

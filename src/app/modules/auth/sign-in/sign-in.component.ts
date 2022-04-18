@@ -193,7 +193,7 @@ export class AuthSignInComponent implements OnInit
                         // // Navigate to the redirect url
                         // this._router.navigateByUrl(redirectURL);
 
-                        this._router.navigate(['/stores' ]);
+                        this._router.navigate(['/orders' ]);
                     },
                     exception => {
                         console.error("An error has occured : ",exception);
@@ -219,7 +219,7 @@ export class AuthSignInComponent implements OnInit
                         // // Navigate to the redirect url
                         // this._router.navigateByUrl(redirectURL);
 
-                        this._router.navigate(['/stores' ]);
+                        this._router.navigate(['/orders' ]);
                     },
                     exception => {
                         console.error("An error has occur : ",exception);
