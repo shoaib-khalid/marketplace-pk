@@ -4,7 +4,7 @@
 <!-- Navigation -->
 <ng-container *ngIf="isScreenSmall">
     <fuse-vertical-navigation
-        class="dark bg-black print:hidden"
+        class="dark bg-black print:hidden sticky-top-0"
         [mode]="'over'"
         [name]="'mainNavigation'"
         [navigation]="navigation.default"
@@ -54,7 +54,7 @@
 <div class="flex flex-col flex-auto items-center w-full min-w-0 bg-gray-200 dark:bg-card">
 
     <!-- Header -->
-    <div class="relative flex flex-col flex-0 justify-center w-full h-16 sm:h-20 md:h-36 overflow-hidden z-49 shadow dark:shadow-none print:hidden">
+    <div class="md:relative flex flex-col flex-0 justify-center w-full h-16 sm:h-20 md:h-36 overflow-hidden z-49 shadow dark:shadow-none print:hidden sticky top-0">
         <!-- Top bar -->
         <div class="relative dark flex flex-auto justify-center w-full px-4 md:px-8 bg-black dark:bg-gray-900">
             <div class="flex flex-row justify-between items-center w-full max-w-360 h-16 sm:h-20">
