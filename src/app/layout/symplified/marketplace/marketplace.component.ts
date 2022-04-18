@@ -29,6 +29,8 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
     public version: string = environment.appVersion;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    displayUsername:string ='';
+
     /**
      * Constructor
      */
@@ -85,6 +87,9 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
             .pipe((takeUntil(this._unsubscribeAll)))
             .subscribe((user: User) => {
                 this.user = user;
+                this.displayUsername = this.textTruncate(this.user["data"].username,12)
+
+                
             });
 
         // Subscribe to media changes
@@ -170,4 +175,20 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
 
         return labelName;
     }
+
+    textTruncate(str, length, ending?:any){
+        if (length == null) {
+            length = 100;
+          }
+          if (ending == null) {
+            ending = '...';
+          }
+          if (str.length > length) {
+            return str.substring(0, length - ending.length) + ending;
+          } else {
+            return str;
+          }  
+    }
+
+
 }
