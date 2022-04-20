@@ -133,11 +133,21 @@ export class VoucherListComponent implements OnInit, OnDestroy
             this._changeDetectorRef.markForCheck();
         });
 
-        // Get used customer voucher
+        // Get unused customer voucher
         this._vouchersService.customerVouchers$
         .subscribe((response: CustomerVoucher[]) => {
 
             this.customerVoucher = response;
+            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Get used customer voucher
+        this._vouchersService.usedCustomerVouchers$
+        .subscribe((response: CustomerVoucher[]) => {
+
+            this.usedCustomerVoucher = response;
             
             // Mark for check
             this._changeDetectorRef.markForCheck();

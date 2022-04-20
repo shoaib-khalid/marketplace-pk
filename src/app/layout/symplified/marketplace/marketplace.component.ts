@@ -158,7 +158,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
         // If the route is dynamic route such as ':id', remove it
         const lastRoutePart = path.split('/').pop();
         const isDynamicRoute = lastRoutePart.startsWith(':');
-        if(isDynamicRoute && !!route.snapshot) {
+        if(isDynamicRoute && !!route.snapshot && route.routeConfig.data.headerTitle) {
             const paramName = lastRoutePart.split(':')[1];
             path = path.replace(lastRoutePart, route.snapshot.params[paramName]);
             label = route.snapshot.params[paramName];
