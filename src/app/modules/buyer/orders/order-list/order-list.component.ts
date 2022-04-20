@@ -88,9 +88,9 @@ export class OrderListComponent implements OnInit
 
         this._orderCountSummary = [
             { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0 },
-            { id: "TO_SHIP", label: "To Ship", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0 },            
-            { id: "SENT_OUT", label: "Shipping", completionStatus: "BEING_DELIVERED", count: 0 },
-            { id: "DELIVERED", label: "Delivered", completionStatus: ["DELIVERED_TO_CUSTOMER", "RECEIVED_AT_STORE"], count: 0 },
+            { id: "TO_SHIP", label: "To Deliver", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0 },            
+            { id: "SENT_OUT", label: "On Delivery", completionStatus: "BEING_DELIVERED", count: 0 },
+            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0 },
             { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0 },
         ];
                 
