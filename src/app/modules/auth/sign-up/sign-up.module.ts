@@ -13,6 +13,9 @@ import { AuthSignUpComponent } from 'app/modules/auth/sign-up/sign-up.component'
 import { authSignupRoutes } from 'app/modules/auth/sign-up/sign-up.routing';
 import { SharedBackgroundModule } from '../shared-background/shared-background.module';
 import { SharedLogoModule } from '../shared-logo/shared-logo.module';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
+import { AppleLoginProvider } from '../sign-in/apple.provider';
+import { SocialLooginClientId } from '../sign-in/oauth.types';
 
 @NgModule({
     declarations: [
@@ -30,8 +33,41 @@ import { SharedLogoModule } from '../shared-logo/shared-logo.module';
         FuseAlertModule,
         SharedModule,
         SharedBackgroundModule,
-        SharedLogoModule
-    ]
+        SharedLogoModule,
+        SocialLoginModule
+    ],
+    providers: [
+        {
+          provide: 'SocialAuthServiceConfig',
+          useValue: {
+            autoLogin: false,
+            providers: [
+              {
+                id: GoogleLoginProvider.PROVIDER_ID,
+                provider: new GoogleLoginProvider(
+                  SocialLooginClientId.GOOGLE_CLIENT_ID
+                )
+              },
+              {
+                id: AppleLoginProvider.PROVIDER_ID,
+                provider: new AppleLoginProvider(
+                  SocialLooginClientId.APPLE_CLIENT_ID                
+                  )
+              },
+              {
+                id: FacebookLoginProvider.PROVIDER_ID,
+                provider: new FacebookLoginProvider(
+                  SocialLooginClientId.FACEBOOK_CLIENT_ID
+                  )
+              }
+            ],
+            onError: (err) => {
+
+              console.error(err);
+            }
+          } as SocialAuthServiceConfig,
+        }
+    ],
 })
 export class AuthSignUpModule
 {
