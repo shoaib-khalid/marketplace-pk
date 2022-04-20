@@ -84,14 +84,14 @@ export class OrderListComponent implements OnInit
 
     ngOnInit() :void {
 
-        this.ordersDetails$ = this._orderService.ordersDetails$;
+        this.ordersDetails$ = this._orderService.ordersDetails$;        
 
         this._orderCountSummary = [
             { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0 },
-            { id: "TO_SHIP", label: "To Ship", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0 },            
+            { id: "TO_SHIP", label: "To Ship", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0 },            
             { id: "SENT_OUT", label: "Shipping", completionStatus: "BEING_DELIVERED", count: 0 },
-            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0 },
-            { id: "CANCELLED", label: "Cancelled            ", completionStatus: "CANCELED_BY_MERCHANT", count: 0 },
+            { id: "DELIVERED", label: "Delivered", completionStatus: ["DELIVERED_TO_CUSTOMER", "RECEIVED_AT_STORE"], count: 0 },
+            { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0 },
         ];
                 
         // Subscribe to media changes
@@ -131,7 +131,7 @@ export class OrderListComponent implements OnInit
             )
             .subscribe();
 
-        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
+        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 3, this._orderCountSummary.find(item => item.id === "ALL").completionStatus)
             .subscribe((response) =>{
                 
             });
@@ -146,7 +146,7 @@ export class OrderListComponent implements OnInit
                 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
-            });
+            });        
 
         this.tabControl.valueChanges
             .pipe(
@@ -213,7 +213,7 @@ export class OrderListComponent implements OnInit
         this.pageOfItems['currentPage'] = 1;
 
         this.tabControl.setValue(this._orderCountSummary.find(item => item.id === this.openTab).completionStatus);
-
+        
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
@@ -224,16 +224,19 @@ export class OrderListComponent implements OnInit
         // update current page of items
         this.pageOfItems = pageOfItems;
         
-        if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
-            // set loading to true
-            this.isLoading = true;
+        if(this.pagination && this.pageOfItems['currentPage']) {
 
-            this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.tabControl.value)
-                .subscribe(()=>{
-                    // set loading to false
-                    this.isLoading = false;
-                });
-
+            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+                // set loading to true
+                this.isLoading = true;
+    
+                this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.tabControl.value)
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
+    
+            }
         }
         // Mark for check
         this._changeDetectorRef.markForCheck();
