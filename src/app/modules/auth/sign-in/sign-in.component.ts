@@ -46,6 +46,8 @@ export class AuthSignInComponent implements OnInit
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    domain :string ='';
+
     /**
      * Constructor
      */
@@ -84,6 +86,7 @@ export class AuthSignInComponent implements OnInit
 
         let domain = this._apiServer.settings.storeFrontDomain;
         this.signInForm.get('domain').patchValue(domain);
+        this.domain = domain;
 
         
         // Subscribe to platform data
@@ -185,6 +188,8 @@ export class AuthSignInComponent implements OnInit
                 this.validateOauthRequest.loginType = "GOOGLE";
                 this.validateOauthRequest.name = userData.name;
                 this.validateOauthRequest.token = userData.idToken;
+                this.validateOauthRequest.domain = this.domain;
+
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
                     .subscribe(() => {
@@ -211,6 +216,8 @@ export class AuthSignInComponent implements OnInit
                 this.validateOauthRequest.name = userData.name;
                 this.validateOauthRequest.token = userData.authToken;
                 this.validateOauthRequest.userId = userData.id;
+                this.validateOauthRequest.domain = this.domain;
+
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
                     .subscribe(() => {                    

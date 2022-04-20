@@ -11,6 +11,8 @@ import { Platform } from 'app/core/platform/platform.types';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppleLoginProvider } from '../sign-in/apple.provider';
+import { AppConfig } from 'app/config/service.config';
+
 
 @Component({
     selector     : 'auth-sign-up',
@@ -44,6 +46,7 @@ export class AuthSignUpComponent implements OnInit
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     platform: Platform;
 
+    domain :string ='';
 
     /**
      * Constructor
@@ -55,6 +58,8 @@ export class AuthSignUpComponent implements OnInit
         private _route: ActivatedRoute,
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
+        private _apiServer: AppConfig,
+
 
 
     )
@@ -99,6 +104,10 @@ export class AuthSignUpComponent implements OnInit
             this.countryCode = this.platform.country;
   
         });
+
+        this.domain = this._apiServer.settings.storeFrontDomain;
+
+
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -169,6 +178,8 @@ export class AuthSignUpComponent implements OnInit
                 this.validateOauthRequest.loginType = "GOOGLE";
                 this.validateOauthRequest.name = userData.name;
                 this.validateOauthRequest.token = userData.idToken;
+                this.validateOauthRequest.domain = this.domain;
+
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
                     .subscribe(() => {
@@ -195,6 +206,8 @@ export class AuthSignUpComponent implements OnInit
                 this.validateOauthRequest.name = userData.name;
                 this.validateOauthRequest.token = userData.authToken;
                 this.validateOauthRequest.userId = userData.id;
+                this.validateOauthRequest.domain = this.domain;
+
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
                     .subscribe(() => {                    

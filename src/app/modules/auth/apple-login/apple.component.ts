@@ -7,6 +7,8 @@ import { map, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Platform } from 'app/core/platform/platform.types';
 import { AuthService } from 'app/core/auth/auth.service';
 import { ValidateOauthRequest } from 'app/core/auth/auth.types';
+import { AppConfig } from 'app/config/service.config';
+
 
 
 @Component({
@@ -30,6 +32,7 @@ export class AppleLoginComponent
     platform: Platform;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    domain :string ='';
 
 
     /**
@@ -41,6 +44,8 @@ export class AppleLoginComponent
         private _authService: AuthService,
         private _router: Router,
         private _platformsService: PlatformService,
+        private _apiServer: AppConfig,
+
     )
     {
       
@@ -59,7 +64,9 @@ export class AppleLoginComponent
             this.idToken = params['id_token'];
             this.jwtData = this._jwtService.getJwtPayload(this.idToken);
             this.clientEmail = this.jwtData['email'];
-            
+
+            this.domain = this._apiServer.settings.storeFrontDomain;
+
             this._platformsService.platform$
                 .pipe(
                     map((resp)=>{
@@ -72,6 +79,8 @@ export class AppleLoginComponent
                         this.validateOauthRequest.loginType = "APPLE";
                         this.validateOauthRequest.token = this.idToken;
                         this.validateOauthRequest.email = this.clientEmail;
+                        this.validateOauthRequest.domain = this.domain;
+
                         return this.validateOauthRequest;
                     }),
                     switchMap((resp:ValidateOauthRequest)=>this._authService.loginOauth(resp, "apple comp")),

@@ -19,5 +19,6 @@ export class ValidateOauthRequest{
     loginType	:   string;
     name	    ?:   string;
     token	    :   string;
-    userId	   ?:   string;
+    userId	    ?:   string;
+    domain      ?: string;
 } 
