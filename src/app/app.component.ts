@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { CookieService } from 'ngx-cookie-service';
+import { DOCUMENT } from '@angular/common';
 
 declare let gtag: Function;
 
@@ -26,10 +27,13 @@ export class AppComponent
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _titleService: Title,
         private _router: Router,
         private _platformsService: PlatformService,
-        private _cookieService: CookieService
+        private _cookieService: CookieService,
+        private _activatedRoute: ActivatedRoute,
+
     )
     {
     }
@@ -94,5 +98,17 @@ export class AppComponent
                     }
                 }
             });
+
+
+        // Navigate to the redirect url
+        this._activatedRoute.queryParams.subscribe(param => {
+            const redirectUrl = param['redirectUrl'];     
+
+            if (redirectUrl) {
+                this._document.location.href = redirectUrl;
+                
+            }
+            
+        })
     }
 }
