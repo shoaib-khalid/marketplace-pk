@@ -98,17 +98,5 @@ export class AppComponent
                     }
                 }
             });
-
-
-        // Navigate to the redirect url
-        this._activatedRoute.queryParams.subscribe(param => {
-            const redirectUrl = param['redirectUrl'];     
-
-            if (redirectUrl) {
-                this._document.location.href = redirectUrl;
-                
-            }
-            
-        })
     }
 }
