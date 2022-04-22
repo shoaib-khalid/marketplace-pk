@@ -196,6 +196,7 @@ export class AuthSignInComponent implements OnInit
     signInWithGoogle(): void {
         this._socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
             .then(userData => {
+                console.log('user data google', userData);
                 this.validateOauthRequest = new ValidateOauthRequest();
                 this.validateOauthRequest.country = this.countryCode;
                 this.validateOauthRequest.email = userData.email;
@@ -223,6 +224,7 @@ export class AuthSignInComponent implements OnInit
     signInWithFB(): void {
         this._socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID)
             .then(userData => {
+                console.log('user data fb', userData);
                 this.validateOauthRequest = new ValidateOauthRequest();
                 this.validateOauthRequest.country = this.countryCode;
                 this.validateOauthRequest.email = userData.email
