@@ -294,8 +294,16 @@ export class VoucherListComponent implements OnInit, OnDestroy
             
         }, (error) => {
             // if voucher is invalid
-            this.openVoucherModal('heroicons_outline:x','Invalid Code!', 'Please add valid code', null);
-            this.inputPromoCode = '';
+            if(error.status === 404) {
+                this.openVoucherModal('heroicons_outline:x','Invalid Code!', 'Invalid code, please try again', null);
+                this.inputPromoCode = '';
+            } else if (error.status === 409) {
+                this.openVoucherModal('heroicons_outline:x','Oops...', 'Sorry, you have redeemed this voucher', null);
+                this.inputPromoCode = '';
+            } else if (error.status === 417) {
+                this.openVoucherModal('heroicons_outline:x','Oops...', 'Sorry, this promo code has expired', null);
+                this.inputPromoCode = '';
+            }
         });
     }
 
