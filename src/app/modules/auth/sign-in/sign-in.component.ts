@@ -149,28 +149,26 @@ export class AuthSignInComponent implements OnInit
                                 this._userService.user = user;
                             });
 
-                            // // Set the redirect url.
-                            // // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                            // // to the correct page after a successful sign in. This way, that url can be set via
-                            // // routing file and we don't have to touch here.
-                            // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                            // Set the redirect url.
+                            // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
+                            // to the correct page after a successful sign in. This way, that url can be set via
+                            // routing file and we don't have to touch here.                            
+
+                            if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {
+                                const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                                // Navigate to the internal redirect url
+                                this._router.navigateByUrl(redirectURL);
+                            }
+                            else if (this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')) {
+                                const redirectExtURL = this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')
+                                // Navigate to the external redirect url
+                                this._document.location.href = redirectExtURL;
+                            }
+                            else 
+                            {
+                                this._router.navigateByUrl('/signed-in-redirect');
+                            }
                             
-                            // // Navigate to the redirect url
-                            // this._router.navigateByUrl(redirectURL);
-
-                            // Navigate to the redirect url
-                            this._activatedRoute.queryParams.subscribe(param => {
-                                const redirectUrl = param['redirectUrl'];     
-
-                                if (redirectUrl) {
-                                    this._document.location.href = redirectUrl;
-                                    
-                                }
-                                else {
-                                    this._router.navigateByUrl('/signed-in-redirect');
-                                    
-                                }
-                            })
                     }
                 },
                 (error) => {
@@ -196,7 +194,6 @@ export class AuthSignInComponent implements OnInit
     signInWithGoogle(): void {
         this._socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
             .then(userData => {
-                console.log('user data google', userData);
                 this.validateOauthRequest = new ValidateOauthRequest();
                 this.validateOauthRequest.country = this.countryCode;
                 this.validateOauthRequest.email = userData.email;
@@ -224,7 +221,6 @@ export class AuthSignInComponent implements OnInit
     signInWithFB(): void {
         this._socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID)
             .then(userData => {
-                console.log('user data fb', userData);
                 this.validateOauthRequest = new ValidateOauthRequest();
                 this.validateOauthRequest.country = this.countryCode;
                 this.validateOauthRequest.email = userData.email

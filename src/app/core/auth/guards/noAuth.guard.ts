@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
+import { Inject, Injectable } from '@angular/core';
+import { ActivatedRoute, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
 import { switchMap } from 'rxjs/operators';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
         private _router: Router
     )
@@ -30,8 +32,8 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      * @param state
      */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean
-    {
-        return this._check();
+    {        
+        return this._check(route);
     }
 
     /**
@@ -42,7 +44,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      */
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
     {
-        return this._check();
+        return this._check(null);
     }
 
     /**
@@ -53,7 +55,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      */
     canLoad(route: Route, segments: UrlSegment[]): Observable<boolean> | Promise<boolean> | boolean
     {
-        return this._check();
+        return this._check(null);
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -65,8 +67,11 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      *
      * @private
      */
-    private _check(): Observable<boolean>
+    private _check(route?: ActivatedRouteSnapshot): Observable<boolean>
     {
+        
+        const redirectUrl = route ? route.queryParamMap.get('redirectUrl') : null
+
         // Check the authentication status
         return this._authService.check()
         .pipe(
@@ -75,6 +80,11 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
                 // If the user is authenticated...
                 if ( authenticated )
                 {
+                    // If it has redirectUrl, redirect it to external url
+                    if (redirectUrl) {
+                        this._document.location.href = redirectUrl;
+                    }
+                    
                     // Redirect to the root
                     this._router.navigate(['/orders']);
 
