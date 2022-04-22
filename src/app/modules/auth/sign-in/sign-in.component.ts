@@ -152,17 +152,22 @@ export class AuthSignInComponent implements OnInit
                             // Set the redirect url.
                             // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
                             // to the correct page after a successful sign in. This way, that url can be set via
-                            // routing file and we don't have to touch here.                            
-
-                            if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {
-                                const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-                                // Navigate to the internal redirect url
-                                this._router.navigateByUrl(redirectURL);
-                            }
-                            else if (this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')) {
-                                const redirectExtURL = this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')
-                                // Navigate to the external redirect url
-                                this._document.location.href = redirectExtURL;
+                            // routing file and we don't have to touch here.                        
+                            
+                            // redirectURL
+                            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                            // store front domain, to be used to compare with redirectURL
+                            const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                            
+                            if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                                
+                                if (redirectURL.includes(storeFrontDomain)) {
+                                    // Navigate to the external redirect url
+                                    this._document.location.href = redirectURL;
+                                } else {
+                                    // Navigate to the internal redirect url
+                                    this._router.navigateByUrl(redirectURL);
+                                }
                             }
                             else 
                             {

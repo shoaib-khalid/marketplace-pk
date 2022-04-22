@@ -59,19 +59,24 @@ export class AuthSignOutComponent implements OnInit, OnDestroy
             .pipe(
                 finalize(() => {
                     
-                    if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {
-                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-                        // Navigate to the internal redirect url
-                        this._router.navigateByUrl(redirectURL);
-                    }
-                    else if (this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')) {
-                        const redirectExtURL = this._activatedRoute.snapshot.queryParamMap.get('redirectUrl')
-                        // Navigate to the external redirect url
-                        this._document.location.href = redirectExtURL;
+                    // redirectURL
+                    const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                    // store front domain, to be used to compare with redirectURL
+                    const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                    
+                    if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                        
+                        if (redirectURL.includes(storeFrontDomain)) {
+                            // Navigate to the external redirect url
+                            this._document.location.href = redirectURL;
+                        } else {
+                            // Navigate to the internal redirect url
+                            this._router.navigateByUrl(redirectURL);
+                        }
                     }
                     else 
                     {
-                        this._router.navigateByUrl('/sign-in');
+                        this._router.navigateByUrl('/signed-in-redirect');
                     }
 
                 }),

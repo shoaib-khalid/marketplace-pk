@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
 import { switchMap } from 'rxjs/operators';
 import { DOCUMENT } from '@angular/common';
+import { AppConfig } from 'app/config/service.config';
 
 @Injectable({
     providedIn: 'root'
@@ -16,6 +17,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
     constructor(
         @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
+        private _apiServer: AppConfig,
         private _router: Router
     )
     {
@@ -70,8 +72,12 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
     private _check(route?: ActivatedRouteSnapshot): Observable<boolean>
     {
         
-        const redirectUrl = route ? route.queryParamMap.get('redirectUrl') : null
-
+        const redirectUrl = route ? route.queryParamMap.get('redirectURL') : null
+        
+        // store front domain, to be used to compare with redirectURL
+        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+        console.log(storeFrontDomain);
+        
         // Check the authentication status
         return this._authService.check()
         .pipe(
@@ -82,7 +88,10 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
                 {
                     // If it has redirectUrl, redirect it to external url
                     if (redirectUrl) {
-                        this._document.location.href = redirectUrl;
+                        if (redirectUrl.includes(storeFrontDomain)) {
+                            // Navigate to the external redirect url
+                            this._document.location.href = redirectUrl;
+                        }
                     }
                     
                     // Redirect to the root
