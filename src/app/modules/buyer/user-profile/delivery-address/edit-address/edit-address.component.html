@@ -27,8 +27,16 @@
                         <mat-label>Phone Number</mat-label>
                         <input
                             [formControlName]="'phoneNumber'"
-                            placeholder="Enter your phonenumber"
+                            [placeholder]="dialingCode + '123456789'"
+                            [required]="true"
+                            (change)="addressForm.get('phoneNumber').patchValue(sanitizePhoneNumber(addressForm.get('phoneNumber').value))"
                             matInput>
+                        <mat-error *ngIf="addressForm.get('phoneNumber').hasError('required')">
+                            Required
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.get('phoneNumber').hasError('invalidPhonenumber')">
+                            Invalid phone number
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
                         <mat-label>Email</mat-label>

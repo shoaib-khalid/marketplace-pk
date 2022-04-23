@@ -5,6 +5,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
 import { Subject, takeUntil } from 'rxjs';
+import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 
 @Component({
@@ -22,6 +23,8 @@ export class EditAddressDialog implements OnInit {
     
     displayToogleNotDefault: boolean = false;
     isLoading: boolean = false;
+
+    dialingCode: string;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -46,11 +49,11 @@ export class EditAddressDialog implements OnInit {
             address     : ['', Validators.required],
             city        : ['', Validators.required],
             country     : ['', Validators.required],
-            phoneNumber : ['', Validators.required],
+            phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
             postCode    : ['', Validators.required],
             state       : ['', Validators.required],
             isDefault   : ['']
-        });
+        });        
 
         // Subscribe to platform data
         this._platformsService.platform$
@@ -60,6 +63,22 @@ export class EditAddressDialog implements OnInit {
             
                 this.countryCode = this.platform.country;
                 this.countryName = this.countryCode === 'MYS' ? 'Malaysia': 'Pakistan';
+
+                // -------------------------
+                // Set Dialing code
+                // -------------------------
+                
+                let countryId = this.countryCode;
+                switch (countryId) {
+                    case 'MYS':
+                        this.dialingCode = '+60'
+                        break;
+                    case 'PAK':
+                        this.dialingCode = '+92'
+                        break;
+                    default:
+                        break;
+                }
                 
                 // Get states by country Z(using symplified backend)
                 this._storesService.getStoreRegionCountryState(this.countryCode)
@@ -77,10 +96,15 @@ export class EditAddressDialog implements OnInit {
             this.addressForm.get('customerId').setValue(this.data.customerId);
             this.addressForm.get('isDefault').setValue(false);
             this.addressForm.get('country').setValue(this.countryName);
+
+            
+            
         } else {
             this.addressForm.patchValue(this.data.customerAddress);
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
+
+        console.log("this.countryName", this.countryName);
     }
 
     updateAddress(){
@@ -89,6 +113,32 @@ export class EditAddressDialog implements OnInit {
 
     closeDialog(){
         this.dialogRef.close();
+    }
+
+    sanitizePhoneNumber(phoneNumber: string) {
+
+        let substring = phoneNumber.substring(0, 1)
+        let countryId = this.countryCode;
+        let sanitizedPhoneNo = ''
+        
+        if ( countryId === 'MYS' ) {
+
+                 if (substring === '6') sanitizedPhoneNo = phoneNumber;
+            else if (substring === '0') sanitizedPhoneNo = '6' + phoneNumber;
+            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+            else                        sanitizedPhoneNo = '60' + phoneNumber;
+
+        }
+        else if ( countryId === 'PAK') {
+
+                 if (substring === '9') sanitizedPhoneNo = phoneNumber;
+            else if (substring === '2') sanitizedPhoneNo = '9' + phoneNumber;
+            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+            else                        sanitizedPhoneNo = '92' + phoneNumber;
+
+        }
+
+        return sanitizedPhoneNo;
     }
 
 }
