@@ -10,6 +10,7 @@ import { UserService } from 'app/core/user/user.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
+import { CartService } from './core/cart/cart.service';
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +28,7 @@ export class InitialDataResolver implements Resolve<any>
         private _notificationsService: NotificationsService,
         private _quickChatService: QuickChatService,
         private _shortcutsService: ShortcutsService,
+        private _cartService: CartService,
         private _userService: UserService
     )
     {
@@ -44,6 +46,8 @@ export class InitialDataResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
+        let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
         // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
             this._navigationService.get(),
@@ -51,7 +55,8 @@ export class InitialDataResolver implements Resolve<any>
             this._notificationsService.getAll(),
             this._quickChatService.getChats(),
             this._shortcutsService.getAll(),
-            this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
+            this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
+            this._cartService.getCartsByCustomerId(customerId)
         ]);
     }
 }

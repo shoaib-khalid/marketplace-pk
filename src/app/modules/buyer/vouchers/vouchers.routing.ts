@@ -12,7 +12,7 @@ export const voucherRoutes: Route[] = [
                     address: VoucherResolver,
                 },
                 data: {
-                    headerTitle: 'My Voucher'
+                    headerTitle: 'My Vouchers'
                 },
                 component: VoucherListComponent,
             }

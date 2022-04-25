@@ -202,7 +202,8 @@ export class EditDeliveryAddressComponent implements OnInit
                 disableClose: true,
                 data: {
                     type: "create",
-                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid
+                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
+                    user: this.accountForm.value
                 },
             }
         );    

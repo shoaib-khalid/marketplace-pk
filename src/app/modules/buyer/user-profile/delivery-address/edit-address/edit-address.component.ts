@@ -48,7 +48,7 @@ export class EditAddressDialog implements OnInit {
             country     : ['', Validators.required],
             phoneNumber : ['', Validators.required],
             postCode    : ['', Validators.required],
-            state       : ['', Validators.required],
+            state       : ['Selangor', Validators.required],
             isDefault   : ['']
         });
 
@@ -77,6 +77,7 @@ export class EditAddressDialog implements OnInit {
             this.addressForm.get('customerId').setValue(this.data.customerId);
             this.addressForm.get('isDefault').setValue(false);
             this.addressForm.get('country').setValue(this.countryName);
+            this.addressForm.get('email').setValue(this.data.user.email);
         } else {
             this.addressForm.patchValue(this.data.customerAddress);
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;

@@ -22,7 +22,7 @@ export const ordersRoutes: Route[] = [
             {
                 path: '',
                 data: {
-                    headerTitle: 'My Order'
+                    headerTitle: 'My Orders'
                 },
                 component: OrderListComponent,
             }
