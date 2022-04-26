@@ -4,6 +4,8 @@ import { fuseAnimations } from '@fuse/animations';
 import { MatDrawer } from '@angular/material/sidenav';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Subject, takeUntil } from 'rxjs';
+import { UserService } from 'app/core/user/user.service';
+import { Customer } from 'app/core/user/user.types';
 
 
 @Component({
@@ -23,6 +25,7 @@ export class EditProfileComponent implements OnInit
     panels: any[] = [];
     selectedPanel: string = 'account';
     currentScreenSize: any;
+    customer: Customer;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -31,7 +34,9 @@ export class EditProfileComponent implements OnInit
      */
     constructor(
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _userService: UserService
+
     )
     {
         // this.checkExistingURL = debounce(this.checkExistingURL, 300);
@@ -86,6 +91,24 @@ export class EditProfileComponent implements OnInit
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
+            });
+
+        
+
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response)=>{
+
+                this.customer = response['data']
+
+                // if 'password' doesn't exist in object
+                if (!("password" in this.customer)) {
+                    // Remove security panel
+                    let index = this.panels.findIndex(item => item.id === 'security')
+                    if (index > 1) {
+                        this.panels.splice(index, 1)
+                    }
+                }
             });
     }
 

@@ -31,7 +31,7 @@
                             [ngClass]="{'bg-gray-300 hover:bg-gray-400': openTab !== orderStatus.id, 'bg-primary font-semibold cursor-auto': openTab === orderStatus.id}"
                             [for]="orderStatus.id + '-btn'"
                         >
-                            <span class="text-sm sm:text-base">{{orderStatus.label}}</span>
+                            <span class="text-sm sm:text-base tracking-tight">{{orderStatus.label}}</span>
                         </label>
                     </div>
                 </ng-container>
@@ -47,14 +47,14 @@
                     <ng-container *ngIf="ordersDetails.length > 0; else noOrder">
                         <ng-container *ngFor="let orderDetails of ordersDetails">
                             <!-- Orders -->
-                            <div class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-4 mb-4">
+                            <div class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-2 mb-4">
                                 <div class="flex flex-col w-full">
                                     <!-- Header -->
-                                    <div class="flex flex-row my-3 items-start justify-between w-full">
+                                    <div class="flex flex-row my-3 items-start justify-between w-full sm:px-2">
                                         <!-- Store Details -->
                                         <div class="flex flex-row">
                                             <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
-                                            <div class="flex flex-col pl-2">
+                                            <div class="flex flex-col px-2">
                                                 <h3 class="font-bold">{{orderDetails.store.name}}</h3>
                                                 <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
                                                 <h3 class="text-gray-400 text-xs">Order Placed : {{orderDetails.created | date:'MMM dd, h:mm a' }}</h3>
@@ -108,7 +108,9 @@
                                     
                                     <!-- Body -->
                                     <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails">
-                                        <div class="flex flex-row items-center justify-around w-full py-2">
+                                        <div 
+                                            (click)="redirect(orderItemDetail.productInventory.product.seoUrl)"  
+                                            class="flex flex-row items-center justify-around w-full py-2 cursor-pointer group hover:bg-primary-50 sm:px-2">
                                             <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
                                                 <img
                                                     class="w-full"
@@ -120,14 +122,14 @@
                                                         : 'assets/branding/deliverin/logo/DeliverIN-Original.jpg'">
                                             </div>
                                             <div class="w-full md:pl-50">
-                                                <h3 (click)="redirect(orderItemDetail.productInventory.product.seoUrl)" 
-                                                    class="font-semibold text-sm hover:text-primary cursor-pointer">
+                                                <h3 
+                                                    class="font-semibold text-sm group-hover:text-primary">
                                                     {{orderItemDetail.productName}}
                                                 </h3>
-                                                <h3 class="text-gray-400 text-sm">{{orderItemDetail.productVariant}}</h3>
+                                                <h3 class="text-gray-400 text-sm group-hover:text-primary">{{orderItemDetail.productVariant}}</h3>
                                             </div>
                                             <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
-                                                <h3 class="text-gray-400 items-center text-sm">x{{orderItemDetail.quantity}}</h3>
+                                                <h3 class="text-gray-400 items-center text-sm group-hover:text-primary">x{{orderItemDetail.quantity}}</h3>
                                                 <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
                                                 <h3 class="font-bold text-primary text-sm">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                             </div>
@@ -138,7 +140,7 @@
                                     <div class="border-b w-full"></div>
                                     
                                     <!-- Footer -->
-                                    <div class="flex flex-row justify-between w-full py-2">
+                                    <div class="flex flex-row justify-between w-full py-2 sm:px-2">
                                         <!-- Order Details Button -->
                                         <div class="flex flex-row">
                                             <div class="w-24">

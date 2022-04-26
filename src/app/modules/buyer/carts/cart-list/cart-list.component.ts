@@ -6,7 +6,8 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
-import { Cart } from 'app/core/cart/cart.types';
+import { Cart, CartPagination } from 'app/core/cart/cart.types';
+import { JwtService } from 'app/core/jwt/jwt.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -83,8 +84,7 @@ import { map, switchMap, takeUntil } from 'rxjs/operators';
 })
 export class CartListComponent implements OnInit, OnDestroy
 {
-    // @ViewChild("customerVoucher", {read: MatPaginator}) private _customerVoucherPagination: MatPaginator;
-    // @ViewChild("usedCustomerVoucher", {read: MatPaginator}) private _usedCustomerVoucherPagination: MatPaginator;
+    @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
     platform: Platform;
     inputPromoCode: string ='';
@@ -92,13 +92,14 @@ export class CartListComponent implements OnInit, OnDestroy
     pageOfItems: Array<any>;
     customerAuthenticate: CustomerAuthenticate;
     stores: Store[] = [];
-
+    pagination: CartPagination;
     cart: Cart;
     carts: Cart[];
     totalCartItems: number;
     user: User;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    customerId: string = '';
 
     /**
      * Constructor
@@ -108,10 +109,11 @@ export class CartListComponent implements OnInit, OnDestroy
         public _dialog: MatDialog,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _authService: AuthService,
         private _platformService : PlatformService,
         private _cartService: CartService,
-        private _storesService: StoresService
+        private _storesService: StoresService,
+        private _jwtService: JwtService,
+        private _authService: AuthService
 
     )
     {
@@ -126,40 +128,42 @@ export class CartListComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
-        this._cartService.customerCarts$
+        this._cartService.carts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((carts: Cart[]) => {
-                this.carts = carts["cartList"];
-                this.totalCartItems = carts["totalItem"];
 
                 // remove duplicate stores
-                let resArr = [];
-                this.carts.filter(function(item){
+                // let resArr = [];
+                // this.carts.filter(function(item){
 
-                    let i = resArr.findIndex(x => (x.storeId == item.storeId));
+                //     let i = resArr.findIndex(x => (x.storeId == item.storeId));
 
-                    if (i <= -1){
-                        resArr.push(item);
-                    }
-                    return null;
-                });
-                this.carts = resArr;
+                //     if (i <= -1){
+                //         resArr.push(item);
+                //     }
+                //     return null;
+                // });
+                // this.carts = resArr;
 
-                this.carts.forEach(cart => {
-
-                    this._storesService.getStoreById(cart.storeId) 
-                    .subscribe((store: Store)=>{
-                        if (store){
-                            this.stores.push(store);
-                        }
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
-                    });
-                }) 
+                this.carts = carts
+                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Get the orders pagination
+        this._cartService.cartPagination$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((pagination: CartPagination) => {
+            
+            // Update the pagination
+            this.pagination = pagination;
+            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });    
 
     }
 
@@ -168,35 +172,17 @@ export class CartListComponent implements OnInit, OnDestroy
     */
     ngAfterViewInit(): void
     {
-        /*
         setTimeout(() => {
-            if (this._customerVoucherPagination )
+            if (this._paginator )
             {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
 
                 // Get products if sort or page changes
-                merge(this._customerVoucherPagination.page).pipe(
+                merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._vouchersService.getAvailableCustomerVoucher(false, 0, 10);
-                    }),
-                    map(() => {
-                        this.isLoading = false;
-                    })
-                ).subscribe();
-            }
-
-            if (this._usedCustomerVoucherPagination )
-            {
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-
-                // Get products if sort or page changes
-                merge(this._usedCustomerVoucherPagination.page).pipe(
-                    switchMap(() => {
-                        this.isLoading = true;
-                        return this._vouchersService.getAvailableCustomerVoucher(true, 0, 10);
+                        return this._cartService.getCarts(0, 4, null, this.customerId);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -205,7 +191,6 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         }, 0);
 
-        */
     }
 
     /**
@@ -220,19 +205,16 @@ export class CartListComponent implements OnInit, OnDestroy
     }
 
     onChangePage(pageOfItems: Array<any>) {
-
-        /*
         
         // update current page of items
         this.pageOfItems = pageOfItems;
         
-        if(this.customerVoucherPagination && this.pageOfItems['currentPage']){
+        if(this.pagination && this.pageOfItems['currentPage']){
 
-            if (this.pageOfItems['currentPage'] - 1 !== this.customerVoucherPagination.page) {
+            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-    
-                this._vouchersService.getAvailableCustomerVoucher(false,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._cartService.getCarts(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], null, this.customerId)
                     .subscribe((response)=>{
                             
                         // set loading to false
@@ -242,35 +224,19 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         }
 
-        if(this.usedCustomerVoucherPagination && this.pageOfItems['currentPage']){
-
-            if (this.pageOfItems['currentPage'] - 1 !== this.usedCustomerVoucherPagination.page) {
-                // set loading to true
-                this.isLoading = true;
-    
-                this._vouchersService.getAvailableCustomerVoucher(true,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
-                    .subscribe((response)=>{
-                        
-                        // set loading to false
-                        this.isLoading = false;
-                    });
-                    
-            }
-        }
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
-        */
     }
 
     redirectToStore(store: Store) {
         this._document.location.href = 'https://' + store.domain + '/checkout'
     }
 
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
+    displayStoreLogo(store: Store) {
+        // let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (store.storeLogoUrl != null) {
+            return store.storeLogoUrl;
         } else {
             return 'assets/branding/symplified/logo/symplified.png'
         }

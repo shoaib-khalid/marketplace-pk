@@ -51,37 +51,43 @@
 
 <mat-menu
     class="max-w-60 overflow-hidden"
-    [ngClass]="seeMoreCarts === true ? 'h-auto' : 'h-[179px]'"
+    [ngClass]="seeMoreCarts === true ? 'h-auto' : 'max-h-[179px]'"
     [xPosition]="'before'"
     #cartMenu="matMenu">
-    <!-- Divider  -->
-    <div class="border-t"></div>
-    <!-- Stores  -->
-    <ng-container *ngFor="let store of stores">
-        <div 
-            (click)="redirectToStore(store)"
-            class="p-4 cursor-pointer grid grid-cols-4 gap-2 justify-between hover:bg-primary-50">
-            <!-- Logo -->
-            <div class="flex items-center justify-center">
-                <img
-                    class="w-5"
-                    [src]="displayStoreLogo(store.storeAssets)"
-                    alt="Logo image">
+    <ng-container *ngIf="carts.length > 0, else noCarts">
+        <!-- Divider  -->
+        <div class="border-t"></div>
+        <!-- Stores  -->
+        <ng-container *ngFor="let cart of carts">
+            <div 
+                (click)="redirectToStore(cart.store)"
+                class="p-4 cursor-pointer grid grid-cols-4 gap-2 justify-between hover:bg-primary-50">
+                <!-- Logo -->
+                <div class="flex items-center justify-center">
+                    <img
+                        class="w-5"
+                        [src]="displayStoreLogo(cart.store)"
+                        alt="Logo image">
+                </div>
+                <span class="col-span-3 truncate">
+                    {{cart.store.name}}
+                </span>
             </div>
-            <span class="col-span-3 truncate">
-                {{store.name}}
-            </span>
-        </div>
-        <!-- Divider  -->
-        <div class="border-t"></div>
+            <!-- Divider  -->
+            <div class="border-t"></div>
+        </ng-container>
+        <!-- See more  -->
+        <ng-container *ngIf="seeMoreCarts">
+            <div [routerLink]="'/carts'" class="flex justify-center p-2 font-semibold bg-gray-100 hover:bg-primary-50 cursor-pointer hover:text-primary-500">
+                See More
+            </div>
+            <!-- Divider  -->
+            <div class="border-t"></div>
+        </ng-container>
     </ng-container>
-    <!-- See more  -->
-    <ng-container *ngIf="seeMoreCarts">
-        <div [routerLink]="'/carts'" class="flex justify-center p-3 font-semibold bg-gray-100 hover:bg-primary-50 cursor-pointer hover:text-primary-500">
-            See More
-        </div>
-        <!-- Divider  -->
-        <div class="border-t"></div>
-    </ng-container>
+
+    <ng-template #noCarts>
+        <div [routerLink]="'/carts'" class="flex justify-center items-center h-full font-medium hover:bg-gray-100 cursor-pointer p-3 mt-[1px] tracking-tight">Carts are empty</div>
+    </ng-template>
 </mat-menu>
 

@@ -56,7 +56,7 @@
 <ul *ngIf="pager.pages && pager.pages.length" class="pagination flex flex-row items-center">
     <li 
         (click)="setPage(1)"
-        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item first-item" 
+        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item first-item pt-[6px]" 
         [ngClass]="pager.currentPage === 1 ? 'disabled bg-disabled cursor-default' : 'bg-card cursor-pointer group hover:bg-primary'"
     >
         <a class="page-link">
@@ -68,7 +68,7 @@
     </li>
     <li 
         (click)="setPage(pager.currentPage - 1)"
-        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item previous-item" 
+        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item previous-item pt-[6px]" 
         [ngClass]="pager.currentPage === 1 ? 'disabled bg-disabled cursor-default' : 'bg-card cursor-pointer group hover:bg-primary'"
     >
         <a class="page-link">
@@ -93,7 +93,7 @@
 
     <li 
         (click)="setPage(pager.currentPage + 1)"
-        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item next-item" 
+        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item next-item pt-[6px]" 
         [ngClass]="pager.currentPage === pager.totalPages ? 'disabled bg-disabled cursor-default' : 'bg-card cursor-pointer group hover:bg-primary'"
     >
         <a class="page-link">
@@ -105,7 +105,7 @@
     </li>
     <li 
         (click)="setPage(pager.totalPages)"
-        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item last-item" 
+        class="bg-card h-10 w-10 flex justify-center items-center cursor-pointer rounded-full page-item last-item pt-[6px]" 
         [ngClass]="pager.currentPage === pager.totalPages ? 'disabled bg-disabled cursor-default' : 'bg-card cursor-pointer group hover:bg-primary'"
     >
         <a class="page-link">

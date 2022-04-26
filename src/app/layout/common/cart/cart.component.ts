@@ -29,8 +29,8 @@ export class CartComponent implements OnInit, OnDestroy
 
     @Input() showAvatar: boolean = true;
     cart: Cart;
-    carts: Cart[];
-    totalCartItems: number;
+    carts: Cart[] = [];
+    totalCartItems: number = 0;
     user: User;
     seeMoreCarts: boolean = true;
     customer:any;
@@ -68,33 +68,46 @@ export class CartComponent implements OnInit, OnDestroy
         this._cartService.customerCarts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((carts: Cart[]) => {
-                this.carts = carts["cartList"];
-                this.totalCartItems = carts["totalItem"];
+                
+                if (carts) {
 
-                // remove duplicate stores
-                let resArr = [];
-                this.carts.filter(function(item){
-
-                    let i = resArr.findIndex(x => (x.storeId == item.storeId));
-
-                    if (i <= -1){
-                        resArr.push(item);
-                    }
-                    return null;
-                });
-                this.carts = resArr;
-
-                this.carts.forEach(cart => {
-
-                    this._storesService.getStoreById(cart.storeId) 
-                    .subscribe((store: Store)=>{
-                        if (store){
-                            this.stores.push(store);
+                    this.carts = carts["cartList"];
+                    this.totalCartItems = carts["totalItem"];
+    
+                    // remove duplicate stores
+                    let resArr = [];
+                    this.carts.filter(function(item){
+                        let i = resArr.findIndex(x => (x.storeId == item.storeId));
+    
+                        if (i <= -1){
+                            resArr.push(item);
                         }
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
+                        return null;
                     });
-                }) 
+                    
+                    // to show only 3
+                    if (resArr.length >= 3) {
+                        const slicedArray = resArr.slice(0, 3);
+                        this.carts = slicedArray;
+                    }
+    
+                }
+                else {
+                    this.seeMoreCarts = false
+                }
+                    
+                
+                // this.carts.forEach(cart => {
+
+                //     this._storesService.getStoreById(cart.storeId) 
+                //     .subscribe((store: Store)=>{
+                //         if (store){
+                //             this.stores.push(store);
+                //         }
+                //         // Mark for check
+                //         this._changeDetectorRef.markForCheck();
+                //     });
+                // }) 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -126,10 +139,10 @@ export class CartComponent implements OnInit, OnDestroy
         this._document.location.href = 'https://' + store.domain + '/checkout'
     }
 
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
+    displayStoreLogo(store: Store) {
+        // let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (store.storeLogoUrl != null) {
+            return store.storeLogoUrl;
         } else {
             return 'assets/branding/symplified/logo/symplified.png'
         }

@@ -109,9 +109,12 @@
                                             <h3 *ngIf="voucher.voucher.calculationType === 'FIX'" class="text-primary group-hover:text-white">{{voucher.voucher.discountValue | currency: voucher.voucher.currencyLabel}} off on {{voucher.voucher.name}}</h3>
                                             <h3 *ngIf="voucher.voucher.calculationType === 'PERCENT'" class="text-primary group-hover:text-white">{{voucher.voucher.discountValue}}% off on {{voucher.voucher.name}}</h3>
                                             <div class="flex flex-row justify-between w-full">
-                                                <div class="flex flex-row">
+                                                <div *ngIf="voucher.voucher.maxDiscountAmount > 0" class="flex flex-row">
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">Capped at&nbsp;</h3>
                                                     <h3 class="text-sm text-gray-400 group-hover:text-black">{{voucher.voucher.maxDiscountAmount | currency: voucher.voucher.currencyLabel}}</h3>
-                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">minimum spend</h3>
+                                                </div>
+                                                <div *ngIf="voucher.voucher.maxDiscountAmount === 0 || voucher.voucher.maxDiscountAmount === null" class="flex flex-row">
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">No Capped Amount</h3>
                                                 </div>
                                                 <div class="flex flex-row sm:flex-col text-right">
                                                     <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400 group-hover:text-black">Valid Until</h3>
@@ -190,9 +193,12 @@
                                             <h3 *ngIf="usedVoucher.voucher.calculationType === 'FIX'" class="text-primary group-hover:text-white">{{usedVoucher.voucher.discountValue | currency: usedVoucher.voucher.currencyLabel}} off on {{usedVoucher.voucher.name}}</h3>
                                             <h3 *ngIf="usedVoucher.voucher.calculationType === 'PERCENT'" class="text-primary group-hover:text-white">{{usedVoucher.voucher.discountValue}}% off on {{usedVoucher.voucher.name}}</h3>
                                             <div class="flex flex-row justify-between w-full">
-                                                <div class="flex flex-row">
+                                                <div *ngIf="usedVoucher.voucher.maxDiscountAmount > 0" class="flex flex-row">
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">Capped at&nbsp;</h3>
                                                     <h3 class="text-sm text-gray-400 group-hover:text-black">{{usedVoucher.voucher.maxDiscountAmount | currency: usedVoucher.voucher.currencyLabel}}</h3>
-                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">minimum spend</h3>
+                                                </div>
+                                                <div *ngIf="usedVoucher.voucher.maxDiscountAmount === 0 || usedVoucher.voucher.maxDiscountAmount === null" class="flex flex-row">
+                                                    <h3 class="text-xs pl-0.5 pt-0.5 text-gray-400 group-hover:text-black">No Capped Amount</h3>
                                                 </div>
                                                 <div class="flex flex-row sm:flex-col text-right">
                                                     <h3 class="text-xs pr-0.5 pt-0.5 text-gray-400 group-hover:text-black">Valid Until</h3>
