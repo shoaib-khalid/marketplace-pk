@@ -1,4 +1,4 @@
-<div class="flex flex-col w-full sm:min-w-140 overflow-y-auto">
+<div class="flex flex-col max-w-120 md:min-w-160 overflow-y-auto">
     <div class="flex flex-col flex-auto p-2 overflow-y-auto w-full">
         <!-- Header new adrdress -->
         <div class="flex items-center justify-center flex-auto p-2 w-full">
@@ -39,12 +39,32 @@
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
+                        <mat-label>State</mat-label>
+                        <mat-select 
+                            [formControlName]="'state'"
+                            [required]="true"
+                            [placeholder]="'Select state'"
+                            #stateSelector="matSelect">
+                            <mat-select-trigger>
+                                <span class="flex items-center">
+                                    <span>{{ stateSelector.triggerValue }}</span>
+                                </span>
+                            </mat-select-trigger>
+                            <div *ngFor="let state of storeStates">
+                                <mat-option [value]="state.id">{{state.name}}</mat-option>
+                            </div>
+                        </mat-select>
+                        <!-- <mat-error *ngIf="addressForm.get('state').hasError('required')">
+                            Required
+                        </mat-error> -->
+                    </mat-form-field>
+                    <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
                         <mat-label>Email</mat-label>
                         <input
                             [formControlName]="'email'"
                             placeholder="Enter your email"
                             matInput>
-                    </mat-form-field>
+                    </mat-form-field> -->
                 </div>
  
                 <!-- City, Postcode -->
@@ -64,42 +84,11 @@
                             matInput>
                     </mat-form-field>
                 </div>
-    
-                <!-- State, Country -->
-                <div class="w-full">
-                    <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
-                        <mat-label>State</mat-label>
-                        <mat-select 
-                            [formControlName]="'state'"
-                            [required]="true"
-                            [placeholder]="'Select state'"
-                            #stateSelector="matSelect">
-                            <mat-select-trigger>
-                                <span class="flex items-center">
-                                    <span>{{ stateSelector.triggerValue }}</span>
-                                </span>
-                            </mat-select-trigger>
-                            <div *ngFor="let state of storeStates">
-                                <mat-option [value]="state.id">{{state.name}}</mat-option>
-                            </div>
-                        </mat-select>
-                        <mat-error *ngIf="addressForm.get('state').hasError('required')">
-                            Required
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
-                        <mat-label>Country</mat-label>
-                        <input
-                            [formControlName]="'country'"
-                            placeholder="Enter your country"
-                            readonly
-                            matInput>
-                    </mat-form-field>
-                </div>
+
                 
                 <!-- Address -->
                 <div class="w-full">
-                    <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
+                    <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
                         <mat-label>Address</mat-label>
                         <textarea
                             matInput
@@ -110,6 +99,22 @@
                             [formControlName]="'address'"
                             cdkTextareaAutosize
                             [cdkAutosizeMinRows]="5"></textarea>
+                    </mat-form-field> -->
+                    <!-- Address -->
+                    <mat-form-field
+                        class="w-full" 
+                        floatLabel="always" 
+                        >
+                        <mat-label>Address</mat-label>
+                        <input
+                            matInput
+                            [formControlName]="'address'"
+                            placeholder="Enter your address"
+                            autocomplete="disabled"
+                            [required]="true">
+                        <!-- <mat-error *ngIf="checkoutForm.get('address').hasError('required')">
+                            Required
+                        </mat-error> -->
                     </mat-form-field>
                 </div>
     
@@ -136,7 +141,7 @@
                 </ng-template>
     
                 <!-- Actions -->
-                <div class="flex flex-row items-center justify-between pt-4">
+                <div class="flex sm:flex-row sm:items-center justify-end mt-4 sm:mt-6">
                     <button
                         class="hover:bg-gray-500 border border-gray-500"
                         mat-flat-button
@@ -146,6 +151,7 @@
                         >
                         Cancel
                     </button>
+                    <span>&nbsp;&nbsp;</span>
                     <button
                         mat-flat-button
                         [disabled]="isLoading || addressForm.pristine || addressForm.invalid"

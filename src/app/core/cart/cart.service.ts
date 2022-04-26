@@ -7,6 +7,7 @@ import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { StoresService } from '../store/store.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +16,7 @@ export class CartService
 {
     private _cart: ReplaySubject<Cart> = new ReplaySubject<Cart>(1);
     private _cartItems: ReplaySubject<CartItem[]> = new ReplaySubject<CartItem[]>(1);
+    private _customerCarts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
 
     /**
      * Constructor
@@ -24,6 +26,7 @@ export class CartService
         private _apiServer: AppConfig,
         private _storeService: StoresService,
         private _jwt: JwtService,
+        private _authService: AuthService,
         private _logging: LogService
     )
     {
@@ -80,6 +83,14 @@ export class CartService
         return localStorage.getItem('cartId') ?? '';
     }
 
+    /**
+     * Getter for customerCarts
+     */
+    get customerCarts$(): Observable<Cart[]>
+    {
+        return this._customerCarts.asObservable();
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -98,6 +109,30 @@ export class CartService
                 this._cart.next(cart);
             })
         );
+    }
+
+    getCartsByCustomerId(customerId: string): Observable<Cart>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${this._authService.publicToken}`),
+            params: {
+                customerId
+            }
+        };
+
+        return this._httpClient.get<any>(orderService + '/carts/customer', header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
+                    
+                    // set customer cart
+                    this._customerCarts.next(response["data"]);
+
+                    return response["data"];
+                })
+            );
     }
     
     /**
