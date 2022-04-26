@@ -48,7 +48,7 @@ export class CoreInterceptor implements HttpInterceptor
                         },
                         actions: {
                             confirm: {
-                                label: 'Ok',
+                                label: 'OK',
                                 color: "primary",
                             },
                             cancel: {

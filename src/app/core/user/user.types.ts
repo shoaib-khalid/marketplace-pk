@@ -21,6 +21,7 @@ export interface Customer
     roleId: string;
     storeId: string;
     customerAddress: CustomerAddress[]
+    password?: string;
 }
 
 export interface CustomerAddress

@@ -1,5 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { StoresService } from 'app/core/store/store.service';
+import { Store } from 'app/core/store/store.types';
 import { CustomerVoucher } from '../vouchers.types';
 
 @Component({
@@ -12,9 +14,12 @@ export class VoucherModalComponent implements OnInit {
     title: string;
     description: string;
     voucher: CustomerVoucher;
+    storeName: string;
 
     constructor(
         private dialogRef: MatDialogRef<VoucherModalComponent>,
+        private _storesService: StoresService,
+        private _changeDetectorRef: ChangeDetectorRef,
         @Inject(MAT_DIALOG_DATA) private data: any
     ) { }
 
@@ -23,11 +28,12 @@ export class VoucherModalComponent implements OnInit {
         this.title = this.data['title'];
         this.description = this.data['description'];
         this.voucher = this.data['voucher'];
-       
+        this.storeName = this.data['storeName']
     }
 
     okButton() {
         this.dialogRef.close();
     }
 
+    
 }

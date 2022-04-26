@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
-import { Cart, CartItem } from 'app/core/cart/cart.types';
+import { Cart, CartItem, CartPagination } from 'app/core/cart/cart.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -17,6 +17,8 @@ export class CartService
     private _cart: ReplaySubject<Cart> = new ReplaySubject<Cart>(1);
     private _cartItems: ReplaySubject<CartItem[]> = new ReplaySubject<CartItem[]>(1);
     private _customerCarts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
+    private _carts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
+    private _cartPagination: BehaviorSubject<CartPagination | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -50,6 +52,11 @@ export class CartService
     get cart$(): Observable<Cart>
     {
         return this._cart.asObservable();
+    }
+
+    get carts$(): Observable<Cart[]>
+    {
+        return this._carts.asObservable();
     }
 
     /**
@@ -91,6 +98,14 @@ export class CartService
         return this._customerCarts.asObservable();
     }
 
+    /**
+    * Getter for cart pagination
+    */
+     get cartPagination$(): Observable<CartPagination>
+     {
+         return this._cartPagination.asObservable();
+     }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -102,11 +117,40 @@ export class CartService
     /**
      * Get the current logged in cart data
      */
-    getCart(): Observable<Cart>
+    getCarts(page: number = 0, size: number = 10, storeId: string = null, customerId: string = null):
+        Observable<{ pagination: CartPagination; carts: Cart[] }>
     {
-        return this._httpClient.get<Cart>('api/common/cart').pipe(
-            tap((cart) => {
-                this._cart.next(cart);
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                page        : '' + page,
+                pageSize    : '' + size,
+                storeId     : '' + storeId,
+                customerId  : '' + customerId
+            }
+        };
+
+        if (storeId === null) delete header.params.storeId;
+
+        return this._httpClient.get<any>(orderService +'/carts', header).pipe(
+            tap((response) => {
+
+                this._logging.debug("Response from CartService (getCarts)",response);
+
+                let _pagination = {
+                    length: response.data.totalElements,
+                    size: response.data.size,
+                    page: response.data.number,
+                    lastPage: response.data.totalPages,
+                    startIndex: response.data.pageable.offset,
+                    endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                }
+                this._cartPagination.next(_pagination);
+                this._carts.next(response.data.content);
             })
         );
     }

@@ -210,12 +210,28 @@ export class AuthSignInComponent implements OnInit
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
                     .subscribe(() => {
-                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
 
-                        // // Navigate to the redirect url
-                        // this._router.navigateByUrl(redirectURL);
+                        // redirectURL
+                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                        // store front domain, to be used to compare with redirectURL
+                        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                        
+                        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                            
+                            if (redirectURL.includes(storeFrontDomain)) {
+                                // Navigate to the external redirect url
+                                this._document.location.href = redirectURL;
+                            } else {
+                                // Navigate to the internal redirect url
+                                this._router.navigateByUrl(redirectURL);
+                            }
+                        }
+                        else 
+                        {
+                            this._router.navigateByUrl('/signed-in-redirect');
+                        }
 
-                        this._router.navigate(['/orders' ]);
+                        // this._router.navigate(['/orders' ]);
                     },
                     exception => {
                         console.error("An error has occured : ",exception);
@@ -238,12 +254,27 @@ export class AuthSignInComponent implements OnInit
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
                     .subscribe(() => {                    
-                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                        // redirectURL
+                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                        // store front domain, to be used to compare with redirectURL
+                        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                        
+                        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                            
+                            if (redirectURL.includes(storeFrontDomain)) {
+                                // Navigate to the external redirect url
+                                this._document.location.href = redirectURL;
+                            } else {
+                                // Navigate to the internal redirect url
+                                this._router.navigateByUrl(redirectURL);
+                            }
+                        }
+                        else 
+                        {
+                            this._router.navigateByUrl('/signed-in-redirect');
+                        }
 
-                        // // Navigate to the redirect url
-                        // this._router.navigateByUrl(redirectURL);
-
-                        this._router.navigate(['/orders' ]);
+                        // this._router.navigate(['/orders' ]);
                     },
                     exception => {
                         console.error("An error has occur : ",exception);

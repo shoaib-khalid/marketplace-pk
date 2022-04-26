@@ -6,6 +6,8 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { StoresService } from 'app/core/store/store.service';
+import { Store } from 'app/core/store/store.types';
 import { merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { VoucherModalComponent } from '../voucher-modal/voucher-modal.component';
@@ -107,6 +109,8 @@ export class VoucherListComponent implements OnInit, OnDestroy
         private _vouchersService: VouchersService,
         private _authService: AuthService,
         private _platformService : PlatformService,
+        private _storesService: StoresService,
+
     )
     {
     }
@@ -308,18 +312,47 @@ export class VoucherListComponent implements OnInit, OnDestroy
     }
 
     openVoucherModal(icon: string, title: string, description: string, voucher: CustomerVoucher) : void {
+
+        let storeName = '';
+        if (voucher.voucher.storeId != null) {
+            this._storesService.getStoreById(voucher.voucher.storeId)
+                        .subscribe((response: Store) => {
+            
+                        storeName = response.name;
+                        const dialogRef = this._dialog.open( 
+                        VoucherModalComponent,{
+                            data:{ 
+                                icon,
+                                title,
+                                description,
+                                voucher, 
+                                storeName
+                            }
+                        });
+                        
+                        dialogRef.afterClosed().subscribe();
+                        
+                        // Mark for check
+                        this._changeDetectorRef.markForCheck();
+                    });
+
+        }
+        else {
+
+            const dialogRef = this._dialog.open( 
+                VoucherModalComponent,{
+                    data:{ 
+                        icon,
+                        title,
+                        description,
+                        voucher, 
+                        storeName: null
+                    }
+                });
+                
+                dialogRef.afterClosed().subscribe();
+        }
         
-        const dialogRef = this._dialog.open( 
-        VoucherModalComponent,{
-            data:{ 
-                icon,
-                title,
-                description,
-                voucher, 
-            }
-        });
-        
-        dialogRef.afterClosed().subscribe();
     }
 
 }

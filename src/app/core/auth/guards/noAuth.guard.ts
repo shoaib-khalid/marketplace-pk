@@ -76,7 +76,6 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
         
         // store front domain, to be used to compare with redirectURL
         const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-        console.log(storeFrontDomain);
         
         // Check the authentication status
         return this._authService.check()
