@@ -55,6 +55,15 @@ export class EditAddressDialog implements OnInit {
             isDefault   : ['']
         });        
 
+        // email               : ['', [Validators.required, CheckoutValidationService.emailValidator]],
+        // phoneNumber         : ['', [CheckoutValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
+        // address             : ['', Validators.required],
+        // storePickup         : [false],
+        // postCode            : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), CheckoutValidationService.postcodeValidator]],
+        // state               : ['Selangor', Validators.required],
+        // city                : ['', Validators.required],
+
+
         // Subscribe to platform data
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -102,7 +111,6 @@ export class EditAddressDialog implements OnInit {
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
 
-        console.log("this.countryName", this.countryName);
     }
 
     updateAddress(){
@@ -115,28 +123,35 @@ export class EditAddressDialog implements OnInit {
 
     sanitizePhoneNumber(phoneNumber: string) {
 
-        let substring = phoneNumber.substring(0, 1)
-        let countryId = this.countryCode;
-        let sanitizedPhoneNo = ''
-        
-        if ( countryId === 'MYS' ) {
+        if (phoneNumber.match(/^\d+$/)) {
 
-                 if (substring === '6') sanitizedPhoneNo = phoneNumber;
-            else if (substring === '0') sanitizedPhoneNo = '6' + phoneNumber;
-            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
-            else                        sanitizedPhoneNo = '60' + phoneNumber;
-
+            let substring = phoneNumber.substring(0, 1)
+            let countryId = this.countryCode;
+            let sanitizedPhoneNo = ''
+            
+            if ( countryId === 'MYS' ) {
+    
+                     if (substring === '6') sanitizedPhoneNo = phoneNumber;
+                else if (substring === '0') sanitizedPhoneNo = '6' + phoneNumber;
+                else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+                else                        sanitizedPhoneNo = '60' + phoneNumber;
+    
+            }
+            else if ( countryId === 'PAK') {
+    
+                     if (substring === '9') sanitizedPhoneNo = phoneNumber;
+                else if (substring === '2') sanitizedPhoneNo = '9' + phoneNumber;
+                else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+                else                        sanitizedPhoneNo = '92' + phoneNumber;
+    
+            }
+    
+            return sanitizedPhoneNo;
         }
-        else if ( countryId === 'PAK') {
-
-                 if (substring === '9') sanitizedPhoneNo = phoneNumber;
-            else if (substring === '2') sanitizedPhoneNo = '9' + phoneNumber;
-            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
-            else                        sanitizedPhoneNo = '92' + phoneNumber;
-
+        else {
+            return phoneNumber;
         }
 
-        return sanitizedPhoneNo;
     }
 
 }

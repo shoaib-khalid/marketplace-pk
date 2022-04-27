@@ -47,7 +47,7 @@
                             [formControlName]="'username'"
                             placeholder="Username" class="px-2" >
                         <mat-error *ngIf="signUpForm.get('username').hasError('required')">
-                            User name is required
+                            Username is required
                         </mat-error>
                     </mat-form-field>
 
@@ -124,7 +124,7 @@
                         [disabled]="signUpForm.disabled"
                         (click)="signUp()">
                         <span *ngIf="!signUpForm.disabled">
-                            Sign Up
+                            {{buttonText}}
                         </span>
                         <mat-progress-spinner
                             *ngIf="signUpForm.disabled"

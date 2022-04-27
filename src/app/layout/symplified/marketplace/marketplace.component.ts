@@ -87,9 +87,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
             .pipe((takeUntil(this._unsubscribeAll)))
             .subscribe((user: User) => {
                 this.user = user;
-                this.displayUsername = this.textTruncate(this.user["data"].username,12)
-
-                
+                this.displayUsername = this.textTruncate(user.username, 12)
             });
 
         // Subscribe to media changes

@@ -5,7 +5,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Subject, takeUntil } from 'rxjs';
 import { UserService } from 'app/core/user/user.service';
-import { Customer } from 'app/core/user/user.types';
+import { Customer, User } from 'app/core/user/user.types';
 
 
 @Component({
@@ -25,7 +25,7 @@ export class EditProfileComponent implements OnInit
     panels: any[] = [];
     selectedPanel: string = 'account';
     currentScreenSize: any;
-    customer: Customer;
+    customer: any;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -97,10 +97,10 @@ export class EditProfileComponent implements OnInit
 
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((response)=>{
+            .subscribe((user: User)=>{
 
-                this.customer = response['data']
-
+                this.customer = user
+                
                 // if 'password' doesn't exist in object
                 if (!("password" in this.customer)) {
                     // Remove security panel

@@ -66,7 +66,7 @@ export class EditAccountComponent implements OnInit
         this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response)=>{
-                this.accountForm.patchValue(response.data);
+                this.accountForm.patchValue(response);
             });
 
         this._fuseMediaWatcherService.onMediaChange$

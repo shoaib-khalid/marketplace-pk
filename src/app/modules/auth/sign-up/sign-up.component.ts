@@ -37,6 +37,7 @@ export class AuthSignUpComponent implements OnInit
     //to be display the text
     titleText: string ='Sign Up';
     descriptionText: string ='Please enter the following details to create your account';
+    buttonText: string = 'Sign Up'
 
 
     //validate Payload
@@ -80,7 +81,8 @@ export class AuthSignUpComponent implements OnInit
 
             if (this.existedEmail) {
                 this.titleText = 'Account Activation'
-                this.descriptionText = 'Please enter the following details to active your account'
+                this.descriptionText = 'Please enter the following details to activate your account'
+                this.buttonText = 'Activate'
             }
             
         });
@@ -94,6 +96,10 @@ export class AuthSignUpComponent implements OnInit
                 agreements: ['', Validators.requiredTrue]
             }
         );
+
+        if (this.existedEmail) {
+            this.signUpForm.get('email').disable()
+        }
 
         // Subscribe to platform data
         this._platformsService.platform$

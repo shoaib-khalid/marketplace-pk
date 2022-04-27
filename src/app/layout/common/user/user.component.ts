@@ -70,7 +70,7 @@ export class UserComponent implements OnInit, OnDestroy
 
                 this._userService.get(this.customerAuthenticate.session.ownerId)
                     .subscribe((response)=>{
-                        this.customer = response.data;
+                        this.customer = response;
                     });
                     
                 // Mark for check
@@ -128,6 +128,15 @@ export class UserComponent implements OnInit, OnDestroy
     editProfile(): void
     {
         this._router.navigate(['/profile']);
+    }
+
+    /**
+     * Edit Profile
+     */
+
+    ordersRedirect(): void
+    {
+        this._router.navigate(['/orders']);
     }
     
 }
