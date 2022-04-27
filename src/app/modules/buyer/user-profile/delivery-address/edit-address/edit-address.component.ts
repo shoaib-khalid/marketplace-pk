@@ -50,7 +50,7 @@ export class EditAddressDialog implements OnInit {
             city        : ['', Validators.required],
             country     : ['', Validators.required],
             phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
-            postCode    : ['', Validators.required],
+            postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
             isDefault   : ['']
         });        

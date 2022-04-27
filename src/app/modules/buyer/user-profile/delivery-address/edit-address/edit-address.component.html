@@ -88,8 +88,17 @@
                             [formControlName]="'postCode'"
                             placeholder="Enter postcode"
                             matInput>
-                            <mat-error *ngIf="addressForm.get('city').hasError('required')">
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('required')">
                                 Postcode is required
+                            </mat-error>
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('invalidPostcode')">
+                                Invalid postcode
+                            </mat-error>
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('minlength')">
+                                Postcode does not meet min. length
+                            </mat-error>
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('maxlength')">
+                                Exceed maximum length of postcode
                             </mat-error>
                     </mat-form-field>
                 </div>
