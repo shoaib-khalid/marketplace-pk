@@ -45,7 +45,7 @@ export class EditAddressDialog implements OnInit {
             id          : [''],
             customerId  : ['', Validators.required],
             name        : ['', Validators.required],
-            email       : ['', [Validators.required, Validators.email]],
+            email       : [''],
             address     : ['', Validators.required],
             city        : ['', Validators.required],
             country     : ['', Validators.required],
