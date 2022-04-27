@@ -55,15 +55,6 @@ export class EditAddressDialog implements OnInit {
             isDefault   : ['']
         });        
 
-        // email               : ['', [Validators.required, CheckoutValidationService.emailValidator]],
-        // phoneNumber         : ['', [CheckoutValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
-        // address             : ['', Validators.required],
-        // storePickup         : [false],
-        // postCode            : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), CheckoutValidationService.postcodeValidator]],
-        // state               : ['Selangor', Validators.required],
-        // city                : ['', Validators.required],
-
-
         // Subscribe to platform data
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
