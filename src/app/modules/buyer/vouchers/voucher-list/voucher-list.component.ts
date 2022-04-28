@@ -298,7 +298,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
             
         }, (error) => {
             // if voucher is invalid
-            if(error.status === 404) {
+            if (error.status === 404) {
                 this.openVoucherModal('heroicons_outline:x','Invalid Code!', 'Invalid code, please try again', null);
                 this.inputPromoCode = '';
             } else if (error.status === 409) {
@@ -314,31 +314,28 @@ export class VoucherListComponent implements OnInit, OnDestroy
     openVoucherModal(icon: string, title: string, description: string, voucher: CustomerVoucher) : void {
 
         let storeName = '';
-        if (voucher.voucher.storeId != null) {
+        if (voucher != null && voucher.voucher.storeId != null) {
             this._storesService.getStoreById(voucher.voucher.storeId)
-                        .subscribe((response: Store) => {
-            
-                        storeName = response.name;
-                        const dialogRef = this._dialog.open( 
-                        VoucherModalComponent,{
-                            data:{ 
-                                icon,
-                                title,
-                                description,
-                                voucher, 
-                                storeName
-                            }
-                        });
-                        
-                        dialogRef.afterClosed().subscribe();
-                        
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
-                    });
-
+                .subscribe((response: Store) => {
+    
+                storeName = response.name;
+                const dialogRef = this._dialog.open( 
+                VoucherModalComponent,{
+                    data:{ 
+                        icon,
+                        title,
+                        description,
+                        voucher, 
+                        storeName
+                    }
+                });
+                dialogRef.afterClosed().subscribe();
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
         }
         else {
-
             const dialogRef = this._dialog.open( 
                 VoucherModalComponent,{
                     data:{ 
@@ -349,10 +346,8 @@ export class VoucherListComponent implements OnInit, OnDestroy
                         storeName: null
                     }
                 });
-                
                 dialogRef.afterClosed().subscribe();
         }
-        
     }
 
 }
