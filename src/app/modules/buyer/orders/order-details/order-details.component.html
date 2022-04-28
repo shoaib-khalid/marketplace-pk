@@ -11,7 +11,7 @@
                         <!-- Header -->
                         <div class="flex flex-row justify-between">
                             <h3 class="font-semibold text-lg pt-5 items-center">Order ID : {{orderDetails.invoiceId}}</h3>
-                            <button class="flex flex-row m-2 justify-center w-32 border border-primary p-2 rounded">
+                            <button class="flex flex-row m-2 justify-center w-32 border border-primary p-2 rounded items-center">
                                 <!-- Progress Status Icon -->
                                 <mat-icon 
                                     *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED'" 
@@ -63,15 +63,15 @@
                                 <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                 <div class="flex flex-col pl-2">
                                     <h3 class="font-bold text-xl">{{orderDetails.store.name}}</h3>
-                                    <h3 class="font-medium text-gray-400 text-md">Order Placed : {{orderDetails.created | date:'MMM dd yyyy, h:mm a' }}</h3>
+                                    <h3 class="font-medium text-gray-400 text-md">Order Placed : {{dateCreated | date:'MMM dd yyyy, h:mm a' }}</h3>
                                 </div>
                             </div>
                             <div class="flex flex-row pt-4">
                                 <mat-icon class="text-primary" svgIcon="mat_outline:location_on"></mat-icon>
                                 <div class="flex flex-col pl-2">
                                     <h3 class="font-semibold text-primary text-lg">Delivery Address</h3>
-                                    <h3 class="font-medium pt-2 text-md">Name : {{orderDetails.customer.name}}</h3>
-                                    <h3 class="font-medium pt-2 text-md">Contact : {{orderDetails.customer.phoneNumber}}</h3>
+                                    <h3 class="font-medium pt-2 text-md">Name : {{orderDetails.orderShipmentDetail.receiverName}}</h3>
+                                    <h3 class="font-medium pt-2 text-md">Contact : {{orderDetails.orderShipmentDetail.phoneNumber}}</h3>
                                     <h3 class="font-medium pt-2 text-md">Address : {{orderDetails.orderShipmentDetail.address}}, {{orderDetails.orderShipmentDetail.zipcode}}, {{orderDetails.orderShipmentDetail.city}}, {{orderDetails.orderShipmentDetail.state}}</h3>
                                 </div>
                             </div>

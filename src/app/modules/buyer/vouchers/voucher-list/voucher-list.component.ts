@@ -293,25 +293,25 @@ export class VoucherListComponent implements OnInit, OnDestroy
         this._vouchersService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
         .subscribe((response) => {
             // if voucher is valid
-            this.openVoucherModal('mat_solid:check_circle','Congratulations', 'Promo code successfully added', null);
+            this.openVoucherModal('mat_solid:check_circle','Congratulations', 'Promo code successfully added', null, {width: '255px', maxWidth: '80vw'});
             this.inputPromoCode = '';
             
         }, (error) => {
             // if voucher is invalid
             if (error.status === 404) {
-                this.openVoucherModal('heroicons_outline:x','Invalid Code!', 'Invalid code, please try again', null);
+                this.openVoucherModal('heroicons_outline:x','Invalid Code!', 'Invalid code, please try again', null, {width: '255px', maxWidth: '80vw'});
                 this.inputPromoCode = '';
             } else if (error.status === 409) {
-                this.openVoucherModal('heroicons_outline:x','Oops...', 'Sorry, you have redeemed this voucher', null);
+                this.openVoucherModal('heroicons_outline:x','Oops..', 'Sorry, you have redeemed this voucher', null, {width: '255px', maxWidth: '80vw'});
                 this.inputPromoCode = '';
             } else if (error.status === 417) {
-                this.openVoucherModal('heroicons_outline:x','Oops...', 'Sorry, this promo code has expired', null);
+                this.openVoucherModal('heroicons_outline:x','Oops..', 'Sorry, this promo code has expired', null, {width: '255px', maxWidth: '80vw'});
                 this.inputPromoCode = '';
             }
         });
     }
 
-    openVoucherModal(icon: string, title: string, description: string, voucher: CustomerVoucher) : void {
+    openVoucherModal(icon: string, title: string, description: string, voucher: CustomerVoucher, size?) : void {
 
         let storeName = '';
         if (voucher != null && voucher.voucher.storeId != null) {
@@ -321,6 +321,8 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 storeName = response.name;
                 const dialogRef = this._dialog.open( 
                 VoucherModalComponent,{
+                    width: size ? size.width : '520px',
+                    maxWidth: size ? size.maxWidth : '80vw',
                     data:{ 
                         icon,
                         title,
@@ -338,6 +340,8 @@ export class VoucherListComponent implements OnInit, OnDestroy
         else {
             const dialogRef = this._dialog.open( 
                 VoucherModalComponent,{
+                    width: size ? size.width : '520px',
+                    maxWidth: size ? size.maxWidth : '80vw',
                     data:{ 
                         icon,
                         title,

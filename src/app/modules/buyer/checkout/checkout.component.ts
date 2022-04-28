@@ -617,7 +617,7 @@ export class BuyerCheckoutComponent implements OnInit
             "actions": {
             "confirm": {
                 "show": true,
-                "label": "Okay",
+                "label": "OK",
                 "color": "warn"
             },
             "cancel": {

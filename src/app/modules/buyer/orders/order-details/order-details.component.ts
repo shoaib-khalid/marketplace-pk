@@ -9,6 +9,7 @@ import { DeliveryRiderDetails, OrderDetails } from '../order-list/order-list.typ
 import { OrderListService } from '../order-list/order-list.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
+import { Store } from 'app/core/store/store.types';
 
 
 @Component({
@@ -51,6 +52,11 @@ export class OrderDetailsComponent implements OnInit
     orderDetails: any;
     rider$: any;
 
+    store$: Store;
+    timezoneString: any;
+    dateCreated: Date;
+    dateUpdated: Date;
+  
     customerAuthenticate: CustomerAuthenticate;
 
     /**
@@ -61,6 +67,7 @@ export class OrderDetailsComponent implements OnInit
         private _route: ActivatedRoute,
         private _authService: AuthService,
         private _changeDetectorRef: ChangeDetectorRef,
+        private _storesService: StoresService,
 
     )
     {
@@ -90,6 +97,29 @@ export class OrderDetailsComponent implements OnInit
             
             this._orderService.getOrderById(this.orderId).subscribe((response)=>{
                 this.orderDetails = response.data
+                var TimezoneName = this.orderDetails.store.regionCountry.timezone;
+                        
+                // Generating the formatted text
+                var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
+                var dateText = Intl.DateTimeFormat([], options).format(new Date);
+                
+                // Scraping the numbers we want from the text
+                this.timezoneString = dateText.split(" ")[1].slice(3);
+                
+                // Getting the offset
+                var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
+    
+                // Checking for a minutes offset and adding if appropriate
+                if (this.timezoneString.includes(":")) {
+                    var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
+                }
+    
+                this.dateCreated = new Date(this.orderDetails.created);
+                this.dateUpdated = new Date(this.orderDetails.updated);
+    
+                this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
+                this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
+                
             });
         });
         
