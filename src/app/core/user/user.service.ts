@@ -136,9 +136,11 @@ export class UserService
 
         return this._httpClient.get<any>(userService + "/customers/" + ownerId, header)
             .pipe(
-                tap((user) => {
-                    this._logging.debug("Response from UserService (getCustomerById)",user);
-                    this._user.next(user);
+                map((user) => {
+                    this._logging.debug("Response from UserService (getCustomerById)", user);
+                    this._user.next(user['data']);
+
+                    return user['data'];
                 })
             );
     }

@@ -1,17 +1,19 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { AuthService } from 'app/core/auth/auth.service';
-import { ValidateOauthRequest } from 'app/core/auth/auth.types';
+import { CustomerAuthenticate, ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppleLoginProvider } from '../sign-in/apple.provider';
 import { AppConfig } from 'app/config/service.config';
+import { UserService } from 'app/core/user/user.service';
+import { DOCUMENT } from '@angular/common';
 
 
 @Component({
@@ -37,6 +39,7 @@ export class AuthSignUpComponent implements OnInit
     //to be display the text
     titleText: string ='Sign Up';
     descriptionText: string ='Please enter the following details to create your account';
+    buttonText: string = 'Sign Up'
 
 
     //validate Payload
@@ -52,6 +55,8 @@ export class AuthSignUpComponent implements OnInit
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
+        private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
         private _router: Router,
@@ -59,7 +64,7 @@ export class AuthSignUpComponent implements OnInit
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
         private _apiServer: AppConfig,
-
+        private _userService: UserService,
 
 
     )
@@ -80,7 +85,8 @@ export class AuthSignUpComponent implements OnInit
 
             if (this.existedEmail) {
                 this.titleText = 'Account Activation'
-                this.descriptionText = 'Please enter the following details to active your account'
+                this.descriptionText = 'Please enter the following details to activate your account'
+                this.buttonText = 'Activate'
             }
             
         });
@@ -90,10 +96,14 @@ export class AuthSignUpComponent implements OnInit
                 name      : ['', Validators.required],
                 username  : ['', Validators.required],
                 email     : [ this.existedEmail, [Validators.required, Validators.email]],
-                password  : ['', Validators.required],
+                password  : ['', [Validators.required, Validators.minLength(8)]],
                 agreements: ['', Validators.requiredTrue]
             }
         );
+
+        if (this.existedEmail) {
+            this.signUpForm.get('email').disable()
+        }
 
         // Subscribe to platform data
         this._platformsService.platform$
@@ -140,7 +150,15 @@ export class AuthSignUpComponent implements OnInit
                 (response) => {
 
                     // Navigate to the confirmation required page
-                    this._router.navigateByUrl('/confirmation-required');
+                    // this._router.navigateByUrl('/confirmation-required');
+
+                    const signInBody = {
+                        domain      : this.domain,
+                        username    : this.signUpForm.get('username').value,
+                        password    : this.signUpForm.get('password').value,
+                    }
+
+                    this.signIn(signInBody);
                 },
                 (response) => {
 
@@ -230,5 +248,76 @@ export class AuthSignUpComponent implements OnInit
             .then(userData => {
 
             });
+    }
+
+    /**
+     * Sign in
+     */
+    signIn(signInBody): void
+    {
+
+        // Sign in
+        this._authService.signIn(signInBody)
+            .subscribe(
+                (customerAuthenticateResponse: CustomerAuthenticate) => {                    
+                    if (customerAuthenticateResponse) {
+                        this._userService.get(customerAuthenticateResponse.session.ownerId)
+                            .subscribe((response)=>{
+                                let user = {
+                                    "id": response.id,
+                                    "name": response.name,
+                                    "username": response.username,
+                                    "locked": response.locked,
+                                    "deactivated": response.deactivated,
+                                    "created": response.created,
+                                    "updated": response.updated,
+                                    "roleId": response.roleId,
+                                    "email": response.email,
+                                    "avatar": "assets/images/logo/logo_default_bg.jpg",
+                                    "status": "online",
+                                    "role": response.roleId
+                                };
+    
+                                this._userService.user = user;
+                            });
+
+                            // Set the redirect url.
+                            // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
+                            // to the correct page after a successful sign in. This way, that url can be set via
+                            // routing file and we don't have to touch here.                        
+                            
+                            // redirectURL
+                            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+                            // store front domain, to be used to compare with redirectURL
+                            const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                            
+                            if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                                
+                                if (redirectURL.includes(storeFrontDomain)) {
+                                    // Navigate to the external redirect url
+                                    this._document.location.href = redirectURL;
+                                } else {
+                                    // Navigate to the internal redirect url
+                                    this._router.navigateByUrl(redirectURL);
+                                }
+                            }
+                            else 
+                            {
+                                this._router.navigateByUrl('/signed-in-redirect');
+                            }
+                            
+                    }
+                },
+                (error) => {
+                    // Set the alert
+                    this.alert = {
+                        type   : 'error',
+                        message: 'Wrong email or password'
+                    };
+
+                    // Show the alert
+                    this.showAlert = true;
+                }
+            );
     }
 }

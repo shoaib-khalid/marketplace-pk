@@ -26,7 +26,7 @@ export class UserProfileValidationService {
         storeNameAlreadytaken:'Sorry, the selected name is already taken',
         invalidPhonenumber: 'Invalid phonenumber',
         invalidPostcode: 'Invalid postcode',
-        requiredAtLeastOne: 'Required at leat one',
+        requiredAtLeastOne: 'Required at least one',
         noDeliveryPartners: 'No delivery partner available',
         minlength: `Minimum length ${validatorValue.requiredLength}`
       };
@@ -91,7 +91,7 @@ export class UserProfileValidationService {
           //   /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/
           // )
           control.value.match(
-            /^\d+$/
+            /^\+?[0-9]+$/
           )
         ) {
           return null;

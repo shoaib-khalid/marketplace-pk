@@ -45,12 +45,12 @@ export class EditAddressDialog implements OnInit {
             id          : [''],
             customerId  : ['', Validators.required],
             name        : ['', Validators.required],
-            email       : ['', [Validators.required, Validators.email]],
+            email       : [''],
             address     : ['', Validators.required],
             city        : ['', Validators.required],
             country     : ['', Validators.required],
-            phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
-            postCode    : ['', Validators.required],
+            phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.maxLength(30)]],
+            postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
             isDefault   : ['']
         });        
@@ -71,10 +71,10 @@ export class EditAddressDialog implements OnInit {
                 let countryId = this.countryCode;
                 switch (countryId) {
                     case 'MYS':
-                        this.dialingCode = '+60'
+                        this.dialingCode = '60'
                         break;
                     case 'PAK':
-                        this.dialingCode = '+92'
+                        this.dialingCode = '92'
                         break;
                     default:
                         break;
@@ -102,7 +102,6 @@ export class EditAddressDialog implements OnInit {
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
 
-        console.log("this.countryName", this.countryName);
     }
 
     updateAddress(){
@@ -115,28 +114,35 @@ export class EditAddressDialog implements OnInit {
 
     sanitizePhoneNumber(phoneNumber: string) {
 
-        let substring = phoneNumber.substring(0, 1)
-        let countryId = this.countryCode;
-        let sanitizedPhoneNo = ''
-        
-        if ( countryId === 'MYS' ) {
+        if (phoneNumber.match(/^\+?[0-9]+$/)) {
 
-                 if (substring === '6') sanitizedPhoneNo = phoneNumber;
-            else if (substring === '0') sanitizedPhoneNo = '6' + phoneNumber;
-            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
-            else                        sanitizedPhoneNo = '60' + phoneNumber;
-
+            let substring = phoneNumber.substring(0, 1)
+            let countryId = this.countryCode;
+            let sanitizedPhoneNo = ''
+            
+            if ( countryId === 'MYS' ) {
+    
+                     if (substring === '6') sanitizedPhoneNo = phoneNumber;
+                else if (substring === '0') sanitizedPhoneNo = '6' + phoneNumber;
+                else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+                else                        sanitizedPhoneNo = '60' + phoneNumber;
+    
+            }
+            else if ( countryId === 'PAK') {
+    
+                     if (substring === '9') sanitizedPhoneNo = phoneNumber;
+                else if (substring === '2') sanitizedPhoneNo = '9' + phoneNumber;
+                else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
+                else                        sanitizedPhoneNo = '92' + phoneNumber;
+    
+            }
+    
+            return sanitizedPhoneNo;
         }
-        else if ( countryId === 'PAK') {
-
-                 if (substring === '9') sanitizedPhoneNo = phoneNumber;
-            else if (substring === '2') sanitizedPhoneNo = '9' + phoneNumber;
-            else if (substring === '+') sanitizedPhoneNo = phoneNumber.substring(1);
-            else                        sanitizedPhoneNo = '92' + phoneNumber;
-
+        else {
+            return phoneNumber;
         }
 
-        return sanitizedPhoneNo;
     }
 
 }

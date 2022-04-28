@@ -11,18 +11,21 @@
             <div class="flex flex-col w-full">
     
                 <!-- Name -->
-                <div class="w-full">
+                <div class="w-full flex flex-col sm:flex-row sm:mb-0 pt-8 sm:pt-6">
                     <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
                         <mat-label>Name</mat-label>
                         <input
                             [formControlName]="'name'"
                             placeholder="Enter your name"
                             matInput>
+                            <mat-error *ngIf="addressForm.get('name').hasError('required')">
+                                Full name is required
+                            </mat-error>
                     </mat-form-field>
                 </div>
     
-                <!-- Phone Number, Email -->
-                <div class="w-full">
+                <!-- Phone Number, State -->
+                <div class="w-full flex flex-col sm:flex-row sm:mb-0">
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
                         <mat-label>Phone Number</mat-label>
                         <input
@@ -32,7 +35,7 @@
                             (change)="addressForm.get('phoneNumber').patchValue(sanitizePhoneNumber(addressForm.get('phoneNumber').value))"
                             matInput>
                         <mat-error *ngIf="addressForm.get('phoneNumber').hasError('required')">
-                            Required
+                            Phone number is required
                         </mat-error>
                         <mat-error *ngIf="addressForm.get('phoneNumber').hasError('invalidPhonenumber')">
                             Invalid phone number
@@ -54,9 +57,9 @@
                                 <mat-option [value]="state.id">{{state.name}}</mat-option>
                             </div>
                         </mat-select>
-                        <!-- <mat-error *ngIf="addressForm.get('state').hasError('required')">
-                            Required
-                        </mat-error> -->
+                        <mat-error *ngIf="addressForm.get('state').hasError('required')">
+                            State is required
+                        </mat-error>
                     </mat-form-field>
                     <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
                         <mat-label>Email</mat-label>
@@ -68,26 +71,44 @@
                 </div>
  
                 <!-- City, Postcode -->
-                <div class="w-full">
+                <div class="w-full flex flex-col sm:flex-row sm:mb-0">
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
                         <mat-label>City</mat-label>
                         <input
                             [formControlName]="'city'"
                             placeholder="Enter city name"
                             matInput>
+                            <mat-error *ngIf="addressForm.get('city').hasError('required')">
+                                City is required
+                            </mat-error>
                     </mat-form-field>
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
                         <mat-label>Postcode</mat-label>
                         <input
                             [formControlName]="'postCode'"
                             placeholder="Enter postcode"
+                            maxlength="5"
                             matInput>
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('required')">
+                                Postcode is required.
+                            </mat-error>
+                            <mat-error *ngIf="addressForm.get('postCode').hasError('invalidPostcode')">
+                                Invalid postcode{{addressForm.get('postCode').hasError('minlength') ? 
+                                '. Does not meet minimum length' : 
+                                addressForm.get('postCode').hasError('maxlength') ? '. Exceeded maximum length' : ''}}
+                            </mat-error>
+                            <mat-error *ngIf="!addressForm.get('postCode').hasError('invalidPostcode') && addressForm.get('postCode').hasError('minlength')">
+                                Does not meet minimum length
+                            </mat-error>
+                            <mat-error *ngIf="!addressForm.get('postCode').hasError('invalidPostcode') && addressForm.get('postCode').hasError('maxlength')">
+                                Exceeded maximum length
+                            </mat-error>
                     </mat-form-field>
                 </div>
 
                 
                 <!-- Address -->
-                <div class="w-full">
+                <div class="w-full flex flex-col sm:flex-row sm:mb-0">
                     <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
                         <mat-label>Address</mat-label>
                         <textarea
@@ -112,9 +133,9 @@
                             placeholder="Enter your address"
                             autocomplete="disabled"
                             [required]="true">
-                        <!-- <mat-error *ngIf="checkoutForm.get('address').hasError('required')">
-                            Required
-                        </mat-error> -->
+                        <mat-error *ngIf="addressForm.get('address').hasError('required')">
+                            Address information is required
+                        </mat-error>
                     </mat-form-field>
                 </div>
     
