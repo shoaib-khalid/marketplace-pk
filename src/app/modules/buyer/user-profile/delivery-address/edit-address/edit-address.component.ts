@@ -49,8 +49,8 @@ export class EditAddressDialog implements OnInit {
             address     : ['', Validators.required],
             city        : ['', Validators.required],
             country     : ['', Validators.required],
-            phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.minLength(5), Validators.maxLength(30)]],
-            postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), UserProfileValidationService.postcodeValidator]],
+            phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.maxLength(30)]],
+            postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
             isDefault   : ['']
         });        
@@ -71,10 +71,10 @@ export class EditAddressDialog implements OnInit {
                 let countryId = this.countryCode;
                 switch (countryId) {
                     case 'MYS':
-                        this.dialingCode = '+60'
+                        this.dialingCode = '60'
                         break;
                     case 'PAK':
-                        this.dialingCode = '+92'
+                        this.dialingCode = '92'
                         break;
                     default:
                         break;
@@ -114,7 +114,7 @@ export class EditAddressDialog implements OnInit {
 
     sanitizePhoneNumber(phoneNumber: string) {
 
-        if (phoneNumber.match(/^\d+$/)) {
+        if (phoneNumber.match(/^\+?[0-9]+$/)) {
 
             let substring = phoneNumber.substring(0, 1)
             let countryId = this.countryCode;

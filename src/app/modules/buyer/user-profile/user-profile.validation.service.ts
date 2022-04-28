@@ -91,7 +91,7 @@ export class UserProfileValidationService {
           //   /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/
           // )
           control.value.match(
-            /^\d+$/
+            /^\+?[0-9]+$/
           )
         ) {
           return null;

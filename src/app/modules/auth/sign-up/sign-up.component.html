@@ -72,6 +72,7 @@
                             type="password"
                             [formControlName]="'password'"
                             placeholder="Password"
+                            [required]="true"
                             class="px-2"
                             #passwordField>
                         <button
@@ -90,8 +91,11 @@
                                 [svgIcon]="'mat_outline:visibility_off'"
                                 class="text-gray-300"></mat-icon>
                         </button>
-                        <mat-error>
+                        <mat-error *ngIf="signUpForm.get('password').hasError('required')">
                             Password is required
+                        </mat-error>
+                        <mat-error *ngIf="signUpForm.get('password').hasError('minlength')">
+                            Must be at least 8 characters
                         </mat-error>
                     </mat-form-field>
 
