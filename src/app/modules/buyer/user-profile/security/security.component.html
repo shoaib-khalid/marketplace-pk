@@ -67,6 +67,12 @@
                             *ngIf="newPasswordField.type === 'text'"
                             [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
                     </button>
+                    <!-- <mat-error *ngIf="securityForm.get('newPassword').hasError('required')">
+                        New password is required
+                    </mat-error> -->
+                    <mat-error *ngIf="securityForm.get('newPassword').hasError('minlength')">
+                        Must be at least 8 characters
+                    </mat-error>
                 </mat-form-field>
                 <!-- <div class="mt-1 text-md text-hint">Minimum 8 characters. Must include numbers, letters and special characters.</div> -->
             </div>
@@ -97,7 +103,13 @@
                             class="icon-size-5"
                             *ngIf="comfirmNewPasswordField.type === 'text'"
                             [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
-                    </button>   
+                    </button>
+                    <!-- <mat-error *ngIf="securityForm.get('comfirmNewPasswordField').hasError('required')">
+                        Confirm new password is required
+                    </mat-error> -->
+                    <mat-error *ngIf="securityForm.get('confirmNewPassword').hasError('minlength')">
+                        Must be at least 8 characters
+                    </mat-error>   
                 </mat-form-field>
             </div>
         </div>

@@ -38,8 +38,8 @@ export class EditSecurityComponent implements OnInit
         // Create the form
         this.securityForm = this._formBuilder.group({
             currentPassword    : ['', Validators.required],
-            newPassword        : ['', Validators.required],
-            confirmNewPassword : ['', Validators.required],
+            newPassword        : ['', [Validators.required, Validators.minLength(8)]],
+            confirmNewPassword : ['', [Validators.required, Validators.minLength(8)]],
             // twoStep            : [true],
             // askPasswordChange  : [false]
         });
