@@ -393,6 +393,27 @@ export class StoresService
         );
     }
 
+    getStoreTop(countryCode:string): Observable<any>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                countryId: countryCode,
+            }
+        };
+
+        return this._httpClient.get<any>(productService + '/stores/top', header).pipe(
+            map((response) => {
+                this._logging.debug("Response from StoresService (getStoreTop)",response);
+
+                return response.data;
+            })
+        );
+    }
+
     // post(storeBody: CreateStore): Observable<any>
     // {
     //     let productService = this._apiServer.settings.apiServer.productService;

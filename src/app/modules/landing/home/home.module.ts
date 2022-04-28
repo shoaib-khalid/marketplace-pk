@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from 'app/shared/shared.module';
 import { LandingHomeComponent } from 'app/modules/landing/home/home.component';
 import { landingHomeRoutes } from 'app/modules/landing/home/home.routing';
+import { MatInputModule } from '@angular/material/input';
+import { FuseCardModule } from '@fuse/components/card';
 
 @NgModule({
     declarations: [
@@ -14,7 +16,9 @@ import { landingHomeRoutes } from 'app/modules/landing/home/home.routing';
         RouterModule.forChild(landingHomeRoutes),
         MatButtonModule,
         MatIconModule,
-        SharedModule
+        SharedModule,
+        MatInputModule,
+        FuseCardModule
     ]
 })
 export class LandingHomeModule

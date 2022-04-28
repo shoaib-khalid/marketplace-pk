@@ -71,7 +71,8 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <img
-                        class="hidden md:block w-24"
+                        [routerLink]="'/home'"
+                        class="hidden md:block w-24 cursor-pointer"
                         [src]="platform.logo"
                         alt="Logo image">
                     <span class="block md:hidden">{{headerTitle}}</span>
