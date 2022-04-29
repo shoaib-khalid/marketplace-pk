@@ -77,6 +77,8 @@ export class EditSecurityComponent implements OnInit
         this._userService.changePasswordCustomerById(this.securityForm.value)
             .subscribe((response) => {
 
+                console.log("checking response",response);
+                
                 // Show a success message (it can also be an error message)
                 const confirmation = this._fuseConfirmationService.open({
                     title  : 'Success',
@@ -100,6 +102,26 @@ export class EditSecurityComponent implements OnInit
                  // Mark for check
                  this._changeDetectorRef.markForCheck();
 
+            },
+            error => {
+                const confirmation = this._fuseConfirmationService.open({
+                    title  : 'Alert',
+                    message: 'Your current password is invalid.',
+                    icon: {
+                        show: true,
+                        name: "heroicons_outline:exclamation",
+                        color: "warn"
+                    },
+                    actions: {
+                        confirm: {
+                            label: 'Ok',
+                            color: "primary",
+                        },
+                        cancel: {
+                            show: false,
+                        },
+                    }
+                });
             });
 
         setTimeout(() => {
