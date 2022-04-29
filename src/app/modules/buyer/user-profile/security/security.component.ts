@@ -39,10 +39,13 @@ export class EditSecurityComponent implements OnInit
         this.securityForm = this._formBuilder.group({
             currentPassword    : ['', Validators.required],
             newPassword        : ['', [Validators.required, Validators.minLength(8)]],
-            confirmNewPassword : ['', [Validators.required, Validators.minLength(8)]],
-            // twoStep            : [true],
-            // askPasswordChange  : [false]
-        });
+            confirmNewPassword : ['', [Validators.required, , Validators.minLength(8)]],
+        }, 
+        {
+            // Used custom form validator name
+            validator: this.checkPasswordMatch("newPassword", "confirmNewPassword")
+          }
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -54,7 +57,8 @@ export class EditSecurityComponent implements OnInit
     */
     updateClientPasswordProfile(): void
     {
-        // Do nothing if the form is invalid
+
+        //Do nothing if the form is invalid
         if ( this.securityForm.invalid )
         {
             return;
@@ -105,4 +109,25 @@ export class EditSecurityComponent implements OnInit
         // Enable the form
         this.securityForm.enable();
     }
+
+
+    checkPasswordMatch(controlName: string,
+        matchingControlName: string){
+        return (formGroup: FormGroup) => {
+          const control = formGroup.controls[controlName];
+          const matchingControl = formGroup.controls[matchingControlName];
+      
+          if (matchingControl.errors && !matchingControl.errors.mustMatch) {
+            return;
+          }
+      
+          if (control.value !== matchingControl.value) {
+            matchingControl.setErrors({ mustMatch: true });
+          } else {
+            matchingControl.setErrors(null);
+          }
+        };
+    }
+
 }
+
