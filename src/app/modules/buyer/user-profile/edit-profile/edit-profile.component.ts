@@ -65,7 +65,7 @@ export class EditProfileComponent implements OnInit
                 id         : 'delivery-address',
                 icon       : 'heroicons_outline:map',
                 title      : 'Delivery Address',
-                description: 'Manage and set default for delivery address'
+                description: 'Manage and set default delivery address'
             },
             {
                 id         : 'security',
