@@ -14,6 +14,9 @@ import { AppleLoginProvider } from '../sign-in/apple.provider';
 import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
 import { DOCUMENT } from '@angular/common';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 
 
 @Component({
@@ -56,6 +59,7 @@ export class AuthSignUpComponent implements OnInit
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
@@ -65,7 +69,7 @@ export class AuthSignUpComponent implements OnInit
         private _platformsService: PlatformService,
         private _apiServer: AppConfig,
         private _userService: UserService,
-
+        private _fuseConfirmationService: FuseConfirmationService,
 
     )
     {
@@ -244,10 +248,25 @@ export class AuthSignUpComponent implements OnInit
     }
 
     signInWithApple(): void {
-        this._socialAuthService.signIn(AppleLoginProvider.PROVIDER_ID)
-            .then(userData => {
 
+        const dialogRef = this._dialog.open( 
+            AuthModalComponent,{
+                width : '520px',
+                maxWidth: '80vw',
+                data:{ 
+                    icon : 'heroicons_solid:exclamation',
+                    title : 'Disclaimer',
+                    description : 'While using Apple ID to create your DeliverIn account, please select option to "Share My Email" to ensure your DeliverIn account is created properly.'
+                }
             });
+        dialogRef.afterClosed().subscribe((result) => {
+            // If the confirm button pressed...
+            this._socialAuthService.signIn(AppleLoginProvider.PROVIDER_ID)
+                .then(userData => {
+
+                });
+        });
+        
     }
 
     /**

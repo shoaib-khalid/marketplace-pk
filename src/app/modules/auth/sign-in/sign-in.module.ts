@@ -16,10 +16,12 @@ import { SharedLogoModule } from '../shared-logo/shared-logo.module';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
 import { SocialLooginClientId } from './oauth.types';
 import { AppleLoginProvider } from './apple.provider';
+import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 
 @NgModule({
     declarations: [
-        AuthSignInComponent
+        AuthSignInComponent,
+        AuthModalComponent
     ],
     imports     : [
         RouterModule.forChild(authSignInRoutes),

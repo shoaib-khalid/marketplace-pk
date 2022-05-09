@@ -14,6 +14,9 @@ import { takeUntil } from 'rxjs/operators';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject } from 'rxjs';
 import { AppleLoginProvider } from './apple.provider';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -53,6 +56,7 @@ export class AuthSignInComponent implements OnInit
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
         private _authService: AuthService,
@@ -61,6 +65,7 @@ export class AuthSignInComponent implements OnInit
         private _router: Router,
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
+        private _fuseConfirmationService: FuseConfirmationService,
 
 
     )
@@ -284,9 +289,24 @@ export class AuthSignInComponent implements OnInit
     }
 
     signInWithApple(): void {
-        this._socialAuthService.signIn(AppleLoginProvider.PROVIDER_ID)
-            .then(userData => {
 
+        const dialogRef = this._dialog.open( 
+            AuthModalComponent,{
+                width : '520px',
+                maxWidth: '80vw',
+                data:{ 
+                    icon : 'heroicons_solid:exclamation',
+                    title : 'Disclaimer',
+                    description : 'While using Apple ID to create your DeliverIn account, please select option to "Share My Email" to ensure your DeliverIn account is created properly.'
+                }
             });
-    }
+        dialogRef.afterClosed().subscribe((result) => {
+            // If the confirm button pressed...
+            this._socialAuthService.signIn(AppleLoginProvider.PROVIDER_ID)
+                .then(userData => {
+
+                });
+        });
+       
+   }
 }
