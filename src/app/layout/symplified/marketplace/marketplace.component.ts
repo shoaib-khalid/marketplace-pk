@@ -10,6 +10,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { environment } from 'environments/environment';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
+import { Error500Service } from 'app/core/error-500/error-500.service';
 
 @Component({
     selector     : 'marketplace-layout',
@@ -30,6 +31,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     displayUsername:string ='';
+    show500: boolean;
 
     /**
      * Constructor
@@ -41,7 +43,9 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
-        private _platformsService: PlatformService
+        private _platformsService: PlatformService,
+        private _error500Service: Error500Service
+
     )
     {
         this.headerTitle = this.getHeaderTitle(this._activatedRoute.root); 
@@ -105,6 +109,14 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
             .subscribe((platform: Platform) => {
                 this.platform = platform;
             });
+
+        // Subscribe to platform data
+        this._error500Service.show500$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((any) => {
+                this.show500 = any;
+            });
+        
     }
 
     /**

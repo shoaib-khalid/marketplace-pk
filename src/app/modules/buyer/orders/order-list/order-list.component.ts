@@ -9,6 +9,7 @@ import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { CartItem } from 'app/core/cart/cart.types';
 import { Store, StoreAssets } from 'app/core/store/store.types';
+import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { merge, Observable, Subject } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 import { OrderListService } from './order-list.service';
@@ -76,13 +77,18 @@ export class OrderListComponent implements OnInit
         private _router: Router,
         private _authService: AuthService,
         public _dialog: MatDialog,
-        private _activatedRoute: ActivatedRoute
+        private _activatedRoute: ActivatedRoute,
+        private _httpstatService: HttpStatService
 
     )
     {
     }
 
     ngOnInit() :void {
+
+        // this._httpstatService.get(503).subscribe((response) =>{
+                
+        // });
 
         this.ordersDetails$ = this._orderService.ordersDetails$;        
 

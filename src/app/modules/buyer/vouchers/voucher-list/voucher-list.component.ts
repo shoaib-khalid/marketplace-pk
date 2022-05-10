@@ -290,6 +290,11 @@ export class VoucherListComponent implements OnInit, OnDestroy
 
     enterPromoCode(){
 
+        // do nothing if no promo code entered
+        if (this.inputPromoCode === ''){
+            return;
+        }
+
         this._vouchersService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
         .subscribe((response) => {
             // if voucher is valid

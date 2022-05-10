@@ -44,7 +44,7 @@ export class EditSecurityComponent implements OnInit
         {
             // Used custom form validator name
             validator: this.checkPasswordMatch("newPassword", "confirmNewPassword")
-          }
+        }
         );
     }
 
@@ -76,8 +76,6 @@ export class EditSecurityComponent implements OnInit
         // // update profile
         this._userService.changePasswordCustomerById(this.securityForm.value)
             .subscribe((response) => {
-
-                console.log("checking response",response);
                 
                 // Show a success message (it can also be an error message)
                 const confirmation = this._fuseConfirmationService.open({
@@ -90,7 +88,7 @@ export class EditSecurityComponent implements OnInit
                     },
                     actions: {
                         confirm: {
-                            label: 'Ok',
+                            label: 'OK',
                             color: "primary",
                         },
                         cancel: {
@@ -106,7 +104,7 @@ export class EditSecurityComponent implements OnInit
             error => {
                 const confirmation = this._fuseConfirmationService.open({
                     title  : 'Alert',
-                    message: 'Your current password is invalid.',
+                    message: 'Your current password is invalid',
                     icon: {
                         show: true,
                         name: "heroicons_outline:exclamation",
@@ -114,7 +112,7 @@ export class EditSecurityComponent implements OnInit
                     },
                     actions: {
                         confirm: {
-                            label: 'Ok',
+                            label: 'OK',
                             color: "primary",
                         },
                         cancel: {
