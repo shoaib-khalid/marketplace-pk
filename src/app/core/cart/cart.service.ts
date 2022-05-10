@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { Cart, CartItem, CartPagination } from 'app/core/cart/cart.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
@@ -154,7 +154,12 @@ export class CartService
             })
         );
     }
-
+    /**
+     * (Used by app.resolver)
+     * 
+     * @param customerId 
+     * @returns 
+     */
     getCartsByCustomerId(customerId: string): Observable<Cart>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
@@ -168,13 +173,18 @@ export class CartService
 
         return this._httpClient.get<any>(orderService + '/carts/customer', header)
             .pipe(
-                map((response) => {
-                    this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
+                                
+                        this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
                     
-                    // set customer cart
-                    this._customerCarts.next(response["data"]);
+                        // set customer cart
+                        this._customerCarts.next(response["data"]);
 
-                    return response["data"];
+                        return response["data"];
                 })
             );
     }

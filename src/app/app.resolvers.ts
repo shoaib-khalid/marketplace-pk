@@ -11,6 +11,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { CartService } from './core/cart/cart.service';
+import { HttpStatService } from './mock-api/httpstat/httpstat.service';
 
 @Injectable({
     providedIn: 'root'
@@ -29,7 +30,8 @@ export class InitialDataResolver implements Resolve<any>
         private _quickChatService: QuickChatService,
         private _shortcutsService: ShortcutsService,
         private _cartService: CartService,
-        private _userService: UserService
+        private _userService: UserService,
+        private _httpstatService: HttpStatService
     )
     {
     }
@@ -56,7 +58,8 @@ export class InitialDataResolver implements Resolve<any>
             this._quickChatService.getChats(),
             this._shortcutsService.getAll(),
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
-            this._cartService.getCartsByCustomerId(customerId)
+            this._cartService.getCartsByCustomerId(customerId),
+            // this._httpstatService.get(500)
         ]);
     }
 }

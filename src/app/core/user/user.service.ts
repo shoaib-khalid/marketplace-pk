@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-import { filter, map, switchMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
+import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { Client, Customer, CustomerAddress, HttpResponse, User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
@@ -124,6 +124,7 @@ export class UserService
 
     /**
      * Get the current logged in user data
+     * (Used by app.resolver)
      */
     get(ownerId: string): Observable<any>
     {
@@ -136,7 +137,12 @@ export class UserService
 
         return this._httpClient.get<any>(userService + "/customers/" + ownerId, header)
             .pipe(
-                map((user) => {
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (user: any) => {
+                                
                     this._logging.debug("Response from UserService (getCustomerById)", user);
                     this._user.next(user['data']);
 

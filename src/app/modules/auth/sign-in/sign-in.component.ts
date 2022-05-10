@@ -17,6 +17,7 @@ import { AppleLoginProvider } from './apple.provider';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -66,6 +67,7 @@ export class AuthSignInComponent implements OnInit
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
         private _fuseConfirmationService: FuseConfirmationService,
+        private _httpstatService: HttpStatService
 
 
     )

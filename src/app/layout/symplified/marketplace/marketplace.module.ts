@@ -18,10 +18,12 @@ import { UserModule } from 'app/layout/common/user/user.module';
 import { CartModule } from 'app/layout/common/cart/cart.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { MarketplaceLayoutComponent } from 'app/layout/symplified/marketplace/marketplace.component';
+import { Error500Component } from 'app/shared/error-500/error-500.component';
 
 @NgModule({
     declarations: [
-        MarketplaceLayoutComponent
+        MarketplaceLayoutComponent,
+        Error500Component
     ],
     imports     : [
         HttpClientModule,
