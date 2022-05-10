@@ -137,14 +137,14 @@ export class PlatformService
                     this._logging.debug("Response from PlatformsService (Before Reconstruct)",response);
 
                     let newPlatform = {
-                        id          : response["data"][0].platformId,
-                        name        : response["data"][0].platformName,
-                        logo        : response["data"][0].platformLogo,
-                        logoDark    : response["data"][0].platformLogoDark,
-                        country     : response["data"][0].platformCountry,
-                        favicon16   : response["data"][0].platformFavIcon,
-                        favicon32   : response["data"][0].platformFavIcon32,
-                        gacode      : response["data"][0].gaCode
+                        id          : response ? response["data"][0].platformId : null,
+                        name        : response ? response["data"][0].platformName : null,
+                        logo        : response ? response["data"][0].platformLogo : null,
+                        logoDark    : response ? response["data"][0].platformLogoDark : null,
+                        country     : response ? response["data"][0].platformCountry : null,
+                        favicon16   : response ? response["data"][0].platformFavIcon : null,
+                        favicon32   : response ? response["data"][0].platformFavIcon32 : null,
+                        gacode      : response ? response["data"][0].gaCode : null
                     };
                         
                     // set this
