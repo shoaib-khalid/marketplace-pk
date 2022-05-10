@@ -32,8 +32,6 @@ export class CoreInterceptor implements HttpInterceptor
     {
         // Clone the request object
         let newReq = req.clone();
-        // // set show error 500 page to false
-        // this._error500Service.hide();
         
         // Response
         return next.handle(newReq).pipe(
@@ -48,7 +46,7 @@ export class CoreInterceptor implements HttpInterceptor
                     const substring =  String(error.status)[0]
                     
                     // retry 'retryCount' amount of times
-                    if (count < retryCount && error instanceof HttpErrorResponse && substring === '5') {
+                    if (count < retryCount && error instanceof HttpErrorResponse && (substring === '5' || error.status === 0)) {
                         
                         return of(error);
                     }
