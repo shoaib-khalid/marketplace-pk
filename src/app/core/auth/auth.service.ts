@@ -266,7 +266,7 @@ export class AuthService
      *
      * @param user
      */
-    signUp(user: { name: string; email: string; password: string; username: string;countryId: string }): Observable<any>
+    signUp(user: { name: string; email: string; password: string; username: string;countryId: string;domain:string }): Observable<any>
     {
         let userService = this._apiServer.settings.apiServer.userService;
         const header: any = {
@@ -280,7 +280,8 @@ export class AuthService
             "username": user.username,
             "password": user.password,
             "roleId": UserRole.Customer,
-            "countryId":user.countryId
+            "countryId":user.countryId,
+            "domain":user.domain
           };
         
         return this._httpClient.post(userService + '/customers/register', body, header).pipe(

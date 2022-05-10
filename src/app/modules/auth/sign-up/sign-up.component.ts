@@ -97,7 +97,9 @@ export class AuthSignUpComponent implements OnInit
                 username  : ['', Validators.required],
                 email     : [ this.existedEmail, [Validators.required, Validators.email]],
                 password  : ['', [Validators.required, Validators.minLength(8)]],
-                agreements: ['', Validators.requiredTrue]
+                agreements: ['', Validators.requiredTrue],
+                domain    : [''],
+                countryId:['']
             }
         );
 
@@ -112,11 +114,12 @@ export class AuthSignUpComponent implements OnInit
             this.platform = platform;
 
             this.countryCode = this.platform.country;
-  
+            this.signUpForm.get('countryId').patchValue(this.countryCode);
+
         });
 
         this.domain = this._apiServer.settings.storeFrontDomain;
-
+        this.signUpForm.get('domain').patchValue(this.domain);
 
     }
 
