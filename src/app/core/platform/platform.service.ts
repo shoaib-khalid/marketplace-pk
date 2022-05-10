@@ -134,17 +134,17 @@ export class PlatformService
                 ),
                 switchMap(async (response: any) => {
                                 
-                    this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+                    this._logging.debug("Response from PlatformsService (Before Reconstruct)",response);
 
                     let newPlatform = {
-                        id          : response.platformId,
-                        name        : response.platformName,
-                        logo        : response.platformLogo,
-                        logoDark    : response.platformLogoDark,
-                        country     : response.platformCountry,
-                        favicon16   : response.platformFavIcon,
-                        favicon32   : response.platformFavIcon32,
-                        gacode      : response.gaCode
+                        id          : response["data"][0].platformId,
+                        name        : response["data"][0].platformName,
+                        logo        : response["data"][0].platformLogo,
+                        logoDark    : response["data"][0].platformLogoDark,
+                        country     : response["data"][0].platformCountry,
+                        favicon16   : response["data"][0].platformFavIcon,
+                        favicon32   : response["data"][0].platformFavIcon32,
+                        gacode      : response["data"][0].gaCode
                     };
                         
                     // set this
