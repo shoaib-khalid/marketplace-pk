@@ -55,10 +55,8 @@ export class AppComponent
      
                     // set GA code
                     googleAnalyticId = this.platform.gacode;
-                     this.favIcon16.href = this.platform.favicon16;
+                    this.favIcon16.href = this.platform.favicon16;
                     this.favIcon32.href = this.platform.favicon32;
-                
-
 
                     // Set Google Analytic Code
                     if (googleAnalyticId) {
