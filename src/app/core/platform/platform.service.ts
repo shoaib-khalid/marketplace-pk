@@ -128,21 +128,24 @@ export class PlatformService
         
         return this._httpClient.get<any>(productService + '/platformconfig', header)
             .pipe(
-                tap((response) => {
-                    
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
+                                
                     this._logging.debug("Response from StoresService (Before Reconstruct)",response);
 
-                    response["data"].map((res)=>{
-                            let newPlatform = {
-                            id: res.platformId,
-                            name: res.platformName,
-                            logo: res.platformLogo,
-                            logoDark: res.platformLogoDark,
-                            country: res.platformCountry,
-                            favicon16:res.platformFavIcon,
-                            favicon32:res.platformFavIcon32,
-                            gacode:res.gaCode
-                        };
+                    let newPlatform = {
+                        id          : response.platformId,
+                        name        : response.platformName,
+                        logo        : response.platformLogo,
+                        logoDark    : response.platformLogoDark,
+                        country     : response.platformCountry,
+                        favicon16   : response.platformFavIcon,
+                        favicon32   : response.platformFavIcon32,
+                        gacode      : response.gaCode
+                    };
                         
                     // set this
                     this.platformControl.setValue(newPlatform);
@@ -154,9 +157,6 @@ export class PlatformService
 
                     // Return the store
                     return newPlatform;
-                    })
-
-               
                 })
             );
     }
