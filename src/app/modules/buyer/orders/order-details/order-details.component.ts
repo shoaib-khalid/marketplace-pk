@@ -65,6 +65,7 @@ export class OrderDetailsComponent implements OnInit
     constructor(
         private _orderService: OrderListService,
         private _route: ActivatedRoute,
+        private _router: Router,
         private _authService: AuthService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _storesService: StoresService,
@@ -140,6 +141,11 @@ export class OrderDetailsComponent implements OnInit
     goToCatalogue() {
         history.back();
         // this._router.navigate(['/catalogue/'+this.categorySlug]);
+    }
+
+    redirect(pagename: string) {
+        // this._route.snapshot.paramMap.get(pagename)
+        this._router.navigate([window.location.href = pagename]);
     }
 
 }
