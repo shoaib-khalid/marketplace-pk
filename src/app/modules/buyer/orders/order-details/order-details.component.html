@@ -198,14 +198,14 @@
 
                         <!-- Footer -->
                         <div class="flex flex-col pt-2">
+                            <!-- Sub Total -->
                             <div class="flex flex-row justify-between w-full">
-                                <!-- Order Details Button -->
                                 <h3 class="font-semibold text-gray-500">Sub Total</h3>
                                 <p class="items-center font-semibold text-gray-400">{{orderDetails.subTotal | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                             </div>
+                            <!-- Order Discount -->
                             <ng-container *ngIf="orderDetails.appliedDiscount !== 0">
                                 <div class="flex flex-row justify-between w-full">
-                                    <!-- Order Details Button -->
                                     <p class="font-semibold text-gray-500">
                                         <span>Order Discount</span>
                                         <span *ngIf="orderDetails.appliedDiscountDescription">&nbsp;({{orderDetails.appliedDiscountDescription}})</span>
@@ -216,16 +216,19 @@
                                     <p class="items-center font-semibold text-gray-400">-{{orderDetails.appliedDiscount | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                                 </div>
                             </ng-container>
+                            <!-- Service Charges -->
+                            <ng-container *ngIf="orderDetails.store.serviceChargesPercentage !== 0">
+                                <div class="flex flex-row justify-between w-full">
+                                    <h3 class="font-semibold text-gray-500">Service Charges ({{orderDetails.store.serviceChargesPercentage | number}}%)</h3>
+                                    <p class="items-center font-semibold text-gray-400">{{orderDetails.storeServiceCharges | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
+                                </div>
+                            </ng-container>
+                            <!-- Delivery Charges -->
                             <div class="flex flex-row justify-between w-full">
-                                <!-- Order Details Button -->
-                                <h3 class="font-semibold text-gray-500">Service Charges ({{orderDetails.store.serviceChargesPercentage | number}}%)</h3>
-                                <p class="items-center font-semibold text-gray-400">{{orderDetails.storeServiceCharges | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
-                            </div>
-                            <div class="flex flex-row justify-between w-full">
-                                <!-- Order Details Button -->
                                 <h3 class="font-semibold text-gray-500 ">Delivery Charges</h3>
                                 <p class="items-center font-semibold text-gray-400">{{orderDetails.deliveryCharges | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                             </div>
+                            <!-- Delivery Discount -->
                             <ng-container *ngIf="orderDetails.deliveryDiscount !== 0">
                                 <div class="flex flex-row justify-between w-full">
                                     <p class="font-semibold text-gray-500">
@@ -238,6 +241,7 @@
                                     <p class="items-center font-semibold text-gray-400">-{{orderDetails.deliveryDiscount | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                                 </div>
                             </ng-container>
+                            <!-- Total Amount -->
                             <div class="flex flex-row justify-between w-full">
                                 <h3 class="font-bold">Total Amount</h3>
                                 <p class="items-center font-semibold">Total Order ({{orderDetails.orderItemWithDetails.length}}) : {{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
