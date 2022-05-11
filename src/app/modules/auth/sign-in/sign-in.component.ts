@@ -18,6 +18,8 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
+import { CartService } from 'app/core/cart/cart.service';
+import { Cart } from 'app/core/cart/cart.types';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -50,7 +52,8 @@ export class AuthSignInComponent implements OnInit
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    domain :string ='';
+    domain :string = '';
+    cart: Cart;
 
     /**
      * Constructor
@@ -67,7 +70,8 @@ export class AuthSignInComponent implements OnInit
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
         private _fuseConfirmationService: FuseConfirmationService,
-        private _httpstatService: HttpStatService
+        private _httpstatService: HttpStatService,
+        private _cartsService: CartService,
 
 
     )
@@ -154,6 +158,28 @@ export class AuthSignInComponent implements OnInit
                                 };
     
                                 this._userService.user = user;
+
+                                // cartId
+                                if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
+                                    const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+                                    const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
+
+                                    this._cartsService.getCarts(0, 20, storeId, response.id)
+                                        .subscribe(response => {
+
+                                            if (response['data'].content.length > 0) {
+                                                
+                                                this.cart = response['data'].content[0];
+                                                
+                                                // merge carts
+                                                this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                    .subscribe(response => {
+                                                    })
+                                            }
+
+                                        })
+                                
+                                }
                             });
 
                             // Set the redirect url.
@@ -162,11 +188,11 @@ export class AuthSignInComponent implements OnInit
                             // routing file and we don't have to touch here.                        
                             
                             // redirectURL
-                            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
                             // store front domain, to be used to compare with redirectURL
                             const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
                             
                             if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                                const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
                                 
                                 if (redirectURL.includes(storeFrontDomain)) {
                                     // Navigate to the external redirect url
@@ -180,6 +206,7 @@ export class AuthSignInComponent implements OnInit
                             {
                                 this._router.navigateByUrl('/signed-in-redirect');
                             }
+
                             
                     }
                 },
