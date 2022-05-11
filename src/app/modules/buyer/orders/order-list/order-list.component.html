@@ -55,7 +55,7 @@
                                         <div class="flex flex-row">
                                             <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                             <div class="flex flex-col px-2">
-                                                <h3 class="font-bold">{{orderDetails.store.name}}</h3>
+                                                <h3 class="font-bold cursor-pointer" (click)="redirect('https://' + orderDetails.store.domain + '/home')">{{orderDetails.store.name}}</h3>
                                                 <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
                                                 <h3 class="text-gray-400 text-xs">Order Placed : {{orderDetails.created | date:'MMM dd, h:mm a' }}</h3>
                                             </div>
