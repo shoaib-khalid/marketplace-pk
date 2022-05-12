@@ -219,7 +219,6 @@ export class CartListComponent implements OnInit, OnDestroy
     redirectToStore(store: Store, cartId: string) {
         this._document.location.href = 'https://' + store.domain + '/checkout' +
          '?customerCartId=' + cartId;
-
     }
 
     displayStoreLogo(store: Store) {

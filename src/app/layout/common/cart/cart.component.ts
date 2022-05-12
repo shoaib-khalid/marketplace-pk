@@ -95,7 +95,7 @@ export class CartComponent implements OnInit, OnDestroy
                 else {
                     this.seeMoreCarts = false
                 }
-                
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -123,8 +123,9 @@ export class CartComponent implements OnInit, OnDestroy
         this._router.navigate(['/sign-out']);
     }
 
-    redirectToStore(store: Store) {
-        this._document.location.href = 'https://' + store.domain + '/checkout'
+    redirectToStore(store: Store, cartId: string) {
+        this._document.location.href = 'https://' + store.domain + '/checkout' +
+         '?customerCartId=' + cartId;
     }
 
     displayStoreLogo(store: Store) {

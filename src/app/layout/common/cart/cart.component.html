@@ -60,7 +60,7 @@
         <!-- Stores  -->
         <ng-container *ngFor="let cart of carts">
             <div 
-                (click)="redirectToStore(cart.store)"
+                (click)="redirectToStore(cart.store, cart.id)"
                 class="p-4 cursor-pointer grid grid-cols-4 gap-2 justify-between hover:bg-primary-50">
                 <!-- Logo -->
                 <div class="flex items-center justify-center">
