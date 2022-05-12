@@ -10,12 +10,27 @@
                                 class="object-cover h-24"
                                 [src]="imageAsset.assetUrl">
                             <div class="flex flex-col m-2 font-semibold">
-                                <span class="text-lg">WafiFood</span>
+                                <span class="group-hover:text-primary  text-lg">WafiFood</span>
                                 <span class="text-xs">Makanan tersedap didunia . mari beli</span>
                             </div>
                         </fuse-card>
                     </div>
                 </ng-container>
+                <ng-contanier *ngIf="store">
+                    <div class="grid col-span-1 w-full group">
+                        <fuse-card 
+                            (click)="chooseStore()"
+                            class="flex flex-col rounded-lg border border-gray-300 min-w-44 h-44 w-full cursor-pointer filter-article">
+                            <img
+                                class="object-cover h-24"
+                                [src]="store.storeAssets[2].assetUrl">
+                            <div class="flex flex-col m-2 font-semibold">
+                                <span class="group-hover:text-primary text-lg">{{store.name}}</span>
+                                <span class="text-xs">{{store.storeDescription}}</span>
+                            </div>
+                        </fuse-card>
+                    </div>
+                </ng-contanier>
             </div>
         </div>
         <!-- Join Now banner -->
