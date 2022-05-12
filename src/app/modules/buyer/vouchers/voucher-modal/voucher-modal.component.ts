@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { StoresService } from 'app/core/store/store.service';
 import { Store } from 'app/core/store/store.types';
-import { CustomerVoucher } from '../vouchers.types';
+import { CustomerVoucher, VoucherVerticalList } from '../vouchers.types';
 
 @Component({
   selector: 'voucher-moal',
@@ -15,6 +15,7 @@ export class VoucherModalComponent implements OnInit {
     description: string;
     voucher: CustomerVoucher;
     storeName: string;
+    verticalList: string[] = [];
 
     constructor(
         private dialogRef: MatDialogRef<VoucherModalComponent>,
@@ -29,6 +30,8 @@ export class VoucherModalComponent implements OnInit {
         this.description = this.data['description'];
         this.voucher = this.data['voucher'];
         this.storeName = this.data['storeName']
+
+        this.verticalList = this.voucher.voucher.voucherVerticalList.map(x => x.verticalCode);        
     }
 
     okButton() {
