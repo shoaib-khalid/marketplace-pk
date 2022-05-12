@@ -174,38 +174,27 @@ export class AuthSignInComponent implements OnInit
                                                 // merge carts
                                                 this._cartsService.mergeCart(this.cart.id, guestCartId)
                                                     .subscribe(response => {
+
+                                                        this.redirect();
                                                     })
+                                            }
+                                            // if no existing cart for the store
+                                            else {
+                                                this.redirect();
                                             }
 
                                         })
                                 
+                                } 
+                                // if no guestCartId/storeId, which should not be
+                                else {
+                                    this.redirect();
                                 }
+
+
+                                
                             });
 
-                            // Set the redirect url.
-                            // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                            // to the correct page after a successful sign in. This way, that url can be set via
-                            // routing file and we don't have to touch here.                        
-                            
-                            // redirectURL
-                            // store front domain, to be used to compare with redirectURL
-                            const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-                            
-                            if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-                                const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-                                
-                                if (redirectURL.includes(storeFrontDomain)) {
-                                    // Navigate to the external redirect url
-                                    this._document.location.href = redirectURL;
-                                } else {
-                                    // Navigate to the internal redirect url
-                                    this._router.navigateByUrl(redirectURL);
-                                }
-                            }
-                            else 
-                            {
-                                this._router.navigateByUrl('/signed-in-redirect');
-                            }
 
                             
                     }
@@ -337,5 +326,34 @@ export class AuthSignInComponent implements OnInit
                 });
         });
        
+   }
+
+   redirect() {
+
+        // Set the redirect url.
+        // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
+        // to the correct page after a successful sign in. This way, that url can be set via
+        // routing file and we don't have to touch here.                        
+        
+        // redirectURL
+        // store front domain, to be used to compare with redirectURL
+        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+        
+        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+            
+            if (redirectURL.includes(storeFrontDomain)) {
+                // Navigate to the external redirect url
+                this._document.location.href = redirectURL;
+            } else {
+                // Navigate to the internal redirect url
+                this._router.navigateByUrl(redirectURL);
+            }
+        }
+        else 
+        {
+            this._router.navigateByUrl('/signed-in-redirect');
+        }
+
    }
 }

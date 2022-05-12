@@ -253,7 +253,7 @@ export class CartListComponent implements OnInit, OnDestroy
                 actions: {
                     confirm: {
                         label: 'Delete',
-                        color: 'primary'
+                        color: 'warn'
                     }
                 }
             });

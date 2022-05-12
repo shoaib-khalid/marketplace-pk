@@ -284,8 +284,6 @@ export class CartService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
         };
 
-        console.log('masuk');
-
         return this._httpClient.put<any>(orderService + '/carts/' + customerCartId + '/' + guestCartId, header)
             .pipe(
                 take(1),
