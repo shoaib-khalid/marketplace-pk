@@ -95,19 +95,7 @@ export class CartComponent implements OnInit, OnDestroy
                 else {
                     this.seeMoreCarts = false
                 }
-                    
                 
-                // this.carts.forEach(cart => {
-
-                //     this._storesService.getStoreById(cart.storeId) 
-                //     .subscribe((store: Store)=>{
-                //         if (store){
-                //             this.stores.push(store);
-                //         }
-                //         // Mark for check
-                //         this._changeDetectorRef.markForCheck();
-                //     });
-                // }) 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

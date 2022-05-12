@@ -45,7 +45,7 @@
                         <ng-container *ngFor="let cart of carts">
                             <!-- Orders -->
                             <div 
-                                (click)="redirectToStore(cart.store)" 
+                                (click)="redirectToStore(cart.store, cart.id)" 
                                 class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-4 mb-4 cursor-pointer group hover:bg-primary-50">
                                 <div class="flex flex-col w-full">
                                     <!-- Header -->

@@ -134,19 +134,6 @@ export class CartListComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((carts: Cart[]) => {
 
-                // remove duplicate stores
-                // let resArr = [];
-                // this.carts.filter(function(item){
-
-                //     let i = resArr.findIndex(x => (x.storeId == item.storeId));
-
-                //     if (i <= -1){
-                //         resArr.push(item);
-                //     }
-                //     return null;
-                // });
-                // this.carts = resArr;
-
                 this.carts = carts
                 
                 // Mark for check
@@ -229,8 +216,10 @@ export class CartListComponent implements OnInit, OnDestroy
 
     }
 
-    redirectToStore(store: Store) {
-        this._document.location.href = 'https://' + store.domain + '/checkout'
+    redirectToStore(store: Store, cartId: string) {
+        this._document.location.href = 'https://' + store.domain + '/checkout' +
+         '?customerCartId=' + cartId;
+
     }
 
     displayStoreLogo(store: Store) {
@@ -266,6 +255,9 @@ export class CartListComponent implements OnInit, OnDestroy
 
                 this._cartService.deleteCart(cartId)
                     .subscribe(response => {
+
+                        this._cartService.getCartsByCustomerId(this.customerId)
+                            .subscribe()
                     })
             }
         });    
