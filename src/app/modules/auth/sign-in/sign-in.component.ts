@@ -170,13 +170,15 @@ export class AuthSignInComponent implements OnInit
                                             if (response['data'].content.length > 0) {
                                                 
                                                 this.cart = response['data'].content[0];
-                                                
-                                                // merge carts
-                                                this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                    .subscribe(response => {
 
-                                                        this.redirect();
-                                                    })
+                                                if (guestCartId != this.cart.id) {
+                                                    // merge carts
+                                                    this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                        .subscribe(response => {
+    
+                                                            this.redirect();
+                                                        })
+                                                }
                                             }
                                             // if no existing cart for the store
                                             else {
