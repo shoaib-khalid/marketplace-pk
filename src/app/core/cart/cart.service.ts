@@ -179,12 +179,12 @@ export class CartService
                 ),
                 switchMap(async (response: any) => {
                                 
-                        this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
-                    
-                        // set customer cart
-                        this._customerCarts.next(response["data"]);
+                    this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
+                
+                    // set customer cart
+                    this._customerCarts.next(response["data"]);
 
-                        return response["data"];
+                    return response["data"];
                 })
             );
     }
@@ -232,6 +232,75 @@ export class CartService
                 this._cart.next(response);
             })
         );
+    }
+
+    /**
+     * Delete cart
+     * 
+     * @param cartId 
+     * @param itemId 
+     * @returns 
+     */
+    deleteCart(cartId: string): Observable<Cart>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this.carts$.pipe(
+            take(1),
+            switchMap(carts => this._httpClient.delete<any>(orderService + '/carts/' + cartId, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from CartService (deleteCart)", response);
+
+                    let index = carts.findIndex(item => item.id === cartId);
+
+                    if (index > -1) {
+                        // Delete the cartItems
+                        carts.splice(index, 1);
+
+                        // Update the products
+                        this._carts.next(carts);
+                    }
+
+                    return response["data"];
+                })
+            ))
+        );
+    }
+
+    mergeCart(customerCartId : string, guestCartId : string):  Observable<Cart>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        console.log('masuk');
+
+        return this._httpClient.put<any>(orderService + '/carts/' + customerCartId + '/' + guestCartId, header)
+            .pipe(
+                take(1),
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
+                                
+                    this._logging.debug("Response from CartService (mergeCart)", response);
+                
+                    return response;
+                })
+            );
+
     }
 
     // -------------

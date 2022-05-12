@@ -241,5 +241,34 @@ export class CartListComponent implements OnInit, OnDestroy
             return 'assets/branding/symplified/logo/symplified.png'
         }
     }
+    deleteCart(cartId: string) {
 
+        const confirmation = this._fuseConfirmationService.open({
+                title  : 'Delete Cart',
+                message: 'Are you sure you want to delete this cart?',
+                icon:{
+                    name:"mat_outline:delete_forever",
+                    color:"primary"
+                },
+                actions: {
+                    confirm: {
+                        label: 'Delete',
+                        color: 'primary'
+                    }
+                }
+            });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+    
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+
+                this._cartService.deleteCart(cartId)
+                    .subscribe(response => {
+                    })
+            }
+        });    
+        
+    }
 }

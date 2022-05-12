@@ -1,3 +1,5 @@
+import { Store } from "../store/store.types";
+
 export interface Cart
 {
     id?: string;
@@ -5,6 +7,7 @@ export interface Cart
     storeId: string;
     created?: string;
     updated?: string;
+    store?: Store;
 }
 
 export interface CartPagination
