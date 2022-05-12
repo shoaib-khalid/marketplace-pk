@@ -179,6 +179,7 @@ export class AuthSignInComponent implements OnInit
                                                             this.redirect();
                                                         })
                                                 }
+                                                this.redirect();
                                             }
                                             // if no existing cart for the store
                                             else {
