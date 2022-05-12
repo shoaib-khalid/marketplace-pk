@@ -35,7 +35,7 @@ import { FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/f
           outline: none !important;
         }
 
-        :host ::ng-deep .ngx-gallery {
+        :host ::ng-deep ngx-gallery {
             position: relative;
             z-index: 10;
             border-radius:15px !important;
@@ -54,10 +54,6 @@ import { FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/f
 
         :host ::ng-deep .fa-arrow-circle-left:before {
             color: var(--fuse-primary);
-            z-index: 40 !important;
-        }
-
-        .ngx-gallery-bullets {
             z-index: 40 !important;
         }
 
@@ -194,6 +190,7 @@ export class LandingProductDetailsComponent implements OnInit
                 thumbnailsColumns: 0,
                 thumbnails : false,
                 thumbnailsArrows  : true,
+                imageArrowsAutoHide : false,
                 thumbnailsArrowsAutoHide: false,
                 imageSwipe: true,
                 imageBullets : true,
