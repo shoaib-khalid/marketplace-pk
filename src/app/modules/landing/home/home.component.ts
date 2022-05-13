@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
+import { Store, StoreAssets } from 'app/core/store/store.types';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -15,6 +17,7 @@ export class LandingHomeComponent implements OnInit
 
     locations: any;
     categories: any;
+    stores: any;
    
     platform: Platform;
     image: any = [];
@@ -28,6 +31,7 @@ export class LandingHomeComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _storesService: StoresService,
+        private _router: Router,
     )
     {
     }
@@ -103,23 +107,53 @@ export class LandingHomeComponent implements OnInit
             {name: "Home Exercise Equipments", url: "https://pngimg.com/uploads/gym_equipment/gym_equipment_PNG85.png"},
         ]
 
-        // Subscribe to platform data
         this._platformsService.platform$
         .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => {
-            if (platform) {
-                this.platform = platform;
-        
-                this.countryCode = this.platform.country;
+        .subscribe((platform: Platform) => { 
 
-                this._storesService.getStoreTop(this.countryCode)
-                .subscribe((response)=>{
-                    this.image = response.topStoreAsset;
-                    
-                });
-            }
-            // Mark for check
+            this.platform = platform;  
+
+            console.log("this.platform",this.platform);
+
+            this._storesService.getFeaturedStore("",0,6,this.platform.country,"created","desc","","")
+            .subscribe((response) => {
+                this.stores = response;  
+
+                console.log("responsexnbhcg", response);
+                
+            });
+            
+            
             this._changeDetectorRef.markForCheck();
+
         });
+
+        // this._storesService.featuredStores$
+        // .pipe(takeUntil(this._unsubscribeAll))
+        // .subscribe((stores: Store[]) => { 
+        //     this.stores = stores;  
+            
+        //     this._changeDetectorRef.markForCheck();
+
+        // });
+
+
+    }
+
+    displayStoreLogo(storeAssets: StoreAssets[]) {
+        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (storeAssetsIndex > -1) {
+            return storeAssets[storeAssetsIndex].assetUrl;
+        } else {
+            return 'assets/branding/symplified/logo/symplified.png'
+        }
+    }
+
+    chooseStore(storeDomain:string) {
+        
+        let slug = storeDomain.split(".")[0]
+        
+        this._router.navigate(['/stores/' + slug]);
+        
     }
 }

@@ -3,6 +3,7 @@ import { LandingProductDetailsComponent } from './product-details/product-detail
 import { ProductResolver } from './product-details/product-details.resolver';
 import { LandingStoreComponent } from './store/store.component';
 import { LandingStoresComponent } from './stores.component';
+import { StoresResolver } from './stores.resolvers';
 
 export const landingStoresRoutes: Route[] = [
     {
@@ -10,6 +11,9 @@ export const landingStoresRoutes: Route[] = [
         data: {
             headerTitle: 'All Stores'
         },
+        // resolve  : {
+        //     stores: StoresResolver,
+        // },
         component: LandingStoresComponent
     },
     {

@@ -1,14 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CartService } from 'app/core/cart/cart.service';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreCategory } from 'app/core/store/store.types';
+import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
-import { debounceTime, fromEvent, map, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, take, map, of, switchMap, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 
 @Component({
@@ -84,6 +84,7 @@ import { FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/f
 })
 export class LandingProductDetailsComponent implements OnInit
 { 
+    storeDomain: string;
 
     store: Store;
     product: Product;
@@ -130,6 +131,7 @@ export class LandingProductDetailsComponent implements OnInit
         private _cartService: CartService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _router: Router,
+        private _route: ActivatedRoute,
         private _formBuilder: FormBuilder,
         private _changeDetectorRef: ChangeDetectorRef
 
@@ -147,25 +149,180 @@ export class LandingProductDetailsComponent implements OnInit
             specialInstructionValue     : ['']
         });
 
-        // hardcoded for testing purposes only
-        this._storesService.getStoreById('8913d06f-a63f-4a16-8059-2a30a517663a')
-        .subscribe((store: Store)=>{
-            // this.store = store;
+        this.storeDomain = this._route.snapshot.paramMap.get('store-slug');             
 
-            // console.log("store CinemaOnline :", this.store );
+        this._storesService.getStoreByDomainName(this.storeDomain)
+        .pipe(
+            take(1),
+            switchMap((response) => {
 
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
-        // Get the store info
-        this._storesService.store$
-            .subscribe((response: Store) => {
-                this.store = response;
+                this.store = response
                 
-            });
+                // get product
+                this._productsService.product$
+                .subscribe((response: Product) => {
+                    this.product = response;                
 
+                    // ----------------------------------
+                    // Get category info by category id
+                    // ----------------------------------
+
+                    if (this.product && this.product.productInventories.length > 0) {
+                        
+                        this._storesService.getStoreCategoriesById(response.categoryId)
+                            .subscribe((response: StoreCategory) => {
+                                this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
+                            });
+                        
+                        //Check condition if the product inventory got itemDiscount or not
+                        const checkItemDiscount = this.product.productInventories.filter((x:any)=>x.itemDiscount);
+                        
+                        if(checkItemDiscount.length > 0){
+                            //get most discount amount 
+                            this.selectedProductInventory = this.product.productInventories.reduce((r, e) => (<any>r).itemDiscount.discountAmount > (<any>e).itemDiscount.discountAmount ? r : e);
+                        }
+                        else {
+                            //get the cheapest price
+                            this.selectedProductInventory = this.product.productInventories.reduce((r, e) => r.price < e.price ? r : e);
+                        }
+                        
+                        // set initial selectedProductInventoryItems to the cheapest item
+                        this.selectedProductInventoryItems = this.selectedProductInventory.productInventoryItems;
+
+                        if (this.selectedProductInventoryItems) {
+                            this.displayedProduct.price = this.selectedProductInventory.price;
+                            this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
+                            this.displayedProduct.sku = this.selectedProductInventory.sku;
+                            this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
+                            this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
+                        } 
+                        else {
+                            this.displayedProduct.price = this.selectedProductInventory.price;
+                            this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
+                            this.displayedProduct.sku = this.selectedProductInventory.sku;
+                            this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
+                            this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
+                        }
+
+                        // ------------------
+                        // Product Assets
+                        // ------------------
+
+                        this.productAssets = this.product.productAssets;
+
+                        // first this will push all images expect the one that are currently display
+                        response.productAssets.forEach( object => {
+                            let _imageObject = {
+                                small   : '' + object.url,
+                                medium  : '' + object.url,
+                                big     : '' + object.url
+                            }
+                            
+                            if(object.itemCode != this.displayedProduct.itemCode){
+                                this.imageCollection.push(_imageObject)
+                            } 
+                        });
+
+                        // loop second one to push the one that are currently display in first array
+                        response.productAssets.forEach( object => {
+                            let _imageObject = {
+                                small   : '' + object.url,
+                                medium  : '' + object.url,
+                                big     : '' + object.url
+                            }
+                            
+                            if(object.itemCode == this.displayedProduct.itemCode){
+                                this.imageCollection.unshift(_imageObject)
+                            }
+                        });
+                
+                        // set to galerry images
+                        this.galleryImages = this.imageCollection                    
+                        
+                        if (this.galleryImages.length < 1) {
+                            this.store.storeAssets.forEach(item => {                            
+                                if(item.assetType === "LogoUrl") {
+                                    this.galleryImages = [{
+                                        small   : '' + item.assetUrl,
+                                        medium  : '' + item.assetUrl,
+                                        big     : '' + item.assetUrl
+                                    }];
+                                }
+                            });
+                        }
+
+                        // -----------------------
+                        // Product Variants
+                        // -----------------------
+
+                        // set currentVariant
+                        this.selectedProductInventoryItems.forEach(item => {
+                            this.selectedVariants.push(item.productVariantAvailableId)
+                        });
+
+                        // logic here is to extract current selected variant and to reconstruct new object with its string identifier 
+                        // basically it create new array of object from this.product.productVariants to => this.requestParamVariant
+                        let _productVariants = this.product.productVariants
+                        _productVariants.map(variantBase => {
+                            let _productVariantsAvailable = variantBase.productVariantsAvailable;
+                            _productVariantsAvailable.forEach(element => {
+                                this.selectedVariants.map(currentVariant => {
+                                    if(currentVariant.indexOf(element.id) > -1){
+                                        let _data = {
+                                            basename: variantBase.name,
+                                            variantID: element.id,
+                                        }
+                                        this.selectedVariant.push(_data)
+                                    }
+                                })
+
+                            })
+                        });
+
+                        // -----------------------
+                        // Product Combo
+                        // -----------------------
+
+                        // get product package if exists
+                        if (this.product.isPackage) {
+                            this._productsService.getProductPackageOptions(this.product.id)
+                            .subscribe((response)=>{
+
+                                this.combos = response["data"];
+                                
+                                this.combos.forEach(element => {
+                                    this.selectedCombo[element.id] = [];
+                                });
+
+                            });
+                        }
+
+                        // -----------------------
+                        // Create meta description for product
+                        // -----------------------
+
+                        if (this.product.description) {
+                            const meta = document.createElement('meta');
+                            meta.name = 'description';
+                            meta.content = this.product.description;
+                            document.head.appendChild(meta);
+                        }
+                    } else {
+                        // this means there is no data in product inventory, loading the default image
+                        this.galleryImages = [{
+                            small   : '' + this.store.storeAsset.logoUrl,
+                            medium  : '' + this.store.storeAsset.logoUrl,
+                            big     : '' + this.store.storeAsset.logoUrl
+                        }];
+                    }
+                });
+                                
+                return of(true);
+            })
+        ).subscribe(() => {
+            
+        });
+        
         // initialise gallery
         // set galleryOptions
         this.galleryOptions = [
@@ -203,164 +360,6 @@ export class LandingProductDetailsComponent implements OnInit
             }
         ];
 
-        // get product
-        this._productsService.product$
-            .subscribe((response: Product) => {
-                this.product = response;                
-
-                // ----------------------------------
-                // Get category info by category id
-                // ----------------------------------
-
-                if (this.product && this.product.productInventories.length > 0) {
-                    
-                    this._storesService.getStoreCategoriesById(response.categoryId)
-                        .subscribe((response: StoreCategory) => {
-                            this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
-                        });
-                    
-                    //Check condition if the product inventory got itemDiscount or not
-                    const checkItemDiscount = this.product.productInventories.filter((x:any)=>x.itemDiscount);
-                    
-                    if(checkItemDiscount.length > 0){
-                        //get most discount amount 
-                        this.selectedProductInventory = this.product.productInventories.reduce((r, e) => (<any>r).itemDiscount.discountAmount > (<any>e).itemDiscount.discountAmount ? r : e);
-                    }
-                    else {
-                        //get the cheapest price
-                        this.selectedProductInventory = this.product.productInventories.reduce((r, e) => r.price < e.price ? r : e);
-                    }
-                       
-                    // set initial selectedProductInventoryItems to the cheapest item
-                    this.selectedProductInventoryItems = this.selectedProductInventory.productInventoryItems;
-    
-                    if (this.selectedProductInventoryItems) {
-                        this.displayedProduct.price = this.selectedProductInventory.price;
-                        this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
-                        this.displayedProduct.sku = this.selectedProductInventory.sku;
-                        this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
-                        this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
-                    } 
-                    else {
-                        this.displayedProduct.price = this.selectedProductInventory.price;
-                        this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
-                        this.displayedProduct.sku = this.selectedProductInventory.sku;
-                        this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
-                        this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
-                    }
-    
-                    // ------------------
-                    // Product Assets
-                    // ------------------
-    
-                    this.productAssets = this.product.productAssets;
-    
-                    // first this will push all images expect the one that are currently display
-                    response.productAssets.forEach( object => {
-                        let _imageObject = {
-                            small   : '' + object.url,
-                            medium  : '' + object.url,
-                            big     : '' + object.url
-                        }
-                        
-                        if(object.itemCode != this.displayedProduct.itemCode){
-                            this.imageCollection.push(_imageObject)
-                        } 
-                    });
-    
-                    // loop second one to push the one that are currently display in first array
-                    response.productAssets.forEach( object => {
-                        let _imageObject = {
-                            small   : '' + object.url,
-                            medium  : '' + object.url,
-                            big     : '' + object.url
-                        }
-                        
-                        if(object.itemCode == this.displayedProduct.itemCode){
-                            this.imageCollection.unshift(_imageObject)
-                        }
-                    });
-            
-                    // set to galerry images
-                    this.galleryImages = this.imageCollection                    
-
-                    if (this.galleryImages.length < 1) {
-                        this.store.storeAssets.forEach(item => {
-                            if(item.assetType === "LogoUrl") {
-                                this.galleryImages = [{
-                                    small   : '' + item.assetUrl,
-                                    medium  : '' + item.assetUrl,
-                                    big     : '' + item.assetUrl
-                                }];
-                            }
-                        });
-                    }
-    
-                    // -----------------------
-                    // Product Variants
-                    // -----------------------
-    
-                    // set currentVariant
-                    this.selectedProductInventoryItems.forEach(item => {
-                        this.selectedVariants.push(item.productVariantAvailableId)
-                    });
-    
-                    // logic here is to extract current selected variant and to reconstruct new object with its string identifier 
-                    // basically it create new array of object from this.product.productVariants to => this.requestParamVariant
-                    let _productVariants = this.product.productVariants
-                    _productVariants.map(variantBase => {
-                        let _productVariantsAvailable = variantBase.productVariantsAvailable;
-                        _productVariantsAvailable.forEach(element => {
-                            this.selectedVariants.map(currentVariant => {
-                                if(currentVariant.indexOf(element.id) > -1){
-                                    let _data = {
-                                        basename: variantBase.name,
-                                        variantID: element.id,
-                                    }
-                                    this.selectedVariant.push(_data)
-                                }
-                            })
-    
-                        })
-                    });
-    
-                    // -----------------------
-                    // Product Combo
-                    // -----------------------
-    
-                    // get product package if exists
-                    if (this.product.isPackage) {
-                        this._productsService.getProductPackageOptions(this.product.id)
-                        .subscribe((response)=>{
-
-                            this.combos = response["data"];
-                            
-                            this.combos.forEach(element => {
-                                this.selectedCombo[element.id] = [];
-                            });
-    
-                        });
-                    }
-
-                    // -----------------------
-                    // Create meta description for product
-                    // -----------------------
-
-                    if (this.product.description) {
-                        const meta = document.createElement('meta');
-                        meta.name = 'description';
-                        meta.content = this.product.description;
-                        document.head.appendChild(meta);
-                    }
-                } else {
-                    // this means there is no data in product inventory, loading the default image
-                    this.galleryImages = [{
-                        small   : '' + this.store.storeAsset.logoUrl,
-                        medium  : '' + this.store.storeAsset.logoUrl,
-                        big     : '' + this.store.storeAsset.logoUrl
-                    }];
-                }
-            });
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -670,6 +669,15 @@ export class LandingProductDetailsComponent implements OnInit
                 this.quantity = this.minQuantity;
             else if (this.quantity > this.maxQuantity)
                 this.quantity = this.maxQuantity;
+        }
+    }
+
+    displayStoreLogo(storeAssets: StoreAssets[]) {
+        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (storeAssetsIndex > -1) {
+            return storeAssets[storeAssetsIndex].assetUrl;
+        } else {
+            return 'assets/branding/symplified/logo/symplified.png'
         }
     }
 }

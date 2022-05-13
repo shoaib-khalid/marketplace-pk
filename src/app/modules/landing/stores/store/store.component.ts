@@ -61,6 +61,8 @@ export class LandingStoreComponent implements OnInit
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
    
+    storeDomain: string;
+
     image: any = [];
     store: Store;
     storeCategories: StoreCategory[];
@@ -108,6 +110,7 @@ export class LandingStoreComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _matIconRegistry: MatIconRegistry,
         private _domSanitizer: DomSanitizer,
+        private _route: ActivatedRoute,
     )
     {
         this._matIconRegistry
@@ -117,8 +120,9 @@ export class LandingStoreComponent implements OnInit
     }
 
     ngOnInit(): void {
+        this.storeDomain = this._route.snapshot.paramMap.get('store-slug');     
         
-        this._storesService.getStoreByDomainName('cinema-online')
+        this._storesService.getStoreByDomainName(this.storeDomain)
         .pipe(
             take(1),
             switchMap((response) => {
@@ -225,26 +229,26 @@ export class LandingStoreComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-            // Subscribe to search input field value changes
-            this.searchInputControl.valueChanges
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                debounceTime(300),
-                switchMap((query) => {                    
+        // Subscribe to search input field value changes
+        this.searchInputControl.valueChanges
+        .pipe(
+            takeUntil(this._unsubscribeAll),
+            debounceTime(300),
+            switchMap((query) => {                    
 
-                    this.searchName = query;
-                    
-                    // set loading to true
-                    this.isLoading = true;
-                    
-                    return this._productsService.getProducts(0, 12, this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '');
-                }),
-                map(() => {
-                    // set loading to false
-                    this.isLoading = false;
-                })
-            )
-            .subscribe();
+                this.searchName = query;
+                
+                // set loading to true
+                this.isLoading = true;
+                
+                return this._productsService.getProducts(0, 12, this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '');
+            }),
+            map(() => {
+                // set loading to false
+                this.isLoading = false;
+            })
+        )
+        .subscribe();
 
         this.sortInputControl.valueChanges
             .pipe(
@@ -390,7 +394,7 @@ export class LandingStoreComponent implements OnInit
         // catalogue slug will be use in url
         this.catalogueSlug = value;        
         
-        this._router.navigate(['stores/cinema-online/' + value]);
+        this._router.navigate(['stores/' + this.storeDomain + '/' + value]);
 
         this.reload();
 

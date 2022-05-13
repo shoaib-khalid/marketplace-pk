@@ -7,6 +7,7 @@ import { LandingHomeComponent } from 'app/modules/landing/home/home.component';
 import { landingHomeRoutes } from 'app/modules/landing/home/home.routing';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
+import { BannerModule } from 'app/layout/common/banner/banner.module';
 
 @NgModule({
     declarations: [
@@ -18,7 +19,8 @@ import { FuseCardModule } from '@fuse/components/card';
         MatIconModule,
         SharedModule,
         MatInputModule,
-        FuseCardModule
+        FuseCardModule,
+        BannerModule
     ]
 })
 export class LandingHomeModule

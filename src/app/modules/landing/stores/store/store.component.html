@@ -17,12 +17,12 @@
                     </mat-form-field>
                 </ng-container>
                 <!-- Selected Store -->
-                <fuse-card class="flex flex-row h-30 md:h-full w-full border border-primary rounded-lg filter-article">
-                    <div class="flex-0 w-30 md:w-64">
+                <fuse-card class="flex flex-row h-32 md:h-full w-full border border-primary rounded-lg filter-article">
+                    <div class="flex-0 w-30 md:w-44 ">
                         <img
-                        class="w-full h-full object-cover"
-                        [src]="store.storeAssets[2].assetUrl"
-                        [alt]="'Card cover image'">
+                            class="w-full h-full shadow object-cover"
+                            [src]="displayStoreLogo(store.storeAssets)"
+                            [alt]="'Card cover image'">
                     </div>
                     <div class="flex flex-col flex-auto md:m-6 md:mb-4">
                         <!-- Store name -->
@@ -261,7 +261,7 @@
                                                     <!-- Product -->
                                                     <div class="flex flex-col h-120 w-full lg:w-60 shadow-lg border group hover:border-2 rounded-lg overflow-hidden cursor-pointer"
                                                         [ngClass]="isProductOutOfStock(product) ? 'bg-card hover:border-primary' : 'bg-gray-200 hover:border-gray-600'"
-                                                        [routerLink]="['/stores/cinema-online/' + '/' + catalogueSlug + '/' + product.seoName]"
+                                                        [routerLink]="['/stores/' + storeDomain + '/' + catalogueSlug + '/' + product.seoName]"
                                                     >
                                                         <!-- Product Header -->
                                                         <div class="relative flex flex-col p-2 h-60 bg-white bg-no-repeat bg-cover bg-center" 
@@ -373,7 +373,7 @@
                                                 <ng-container *ngFor="let product of products">
                                                     <div class="flex flex-wrap flex-row h-40 sm:h-48 mb-4 w-full bg-card shadow border group hover:border-2 rounded-lg justify-between items-center cursor-pointer"
                                                         [ngClass]="isProductOutOfStock(product) ? 'bg-card hover:border-primary' : 'bg-gray-200 hover:border-gray-600'"
-                                                        [routerLink]="['/stores/cinema-online/' + '/' + catalogueSlug + '/' + product.seoName]"
+                                                        [routerLink]="['/stores/' + storeDomain + '/' + catalogueSlug + '/' + product.seoName]"
                                                     >
                                                         <!-- Image Thumbnail -->
                                                         <div class="relative h-full w-2/5 sm:w-2/6 max-w-52 rounded-l-lg p-2 bg-white bg-no-repeat bg-cover bg-center" 
