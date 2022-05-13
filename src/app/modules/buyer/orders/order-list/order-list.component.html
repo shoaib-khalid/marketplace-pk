@@ -62,43 +62,15 @@
                                         </div>
                                         <!-- Progress Status Icon -->
                                         <div class="flex flex-row items-center justify-center min-w-24 border border-primary p-1 sm:p-2 rounded">
+                                            <!-- Progress Status Icon -->
                                             <mat-icon 
-                                                *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED' || orderDetails.completionStatus === 'AWAITING_PICKUP'"  
-                                                class="text-green-500" 
-                                                svgIcon="heroicons_solid:clock">
-                                            </mat-icon>
-                                            <mat-icon 
-                                                *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED'"
-                                                class="text-green-500"
-                                                svgIcon="mat_solid:local_shipping">
-                                            </mat-icon>
-                                            <mat-icon 
-                                                *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER'"
-                                                class="text-green-500" 
-                                                svgIcon="heroicons_solid:check-circle">
-                                            </mat-icon>
-                                            <mat-icon 
-                                                *ngIf="orderDetails.completionStatus === 'CANCELED_BY_CUSTOMER' || orderDetails.completionStatus === 'CANCELED_BY_MERCHANT'"
-                                                class="text-red-600" 
-                                                svgIcon="heroicons_solid:x-circle">
+                                                [class]="displayStatus(orderDetails.completionStatus).class" 
+                                                [svgIcon]="displayStatus(orderDetails.completionStatus).icon">
                                             </mat-icon>
 
                                             <!-- Progress Status -->
                                             <span 
-                                                *ngIf="orderDetails.completionStatus === 'BEING_PREPARED' || orderDetails.completionStatus === 'PAYMENT_CONFIRMED' || orderDetails.completionStatus === 'AWAITING_PICKUP'" 
-                                                class="font-semibold items-center text-sm pl-2">To Deliver
-                                            </span>
-                                            <span 
-                                                *ngIf="orderDetails.completionStatus === 'BEING_DELIVERED'" 
-                                                class="font-semibold items-center text-sm pl-2">On Delivery
-                                            </span>
-                                            <span 
-                                                *ngIf="orderDetails.completionStatus === 'DELIVERED_TO_CUSTOMER'" 
-                                                class="font-semibold items-center text-sm pl-2">Delivered
-                                            </span>
-                                            <span 
-                                                *ngIf="orderDetails.completionStatus === 'CANCELED_BY_CUSTOMER' || orderDetails.completionStatus === 'CANCELED_BY_MERCHANT'" 
-                                                class="font-semibold items-center text-sm pl-2">Cancelled
+                                                class="font-semibold items-center pl-2">{{displayStatus(orderDetails.completionStatus).label}}
                                             </span>
                                         </div>
                                     </div>

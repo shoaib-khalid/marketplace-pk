@@ -93,11 +93,11 @@ export class OrderListComponent implements OnInit
         this.ordersDetails$ = this._orderService.ordersDetails$;        
 
         this._orderCountSummary = [
-            { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0 },
-            { id: "TO_SHIP", label: "To Deliver", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0 },            
-            { id: "SENT_OUT", label: "On Delivery", completionStatus: "BEING_DELIVERED", count: 0 },
-            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0 },
-            { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0 },
+            { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0, class: null, icon: null },
+            { id: "TO_SHIP", label: "To Deliver", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0, class: "text-green-500", icon: "heroicons_solid:clock" },            
+            { id: "SENT_OUT", label: "On Delivery", completionStatus: "BEING_DELIVERED", count: 0, class: "text-green-500", icon: "mat_solid:local_shipping" },
+            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0, class: "text-green-500", icon: "heroicons_solid:check-circle" },
+            { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0, class: "text-red-600", icon: "heroicons_solid:x-circle" },
         ];
                 
         // Subscribe to media changes
@@ -251,6 +251,12 @@ export class OrderListComponent implements OnInit
     redirect(pagename: string) {
         // this._route.snapshot.paramMap.get(pagename)
         this._router.navigate([window.location.href = pagename]);
+    }
+
+    displayStatus(completionStatus: string) {
+        let index = this._orderCountSummary.findIndex(item => item.id !== 'ALL' && item.completionStatus.includes(completionStatus));
+
+        return index > -1 ? this._orderCountSummary[index] : null;
     }
     
 }
