@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, O
 import { Router } from '@angular/router';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { Subject, takeUntil } from 'rxjs';
-import { Cart } from 'app/core/cart/cart.types';
+import { Cart, CustomerCart } from 'app/core/cart/cart.types';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -39,6 +39,7 @@ export class CartComponent implements OnInit, OnDestroy
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     stores: Store[] = [];
+    totalCartList: number;
 
     /**
      * Constructor
@@ -67,12 +68,14 @@ export class CartComponent implements OnInit, OnDestroy
 
         this._cartService.customerCarts$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((carts: Cart[]) => {
+            .subscribe((carts: CustomerCart) => {
                 
                 if (carts) {
 
-                    this.carts = carts["cartList"];
-                    this.totalCartItems = carts["totalItem"];
+                    this.carts = carts.cartList;
+                    this.totalCartItems = carts.totalItem;
+
+                    this.totalCartList = carts.cartList.length;
     
                     // remove duplicate stores
                     let resArr = [];
@@ -87,6 +90,7 @@ export class CartComponent implements OnInit, OnDestroy
                     
                     // to show only 3
                     if (resArr.length >= 3) {
+                        this.totalCartList = resArr.length;
                         const slicedArray = resArr.slice(0, 3);
                         this.carts = slicedArray;
                     }

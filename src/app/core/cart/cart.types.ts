@@ -20,6 +20,12 @@ export interface CartPagination
     endIndex    : number;
 }
 
+export interface CustomerCart
+{
+    cartList: Cart[];
+    totalItem: number;
+}
+
 export interface CartItem
 {
     id?: string;

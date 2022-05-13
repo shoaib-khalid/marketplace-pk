@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { CartComponent } from 'app/layout/common/cart/cart.component';
 import { SharedModule } from 'app/shared/shared.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
     declarations: [
@@ -17,7 +18,8 @@ import { SharedModule } from 'app/shared/shared.module';
         MatDividerModule,
         MatIconModule,
         MatMenuModule,
-        SharedModule
+        SharedModule,
+        MatTooltipModule
     ],
     exports     : [
         CartComponent

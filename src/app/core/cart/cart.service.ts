@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
-import { Cart, CartItem, CartPagination } from 'app/core/cart/cart.types';
+import { Cart, CartItem, CartPagination, CustomerCart } from 'app/core/cart/cart.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -16,7 +16,7 @@ export class CartService
 {
     private _cart: ReplaySubject<Cart> = new ReplaySubject<Cart>(1);
     private _cartItems: ReplaySubject<CartItem[]> = new ReplaySubject<CartItem[]>(1);
-    private _customerCarts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
+    private _customerCarts: ReplaySubject<CustomerCart> = new ReplaySubject<CustomerCart>(1);
     private _carts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
     private _cartPagination: BehaviorSubject<CartPagination | null> = new BehaviorSubject(null);
 
@@ -93,7 +93,7 @@ export class CartService
     /**
      * Getter for customerCarts
      */
-    get customerCarts$(): Observable<Cart[]>
+    get customerCarts$(): Observable<CustomerCart>
     {
         return this._customerCarts.asObservable();
     }
@@ -160,7 +160,7 @@ export class CartService
      * @param customerId 
      * @returns 
      */
-    getCartsByCustomerId(customerId: string): Observable<Cart>
+    getCartsByCustomerId(customerId: string): Observable<CustomerCart>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
 

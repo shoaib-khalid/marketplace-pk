@@ -23,10 +23,10 @@
             type="button"
             [routerLink]="'/orders'"
             mat-icon-button> -->
-            <ng-container *ngIf="totalCartItems > 0">
-                <span class="absolute -top-1 -right-1 flex items-center justify-center h-3">
+            <ng-container *ngIf="totalCartList > 0">
+                <span matTooltip="Number of cart" class="absolute -top-1 -right-1 flex items-center justify-center h-3">
                     <span class="flex items-center justify-center flex-shrink-0 min-w-4 h-4 px-1 ml-4 mt-2.5 rounded-full bg-white text-black text-xs font-medium">
-                        {{totalCartItems}}
+                        {{totalCartList}}
                     </span>
                 </span>
             </ng-container>
@@ -79,7 +79,7 @@
         <!-- See more  -->
         <ng-container *ngIf="seeMoreCarts">
             <div [routerLink]="'/carts'" class="flex justify-center p-2 font-semibold bg-gray-100 hover:bg-primary-50 cursor-pointer hover:text-primary-500">
-                See More
+                View More Carts
             </div>
             <!-- Divider  -->
             <div class="border-t"></div>
