@@ -12,11 +12,17 @@
                 <ng-container *ngIf="store">
                     <!-- Selected Store -->
                     <fuse-card class="flex flex-row h-32 md:h-full w-full border border-primary rounded-lg filter-article sm:mt-2">
-                        <div class="flex-0 w-30 md:w-44">
+                        <div class="flex-0 w-30 md:w-44 relative overflow-hidden">
                             <img
                             class="w-full shadow h-full object-cover"
                             [src]="displayStoreLogo(store.storeAssets)"
                             [alt]="'Card cover image'">
+                            <div
+                                [routerLink]="'/stores'" 
+                                class="flex flex-row cursor-pointer justify-center absolute w-full p-1.5 bottom-0 inset-x-0 bg-primary text-white text-xs text-center leading-4 items-center">
+                                <mat-icon class="text-white" svgIcon="heroicons_outline:eye"></mat-icon>
+                                <div class="text-sm pl-1">View Store</div>
+                            </div>
                         </div>
                         <div class="flex flex-col flex-auto md:m-6 md:mb-4">
                             <!-- Store name -->

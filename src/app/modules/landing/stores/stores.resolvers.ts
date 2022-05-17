@@ -34,8 +34,8 @@ export class StoresResolver implements Resolve<any>
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):  Observable<any>
     {
         return forkJoin([
-            this._storesService.getStores("",0,10,"MYS","created","desc"),
-            this._storesService.getFeaturedStore("",0,6,"MYS","created","desc")
+            // this._storesService.getStores("",0,10,"MYS","created","desc"),
+            // this._storesService.getFeaturedStore("",0,6,"MYS","created","desc")
         ]);
         
     }

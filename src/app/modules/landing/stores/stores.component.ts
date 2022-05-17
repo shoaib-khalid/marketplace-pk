@@ -183,6 +183,30 @@ export class LandingStoresComponent implements OnInit
         }
     }
 
+    /**
+    * 
+    * This function will return display see more based on height of 
+    * div container
+    * 
+    * @param storesDescription 
+    * @returns 
+    */
+    displaySeeMore(storesDescription){
+
+        var div = document.createElement("div")
+        div.innerHTML = storesDescription
+        div.style.width ="15rem";
+        document.body.appendChild(div)
+
+        if (div.offsetHeight > 20) {
+            div.setAttribute("class","hidden")
+            return true;
+        } else {
+            div.setAttribute("class","hidden")
+            return false;
+        }
+    }
+
     chooseStore(storeDomain:string) {
         
         let slug = storeDomain.split(".")[0]

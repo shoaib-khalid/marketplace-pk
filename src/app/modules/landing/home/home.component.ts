@@ -115,27 +115,19 @@ export class LandingHomeComponent implements OnInit
 
             console.log("this.platform",this.platform);
 
-            this._storesService.getFeaturedStore("",0,6,this.platform.country,"created","desc","","")
-            .subscribe((response) => {
-                this.stores = response;  
-
-                console.log("responsexnbhcg", response);
+            this._storesService.featuredStores$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((stores: Store[]) => { 
+                this.stores = stores;  
                 
+                this._changeDetectorRef.markForCheck();
+    
             });
-            
+    
             
             this._changeDetectorRef.markForCheck();
 
         });
-
-        // this._storesService.featuredStores$
-        // .pipe(takeUntil(this._unsubscribeAll))
-        // .subscribe((stores: Store[]) => { 
-        //     this.stores = stores;  
-            
-        //     this._changeDetectorRef.markForCheck();
-
-        // });
 
 
     }
