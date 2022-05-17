@@ -64,13 +64,13 @@
                                         <div class="flex flex-row items-center justify-center min-w-24 border border-primary p-1 sm:p-2 rounded">
                                             <!-- Progress Status Icon -->
                                             <mat-icon 
-                                                [class]="displayStatus(orderDetails.completionStatus).class" 
-                                                [svgIcon]="displayStatus(orderDetails.completionStatus).icon">
+                                                [class]="displayStatus(orderDetails.completionStatus)?.class" 
+                                                [svgIcon]="displayStatus(orderDetails.completionStatus)?.icon">
                                             </mat-icon>
 
                                             <!-- Progress Status -->
                                             <span 
-                                                class="font-semibold items-center pl-2">{{displayStatus(orderDetails.completionStatus).label}}
+                                                class="font-semibold items-center pl-2">{{displayStatus(orderDetails.completionStatus)?.label}}
                                             </span>
                                         </div>
                                     </div>

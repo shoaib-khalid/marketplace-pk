@@ -1,3 +1,5 @@
+import { Voucher } from "../../vouchers/vouchers.types";
+
 export interface Order
 {
     appliedDiscount             : number;
@@ -118,6 +120,7 @@ export interface OrderDetails
     customer                    : Customer;
     orderRefund                 : String;
     orderItemWithDetails        : OrderItemWithDetails;
+    voucherDetail               : Voucher
 }
 
 export interface OrderShipmentDetail
