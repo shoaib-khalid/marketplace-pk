@@ -8,6 +8,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { Subject } from 'rxjs';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformLocation } from '@angular/common';
+import { AppConfig } from 'app/config/service.config';
 
 
 @Component({
@@ -36,7 +37,8 @@ export class AuthForgotPasswordComponent implements OnInit
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     urlfull :string;
     platformname:string;
-    
+    domain :string = '';
+
     /**
      * Constructor
      */
@@ -45,6 +47,7 @@ export class AuthForgotPasswordComponent implements OnInit
         private _platformsService: PlatformService,
         private _formBuilder: FormBuilder,
         private _platformLocation: PlatformLocation,
+        private _apiServer: AppConfig,
 
     )
     {
@@ -59,6 +62,9 @@ export class AuthForgotPasswordComponent implements OnInit
      */
     ngOnInit(): void
     {
+
+        this.domain = this._apiServer.settings.storeFrontDomain;
+
         // Subscribe to platform data
         this._platformsService.platform$
         .pipe(takeUntil(this._unsubscribeAll))
@@ -100,7 +106,7 @@ export class AuthForgotPasswordComponent implements OnInit
         this.showAlert = false;
 
         // Forgot password
-        this._authService.forgotPassword(this.forgotPasswordForm.get('email').value, this.platformname , this.urlfull + '/reset-password')
+        this._authService.forgotPassword(this.forgotPasswordForm.get('email').value, this.domain , this.urlfull + '/reset-password')
             .pipe(
                 finalize(() => {
 

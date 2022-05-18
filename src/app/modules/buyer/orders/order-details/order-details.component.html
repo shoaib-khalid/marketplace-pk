@@ -133,7 +133,7 @@
                         <!-- Items -->
                         <div class="flex flex-col my-3 items-center justify-between w-full pt-2">
                             <ng-container *ngFor="let orderItem of orderDetails.orderItemWithDetails">
-                                <div class="flex flex-row justify-between w-full py-2">
+                                <div class="flex flex-row justify-between w-full py-2 gap-2">
                                     <div class="w-full">
                                         <div class="relative flex flex-0 items-center justify-center w-16 h-16 mr-4 rounded overflow-hidden border">
                                             <img
@@ -158,7 +158,7 @@
                                     </div>
                                     <div class="items-end w-full flex flex-col">
                                         <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
-                                        <h3 class="font-bold text-primary">{{orderItem.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                        <h3 class="font-bold text-primary">{{orderItem.price | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
                                     </div>
                                 </div>
                             </ng-container>
@@ -168,7 +168,7 @@
                         <div class="border-t w-full"></div>
 
                         <!-- Footer -->
-                        <div class="flex flex-col pt-2">
+                        <div class="flex flex-col pt-2 gap-1">
                             <!-- Sub Total -->
                             <div class="flex flex-row justify-between w-full">
                                 <h3 class="font-semibold text-gray-500">Sub Total</h3>
@@ -212,10 +212,19 @@
                                     <p class="items-center font-semibold text-gray-400">-{{orderDetails.deliveryDiscount | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                                 </div>
                             </ng-container>
+                            <!-- Voucher Discount -->
+                            <ng-container *ngIf="orderDetails.voucherDiscount !== 0 && orderDetails.voucherDiscount !== null">
+                                <div class="flex flex-row justify-between w-full">
+                                    <p class="font-semibold text-gray-500">
+                                        <span>Voucher Discount</span>
+                                    </p>
+                                    <p class="items-center font-semibold text-gray-400">-{{orderDetails.voucherDiscount | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
+                                </div>
+                            </ng-container>
                             <!-- Total Amount -->
                             <div class="flex flex-row justify-between w-full">
                                 <h3 class="font-bold">Total Amount</h3>
-                                <p class="items-center font-semibold">Total Order ({{orderDetails.orderItemWithDetails.length}}) : {{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
+                                <p class="items-center font-semibold">Total Order ({{orderDetails.orderItemWithDetails.length}}): {{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
                             </div>
                         </div>
                     </div>
