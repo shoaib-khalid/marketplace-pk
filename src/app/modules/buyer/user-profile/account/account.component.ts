@@ -99,7 +99,7 @@ export class EditAccountComponent implements OnInit
         this.alert = false;
 
         // Disable the form
-        this.accountForm.disable();
+        // this.accountForm.disable();
 
         // update profile
         this._userService.putCustomerById(this.accountForm.value)
@@ -137,7 +137,7 @@ export class EditAccountComponent implements OnInit
         }, 7000);
 
         // Enable the form
-        this.accountForm.enable();
+        // this.accountForm.enable();
     }
     
 }
