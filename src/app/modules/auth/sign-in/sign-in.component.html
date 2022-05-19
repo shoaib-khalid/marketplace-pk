@@ -102,34 +102,37 @@
                             [diameter]="24"
                             [mode]="'indeterminate'"></mat-progress-spinner>
                     </button>
-    
-                    <!-- Separator -->
-                    <div class="flex items-center mt-8">
-                        <div class="flex-auto mt-px border-t"></div>
-                        <div class="mx-2 text-secondary text-gray-400">Or continue with</div>
-                        <div class="flex-auto mt-px border-t"></div>
-                    </div>
-    
-                    <!-- Single sign-on buttons -->
-                    <div class="flex flex-row justify-center w-full items-center mt-4 space-x-4">
-                        <div class="flex justify-center">
-                            <div class="mr-4">
-                                <button mat-fab type="button" color="" (click)="signInWithGoogle()">
-                                    <img src = "assets/social-media/google-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                </button>
-                            </div>
-                            <div class="mr-4">
-                                <button mat-fab type="button" color="" (click)="signInWithFB()">
-                                    <img src = "assets/social-media/facebook-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                </button>
-                            </div>
-                            <div class="">
-                                <button mat-fab type="button" color="" (click)="signInWithApple()">
-                                    <img src = "assets/social-media/apple-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                </button>
+
+                    <ng-container *ngIf="countryCode === 'MYS'">
+                        <!-- Separator -->
+                        <div class="flex items-center mt-8">
+                            <div class="flex-auto mt-px border-t"></div>
+                            <div class="mx-2 text-secondary text-gray-400">Or continue with</div>
+                            <div class="flex-auto mt-px border-t"></div>
+                        </div>
+        
+                        <!-- Single sign-on buttons -->
+                        <div class="flex flex-row justify-center w-full items-center mt-4 space-x-4">
+                            <div class="flex justify-center">
+                                <div class="mr-4">
+                                    <button mat-fab type="button" color="" (click)="signInWithGoogle()">
+                                        <img src = "assets/social-media/google-svgrepo.svg" style="width: 25px;height: 25px;" />
+                                    </button>
+                                </div>
+                                <div class="mr-4">
+                                    <button mat-fab type="button" color="" (click)="signInWithFB()">
+                                        <img src = "assets/social-media/facebook-svgrepo.svg" style="width: 25px;height: 25px;" />
+                                    </button>
+                                </div>
+                                <div class="">
+                                    <button mat-fab type="button" color="" (click)="signInWithApple()">
+                                        <img src = "assets/social-media/apple-svgrepo.svg" style="width: 25px;height: 25px;" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </ng-container>
+    
                 </form>
             </div>
         </div>

@@ -99,6 +99,8 @@ export class OrderListComponent implements OnInit
             { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0, class: "text-green-500", icon: "heroicons_solid:check-circle" },
             { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0, class: "text-red-600", icon: "heroicons_solid:x-circle" },
         ];
+
+        this.tabControl.setValue(this._orderCountSummary.find(item => item.id === "ALL").completionStatus);
                 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
