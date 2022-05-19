@@ -19,7 +19,7 @@ export class AppleLoginProvider extends BaseLoginProvider {
     ) {
         super();
         this.marketPlaceDomain = AppConfig.settings.marketplaceDomain;
-        this.userServiceUrl = AppConfig.settings.apiServer.userService + '/clients/applecallback/'+ this.marketPlaceDomain;
+        this.userServiceUrl = AppConfig.settings.apiServer.userService + '/customers/applecallback/'+ this.marketPlaceDomain;
     }
 
     public initialize(): Promise<void> {
