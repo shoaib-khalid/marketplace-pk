@@ -12,34 +12,46 @@
                 <ng-container *ngIf="store">
                     <!-- Selected Store -->
                     <fuse-card class="flex flex-row h-32 md:h-full w-full border border-primary rounded-lg filter-article sm:mt-2">
-                        <div class="flex-0 w-30 md:w-44 relative overflow-hidden">
+                        <div class="flex-0 w-30 md:w-44">
                             <img
                             class="w-full shadow h-full object-cover"
                             [src]="displayStoreLogo(store.storeAssets)"
                             [alt]="'Card cover image'">
-                            <div
-                                [routerLink]="'/stores'" 
-                                class="flex flex-row cursor-pointer justify-center absolute w-full p-1.5 bottom-0 inset-x-0 bg-primary text-white text-xs text-center leading-4 items-center">
-                                <mat-icon class="text-white" svgIcon="heroicons_outline:eye"></mat-icon>
-                                <div class="text-sm pl-1">View Store</div>
-                            </div>
                         </div>
-                        <div class="flex flex-col flex-auto md:m-6 md:mb-4">
-                            <!-- Store name -->
-                            <div class="md:text-2xl text-lg py-1 px-2 font-semibold leading-tight">{{store.name}}</div>
-                            <!-- Store Description -->
-                            <p class="px-2 flex flex-row text-black text-xs sm:text-sm md:text-base" [innerHTML]="store.storeDescription"></p>
-                            <div class="flex flex-row justify-between px-2 pt-2">
-                                <div class="flex flex-row">
-                                    <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
-                                    <span class="text-xs sm:text-sm md:text-base font-bold">{{store.phoneNumber}}</span>
-                                </div>
-                                <div class="flex flex-row">
+                        <!-- design changed -->
+                        <!-- <div class="flex-0 relative w-30 md:w-44">
+                            <div class="absolute top-0 bottom-0 left-0 right-0">
+                                <img
+                                class="w-full shadow h-full object-cover"
+                                [src]="displayStoreLogo(store.storeAssets)"
+                                alt="Logo image">
+                            </div>
+                            <div class="flex w-full h-full absolute items-center justify-center bg-primary opacity-70"></div>
+                            <div
+                                (click)="chooseStore(store.domain)" 
+                                class="flex w-full h-full absolute items-center justify-center cursor-pointer">
+                                <mat-icon class="text-white" svgIcon="mat_outline:remove_red_eye"></mat-icon>
+                                <span class="font-semibold text-white pl-1">View Store</span>
+                            </div>
+                        </div> -->
+                        <div class="flex flex-col m-2 justify-center items-center w-full">
+                            <div class="flex flex-row w-full justify-between pb-3 sm:pr-6">
+                                <div class="flex flex-row items-center">
                                     <span class="text-xs sm:text-sm md:text-base">Products:</span>
                                     <span class="text-xs sm:text-sm md:text-base font-bold">80</span>
                                 </div>
+                                <div class="group cursor-pointer" (click)="chooseStore(store.domain)">
+                                    <div class="flex flex-row items-center border rounded-md border-primary py-1 px-2 group-hover:bg-primary">
+                                        <mat-icon class="icon-size-5 text-primary group-hover:text-white sm:icon-size-6" svgIcon="mat_outline:storefront"></mat-icon>
+                                        <span class="text-sm sm:text-base font-semibold group-hover:text-white text-primary pl-2">View Store</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex flex-row px-2">
+                            <div class="flex flex-row w-full pb-3">
+                                <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
+                                <span class="text-xs sm:text-sm md:text-base font-bold">{{store.phoneNumber}}</span>
+                            </div>
+                            <div class="flex flex-row w-full">
                                 <span class="text-xs sm:text-sm md:text-base">Email:</span>
                                 <span class="text-xs sm:text-sm md:text-base font-bold">{{store.email}}</span>
                             </div>                        
@@ -50,7 +62,7 @@
         
                             <!-- Product Assets -->
                             <div class="flex justify-center w-full md:w-140">
-                                <ngx-gallery class="shadow-xl" style="border-radius: 15px;" [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
+                                <ngx-gallery class="shadow" style="border-radius: 15px;" [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
                             </div>
                             
                             <!-- Product Details -->
@@ -61,6 +73,29 @@
                                     <!-- <span *ngIf="displayedProduct.discountAmount>0" class="mb-2 py-1 px-3 rounded text-sm font-semibold mx-2 items-center" [ngClass]="'text-primary-100 bg-red-600'">      
                                         {{displayedProduct.discountAmount}}% Off
                                     </span> -->
+                                </div>
+                                <!-- Product Rating -->
+                                <div class="flex items-center leading-none mt-2 -ml-1">
+                                    <div class="flex items-center">
+                                        <mat-icon
+                                            class="text-yellow-400 icon-size-5"
+                                            [svgIcon]="'mat_outline:star'"></mat-icon>
+                                        <mat-icon
+                                            class="text-yellow-400 icon-size-5"
+                                            [svgIcon]="'mat_outline:star'"></mat-icon>
+                                        <mat-icon
+                                            class="text-yellow-400 icon-size-5"
+                                            [svgIcon]="'mat_outline:star'"></mat-icon>
+                                        <mat-icon
+                                            class="text-yellow-400 icon-size-5"
+                                            [svgIcon]="'mat_outline:star'"></mat-icon>
+                                        <mat-icon
+                                            class="text-yellow-400 icon-size-5"
+                                            [svgIcon]="'mat_outline:star_half'"></mat-icon>
+                                    </div>
+                                    <div class="text-secondary ml-2">4.5</div>
+                                    <div class="text-secondary mx-2">&bull;</div>
+                                    <div class="text-secondary">98 reviews</div>
                                 </div>
                                 <!-- Price -->
                                 <div class="mt-2">
@@ -78,7 +113,7 @@
                                 <!-- Details -->
                                 <div class="">
                                     <p class="mb-2 font-semibold">Details:</p> 
-                                    <span class="text-sm font-normal" [innerHTML]="product.description"></span>
+                                    <span class="text-sm font-normal text-gray-400" [innerHTML]="product.description"></span>
                                 </div>
                                 <!-- Variants / Combo -->
                                 <ng-container *ngIf="!product.isPackage; else comboProduct">
@@ -130,12 +165,12 @@
                                 <!-- Quantity -->
                                 <div class="flex flex-row justify-between items-center mt-4">
                                     <span class="font-semibold">Quantity:</span> 
-                                    <div class="flex flex-row h-8 w-20 rounded-lg relative border border-primary">
-                                        <button (click)="checkQuantity('decrement')" class="text-black hover:bg-primary h-full w-20 rounded-l-lg cursor-pointer outline-none pb-2">
+                                    <div class="flex flex-row h-8 w-20 rounded-md relative bg-primary">
+                                        <button (click)="checkQuantity('decrement')" class="text-white hover:bg-white hover:text-primary border border-primary h-full w-20 rounded-l-md cursor-pointer outline-none pb-2">
                                             <span class="text-2xl">−</span>
                                         </button>
-                                        <input [(ngModel)]="quantity" (change)="checkQuantity()" type="number" class="focus:outline-none text-center w-full font-semibold text-md text-black focus:text-black md:text-basecursor-default flex items-center outline-none" name="custom-input-number" value="0"/>
-                                        <button (click)="checkQuantity('increment')" class="text-black hover:bg-primary h-full w-20 rounded-r-lg cursor-pointer pb-2">
+                                        <input [(ngModel)]="quantity" (change)="checkQuantity()" type="number" class="focus:outline-none text-center w-full font-semibold text-md text-white focus:text-white md:text-basecursor-default flex items-center outline-none" name="custom-input-number" value="0"/>
+                                        <button (click)="checkQuantity('increment')" class="text-white hover:bg-white hover:text-primary border border-primary h-full w-20 rounded-r-md cursor-pointer pb-2">
                                             <span class="text-2xl">+</span>
                                         </button>
                                     </div>
@@ -165,7 +200,7 @@
                                 </form>
     
                                 <div class="flex flex-row w-full justify-between mb-2">
-                                    <p class="font-semibold">Sub Total:</p> 
+                                    <p class="font-semibold">Total:</p> 
                                     <ng-container *ngIf="displayedProduct.discountAmount>0;else noItemDiscountSubTotal">
                                         <span class="text-xl font-semibold px-2 ">{{(displayedProduct.discountedPrice * quantity) | currency: store.regionCountry.currencySymbol}}</span>
                                     </ng-container>
@@ -186,12 +221,12 @@
                                         (click)="addToCart()"
                                         mat-button>
                                     <label 
-                                        class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 border rounded-lg cursor-pointer border-primary-300 bg-primary hover:border-primary-500"
+                                        class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg cursor-pointer bg-primary"
                                         for="add-to-cart-button"
                                         matRipple>
-                                        <span class="text-sm font-semibold text-black">Add to Cart</span>
+                                        <span class="text-sm font-semibold text-white">Add to Cart</span>
                                         <mat-icon
-                                            class="hidden sm:block pl-1 text-black transform scale-75"
+                                            class="pl-1 text-white transform scale-75"
                                             [svgIcon]="'heroicons_solid:shopping-cart'"></mat-icon>
                                     </label>
         
@@ -203,12 +238,12 @@
                                         [routerLink]="['/checkout']"
                                         mat-button>
                                     <label 
-                                        class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 border rounded-lg border-green-300 bg-green-500 hover:border-green-500 cursor-pointer"
+                                        class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg bg-green-500 cursor-pointer"
                                         for="go-checkout-button"
                                         matRipple>
-                                        <span class="text-sm font-semibold text-black">Checkout</span>
+                                        <span class="text-sm font-semibold text-white">Checkout</span>
                                         <mat-icon
-                                            class="hidden sm:block pl-1 text-black transform scale-75"
+                                            class="pl-1 text-white transform scale-75"
                                             [svgIcon]="'heroicons_solid:shopping-bag'"></mat-icon>
                                     </label>
                                 </div>

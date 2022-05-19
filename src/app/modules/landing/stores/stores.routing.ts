@@ -21,6 +21,9 @@ export const landingStoresRoutes: Route[] = [
         children   : [
             {
                 path: '',
+                data: {
+                    headerTitle: ''
+                },
                 component: LandingStoreComponent,
             },
             {

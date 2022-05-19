@@ -3,7 +3,6 @@
         <!-- Stores -->
         <div class="flex flex-col pt-8">
             <!-- Search For xs view Mobile -->
-            <ng-container *ngIf="!currentScreenSize.includes('md')">
                 <mat-form-field class="w-full fuse-mat-emphasized-affix min-w-64">
                     <input
                         matInput
@@ -15,14 +14,13 @@
                     matSuffix
                     [svgIcon]="'search'"></mat-icon>
                 </mat-form-field>
-            </ng-container>
             <!-- store list -->
             <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
                 <ng-container *ngFor="let store of stores">
                     <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
                         <fuse-card
                             (click)="chooseStore(store.domain)" 
-                            class="flex flex-col rounded-lg border border-gray-300 h-60 w-40 md:w-44 mb-3 cursor-pointer filter-article">
+                            class="flex flex-col rounded-lg border border-gray-300 h-60 w-44 mb-3 cursor-pointer filter-article">
                             <img
                                 class="object-cover h-26"
                                 [src]="displayStoreLogo(store.storeAssets)">

@@ -680,4 +680,12 @@ export class LandingProductDetailsComponent implements OnInit
             return 'assets/branding/symplified/logo/symplified.png'
         }
     }
+
+    chooseStore(storeDomain:string) {
+        
+        let slug = storeDomain.split(".")[0]
+        
+        this._router.navigate(['/stores/' + slug]);
+        
+    }
 }

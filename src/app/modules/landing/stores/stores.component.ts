@@ -60,10 +60,7 @@ export class LandingStoresComponent implements OnInit
         this._storesService.stores$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((stores: Store[]) => { 
-            this.stores = stores; 
-            
-            console.log("this.stores",this.stores);
-            
+            this.stores = stores;             
 
             this._changeDetectorRef.markForCheck();
         });

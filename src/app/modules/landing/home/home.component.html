@@ -54,7 +54,7 @@
             </div>
         </div>
         <!-- Categories -->
-        <div class="flex flex-col pt-8">
+        <!-- <div class="flex flex-col pt-8">
             <div class="flex flex-row w-full items-center justify-between">
                 <span class="font-semibold text-xl">Categories</span>
                 <span [routerLink]="'/categories'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
@@ -68,6 +68,32 @@
                                 [src]="category.url">
                             <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.name}}</span>
                         </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div> -->
+        <!-- Trending Products -->
+        <div class="flex flex-col pt-8">
+            <div class="flex flex-row w-full items-center justify-between">
+                <span class="font-semibold text-xl">Trending Products</span>
+                <!-- <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span> -->
+            </div>
+            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+                <ng-container *ngFor="let location of locations">
+                    <div class="flex-wrap items-center p-1">
+                        <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
+                            <img
+                                class="object-cover h-30"
+                                [src]="location.productUrl">
+                            <div class="flex flex-col mx-2 mt-1">
+                                <span class="m-0.5 font-semibold">{{location.ProductName}}</span>
+                                <span class="m-0.5 text-gray-400">{{location.storeName}}</span>
+                                <div class="flex flex-row justify-between">
+                                    <span class="line-through text-sm font-semibold">RM 19.44</span>
+                                    <span class="font-semibold">RM 25.00</span>
+                                </div>
+                            </div>
+                        </fuse-card>
                     </div>
                 </ng-container>
             </div>
