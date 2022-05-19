@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
@@ -11,6 +11,7 @@ import { environment } from 'environments/environment';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { Error500Service } from 'app/core/error-500/error-500.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector     : 'marketplace-layout',
@@ -37,6 +38,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _userService: UserService,
@@ -187,18 +189,21 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
     }
 
     textTruncate(str, length, ending?:any){
-        if (length == null) {
-            length = 100;
-          }
-          if (ending == null) {
-            ending = '...';
-          }
-          if (str.length > length) {
+        if (length == null) { length = 100; }
+        if (ending == null) { ending = '...'; }
+        
+        if (str.length > length) {
             return str.substring(0, length - ending.length) + ending;
-          } else {
+        } else {
             return str;
-          }  
+        }
     }
 
+    goToHome() {
+        // this._router.navigate(['home']);
 
+        // Navigate to the internal redirect url (temporary)
+        const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
+        this._document.location.href = redirectURL;
+    }
 }
