@@ -103,7 +103,7 @@ export class AuthSignUpComponent implements OnInit
                 password  : ['', [Validators.required, Validators.minLength(8)]],
                 agreements: ['', Validators.requiredTrue],
                 domain    : [''],
-                countryId:['']
+                countryId : ['']
             }
         );
 
@@ -136,6 +136,10 @@ export class AuthSignUpComponent implements OnInit
      */
     signUp(): void
     {
+
+        // Patch username with email value
+        this.signUpForm.get('username').patchValue(this.signUpForm.get('email').value);
+
         // Do nothing if the form is invalid
         if ( this.signUpForm.invalid )
         {
@@ -213,7 +217,7 @@ export class AuthSignUpComponent implements OnInit
                         // // Navigate to the redirect url
                         // this._router.navigateByUrl(redirectURL);
 
-                        this._router.navigate(['/orders' ]);
+                        this.redirect();
                     },
                     exception => {
                         console.error("An error has occured : ",exception);
@@ -241,7 +245,7 @@ export class AuthSignUpComponent implements OnInit
                         // // Navigate to the redirect url
                         // this._router.navigateByUrl(redirectURL);
 
-                        this._router.navigate(['/orders' ]);
+                        this.redirect();
                     },
                     exception => {
                         console.error("An error has occur : ",exception);
@@ -341,5 +345,28 @@ export class AuthSignUpComponent implements OnInit
                     this.showAlert = true;
                 }
             );
+    }
+
+    redirect() {
+
+        // redirectURL
+        // store front domain, to be used to compare with redirectURL
+        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+        
+        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+            
+            if (redirectURL.includes(storeFrontDomain)) {
+                // Navigate to the external redirect url
+                this._document.location.href = redirectURL;
+            } else {
+                // Navigate to the internal redirect url
+                this._router.navigateByUrl(redirectURL);
+            }
+        }
+        else 
+        {
+            this._router.navigateByUrl('/signed-in-redirect');
+        }
     }
 }

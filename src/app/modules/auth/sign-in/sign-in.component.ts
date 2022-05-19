@@ -90,7 +90,7 @@ export class AuthSignInComponent implements OnInit
         // Create the form
         this.signInForm = this._formBuilder.group({
             domain      : [''],
-            username    : ['', [Validators.required]],
+            email    : ['', [Validators.required, Validators.email]],
             password    : ['', Validators.required],
             rememberMe  : ['']
         });
@@ -136,7 +136,7 @@ export class AuthSignInComponent implements OnInit
         this.showAlert = false;
 
         // Sign in
-        this._authService.signIn(this.signInForm.value)
+        this._authService.signIn({username: this.signInForm.get('email').value, password: this.signInForm.get('password').value, domain: this.signInForm.get('domain').value })
             .subscribe(
                 (customerAuthenticateResponse: CustomerAuthenticate) => {                    
                     if (customerAuthenticateResponse) {
@@ -333,11 +333,6 @@ export class AuthSignInComponent implements OnInit
 
    redirect() {
 
-        // Set the redirect url.
-        // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-        // to the correct page after a successful sign in. This way, that url can be set via
-        // routing file and we don't have to touch here.                        
-        
         // redirectURL
         // store front domain, to be used to compare with redirectURL
         const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
