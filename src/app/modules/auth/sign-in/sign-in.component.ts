@@ -345,21 +345,36 @@ export class AuthSignInComponent implements OnInit
         // redirectURL
         // store front domain, to be used to compare with redirectURL
         const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-        
-        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+
+        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId') && this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
             const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-            
+
+
             if (redirectURL.includes(storeFrontDomain)) {
                 // set url to localStorage
                 this._appleLoginService.sfUrl = redirectURL;
-            } else {
-                this._appleLoginService.sfUrl = '';
+                this._appleLoginService.guestCartId = guestCartId;
+                this._appleLoginService.storeId = storeId;
             }
-        }
-        else 
-        {
-            this._appleLoginService.sfUrl = '';
-        }
+        
+        } 
+        
+        // if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+        //     const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+            
+        //     if (redirectURL.includes(storeFrontDomain)) {
+        //         // set url to localStorage
+        //         this._appleLoginService.sfUrl = redirectURL;
+        //     } else {
+        //         this._appleLoginService.sfUrl = '';
+        //     }
+        // }
+        // else 
+        // {
+        //     this._appleLoginService.sfUrl = '';
+        // }
 
         const dialogRef = this._dialog.open( 
             AuthModalComponent,{
