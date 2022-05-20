@@ -348,7 +348,7 @@ export class AuthService
         return this._httpClient.post<any>(this.userService$ +'/customers/loginoauth', authRequest, this.socialOptions).pipe(
             switchMap(async (response: any) => {
     
-                this._logging.debug("Response from AuthService (loginOauth)" + origin,response);
+                this._logging.debug("Response from AuthService (loginOauth) " + origin,response);
 
                 // Generate jwt manually since Kalsym User Service does not have JWT
                 let jwtPayload = {

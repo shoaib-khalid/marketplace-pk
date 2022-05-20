@@ -88,9 +88,6 @@ export class AppleLoginComponent
                         this._authService.loginOauth(validateOauthRequest, "Apple Login")
                             .subscribe((loginOauthResponse)=> {
 
-                                console.log("loginOauthResponse", loginOauthResponse);
-                                
-
                                 // store front domain, to be used to compare with redirectURL
                                 const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
                                 
@@ -105,9 +102,6 @@ export class AppleLoginComponent
                                         this._cartsService.getCarts(0, 20, storeId, loginOauthResponse['session'].ownerId)
                                             .subscribe(response => {
 
-                                                console.log("getCarts", response);
-                                                
-            
                                                 if (response['data'].content.length > 0) {
                                                     
                                                     this.cart = response['data'].content[0];
@@ -116,7 +110,6 @@ export class AppleLoginComponent
                                                         // merge carts
                                                         this._cartsService.mergeCart(this.cart.id, guestCartId)
                                                             .subscribe(response => {
-            
                                                                 // remove 'sf-url' from localStorage
                                                                 localStorage.removeItem('sf-url');
                                                                 // Navigate to the external redirect url
@@ -130,11 +123,10 @@ export class AppleLoginComponent
                                                 else {
                                                     this._document.location.href = sfUrl;
                                                 }
-            
-                                        })
-            
+                                            })
                                         
                                     } else {
+
                                         localStorage.removeItem('sf-url');
                                         // Navigate to the internal redirect url
                                         this._router.navigateByUrl('/signed-in-redirect');
