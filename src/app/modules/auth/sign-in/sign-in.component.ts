@@ -159,6 +159,7 @@ export class AuthSignInComponent implements OnInit
     
                                 this._userService.user = user;
 
+                                // MERGE CART
                                 // cartId
                                 if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
                                     const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
@@ -235,8 +236,10 @@ export class AuthSignInComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
-                    .subscribe(() => {
+                    .subscribe((response) => {
 
+                        console.log('Google sign in response', response);
+                        
                         // redirectURL
                         const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
                         // store front domain, to be used to compare with redirectURL
@@ -279,7 +282,9 @@ export class AuthSignInComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
-                    .subscribe(() => {                    
+                    .subscribe((response) => {      
+                        
+                        console.log('FB sign in response', response);
                         // redirectURL
                         const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
                         // store front domain, to be used to compare with redirectURL
