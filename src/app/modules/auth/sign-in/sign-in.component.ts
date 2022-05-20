@@ -20,6 +20,7 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart } from 'app/core/cart/cart.types';
+import { AppleLoginService } from '../apple-login/apple-login.service';
 // import * as saveAs from 'file-saver';
 
 @Component({
@@ -72,7 +73,7 @@ export class AuthSignInComponent implements OnInit
         private _fuseConfirmationService: FuseConfirmationService,
         private _httpstatService: HttpStatService,
         private _cartsService: CartService,
-
+        private _appleLoginService: AppleLoginService
 
     )
     {
@@ -371,15 +372,19 @@ export class AuthSignInComponent implements OnInit
             const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
             
             if (redirectURL.includes(storeFrontDomain)) {
+                // set url to localStorage
+                this._appleLoginService.sfUrl = redirectURL;
                 // Navigate to the external redirect url
                 this._document.location.href = redirectURL;
             } else {
+                this._appleLoginService.sfUrl = '';
                 // Navigate to the internal redirect url
                 this._router.navigateByUrl(redirectURL);
             }
         }
         else 
         {
+            this._appleLoginService.sfUrl = '';
             this._router.navigateByUrl('/signed-in-redirect');
         }
 

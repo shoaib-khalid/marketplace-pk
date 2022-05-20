@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from 'app/shared/shared.module';
-import { AppleLoginComponent } from './apple.component';
+import { AppleLoginComponent } from './apple-login.component';
 import { appleLoginRoutes } from './apple-login.routing';
 
 @NgModule({

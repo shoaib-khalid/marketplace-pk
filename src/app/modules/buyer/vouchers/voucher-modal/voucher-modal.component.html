@@ -58,9 +58,9 @@
                 <div class="flex flex-col pt-2">
                     <span *ngIf="voucher.voucher.voucherTerms.length > 0" class="font-semibold text-md md:text-base">Terms & Conditions</span>
                     <div class="flex flex-col text-sm sm:text-md">
-                        <li *ngIf="storeName === null" class="text-primary">
+                        <!-- <li *ngIf="storeName === null" class="text-primary">
                             <span class="text-gray-400">Valid for all {{verticalList.join(', ')}} stores</span>
-                        </li>
+                        </li> -->
                         <li *ngIf='storeName != null' class="text-primary">
                             <span class="text-gray-400">
                                 Valid for {{storeName}} only

@@ -9,6 +9,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
 import { DOCUMENT } from '@angular/common';
+import { AppleLoginService } from './apple-login.service';
 
 
 
@@ -47,6 +48,7 @@ export class AppleLoginComponent
         private _router: Router,
         private _platformsService: PlatformService,
         private _apiServer: AppConfig,
+        private _appleLoginService: AppleLoginService
 
     )
     {
@@ -88,22 +90,25 @@ export class AppleLoginComponent
                     switchMap((resp:ValidateOauthRequest)=>this._authService.loginOauth(resp, "apple comp")),
                 )
                 .subscribe(() => {
-                    // this._router.navigate(['/orders' ]);
 
-                    // redirectURL
-                    const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
                     // store front domain, to be used to compare with redirectURL
                     const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
                     
-                    if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+                    if (this._appleLoginService.sfUrl$ && this._appleLoginService.sfUrl$ !== '') {  
+
+                        const sfUrl = this._appleLoginService.sfUrl$
                         
-                        if (redirectURL.includes(storeFrontDomain)) {
+                        if (sfUrl.includes(storeFrontDomain)) {
+                            // remove 'sf-url' from localStorage
+                            localStorage.removeItem('sf-url');
                             // Navigate to the external redirect url
-                            this._document.location.href = redirectURL;
+                            this._document.location.href = sfUrl;
                         } else {
+                            this._appleLoginService.sfUrl = '';
                             // Navigate to the internal redirect url
-                            this._router.navigateByUrl(redirectURL);
+                            this._router.navigateByUrl('/signed-in-redirect');
                         }
+                        
                     }
                     else 
                     {
