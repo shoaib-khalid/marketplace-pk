@@ -237,30 +237,42 @@ export class AuthSignInComponent implements OnInit
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
                     .subscribe((response) => {
-
-                        console.log('Google sign in response', response);
                         
-                        // redirectURL
-                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-                        // store front domain, to be used to compare with redirectURL
-                        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-                        
-                        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-                            
-                            if (redirectURL.includes(storeFrontDomain)) {
-                                // Navigate to the external redirect url
-                                this._document.location.href = redirectURL;
-                            } else {
-                                // Navigate to the internal redirect url
-                                this._router.navigateByUrl(redirectURL);
-                            }
-                        }
-                        else 
-                        {
-                            this._router.navigateByUrl('/signed-in-redirect');
-                        }
+                        // MERGE CART
+                        // cartId
+                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
+                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
 
-                        // this._router.navigate(['/orders' ]);
+                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                .subscribe(response => {
+
+                                    if (response['data'].content.length > 0) {
+                                        
+                                        this.cart = response['data'].content[0];
+
+                                        if (guestCartId != this.cart.id) {
+                                            // merge carts
+                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                .subscribe(response => {
+
+                                                    this.redirect();
+                                                })
+                                        }
+                                        this.redirect();
+                                    }
+                                    // if no existing cart for the store
+                                    else {
+                                        this.redirect();
+                                    }
+
+                                })
+                        
+                        } 
+                        // if no guestCartId/storeId, which should not be
+                        else {
+                            this.redirect();
+                        }
                     },
                     exception => {
                         console.error("An error has occured : ",exception);
@@ -284,28 +296,41 @@ export class AuthSignInComponent implements OnInit
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
                     .subscribe((response) => {      
                         
-                        console.log('FB sign in response', response);
-                        // redirectURL
-                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-                        // store front domain, to be used to compare with redirectURL
-                        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-                        
-                        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-                            
-                            if (redirectURL.includes(storeFrontDomain)) {
-                                // Navigate to the external redirect url
-                                this._document.location.href = redirectURL;
-                            } else {
-                                // Navigate to the internal redirect url
-                                this._router.navigateByUrl(redirectURL);
-                            }
-                        }
-                        else 
-                        {
-                            this._router.navigateByUrl('/signed-in-redirect');
-                        }
+                        // MERGE CART
+                        // cartId
+                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
+                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
 
-                        // this._router.navigate(['/orders' ]);
+                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                .subscribe(response => {
+
+                                    if (response['data'].content.length > 0) {
+                                        
+                                        this.cart = response['data'].content[0];
+
+                                        if (guestCartId != this.cart.id) {
+                                            // merge carts
+                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                .subscribe(response => {
+
+                                                    this.redirect();
+                                                })
+                                        }
+                                        this.redirect();
+                                    }
+                                    // if no existing cart for the store
+                                    else {
+                                        this.redirect();
+                                    }
+
+                                })
+                        
+                        } 
+                        // if no guestCartId/storeId, which should not be
+                        else {
+                            this.redirect();
+                        }
                     },
                     exception => {
                         console.error("An error has occur : ",exception);

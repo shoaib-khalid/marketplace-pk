@@ -17,6 +17,8 @@ import { DOCUMENT } from '@angular/common';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { CartService } from 'app/core/cart/cart.service';
+import { Cart } from 'app/core/cart/cart.types';
 
 
 @Component({
@@ -53,6 +55,7 @@ export class AuthSignUpComponent implements OnInit
     platform: Platform;
 
     domain :string ='';
+    cart: Cart;
 
     /**
      * Constructor
@@ -70,6 +73,7 @@ export class AuthSignUpComponent implements OnInit
         private _apiServer: AppConfig,
         private _userService: UserService,
         private _fuseConfirmationService: FuseConfirmationService,
+        private _cartsService: CartService,
 
     )
     {
@@ -211,13 +215,43 @@ export class AuthSignUpComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
-                    .subscribe(() => {
-                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                    .subscribe((response) => {
 
-                        // // Navigate to the redirect url
-                        // this._router.navigateByUrl(redirectURL);
+                        // MERGE CART
+                        // cartId
+                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
+                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
 
-                        this.redirect();
+                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                .subscribe(response => {
+
+                                    if (response['data'].content.length > 0) {
+                                        
+                                        this.cart = response['data'].content[0];
+
+                                        if (guestCartId != this.cart.id) {
+                                            // merge carts
+                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                .subscribe(response => {
+
+                                                    this.redirect();
+                                                })
+                                        }
+                                        this.redirect();
+                                    }
+                                    // if no existing cart for the store
+                                    else {
+                                        this.redirect();
+                                    }
+
+                                })
+                        
+                        } 
+                        // if no guestCartId/storeId, which should not be
+                        else {
+                            this.redirect();
+                        }
                     },
                     exception => {
                         console.error("An error has occured : ",exception);
@@ -239,13 +273,43 @@ export class AuthSignUpComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
-                    .subscribe(() => {                    
-                        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                    .subscribe((response) => {      
 
-                        // // Navigate to the redirect url
-                        // this._router.navigateByUrl(redirectURL);
+                        // MERGE CART
+                        // cartId
+                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
+                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
+                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
 
-                        this.redirect();
+                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                .subscribe(response => {
+
+                                    if (response['data'].content.length > 0) {
+                                        
+                                        this.cart = response['data'].content[0];
+
+                                        if (guestCartId != this.cart.id) {
+                                            // merge carts
+                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                .subscribe(response => {
+
+                                                    this.redirect();
+                                                })
+                                        }
+                                        this.redirect();
+                                    }
+                                    // if no existing cart for the store
+                                    else {
+                                        this.redirect();
+                                    }
+
+                                })
+                        
+                        } 
+                        // if no guestCartId/storeId, which should not be
+                        else {
+                            this.redirect();
+                        }
                     },
                     exception => {
                         console.error("An error has occur : ",exception);
