@@ -85,8 +85,11 @@ export class AppleLoginComponent
                         validateOauthRequest.email = this.clientEmail;
                         validateOauthRequest.domain = this.domain;
     
-                        this._authService.loginOauth(validateOauthRequest, "apple comp")
-                            .subscribe((response)=> {
+                        this._authService.loginOauth(validateOauthRequest, "Apple Login")
+                            .subscribe((loginOauthResponse)=> {
+
+                                console.log("loginOauthResponse", loginOauthResponse);
+                                
 
                                 // store front domain, to be used to compare with redirectURL
                                 const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
@@ -99,8 +102,11 @@ export class AppleLoginComponent
                                                             
                                     if (sfUrl.includes(storeFrontDomain)) {
             
-                                        this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                        this._cartsService.getCarts(0, 20, storeId, loginOauthResponse['session'].ownerId)
                                             .subscribe(response => {
+
+                                                console.log("getCarts", response);
+                                                
             
                                                 if (response['data'].content.length > 0) {
                                                     
@@ -116,8 +122,9 @@ export class AppleLoginComponent
                                                                 // Navigate to the external redirect url
                                                                 this._document.location.href = sfUrl;
                                                             })
+                                                    } else {
+                                                        this._document.location.href = sfUrl;
                                                     }
-                                                    this._document.location.href = sfUrl;
                                                 }
                                                 // if no existing cart for the store
                                                 else {

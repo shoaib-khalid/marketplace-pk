@@ -236,7 +236,7 @@ export class AuthSignInComponent implements OnInit
                 this.validateOauthRequest.domain = this.domain;
 
                 
-                this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-google')
+                this._authService.loginOauth(this.validateOauthRequest,'Google Login')
                     .subscribe((response) => {
                         
                         // MERGE CART
@@ -294,7 +294,7 @@ export class AuthSignInComponent implements OnInit
                 this.validateOauthRequest.domain = this.domain;
 
                 
-                this._authService.loginOauth(this.validateOauthRequest,'sign-in-comp-facebook')
+                this._authService.loginOauth(this.validateOauthRequest,'Facebook Login')
                     .subscribe((response) => {      
                         
                         // MERGE CART
