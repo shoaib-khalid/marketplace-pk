@@ -342,6 +342,28 @@ export class AuthSignInComponent implements OnInit
 
     signInWithApple(): void {
 
+        // redirectURL
+        // store front domain, to be used to compare with redirectURL
+        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+        
+        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+            
+            if (redirectURL.includes(storeFrontDomain)) {
+                // set url to localStorage
+                this._appleLoginService.sfUrl = redirectURL;
+            } else {
+                this._appleLoginService.sfUrl = '';
+                // Navigate to the internal redirect url
+                this._router.navigateByUrl(redirectURL);
+            }
+        }
+        else 
+        {
+            this._appleLoginService.sfUrl = '';
+            this._router.navigateByUrl('/signed-in-redirect');
+        }
+
         const dialogRef = this._dialog.open( 
             AuthModalComponent,{
                 width : '520px',
@@ -372,19 +394,15 @@ export class AuthSignInComponent implements OnInit
             const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
             
             if (redirectURL.includes(storeFrontDomain)) {
-                // set url to localStorage
-                this._appleLoginService.sfUrl = redirectURL;
                 // Navigate to the external redirect url
                 this._document.location.href = redirectURL;
             } else {
-                this._appleLoginService.sfUrl = '';
                 // Navigate to the internal redirect url
                 this._router.navigateByUrl(redirectURL);
             }
         }
         else 
         {
-            this._appleLoginService.sfUrl = '';
             this._router.navigateByUrl('/signed-in-redirect');
         }
 
