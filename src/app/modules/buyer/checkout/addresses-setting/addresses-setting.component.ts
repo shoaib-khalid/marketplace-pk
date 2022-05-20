@@ -1,32 +1,25 @@
-import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, NgForm, ValidationErrors, Validators } from '@angular/forms';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { DOCUMENT } from '@angular/common'; 
-import { CartService } from 'app/core/cart/cart.service';
-import { CartItem } from 'app/core/cart/cart.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
-import { of, Subject, Subscription, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
-import { takeWhile, scan, tap } from "rxjs/operators";
-import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged } from 'rxjs/operators';
-import { CheckoutService } from './checkout.service';
-import { CheckoutValidationService } from './checkout.validation.service';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address, CartDiscount, DeliveryProvider, DeliveryProviderGroup, Order, Payment } from './checkout.types';
-import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
-import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { AddAddressComponent } from './add-address/add-address.component';
-import { EditAddressComponent } from './edit-address/edit-address.component';
-import { AuthService } from 'app/core/auth/auth.service';
-import { CustomerAuthenticate } from 'app/core/auth/auth.types';
-import { UserService } from 'app/core/user/user.service';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { MatButton } from '@angular/material/button';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { Notification } from 'app/layout/common/notifications/notifications.types';
+import { NotificationsService } from 'app/layout/common/notifications/notifications.service';
 import { Loader } from '@googlemaps/js-api-loader';
+import { AddAddressComponent } from '../add-address/add-address.component';
+import { MatDialog } from '@angular/material/dialog';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { Address } from '../checkout.types';
+import { CheckoutService } from '../checkout.service';
+import { EditAddressComponent } from '../edit-address/edit-address.component';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
 
 @Component({
-    selector     : 'buyer-checkout',
-    templateUrl  : './checkout.component.html',
+    selector       : 'addresses-setting',
+    templateUrl    : './addresses-setting.component.html',
+    encapsulation  : ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    exportAs       : 'addresses-setting',
     styles       : [
         `
             /** Custom input number **/
@@ -82,22 +75,17 @@ import { Loader } from '@googlemaps/js-api-loader';
         `
     ]
 })
-export class BuyerCheckoutComponent implements OnInit
+export class AddressesSettingComponent implements OnInit, OnDestroy
 {
+    @ViewChild('notificationsOrigin') private _notificationsOrigin: MatButton;
+    @ViewChild('notificationsPanel') private _notificationsPanel: TemplateRef<any>;
 
+    notifications: Notification[];
+    unreadCount: number = 0;
+    private _overlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    @ViewChild('checkoutNgForm') signInNgForm: NgForm;
-    @ViewChild('checkoutContainer') checkoutContainer: ElementRef;
-    
-    checkoutForm: FormGroup;
 
     currentScreenSize: string[] = [];
-
-    inputPromoCode:string ='';
-    discountAmountVoucherApplied: number = 0.00;
-    displaydiscountAmountVoucherApplied:any = 0.00;
-    customerAuthenticate: CustomerAuthenticate;
-    user: any;
     customerAddresses: Address[] = [];
 
     //------------------------
@@ -130,26 +118,28 @@ export class BuyerCheckoutComponent implements OnInit
      * Constructor
      */
     constructor(
-        private _formBuilder: FormBuilder,
-
         private _checkoutService: CheckoutService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _authService: AuthService,
-        private _userService: UserService,
-
-        private _datePipe: DatePipe,
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _notificationsService: NotificationsService,
+        private _overlay: Overlay,
+        private _viewContainerRef: ViewContainerRef,
         private _dialog: MatDialog,
-        private _router: Router,
-        @Inject(DOCUMENT) document: Document
     )
     {
     }
 
-    ngOnInit() {
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
 
-        // //to implement get current location first to be display if in db is null
+    /**
+     * On init
+     */
+    ngOnInit(): void
+    {
+        //to implement get current location first to be display if in db is null
         navigator.geolocation.getCurrentPosition((position) => {
             var crd = position.coords;
             this.currentLat = crd.latitude;
@@ -315,49 +305,12 @@ export class BuyerCheckoutComponent implements OnInit
             
         });
 
-        // Create the support form
-        this.checkoutForm = this._formBuilder.group({
-            // Main Store Section
-            id                  : ['undefined'],
-            fullName            : ['', Validators.required],
-            // firstName           : ['', Validators.required],
-            // lastName            : ['', Validators.required],
-            email               : ['', [Validators.required, CheckoutValidationService.emailValidator]],
-            phoneNumber         : ['', CheckoutValidationService.phonenumberValidator],
-            address             : ['', Validators.required],
-            storePickup         : [false],
-            postCode            : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), CheckoutValidationService.postcodeValidator]],
-            state               : ['', Validators.required],
-            city                : ['', Validators.required],
-            deliveryProviderId  : ['', CheckoutValidationService.deliveryProviderValidator],
-            country             : [''],
-            regionCountryStateId: [''],
-            specialInstruction  : [''],
-            saveMyInfo          : [true]
-        });
-
-        this._authService.customerAuthenticate$
-        .subscribe((response: CustomerAuthenticate) => {
-            
-            this.customerAuthenticate = response;
-
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
         // Get customer Addresses
         this._checkoutService.customerAddresses$
         .subscribe((response: Address[]) => {
             
-            this.customerAddresses = response
+            this.customerAddresses = response            
             
-        });
-
-        this._userService.get(this.customerAuthenticate.session.ownerId)
-        .subscribe((response)=>{
-
-            this.user = response.data
- 
         });
 
         // ----------------------
@@ -365,17 +318,31 @@ export class BuyerCheckoutComponent implements OnInit
         // ----------------------
 
         this._fuseMediaWatcherService.onMediaChange$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(({matchingAliases}) => {               
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(({matchingAliases}) => {               
 
-                this.currentScreenSize = matchingAliases;                
+            this.currentScreenSize = matchingAliases;                
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Subscribe to notification changes
+        this._notificationsService.notifications$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((notifications: Notification[]) => {
+
+                // Load the notifications
+                this.notifications = notifications;
+
+                // Calculate the unread count
+                this._calculateUnreadCount();
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
     }
-    
+
     /**
      * On destroy
      */
@@ -384,42 +351,87 @@ export class BuyerCheckoutComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+
+        // Dispose the overlay
+        if ( this._overlayRef )
+        {
+            this._overlayRef.dispose();
+        }
     }
-    
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    displayError(message: string) {
-        const confirmation = this._fuseConfirmationService.open({
-            "title": "Error",
-            "message": message,
-            "icon": {
-            "show": true,
-            "name": "heroicons_outline:exclamation",
-            "color": "warn"
-            },
-            "actions": {
-            "confirm": {
-                "show": true,
-                "label": "Okay",
-                "color": "warn"
-            },
-            "cancel": {
-                "show": false,
-                "label": "Cancel"
-            }
-            },
-            "dismissible": true
-        });
+    /**
+     * Open the notifications panel
+     */
+    openPanel(): void
+    {
+        // Return if the notifications panel or its origin is not defined
+        if ( !this._notificationsPanel || !this._notificationsOrigin )
+        {
+            return;
+        }
 
-        return confirmation;
+        // Create the overlay if it doesn't exist
+        if ( !this._overlayRef )
+        {
+            this._createOverlay();
+        }
+
+        // Attach the portal to the overlay
+        this._overlayRef.attach(new TemplatePortal(this._notificationsPanel, this._viewContainerRef));
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
+    /**
+     * Close the notifications panel
+     */
+    closePanel(): void
+    {
+        this._overlayRef.detach();
+    }
 
+    /**
+     * Mark all notifications as read
+     */
+    markAllAsRead(): void
+    {
+        // Mark all as read
+        this._notificationsService.markAllAsRead().subscribe();
+    }
+
+    /**
+     * Toggle read status of the given notification
+     */
+    toggleRead(notification: Notification): void
+    {
+        // Toggle the read status
+        notification.read = !notification.read;
+
+        // Update the notification
+        this._notificationsService.update(notification.id, notification).subscribe();
+    }
+
+    /**
+     * Delete the given notification
+     */
+    delete(notification: Notification): void
+    {
+        // Delete the notification
+        this._notificationsService.delete(notification.id).subscribe();
+    }
+
+    /**
+     * Track by function for ngFor loops
+     *
+     * @param index
+     * @param item
+     */
+    trackByFn(index: number, item: any): any
+    {
+        return item.id || index;
+    }
 
     addNewAddress() : void 
     {
@@ -461,12 +473,12 @@ export class BuyerCheckoutComponent implements OnInit
             message: 'Are you sure you want to remove this Address ?',
             icon:{
                 name:"mat_outline:delete_forever",
-                color:"primary"
+                color:"warn"
             },
             actions: {
                 confirm: {
                     label: 'Delete',
-                    color: 'primary'
+                    color: 'warn'
                 }
             }
         });
@@ -487,83 +499,73 @@ export class BuyerCheckoutComponent implements OnInit
         });
     }
 
-    // getLocation() {
-    //     if (navigator.geolocation) {
-    //     navigator.geolocation.getCurrentPosition(showPosition);
-    //     } else {
-    //     alert("Geolocation is not supported by this browser.");
-    //     }
-    // }
-    // showPosition(position) {
-    //     var lat = position.coords.latitude;
-    //     var lng = position.coords.longitude;
-    //     map.setCenter(new google.maps.LatLng(lat, lng));
-    // }
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
 
-    // checkPickupOrder(){
-    //     if
-    //     this.checkoutForm.get('state').setErrors({required: false});
-    //     this.checkoutForm.get('city').setErrors({required: false});
-    //     this.checkoutForm.get('postCode').setErrors({required: false});
-    //     this.checkoutForm.get('address').setErrors({required: false});
-    // }
+    /**
+     * Create the overlay
+     */
+    private _createOverlay(): void
+    {
+        // Create the overlay
+        this._overlayRef = this._overlay.create({
+            hasBackdrop     : true,
+            backdropClass   : 'fuse-backdrop-on-mobile',
+            scrollStrategy  : this._overlay.scrollStrategies.block(),
+            positionStrategy: this._overlay.position()
+                                  .flexibleConnectedTo(this._notificationsOrigin._elementRef.nativeElement)
+                                  .withLockedPosition(true)
+                                  .withPush(true)
+                                  .withPositions([
+                                      {
+                                          originX : 'start',
+                                          originY : 'bottom',
+                                          overlayX: 'start',
+                                          overlayY: 'top'
+                                      },
+                                      {
+                                          originX : 'start',
+                                          originY : 'top',
+                                          overlayX: 'start',
+                                          overlayY: 'bottom'
+                                      },
+                                      {
+                                          originX : 'end',
+                                          originY : 'bottom',
+                                          overlayX: 'end',
+                                          overlayY: 'top'
+                                      },
+                                      {
+                                          originX : 'end',
+                                          originY : 'top',
+                                          overlayX: 'end',
+                                          overlayY: 'bottom'
+                                      }
+                                  ])
+        });
 
-    redeemPromoCode(){
+        // Detach the overlay from the portal on backdrop click
+        this._overlayRef.backdropClick().subscribe(() => {
+            this._overlayRef.detach();
+        });
+    }
 
-        // dummy data promo code available
-        let voucherCodes =[
-            'FREESHIPPING',
-            'RAYADEALS'
-        ]
+    /**
+     * Calculate the unread count
+     *
+     * @private
+     */
+    private _calculateUnreadCount(): void
+    {
+        let count = 0;
 
-        //IF VOUCHER EXIST
-        if(voucherCodes.includes(this.inputPromoCode)){
-            const confirmation = this._fuseConfirmationService.open({
-                title  : '', 
-                message: 'Voucher code applied',
-                icon       : {
-                    show : false,
-                },
-                actions: {
-                    confirm: {
-                        label: 'OK',
-                        color: 'primary'
-                    },
-                    cancel : {
-                        show : false,
-                    }
-                }
-            });
-            //to show the dusocunted price when voucher applied
-            this.discountAmountVoucherApplied = 10.50;
-            this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
-           
-        } 
-        else{
-            const confirmation = this._fuseConfirmationService.open({
-                title  : '',
-                message: 'Invalid code, please try again',
-                icon       : {
-                    show : false,
-                },
-                actions: {
-                    confirm: {
-                        label: 'OK',
-                        color: 'primary'
-                    },
-                    cancel : {
-                        show : false,
-                    }
-                }
-            });
+        if ( this.notifications && this.notifications.length )
+        {
+            count = this.notifications.filter(notification => !notification.read).length;
         }
-    }
 
-    selectOnVoucher(value:string){
-
-        //to show the disocunted price when voucher applied
-        this.discountAmountVoucherApplied = parseFloat(value);
-        this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
-                  
+        this.unreadCount = count;
     }
+    
 }

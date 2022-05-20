@@ -5,7 +5,9 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 import { UserService } from 'app/core/user/user.service';
+import { Subject, takeUntil } from 'rxjs';
 import { CheckoutService } from '../checkout.service';
 import { CheckoutValidationService } from '../checkout.validation.service';
 
@@ -15,7 +17,10 @@ import { CheckoutValidationService } from '../checkout.validation.service';
 })
 export class AddAddressComponent implements OnInit {
 
+  private _unsubscribeAll: Subject<any> = new Subject<any>();
+
   createAddressForm: FormGroup;
+  platform: Platform;
 
   showButton: boolean = false;
   addresses: string[];
@@ -33,8 +38,7 @@ export class AddAddressComponent implements OnInit {
     private _checkoutService: CheckoutService,
     private _authService: AuthService,
     private _userService: UserService,
-    private _platformService : PlatformService,
-    private _platformLocation: PlatformLocation,
+    private _platformsService: PlatformService,
 
 
     @Inject(MAT_DIALOG_DATA) private data: any
@@ -68,18 +72,23 @@ export class AddAddressComponent implements OnInit {
 
         this.user = response.data
     
-        this._platformService.set()
-        .subscribe((response) =>{
+        this._platformsService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => { 
 
-          this.state = response.country
-          
-        })
+          this.platform = platform;
+
+          this._changeDetectorRef.markForCheck();
+
+        });
         
         // Get states
-        this._checkoutService.getStoreRegionCountryState(this.state)
+        this._checkoutService.getStoreRegionCountryState(this.platform.country)
         .subscribe((response)=>{
           
           this.regionCountryStates = response;
+          console.log('this.regionCountryStates',this.regionCountryStates);
+          
 
           // Mark for check
           this._changeDetectorRef.markForCheck();

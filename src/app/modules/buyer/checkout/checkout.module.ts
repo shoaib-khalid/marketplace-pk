@@ -19,13 +19,14 @@ import { FuseCardModule } from '@fuse/components/card';
 import { AddAddressComponent } from './add-address/add-address.component';
 import { EditAddressComponent } from './edit-address/edit-address.component';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
+import { AddressesSettingModule } from './addresses-setting/addresses-setting.module';
 
 @NgModule({
     declarations: [
         BuyerCheckoutComponent,
         AddAddressComponent,
         EditAddressComponent,
-        ModalConfirmationDeleteItemComponent
+        ModalConfirmationDeleteItemComponent,
     ],
     imports     : [
         RouterModule.forChild(BuyerCheckoutRoutes),
@@ -41,7 +42,8 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
         MatRadioModule,
         FuseCardModule,
         MatExpansionModule,
-        SharedModule
+        SharedModule,
+        AddressesSettingModule
     ],
     providers   : [
         DatePipe

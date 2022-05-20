@@ -5,10 +5,19 @@ import { AddressResolver } from './checkout.resolver';
 export const BuyerCheckoutRoutes: Route[] = [
     {
         path     : '',
-        resolve  : {
-            address: AddressResolver,
-            // categories: StoreCategoriesResolver
-        },
-        component: BuyerCheckoutComponent
+        children   : [
+            {
+                path: '',
+                data: {
+                    headerTitle: 'Checkout'
+                },
+                resolve  : {
+                    address: AddressResolver,
+                    // categories: StoreCategoriesResolver
+                },
+                component: BuyerCheckoutComponent
+            }
+        ]
+
     }
 ];
