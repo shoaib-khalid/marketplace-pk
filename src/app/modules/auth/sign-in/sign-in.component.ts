@@ -354,14 +354,11 @@ export class AuthSignInComponent implements OnInit
                 this._appleLoginService.sfUrl = redirectURL;
             } else {
                 this._appleLoginService.sfUrl = '';
-                // Navigate to the internal redirect url
-                this._router.navigateByUrl(redirectURL);
             }
         }
         else 
         {
             this._appleLoginService.sfUrl = '';
-            this._router.navigateByUrl('/signed-in-redirect');
         }
 
         const dialogRef = this._dialog.open( 
