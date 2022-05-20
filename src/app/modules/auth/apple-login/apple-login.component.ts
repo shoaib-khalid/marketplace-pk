@@ -1,4 +1,4 @@
-import { Component, Inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { JwtService } from 'app/core/jwt/jwt.service';
@@ -27,12 +27,6 @@ export class AppleLoginComponent
     jwtData:string;
     clientEmail:string;
 
-    countryCode : string = '';
-
-
-    //validate Payload
-    validateOauthRequest : ValidateOauthRequest;
-
     platform: Platform;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -45,6 +39,7 @@ export class AppleLoginComponent
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        private _changeDetectorRef: ChangeDetectorRef,
         private _activatedRoute: ActivatedRoute,
         private _jwtService: JwtService,
         private _authService: AuthService,
@@ -76,75 +71,78 @@ export class AppleLoginComponent
             this.domain = this._apiServer.settings.storeFrontDomain;
 
             this._platformsService.platform$
-                .pipe(
-                    map((resp)=>{
-                        this.platform = resp;
-                        
-                        this.countryCode = this.platform.country;
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((platform: Platform) => {
 
-                        this.validateOauthRequest = new ValidateOauthRequest();
-                        this.validateOauthRequest.country = this.countryCode;
-                        this.validateOauthRequest.loginType = "APPLE";
-                        this.validateOauthRequest.token = this.idToken;
-                        this.validateOauthRequest.email = this.clientEmail;
-                        this.validateOauthRequest.domain = this.domain;
+                    this.platform = platform;    
 
-                        return this.validateOauthRequest;
-                    }),
-                    switchMap((resp:ValidateOauthRequest)=>this._authService.loginOauth(resp, "apple comp")),
-                )
-                .subscribe((response) => {
+                    if (this.platform) {
 
-                    // store front domain, to be used to compare with redirectURL
-                    const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-                    
-                    if (this._appleLoginService.sfUrl$ && this._appleLoginService.guestCartId$ && this._appleLoginService.storeId$ ) {  
+                        let validateOauthRequest: ValidateOauthRequest = new ValidateOauthRequest();
+                        validateOauthRequest.country = this.platform.country;
+                        validateOauthRequest.loginType = "APPLE";
+                        validateOauthRequest.token = this.idToken;
+                        validateOauthRequest.email = this.clientEmail;
+                        validateOauthRequest.domain = this.domain;
+    
+                        this._authService.loginOauth(validateOauthRequest, "apple comp")
+                            .subscribe((response)=> {
 
-                        const sfUrl = this._appleLoginService.sfUrl$;
-                        const guestCartId = this._appleLoginService.guestCartId$;
-                        const storeId = this._appleLoginService.storeId$;
-                                                
-                        if (sfUrl.includes(storeFrontDomain)) {
-
-                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
-                                .subscribe(response => {
-
-                                    if (response['data'].content.length > 0) {
-                                        
-                                        this.cart = response['data'].content[0];
-
-                                        if (guestCartId != this.cart.id) {
-                                            // merge carts
-                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                .subscribe(response => {
-
-                                                    // remove 'sf-url' from localStorage
-                                                    localStorage.removeItem('sf-url');
-                                                    // Navigate to the external redirect url
+                                // store front domain, to be used to compare with redirectURL
+                                const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                                
+                                if (this._appleLoginService.sfUrl$ && this._appleLoginService.guestCartId$ && this._appleLoginService.storeId$ ) {  
+            
+                                    const sfUrl = this._appleLoginService.sfUrl$;
+                                    const guestCartId = this._appleLoginService.guestCartId$;
+                                    const storeId = this._appleLoginService.storeId$;
+                                                            
+                                    if (sfUrl.includes(storeFrontDomain)) {
+            
+                                        this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
+                                            .subscribe(response => {
+            
+                                                if (response['data'].content.length > 0) {
+                                                    
+                                                    this.cart = response['data'].content[0];
+            
+                                                    if (guestCartId != this.cart.id) {
+                                                        // merge carts
+                                                        this._cartsService.mergeCart(this.cart.id, guestCartId)
+                                                            .subscribe(response => {
+            
+                                                                // remove 'sf-url' from localStorage
+                                                                localStorage.removeItem('sf-url');
+                                                                // Navigate to the external redirect url
+                                                                this._document.location.href = sfUrl;
+                                                            })
+                                                    }
                                                     this._document.location.href = sfUrl;
-                                                })
-                                        }
-                                        this._document.location.href = sfUrl;
+                                                }
+                                                // if no existing cart for the store
+                                                else {
+                                                    this._document.location.href = sfUrl;
+                                                }
+            
+                                        })
+            
+                                        
+                                    } else {
+                                        localStorage.removeItem('sf-url');
+                                        // Navigate to the internal redirect url
+                                        this._router.navigateByUrl('/signed-in-redirect');
                                     }
-                                    // if no existing cart for the store
-                                    else {
-                                        this._document.location.href = sfUrl;
-                                    }
-
-                            })
-
-                            
-                        } else {
-                            localStorage.removeItem('sf-url');
-                            // Navigate to the internal redirect url
-                            this._router.navigateByUrl('/signed-in-redirect');
-                        }
-                        
+                                    
+                                }
+                                else 
+                                {
+                                    this._router.navigateByUrl('/signed-in-redirect');
+                                }
+                            });
                     }
-                    else 
-                    {
-                        this._router.navigateByUrl('/signed-in-redirect');
-                    }
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
                 });
           });
      } 
