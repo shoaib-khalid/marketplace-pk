@@ -313,27 +313,4 @@ export class AuthSignInComponent implements OnInit
        
    }
 
-//    redirect() {
-
-//         // redirectURL
-//         // store front domain, to be used to compare with redirectURL
-//         const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-        
-//         if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-//             const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-            
-//             if (redirectURL.includes(storeFrontDomain)) {
-//                 // Navigate to the external redirect url
-//                 this._document.location.href = redirectURL;
-//             } else {
-//                 // Navigate to the internal redirect url
-//                 this._router.navigateByUrl(redirectURL);
-//             }
-//         }
-//         else 
-//         {
-//             this._router.navigateByUrl('/signed-in-redirect');
-//         }
-
-//    }
 }
