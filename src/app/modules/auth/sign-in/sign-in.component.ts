@@ -211,7 +211,7 @@ export class AuthSignInComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'Google Login')
-                    .subscribe((response) => {
+                    .subscribe((loginOauthResponse) => {
 
                         const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ? this._activatedRoute.snapshot.queryParamMap.get('redirectURL') : null;
                         const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId') ? this._activatedRoute.snapshot.queryParamMap.get('guestCartId') : null;
@@ -220,7 +220,7 @@ export class AuthSignInComponent implements OnInit
                         // Merge cart
                         if (guestCartId && storeId) {  
                         
-                            this._cartsService.mergeAndRedirect(guestCartId, storeId, response.id, redirectURL);
+                            this._cartsService.mergeAndRedirect(guestCartId, storeId, loginOauthResponse['session'].ownerId, redirectURL);
                         
                         } 
                         // if no guestCartId/storeId
@@ -248,7 +248,7 @@ export class AuthSignInComponent implements OnInit
 
                 
                 this._authService.loginOauth(this.validateOauthRequest,'Facebook Login')
-                    .subscribe((response) => {      
+                    .subscribe((loginOauthResponse) => {      
 
                         const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ? this._activatedRoute.snapshot.queryParamMap.get('redirectURL') : null;
                         const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId') ? this._activatedRoute.snapshot.queryParamMap.get('guestCartId') : null;
@@ -257,7 +257,7 @@ export class AuthSignInComponent implements OnInit
                         // Merge cart
                         if (guestCartId && storeId) {  
                         
-                            this._cartsService.mergeAndRedirect(guestCartId, storeId, response.id, redirectURL);
+                            this._cartsService.mergeAndRedirect(guestCartId, storeId, loginOauthResponse['session'].ownerId, redirectURL);
                         
                         } 
                         // if no guestCartId/storeId
@@ -266,7 +266,7 @@ export class AuthSignInComponent implements OnInit
                         }
                     },
                     exception => {
-                        console.error("An error has occur : ",exception);
+                        console.error("An error has occured : ",exception);
 
                     });
             });
