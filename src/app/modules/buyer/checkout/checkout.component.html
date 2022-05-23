@@ -14,97 +14,46 @@
                 <ng-container *ngIf="true">
                     <!-- Checkout form section -->
                     <div class="flex flex-col order-1 w-full md:min-w-120 md:max-w-180">
-                        <!-- Delivery Address -->
-                        <div class="w-full flex flex-col sm:border-b pb-2">
-                            <h1 class="text-2xl font-bold pb-2 hidden sm:block">Delivery Addresses</h1>
-                            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                                <ng-container *ngFor="let Address of customerAddresses">
-                                    <div class="hidden sm:block flex-wrap items-center p-1">
-                                        <fuse-card class="flex flex-col w-80 h-48 rounded-lg p-4 bg-primary-50 border border-primary-300 cursor-pointer">
-                                            <div class="flex flex-row justify-between">
-                                                <div class="flex flex-col">
-                                                    <h3 class="text-lg font-semibold leading-tight">{{Address.name}}</h3>
-                                                    <h3 class="font-medium">{{Address.phoneNumber}}</h3>
-                                                    <!-- <div class="flex flex-col ml-6">
-                                                        <div class="text-2xl font-semibold leading-tight">Mountain tops</div>
-                                                        <div class="text-secondary font-medium text-md">Travel locations</div>
-                                                    </div> -->
+                        <!-- Delivery Addresses for mobile view -->
+                        <div class="w-full block sm:hidden flex-col">
+                            <mat-accordion class="max-w-4xl mt-8">
+                                <ng-container>
+                                    <mat-expansion-panel class="border-gray-300 border ">
+                                        <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                                            <mat-panel-title class="font-medium leading-tight">Delivery Addresses</mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <div class="pb-1">
+                                            <!-- <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                                <div (click)="addNewAddress()" class="pl-4 pr-3 flex flex-row w-full justify-between">
+                                                    <span>Add New Address</span>
+                                                    <mat-icon svgIcon="add"></mat-icon>
                                                 </div>
-                                                <div class="flex flex-row">
-                                                    <h3 class="text-primary font-bold">Default</h3>
-                                                    <mat-icon class="text-primary pl-1" svgIcon="mat_solid:verified"></mat-icon>
-                                                </div>
-                                            </div>
-                                            <div class="mt-6 w-full h-full">{{Address.address}}, {{Address.postCode}}, {{Address.city}}, {{Address.state}}</div>
-                                            <div class="flex flex-row justify-between pt-4">
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-primary" svgIcon="heroicons_outline:pencil-alt"></mat-icon>
-                                                    <span (click)="editAddress(Address.id)" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700 pr-5">Edit</span>
-                                                </div>
-                                                <div class="flex flex-row">
-                                                    <mat-icon class="text-center text-primary" svgIcon="heroicons_outline:trash"></mat-icon>
-                                                    <span (click)="deleteAddress(Address.id)" class="pl-1 pt-0.5 font-bold text-primary hover:text-primary-700">Delete</span>
-                                                </div>
-                                                <div class="flex flex-row pl-4">
-                                                    <mat-icon class="text-center text-primary-700" svgIcon="heroicons_outline:clipboard-check"></mat-icon>
-                                                    <span class="pl-1 pt-0.5 font-bold text-primary-700">Selected</span>
-                                                </div>
-                                            </div>
-                                        </fuse-card>
-                                    </div>
-                                </ng-container>
-                                <div class="hidden sm:block flex-wrap items-center p-1">
-                                    <fuse-card
-                                        (click)="addNewAddress()" 
-                                        class="flex flex-col w-80 h-48 rounded-lg border border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
-                                        <div class="w-full pt-14 items-center justify-center flex flex-col">
-                                            <mat-icon class="text-primary w-10 h-10 items-center" svgIcon="add"></mat-icon>
-                                            <span class="text-primary text-center text-lg">Add New Address</span>
+                                            </div> -->
+                                            <addresses-setting></addresses-setting>
                                         </div>
-                                    </fuse-card>
-                                </div>
-                                <!-- Delivery Addresses for mobile view -->
-                                <div class="w-full block sm:hidden flex-col">
-                                    <mat-accordion class="max-w-4xl mt-8">
-                                        <ng-container>
-                                            <mat-expansion-panel class="border-gray-300 border ">
-                                                <mat-expansion-panel-header [collapsedHeight]="'56px'">
-                                                    <mat-panel-title class="font-medium leading-tight">Delivery Addresses</mat-panel-title>
-                                                </mat-expansion-panel-header>
-                                                <div class="pb-1">
-                                                    <!-- <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
-                                                        <div (click)="addNewAddress()" class="pl-4 pr-3 flex flex-row w-full justify-between">
-                                                            <span>Add New Address</span>
-                                                            <mat-icon svgIcon="add"></mat-icon>
-                                                        </div>
-                                                    </div> -->
-                                                    <addresses-setting></addresses-setting>
-                                                </div>
-                                                <ng-container *ngFor="let Address of customerAddresses">
-                                                    <div class="pb-1 group">
-                                                        <div class="w-full p-2 border-t border-gray-300 group-hover:border-primary-300 group-hover:bg-primary-50 cursor-pointer">
-                                                            <div class="flex flex-col w-full">
-                                                                <div class="flex flex-col">
-                                                                    <div class="flex flex-row justify-between">
-                                                                        <span class="font-semibold">{{Address.name}}</span>
-                                                                        <div class="flex flex-row justify-end">
-                                                                            <span class="text-primary">Default</span>
-                                                                            <mat-icon class="text-primary pl-1" svgIcon="mat_solid:verified"></mat-icon>
-                                                                        </div>
-                                                                    </div>
-                                                                    <span class="font-semibold">{{Address.phoneNumber}}</span>
-                                                                    <span>{{Address.address}}, {{Address.postCode}}, {{Address.city}}, {{Address.state}}</span>
+                                        <ng-container *ngFor="let Address of customerAddresses">
+                                            <div class="pb-1 group">
+                                                <div class="w-full p-2 border-t border-gray-300 group-hover:border-primary-300 group-hover:bg-primary-50 cursor-pointer">
+                                                    <div class="flex flex-col w-full">
+                                                        <div class="flex flex-col">
+                                                            <div class="flex flex-row justify-between">
+                                                                <span class="font-semibold">{{Address.name}}</span>
+                                                                <div class="flex flex-row justify-end">
+                                                                    <span class="text-primary">Default</span>
+                                                                    <mat-icon class="text-primary pl-1" svgIcon="mat_solid:verified"></mat-icon>
                                                                 </div>
                                                             </div>
+                                                            <span class="font-semibold">{{Address.phoneNumber}}</span>
+                                                            <span>{{Address.address}}, {{Address.postCode}}, {{Address.city}}, {{Address.state}}</span>
                                                         </div>
-                                                        <div class="border-t border-gray-300 group-hover:bg-primary-50 group-hover:border-primary-300"></div>
                                                     </div>
-                                                </ng-container>
-                                            </mat-expansion-panel>
+                                                </div>
+                                                <div class="border-t border-gray-300 group-hover:bg-primary-50 group-hover:border-primary-300"></div>
+                                            </div>
                                         </ng-container>
-                                    </mat-accordion>
-                                </div>
-                            </div>
+                                    </mat-expansion-panel>
+                                </ng-container>
+                            </mat-accordion>
                         </div>
                         <!-- Pin Location -->
                         <!-- <div class="flex flex-col my-4 w-full">
@@ -124,117 +73,131 @@
                         <!-- Stores Checkout-->
                         <div class="flex flex-col w-full">
                             <!-- Container -->
-                            <div class="flex flex-col justify-center mt-4 w-full">
+                            <div class="flex flex-col justify-center mt-2 sm:mt-0 w-full">
                                 <!-- Order Details -->
                                 <div class="flex flex-col w-full">
                                     <!-- Orders -->
                                     <ng-container *ngIf="true">
                                         <ng-container *ngIf="true">
+                                            <div class="hidden sm:block border-gray-300 sm:border-b-2">
+                                                <!-- Body -->
+                                                <div 
+                                                    class="flex flex-row items-center justify-around w-full py-2 sm:px-2">
+                                                    <div class="w-full ">
+                                                        <h3 class="font-bold">Products</h3>
+                                                    </div>
+                                                    <div class="w-full flex flex-row justify-between sm:max-w-80">
+                                                        <h3 class="font-bold items-center">Quantity</h3>
+                                                        <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
+                                                        <h3 class="font-bold">Price</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <!-- <ng-container *ngFor="let orderDetails of ordersDetails"> -->
-                                                <!-- Orders -->
-                                                <div class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-2 mb-4">
-                                                    <div class="flex flex-col w-full">
-                                                        <!-- Header -->
-                                                        <div class="flex flex-row my-3 items-start justify-between w-full sm:px-2">
-                                                            <!-- Store Details -->
-                                                            <div class="flex flex-row">
-                                                                <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
-                                                                <div class="flex flex-col px-2">
-                                                                    <h3 class="font-bold text-lg">Sinema Online</h3>
-                                                                    <h3 class="text-gray-400 text-xs">Order ID : vvv21222222</h3>
-                                                                    <h3 class="text-gray-400 text-xs">Order Placed : 20-22-2222</h3>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Border -->
-                                                        <div class="border-t w-full"></div>
-                                                        
-                                                        <!-- Body -->
-                                                        <!-- <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails"> -->
-                                                            <div 
-                                                                class="flex flex-row items-center justify-around w-full py-2 cursor-pointer group hover:bg-primary-50 sm:px-2">
-                                                                <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
-                                                                    <img
-                                                                        class="w-full object-cover"
-                                                                        [alt]="'Product thumbnail image of '"
-                                                                        [src]="'https://advergizefiles-bragboxx.netdna-ssl.com/wp-content/uploads/RAW_Pepsico-770x515.jpg'">
-                                                                </div>
-                                                                <div class="w-full md:pl-50">
-                                                                    <h3 
-                                                                        class="font-semibold text-sm group-hover:text-primary">
-                                                                        Dogheyan Selak
-                                                                    </h3>
-                                                                    <h3 class="text-gray-400 text-sm group-hover:text-primary">biru</h3>
-                                                                </div>
-                                                                <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
-                                                                    <h3 class="text-gray-400 items-center text-sm group-hover:text-primary">x2</h3>
-                                                                    <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
-                                                                    <h3 class="font-bold text-primary text-sm">30yal</h3>
-                                                                </div>
-                                                            </div>
-                                                        <!-- </ng-container> -->
-
-                                                        <!-- Border -->
-                                                        <div class="border-b w-full"></div>
-                                                        
-                                                        <!-- Footer -->
-                                                        <div class="w-full flex flex-col my-2">
-                                                            <div class="flex flex-row">
-                                                                <span class="font-semibold text-lg pr-2">Delivery Option</span>
-                                                                <mat-icon svgIcon="info"></mat-icon>
-                                                            </div>
-                                                            <div class="flex flex-row justify-between mt-4">
-                                                                <mat-checkbox [color]="'primary'">
-                                                                    <p class="text-primary">
-                                                                        Express
-                                                                    </p>
-                                                                </mat-checkbox>
-                                                                <mat-checkbox [color]="'primary'">
-                                                                    <p class="text-primary">
-                                                                        4 Hours
-                                                                    </p>
-                                                                </mat-checkbox>
-                                                                <mat-checkbox [color]="'primary'">
-                                                                    <p class="text-primary">
-                                                                        Standard Delivery
-                                                                    </p>
-                                                                </mat-checkbox>
-                                                            </div>
-                                                            <div class="flex flex-col mt-4">
-                                                                <span class="font-semibold">Special Instruction</span>
-                                                                <mat-form-field class="mt-2 fuse-mat-textarea w-full" floatLabel="always">
-                                                                    <!-- [(ngModel)]="specialInstruction" -->
-                                                                    <textarea
-                                                                        [ngClass]="'border border-red-600'"
-                                                                        matInput
-                                                                        maxlength="500"
-                                                                        [rows]="5"
-                                                                        [placeholder]="'Write Something...'"
-                                                                        matTextareaAutosize></textarea>
-                                                                        <!-- <mat-error *ngIf="specialInstructionForm.get('specialInstructionValue').hasError('required')">
-                                                                            Oops! The special instruction is required for this item
-                                                                        </mat-error> -->
-                                                                </mat-form-field>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Border -->
-                                                        <div class="border-b w-full"></div>
-
-                                                        <!-- Shipping details -->
-                                                        <div class="w-full flex flex-row justify-between my-4">
-                                                            <div class="flex flex-row">
-                                                                <span class="font-semibold text-gray-400">Shipping Fee:</span>
-                                                                <span class="font-semibold">RM 50.00</span>
-                                                            </div>
-                                                            <div class="flex flex-row">
-                                                                <span class="font-semibold text-gray-400">Total Items:</span>
-                                                                <span class="font-semibold">RM 48.60</span>
+                                            <!-- Orders -->
+                                            <div class="w-full border sm:border-b-2 sm:border-0 border-gray-300 rounded-lg sm:rounded-none py-1 sm:py-2 px-2 sm:px-2">
+                                                <div class="flex flex-col w-full">
+                                                    <!-- Header -->
+                                                    <div class="flex flex-row my-3 items-start justify-between w-full sm:px-2">
+                                                        <!-- Store Details -->
+                                                        <div class="flex flex-row">
+                                                            <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
+                                                            <div class="flex flex-col px-2">
+                                                                <h3 class="font-bold text-lg">Sinema Online</h3>
+                                                                <h3 class="text-gray-400 text-xs">Order ID : vvv21222222</h3>
+                                                                <h3 class="text-gray-400 text-xs">Order Placed : 20-22-2222</h3>
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Border -->
+                                                    <div class="border-t w-full"></div>
+                                                    
+                                                    <!-- Body -->
+                                                    <!-- <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails"> -->
+                                                        <div 
+                                                            class="flex flex-row items-center justify-around w-full py-2 cursor-pointer group hover:bg-primary-50 sm:px-2">
+                                                            <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
+                                                                <img
+                                                                    class="w-full object-cover"
+                                                                    [alt]="'Product thumbnail image of '"
+                                                                    [src]="'https://advergizefiles-bragboxx.netdna-ssl.com/wp-content/uploads/RAW_Pepsico-770x515.jpg'">
+                                                            </div>
+                                                            <div class="w-full">
+                                                                <h3 
+                                                                    class="font-semibold text-sm group-hover:text-primary">
+                                                                    Dogheyan Selak
+                                                                </h3>
+                                                                <h3 class="text-gray-400 text-sm group-hover:text-primary">biru</h3>
+                                                            </div>
+                                                            <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
+                                                                <h3 class="text-gray-400 items-center text-sm group-hover:text-primary">x2</h3>
+                                                                <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
+                                                                <h3 class="font-bold text-primary text-sm">30yal</h3>
+                                                            </div>
+                                                        </div>
+                                                    <!-- </ng-container> -->
+
+                                                    <!-- Border -->
+                                                    <div class="border-b w-full"></div>
+                                                    
+                                                    <!-- Footer -->
+                                                    <div class="w-full flex flex-col my-2">
+                                                        <div class="flex flex-row">
+                                                            <span class="font-semibold text-lg pr-2">Delivery Option</span>
+                                                            <mat-icon svgIcon="info"></mat-icon>
+                                                        </div>
+                                                        <div class="flex flex-row justify-between mt-4">
+                                                            <mat-checkbox [color]="'primary'">
+                                                                <p class="text-primary">
+                                                                    Express
+                                                                </p>
+                                                            </mat-checkbox>
+                                                            <mat-checkbox [color]="'primary'">
+                                                                <p class="text-primary">
+                                                                    4 Hours
+                                                                </p>
+                                                            </mat-checkbox>
+                                                            <mat-checkbox [color]="'primary'">
+                                                                <p class="text-primary">
+                                                                    Standard Delivery
+                                                                </p>
+                                                            </mat-checkbox>
+                                                        </div>
+                                                        <div class="flex flex-col mt-4">
+                                                            <span class="font-semibold">Special Instruction</span>
+                                                            <mat-form-field class="mt-2 fuse-mat-textarea w-full" floatLabel="always">
+                                                                <!-- [(ngModel)]="specialInstruction" -->
+                                                                <textarea
+                                                                    [ngClass]="'border border-red-600'"
+                                                                    matInput
+                                                                    maxlength="500"
+                                                                    [rows]="5"
+                                                                    [placeholder]="'Write Something...'"
+                                                                    matTextareaAutosize></textarea>
+                                                                    <!-- <mat-error *ngIf="specialInstructionForm.get('specialInstructionValue').hasError('required')">
+                                                                        Oops! The special instruction is required for this item
+                                                                    </mat-error> -->
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Border -->
+                                                    <div class="border-b w-full"></div>
+
+                                                    <!-- Shipping details -->
+                                                    <div class="w-full flex flex-row justify-between my-4">
+                                                        <div class="flex flex-row">
+                                                            <span class="font-semibold text-gray-400">Shipping Fee:</span>
+                                                            <span class="font-semibold">RM 50.00</span>
+                                                        </div>
+                                                        <div class="flex flex-row">
+                                                            <span class="font-semibold text-gray-400">Total Items:</span>
+                                                            <span class="font-semibold">RM 48.60</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                            </div>
                                             <!-- </ng-container> -->
                                         </ng-container>    
                                     </ng-container>
@@ -336,6 +299,29 @@
 
                 <!-- Cart summary section -->
                 <div #checkoutContainer class="flex flex-col order-2 sm:min-w-100 md:pl-10">
+                    <div class="hidden sm:block flex-col border rounded-lg border-gray-300 px-5 py-2 mb-2">
+                        <!-- Delivery Address -->
+                        <div class="flex flex-row w-full items-center">
+                            <mat-icon class="text-primary" svgIcon="mat_solid:location_on"></mat-icon>
+                            <h1 class="text-xl font-bold py-2 pl-3">Delivery Address</h1>
+                        </div>
+                        <!-- border -->
+                        <div class="border-b border-gray-300 w-full"></div>
+                        <!-- details -->
+                        <div class="flex flex-col m-2">
+                            <span class="font-semibold">John Smith</span>
+                            <span class="font-semibold">0123923943</span>
+                            <span class="font-semibold">Address</span>
+                        </div>
+                        <!-- action button -->
+                        <!-- Pay now / Calculate price button -->
+                        <div class="flex w-full justify-center items-center">
+                            <button
+                                class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
+                                <span class="text-white">Change</span>
+                            </button>
+                        </div>
+                    </div>
                     <!-- Cart Summary -->
                     <div class="relative flex flex-col border border-gray-300 rounded-lg px-5 py-2">
                         <h1 class="text-xl font-bold py-2">Cart Summary</h1>
