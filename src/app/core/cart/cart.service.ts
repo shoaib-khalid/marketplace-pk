@@ -212,7 +212,11 @@ export class CartService
 
         return this._httpClient.post<any>(orderService + '/carts', cart, header)
             .pipe(
-                map((response) => {
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
                     this._logging.debug("Response from StoresService (createCart)",response);
 
                     // set cart id
@@ -469,9 +473,22 @@ export class CartService
                             this.redirect(redirectURL);
                         }
                     }
-                    // if no existing cart for the store
+                    // if no existing cart for the store, then create one, then merge it
                     else {
-                        this.redirect(redirectURL);
+                        const createCartBody = {
+                            customerId: ownerId, 
+                            storeId: storeId,
+                        }
+                        this.createCart(createCartBody)
+                            .subscribe((cart: Cart)=>{
+                                // set cart id
+                                let cartId = cart.id;
+                                // merge carts
+                                this.mergeCart(cartId, guestCartId)
+                                .subscribe(mergeResponse => {
+                                    this.redirect(redirectURL);
+                                })
+                            });
                     }
                 })
         } 
