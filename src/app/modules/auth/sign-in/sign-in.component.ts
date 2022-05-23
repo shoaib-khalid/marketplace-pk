@@ -160,48 +160,22 @@ export class AuthSignInComponent implements OnInit
     
                                 this._userService.user = user;
 
-                                // MERGE CART
-                                // cartId
-                                if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
-                                    const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
-                                    const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
+                                const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ? this._activatedRoute.snapshot.queryParamMap.get('redirectURL') : null;
+                                const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId') ? this._activatedRoute.snapshot.queryParamMap.get('guestCartId') : null;
+                                const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId') ? this._activatedRoute.snapshot.queryParamMap.get('storeId') : null;
 
-                                    this._cartsService.getCarts(0, 20, storeId, response.id)
-                                        .subscribe(response => {
-
-                                            if (response['data'].content.length > 0) {
-                                                
-                                                this.cart = response['data'].content[0];
-
-                                                if (guestCartId != this.cart.id) {
-                                                    // merge carts
-                                                    this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                        .subscribe(response => {
-    
-                                                            this.redirect();
-                                                        })
-                                                }
-                                                this.redirect();
-                                            }
-                                            // if no existing cart for the store
-                                            else {
-                                                this.redirect();
-                                            }
-
-                                        })
+                                // Merge cart
+                                if (guestCartId && storeId) {  
+                                
+                                    this._cartsService.mergeAndRedirect(guestCartId, storeId, response.id, redirectURL);
                                 
                                 } 
-                                // if no guestCartId/storeId, which should not be
+                                // if no guestCartId/storeId
                                 else {
-                                    this.redirect();
+                                    this._cartsService.redirect(redirectURL);
                                 }
 
-
-                                
-                            });
-
-
-                            
+                            });                            
                     }
                 },
                 (error) => {
@@ -238,41 +212,20 @@ export class AuthSignInComponent implements OnInit
                 
                 this._authService.loginOauth(this.validateOauthRequest,'Google Login')
                     .subscribe((response) => {
+
+                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ? this._activatedRoute.snapshot.queryParamMap.get('redirectURL') : null;
+                        const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId') ? this._activatedRoute.snapshot.queryParamMap.get('guestCartId') : null;
+                        const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId') ? this._activatedRoute.snapshot.queryParamMap.get('storeId') : null;
+
+                        // Merge cart
+                        if (guestCartId && storeId) {  
                         
-                        // MERGE CART
-                        // cartId
-                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
-                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
-                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
-
-                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
-                                .subscribe(response => {
-
-                                    if (response['data'].content.length > 0) {
-                                        
-                                        this.cart = response['data'].content[0];
-
-                                        if (guestCartId != this.cart.id) {
-                                            // merge carts
-                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                .subscribe(response => {
-
-                                                    this.redirect();
-                                                })
-                                        }
-                                        this.redirect();
-                                    }
-                                    // if no existing cart for the store
-                                    else {
-                                        this.redirect();
-                                    }
-
-                                })
+                            this._cartsService.mergeAndRedirect(guestCartId, storeId, response.id, redirectURL);
                         
                         } 
-                        // if no guestCartId/storeId, which should not be
+                        // if no guestCartId/storeId
                         else {
-                            this.redirect();
+                            this._cartsService.redirect(redirectURL);
                         }
                     },
                     exception => {
@@ -296,41 +249,20 @@ export class AuthSignInComponent implements OnInit
                 
                 this._authService.loginOauth(this.validateOauthRequest,'Facebook Login')
                     .subscribe((response) => {      
+
+                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ? this._activatedRoute.snapshot.queryParamMap.get('redirectURL') : null;
+                        const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId') ? this._activatedRoute.snapshot.queryParamMap.get('guestCartId') : null;
+                        const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId') ? this._activatedRoute.snapshot.queryParamMap.get('storeId') : null;
+
+                        // Merge cart
+                        if (guestCartId && storeId) {  
                         
-                        // MERGE CART
-                        // cartId
-                        if (this._activatedRoute.snapshot.queryParamMap.get('guestCartId') && this._activatedRoute.snapshot.queryParamMap.get('storeId')) {  
-                            const guestCartId = this._activatedRoute.snapshot.queryParamMap.get('guestCartId')
-                            const storeId = this._activatedRoute.snapshot.queryParamMap.get('storeId')
-
-                            this._cartsService.getCarts(0, 20, storeId, response['session'].ownerId)
-                                .subscribe(response => {
-
-                                    if (response['data'].content.length > 0) {
-                                        
-                                        this.cart = response['data'].content[0];
-
-                                        if (guestCartId != this.cart.id) {
-                                            // merge carts
-                                            this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                .subscribe(response => {
-
-                                                    this.redirect();
-                                                })
-                                        }
-                                        this.redirect();
-                                    }
-                                    // if no existing cart for the store
-                                    else {
-                                        this.redirect();
-                                    }
-
-                                })
+                            this._cartsService.mergeAndRedirect(guestCartId, storeId, response.id, redirectURL);
                         
                         } 
-                        // if no guestCartId/storeId, which should not be
+                        // if no guestCartId/storeId
                         else {
-                            this.redirect();
+                            this._cartsService.redirect(redirectURL);
                         }
                     },
                     exception => {
@@ -360,21 +292,6 @@ export class AuthSignInComponent implements OnInit
             }
         
         } 
-        
-        // if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-        //     const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
-            
-        //     if (redirectURL.includes(storeFrontDomain)) {
-        //         // set url to localStorage
-        //         this._appleLoginService.sfUrl = redirectURL;
-        //     } else {
-        //         this._appleLoginService.sfUrl = '';
-        //     }
-        // }
-        // else 
-        // {
-        //     this._appleLoginService.sfUrl = '';
-        // }
 
         const dialogRef = this._dialog.open( 
             AuthModalComponent,{
@@ -396,27 +313,27 @@ export class AuthSignInComponent implements OnInit
        
    }
 
-   redirect() {
+//    redirect() {
 
-        // redirectURL
-        // store front domain, to be used to compare with redirectURL
-        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+//         // redirectURL
+//         // store front domain, to be used to compare with redirectURL
+//         const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
         
-        if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
-            const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+//         if (this._activatedRoute.snapshot.queryParamMap.get('redirectURL')) {  
+//             const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
             
-            if (redirectURL.includes(storeFrontDomain)) {
-                // Navigate to the external redirect url
-                this._document.location.href = redirectURL;
-            } else {
-                // Navigate to the internal redirect url
-                this._router.navigateByUrl(redirectURL);
-            }
-        }
-        else 
-        {
-            this._router.navigateByUrl('/signed-in-redirect');
-        }
+//             if (redirectURL.includes(storeFrontDomain)) {
+//                 // Navigate to the external redirect url
+//                 this._document.location.href = redirectURL;
+//             } else {
+//                 // Navigate to the internal redirect url
+//                 this._router.navigateByUrl(redirectURL);
+//             }
+//         }
+//         else 
+//         {
+//             this._router.navigateByUrl('/signed-in-redirect');
+//         }
 
-   }
+//    }
 }

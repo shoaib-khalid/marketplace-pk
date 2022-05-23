@@ -1,16 +1,19 @@
 import { Inject, Injectable } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { DOCUMENT } from '@angular/common';
 import { AppConfig } from 'app/config/service.config';
+import { CartService } from 'app/core/cart/cart.service';
+import { CustomerAuthenticate } from '../auth.types';
 
 @Injectable({
     providedIn: 'root'
 })
 export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
 {
+    customerAuthenticate: CustomerAuthenticate;
     /**
      * Constructor
      */
@@ -18,7 +21,9 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
         @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
         private _apiServer: AppConfig,
-        private _router: Router
+        private _router: Router,
+        private _cartsService: CartService,
+        // private _changeDetectorRef: ChangeDetectorRef,
     )
     {
     }
@@ -73,10 +78,9 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
     {
         
         const redirectUrl = route ? route.queryParamMap.get('redirectURL') : null
-        
-        // store front domain, to be used to compare with redirectURL
-        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
-        
+        const guestCartId = route ? route.queryParamMap.get('guestCartId') : null
+        const storeId = route ? route.queryParamMap.get('storeId') : null
+                
         // Check the authentication status
         return this._authService.check()
         .pipe(
@@ -85,21 +89,28 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
                 // If the user is authenticated...
                 if ( authenticated )
                 {
-                    // If it has redirectUrl, redirect it to external url
-                    if (redirectUrl) {
-                        if (redirectUrl.includes(storeFrontDomain)) {
-                            // Navigate to the external redirect url
-                            this._document.location.href = redirectUrl;
-                        }
-                    }
+                    this._authService.customerAuthenticate$
+                        .subscribe((response: CustomerAuthenticate) => {
+
+                            this.customerAuthenticate = response;
+
+                            // MERGE CART
+                            if (guestCartId && storeId) {  
+                            
+                                this._cartsService.mergeAndRedirect(guestCartId, storeId, this.customerAuthenticate.session.ownerId, redirectUrl);
+                            
+                            } 
+                            else {
+                                // Redirect to the root
+                                this._router.navigate(['/orders']);
+                            }
+                        });
                     
-                    // Redirect to the root
-                    this._router.navigate(['/orders']);
 
                     // Prevent the access
                     return of(false);
-                }
 
+                }
                 // Allow the access
                 return of(true);
             })

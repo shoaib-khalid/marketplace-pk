@@ -88,55 +88,26 @@ export class AppleLoginComponent
                         this._authService.loginOauth(validateOauthRequest, "Apple Login")
                             .subscribe((loginOauthResponse)=> {
 
-                                // store front domain, to be used to compare with redirectURL
-                                const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+                                const redirectURL = this._appleLoginService.sfUrl$ ? this._appleLoginService.sfUrl$ : null;
+                                const guestCartId = this._appleLoginService.guestCartId$ ? this._appleLoginService.guestCartId$ : null;
+                                const storeId = this._appleLoginService.storeId$ ? this._appleLoginService.storeId$ : null;
+
+                                // Merge cart
+                                if (guestCartId && storeId) {  
                                 
-                                if (this._appleLoginService.sfUrl$ && this._appleLoginService.guestCartId$ && this._appleLoginService.storeId$ ) {  
-            
-                                    const sfUrl = this._appleLoginService.sfUrl$;
-                                    const guestCartId = this._appleLoginService.guestCartId$;
-                                    const storeId = this._appleLoginService.storeId$;
-                                                            
-                                    if (sfUrl.includes(storeFrontDomain)) {
-            
-                                        this._cartsService.getCarts(0, 20, storeId, loginOauthResponse['session'].ownerId)
-                                            .subscribe(response => {
-
-                                                if (response['data'].content.length > 0) {
-                                                    
-                                                    this.cart = response['data'].content[0];
-            
-                                                    if (guestCartId != this.cart.id) {
-                                                        // merge carts
-                                                        this._cartsService.mergeCart(this.cart.id, guestCartId)
-                                                            .subscribe(response => {
-                                                                // remove 'sf-url' from localStorage
-                                                                localStorage.removeItem('sf-url');
-                                                                // Navigate to the external redirect url
-                                                                this._document.location.href = sfUrl;
-                                                            })
-                                                    } else {
-                                                        this._document.location.href = sfUrl;
-                                                    }
-                                                }
-                                                // if no existing cart for the store
-                                                else {
-                                                    this._document.location.href = sfUrl;
-                                                }
-                                            })
-                                        
-                                    } else {
-
-                                        localStorage.removeItem('sf-url');
-                                        // Navigate to the internal redirect url
-                                        this._router.navigateByUrl('/signed-in-redirect');
-                                    }
-                                    
+                                    this._cartsService.mergeAndRedirect(guestCartId, storeId, loginOauthResponse['session'].ownerId, redirectURL);
+                                
+                                } 
+                                // if no guestCartId/storeId
+                                else {
+                                    this._cartsService.redirect(redirectURL);
                                 }
-                                else 
-                                {
-                                    this._router.navigateByUrl('/signed-in-redirect');
-                                }
+                                
+                                // remove from localStorage
+                                localStorage.removeItem('sf-url');
+                                localStorage.removeItem('guestCartId');
+                                localStorage.removeItem('storeId');
+
                             });
                     }
 

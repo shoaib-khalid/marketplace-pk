@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
@@ -8,6 +8,8 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { StoresService } from '../store/store.service';
 import { AuthService } from '../auth/auth.service';
+import { DOCUMENT } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -24,12 +26,16 @@ export class CartService
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _storeService: StoresService,
         private _jwt: JwtService,
         private _authService: AuthService,
-        private _logging: LogService
+        private _router: Router,
+        private _logging: LogService,
+        private _activatedRoute: ActivatedRoute,
+
     )
     {
     }
@@ -430,6 +436,77 @@ export class CartService
                 })
             ))
         );
+    }
+
+    /**
+     * Merge carts and redirect
+     * 
+     * @param guestCartId 
+     * @param storeId 
+     * @param ownerId 
+     * @param redirectURL 
+     */
+    mergeAndRedirect(guestCartId: string, storeId: string, ownerId: string, redirectURL: string = null): void 
+    {
+        if (guestCartId && storeId) {  
+
+            this.getCarts(0, 20, storeId, ownerId)
+                .subscribe(cartResponse => {
+
+                    if (cartResponse['data'].content.length > 0) {
+                        
+                        let cart = cartResponse['data'].content[0];
+
+                        if (guestCartId != cart.id) {
+                            // merge carts
+                            this.mergeCart(cart.id, guestCartId)
+                                .subscribe(mergeResponse => {
+                                    this.redirect(redirectURL);
+                                })
+                        }
+                        // guest cartId and existing cartId is the same
+                        else {
+                            this.redirect(redirectURL);
+                        }
+                    }
+                    // if no existing cart for the store
+                    else {
+                        this.redirect(redirectURL);
+                    }
+                })
+        } 
+        // if no guestCartId/storeId
+        else {
+            this.redirect(redirectURL);
+        }    
+
+    }
+
+    /**
+     * Redirect to external/internal URL
+     * 
+     * @param redirectURL 
+     */
+    redirect(redirectURL?: string) {
+
+        // store front domain, to be used to compare with redirectURL
+        const storeFrontDomain = this._apiServer.settings.storeFrontDomain;
+        // const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL')
+        
+        if (redirectURL) {  
+            
+            if (redirectURL.includes(storeFrontDomain)) {
+                // Navigate to the external redirect url
+                this._document.location.href = redirectURL;
+            } else {
+                // Navigate to the internal redirect url
+                this._router.navigateByUrl(redirectURL);
+            }
+        }
+        else 
+        {
+            this._router.navigateByUrl('/signed-in-redirect');
+        }
     }
 
 }
