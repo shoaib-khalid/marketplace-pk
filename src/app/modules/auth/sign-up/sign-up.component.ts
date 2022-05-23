@@ -187,8 +187,9 @@ export class AuthSignUpComponent implements OnInit
 
                     // Set the alert
                     let message;
+                    
                     if (response.status === 409) {
-                        message = "Something went wrong, " + response.error.data;
+                        message = response.error.message;
                     } else {
                         message = "Something went wrong, please try again.";
                     }
