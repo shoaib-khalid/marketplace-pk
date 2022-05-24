@@ -61,8 +61,8 @@ export class AppleLoginComponent
     /**
      * On init
      */
-     ngOnInit(): void
-     {  
+    ngOnInit(): void
+    {  
         this._activatedRoute.queryParams.subscribe(params => {
             this.idToken = params['id_token'];
             this.jwtData = this._jwtService.getJwtPayload(this.idToken);
@@ -115,5 +115,15 @@ export class AppleLoginComponent
                     this._changeDetectorRef.markForCheck();
                 });
           });
-     } 
+    }
+
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
 }
