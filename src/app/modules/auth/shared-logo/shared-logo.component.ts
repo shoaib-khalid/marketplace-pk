@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -30,11 +31,11 @@ export class SharedLogoComponent implements OnInit
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _platformsService: PlatformService,
         private _formBuilder: FormBuilder,
         private _router: Router,
         private _storesService:StoresService,
-
     )
     {
     }
@@ -57,6 +58,12 @@ export class SharedLogoComponent implements OnInit
             });
     }
 
+    goToHome() {
+        // this._router.navigate(['home']);
 
+        // Navigate to the internal redirect url (temporary)
+        const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
+        this._document.location.href = redirectURL;
+    }
 
 }
