@@ -342,7 +342,7 @@ export class AuthService
         // Throw error, if the user is already logged in
         if ( this._authenticated )
         {
-            return throwError('User is already logged in.');
+            return throwError('Apple User is already logged in.');
         }
     
         return this._httpClient.post<any>(this.userService$ +'/customers/loginoauth', authRequest, this.socialOptions).pipe(
