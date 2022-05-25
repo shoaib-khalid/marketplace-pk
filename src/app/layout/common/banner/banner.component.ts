@@ -67,10 +67,7 @@ export class BannerComponent implements OnInit
             {display: "assets/images/example/order-now.png"},
             {display: "assets/images/example/special-offer.png"},
             {display: "assets/images/example/discount.png"},
-        ]
-
-        console.log("this.banner",this.banner);
-        
+        ]        
         
         // initialise gallery
         // set galleryOptions

@@ -93,7 +93,9 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
             .pipe((takeUntil(this._unsubscribeAll)))
             .subscribe((user: User) => {
                 this.user = user;
-                this.displayUsername = this.textTruncate(user.username, 12)
+                if (user) {
+                    this.displayUsername = this.textTruncate(user.username, 12)
+                }
             });
 
         // Subscribe to media changes
@@ -200,10 +202,10 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
     }
 
     goToHome() {
-        // this._router.navigate(['home']);
+        this._router.navigate(['home']);
 
         // Navigate to the internal redirect url (temporary)
-        const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
-        this._document.location.href = redirectURL;
+        // const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
+        // this._document.location.href = redirectURL;
     }
 }

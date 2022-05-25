@@ -350,7 +350,7 @@ export class StoresService
         Observable<{ pagination: StorePagination; stores: Store[] }>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
         // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
         if(search === null) {
@@ -381,7 +381,7 @@ export class StoresService
         .pipe(
             tap((response) => {
                 
-                this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+                this._logging.debug("Response from StoresService (getStores)",response);
 
                 // Pagination
                 let _pagination = {
@@ -392,7 +392,6 @@ export class StoresService
                     startIndex: response["data"].pageable.offset,
                     endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
                 }
-                this._logging.debug("Response from StoresService (pagination)",_pagination);
                 
                 // this is local
                 this._currentStores = response["data"].content;
@@ -411,8 +410,6 @@ export class StoresService
                     // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
                 });
 
-                this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
-
                 // this is observable service
 
                 this._pagination.next(_pagination);
@@ -428,7 +425,7 @@ export class StoresService
     Observable<{ pagination: StorePagination; stores: Store[] }>
     {
         let productService = this._apiServer.settings.apiServer.productService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
         // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
         if(search === null || regionCountryId === null) {
@@ -460,7 +457,7 @@ export class StoresService
         .pipe(
             tap((response) => {
                 
-                this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+                this._logging.debug("Response from StoresService (getFeaturedStore)",response);
 
                 // Pagination
                 let _pagination = {
@@ -471,7 +468,6 @@ export class StoresService
                     startIndex: response["data"].pageable.offset,
                     endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
                 }
-                this._logging.debug("Response from StoresService (pagination)",_pagination);
                 
                 // this is local
                 this._currentStores = response["data"].content;
@@ -489,8 +485,6 @@ export class StoresService
                     this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
                     // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
                 });
-
-                this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
 
                 // this is observable service
 

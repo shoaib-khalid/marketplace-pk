@@ -59,11 +59,21 @@ export class SharedLogoComponent implements OnInit
     }
 
     goToHome() {
-        // this._router.navigate(['home']);
+        this._router.navigate(['home']);
 
         // Navigate to the internal redirect url (temporary)
-        const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
-        this._document.location.href = redirectURL;
+        // const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
+        // this._document.location.href = redirectURL;
     }
+
+    /**
+     * On destroy
+     */
+     ngOnDestroy(): void
+     {
+         // Unsubscribe from all subscriptions
+         this._unsubscribeAll.next(null);
+         this._unsubscribeAll.complete();
+     }
 
 }

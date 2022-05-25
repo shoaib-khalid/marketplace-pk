@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { Client, Customer, CustomerAddress, HttpResponse, User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
@@ -128,6 +128,13 @@ export class UserService
      */
     get(ownerId: string): Observable<any>
     {
+        // Throw error, if the user is already logged in
+        if ( !ownerId )
+        {
+            this._logging.debug("User not logged in");
+            return of(true);
+        }
+
         let userService = this._apiServer.settings.apiServer.userService;
         let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 

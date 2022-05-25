@@ -76,12 +76,12 @@ export const appRoutes: Route[] = [
     // Landing routes
     {
         path       : '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
+        // canActivate: [AuthGuard],
+        // canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
             layout: 'marketplace',
-            roles: [UserRole.Admin, UserRole.Customer]
+            // roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
             initialData: InitialDataResolver,

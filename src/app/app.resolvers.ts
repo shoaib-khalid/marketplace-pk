@@ -96,14 +96,9 @@ export class PlatformSetupResolver implements Resolve<any>
     {
         return this._platformsService.set().pipe(
             take(1),
-            switchMap((response) => {
-                console.log("response",response["data"]);
-                
-                
-
-                this._storesService.getStores("",0,10,response["data"][0].platformCountry,"created","desc").subscribe(()=>{});
-                this._storesService.getFeaturedStore("",0,6,response["data"][0].platformCountry,"created","desc").subscribe(()=>{});
-
+            switchMap((response) => {                
+                this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
+                this._storesService.getFeaturedStore("",0,6,response.platformCountry,"created","desc").subscribe(()=>{});
                 return of(true);
             })
         )

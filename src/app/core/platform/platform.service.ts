@@ -134,7 +134,7 @@ export class PlatformService
                 ),
                 switchMap(async (response: any) => {
                                 
-                    this._logging.debug("Response from PlatformsService (Before Reconstruct)",response);
+                    this._logging.debug("Response from PlatformsService (Set)",response);
 
                     let newPlatform = {
                         id          : response ? response["data"][0].platformId : null,
@@ -152,8 +152,6 @@ export class PlatformService
 
                     // Update the store
                     this._platform.next(newPlatform);
-
-                    this._logging.debug("Response from PlatformsService (Set)", newPlatform);
 
                     // Return the store
                     return newPlatform;

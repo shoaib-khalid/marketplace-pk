@@ -89,7 +89,7 @@ export class LandingHomeComponent implements OnInit
                 capitalCity: "Shah Alam",
                 scene: "https://c4.wallpaperflare.com/wallpaper/644/192/852/shah-alam-blue-mosque-white-and-blue-mosque-wallpaper-preview.jpg",
                 ProductName: "Yummy Worms",
-                productUrl: "https://ctp-media.imigino.com/image/1/process/nullxnull?source=https://roodepoortrecord.co.za/wp-content/uploads/sites/20/2015/07/o-GUMMY-WORMS-face_649948960.jpg",
+                productUrl: "https://dwu32cgxelq1c.cloudfront.net/local_newspapers/sites/20/2015/07/o-GUMMY-WORMS-face_649948960.jpg",
                 storeName: "Worms Posession"
 
             },
@@ -196,6 +196,16 @@ export class LandingHomeComponent implements OnInit
         });
 
 
+    }
+
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
     }
 
     displayStoreLogo(storeAssets: StoreAssets[]) {
