@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
+import { AddressSettingComponent } from './address-setting/address-setting.component';
 import { BuyerCheckoutComponent } from './checkout.component';
-import { AddressResolver } from './checkout.resolver';
+import { AddressResolver, CustomerAddressResolver } from './checkout.resolver';
 
 export const BuyerCheckoutRoutes: Route[] = [
     {
@@ -13,11 +14,19 @@ export const BuyerCheckoutRoutes: Route[] = [
                 },
                 resolve  : {
                     address: AddressResolver,
-                    // categories: StoreCategoriesResolver
                 },
                 component: BuyerCheckoutComponent
+            },
+            {
+                path: ':addresses',
+                data: {
+                    headerTitle: 'Address Setting'
+                },
+                resolve  : {
+                    address: CustomerAddressResolver,
+                },
+                component: AddressSettingComponent
             }
         ]
-
     }
 ];

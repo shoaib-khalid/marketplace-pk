@@ -22,14 +22,17 @@
                                         <mat-expansion-panel-header [collapsedHeight]="'56px'">
                                             <mat-panel-title class="font-medium leading-tight">Delivery Addresses</mat-panel-title>
                                         </mat-expansion-panel-header>
-                                        <div class="pb-1">
-                                            <!-- <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
-                                                <div (click)="addNewAddress()" class="pl-4 pr-3 flex flex-row w-full justify-between">
-                                                    <span>Add New Address</span>
-                                                    <mat-icon svgIcon="add"></mat-icon>
-                                                </div>
-                                            </div> -->
-                                            <addresses-setting></addresses-setting>
+                                        <!-- <div class="w-full p-2 border rounded-md border-gray-300 hover:border-primary-300 hover:bg-primary-50 cursor-pointer">
+                                            <div (click)="addNewAddress()" class="pl-4 pr-3 flex flex-row w-full justify-between">
+                                                <span>Add New Address</span>
+                                                <mat-icon svgIcon="add"></mat-icon>
+                                            </div>
+                                        </div> -->
+                                        <div
+                                            [routerLink]="'/checkout/addresses'" 
+                                            class="flex flex-row items-center group cursor-pointer pb-2">
+                                            <span class="font-semibold group-hover:text-primary">Setting</span>
+                                            <mat-icon class="group-hover:text-primary" svgIcon="mat_solid:edit_location_alt"></mat-icon>
                                         </div>
                                         <ng-container *ngFor="let Address of customerAddresses">
                                             <div class="pb-1 group">
@@ -308,15 +311,21 @@
                         <!-- border -->
                         <div class="border-b border-gray-300 w-full"></div>
                         <!-- details -->
-                        <div class="flex flex-col m-2">
-                            <span class="font-semibold">John Smith</span>
-                            <span class="font-semibold">0123923943</span>
-                            <span class="font-semibold">Address</span>
-                        </div>
+                        <ng-container *ngFor="let address of customerAddresses">
+                            <ng-container *ngIf="address.isDefault">
+                                <div class="flex flex-col m-2">
+                                    <span class="font-medium pb-0.5">{{address.name}}</span>
+                                    <span class="font-medium pb-0.5">{{address.phoneNumber}}</span>
+                                    <span class="font-medium">{{address.address}}, {{address.postCode}}, {{address.city}}, {{address.state}}</span>
+                                </div>
+                                
+                            </ng-container>
+                        </ng-container>
                         <!-- action button -->
                         <!-- Pay now / Calculate price button -->
                         <div class="flex w-full justify-center items-center">
                             <button
+                                [routerLink]="'/checkout/addresses'"
                                 class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
                                 <span class="text-white">Change</span>
                             </button>
