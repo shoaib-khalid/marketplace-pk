@@ -1,10 +1,12 @@
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSelect } from '@angular/material/select';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
-import { Subject, takeUntil } from 'rxjs';
+import { City } from 'app/core/store/store.types';
+import { Observable, ReplaySubject, Subject, takeUntil, take } from 'rxjs';
 import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 
@@ -13,6 +15,17 @@ import { UserProfileValidationService } from '../../user-profile.validation.serv
   templateUrl: './edit-address.component.html',
 })
 export class EditAddressDialog implements OnInit {
+
+    /** control for the selected bank for multi-selection */
+    public regionCountryStateCities: FormControl = new FormControl();
+
+    private _onDestroy = new Subject<void>();
+    public filteredCities: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+
+    @ViewChild('stateCitySelector') stateCitySelector: MatSelect;
+
+    storeStateCities: string[] = [];
+    storeStateCities$: Observable<City[]>;
 
     platform: Platform;
     addressForm: FormGroup;
@@ -53,7 +66,43 @@ export class EditAddressDialog implements OnInit {
             postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
             isDefault   : ['']
-        });        
+        });
+        
+        this.setInitialValue();
+
+        // set initial selection
+        this.regionCountryStateCities.setValue([]);
+        // load the initial bank list
+        // this.filteredCities.next(this.cities.slice());
+
+        this.regionCountryStateCities.valueChanges
+            .pipe(takeUntil(this._onDestroy))
+            .subscribe((result) => {                
+                // Get states by country Z(using symplified backend)
+                this._storesService.getStoreRegionCountryStateCity(this.addressForm.get('state').value, result )
+                .subscribe((response)=>{
+                    // Get the products
+                    this.storeStateCities$ = this._storesService.cities$;                    
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
+            });
+
+        this.addressForm.get('state').valueChanges
+            .pipe(takeUntil(this._onDestroy))
+            .subscribe((result) => {
+                
+                // Get states by country Z(using symplified backend)
+                this._storesService.getStoreRegionCountryStateCity(result)
+                .subscribe((response)=>{
+                    // Get the products
+                    this.storeStateCities$ = this._storesService.cities$;                    
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
+            });
 
         // Subscribe to platform data
         this._platformsService.platform$
@@ -89,6 +138,18 @@ export class EditAddressDialog implements OnInit {
                         // Mark for check
                         this._changeDetectorRef.markForCheck();
                     });
+
+                let symplifiedCountryStateId = this.addressForm.get('state').value;
+
+                // Get city by state
+                this._storesService.getStoreRegionCountryStateCity(symplifiedCountryStateId)
+                .subscribe((response)=>{
+                    // Get the products
+                    this.storeStateCities$ = this._storesService.cities$;                        
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
         });
 
 
@@ -143,6 +204,14 @@ export class EditAddressDialog implements OnInit {
             return phoneNumber;
         }
 
+    }
+
+    private setInitialValue() {
+        this.filteredCities
+            .pipe(take(1), takeUntil(this._onDestroy))
+            .subscribe(() => {
+                this.stateCitySelector.compareWith = (a: any, b: any) => a === b;
+            });
     }
 
 }

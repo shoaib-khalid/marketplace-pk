@@ -30,6 +30,7 @@ import { EditAccountComponent } from './account/account.component';
 import { EditSecurityComponent } from './security/security.component';
 import { EditDeliveryAddressComponent } from './delivery-address/delivery-address.component';
 import { EditAddressDialog } from './delivery-address/edit-address/edit-address.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
     declarations: [
@@ -60,7 +61,8 @@ import { EditAddressDialog } from './delivery-address/edit-address/edit-address.
         MatListModule,
         FuseCardModule,
         FuseAlertModule,
-        MatDialogModule
+        MatDialogModule,
+        NgxMatSelectSearchModule
     ],
     providers: [
         // GraphHelper
