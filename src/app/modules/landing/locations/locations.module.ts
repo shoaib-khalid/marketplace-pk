@@ -3,26 +3,24 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from 'app/shared/shared.module';
-import { LandingHomeComponent } from 'app/modules/landing/home/home.component';
-import { landingHomeRoutes } from 'app/modules/landing/home/home.routing';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
-import { BannerModule } from 'app/layout/common/banner/banner.module';
+import { LandingLocationsComponent } from './locations.component';
+import { landingLocationsRoutes } from './locations.routing';
 
 @NgModule({
     declarations: [
-        LandingHomeComponent
+        LandingLocationsComponent
     ],
     imports     : [
-        RouterModule.forChild(landingHomeRoutes),
+        RouterModule.forChild(landingLocationsRoutes),
         MatButtonModule,
         MatIconModule,
         SharedModule,
         MatInputModule,
-        FuseCardModule,
-        BannerModule
+        FuseCardModule
     ]
 })
-export class LandingHomeModule
+export class LandingLocationsModule
 {
 }

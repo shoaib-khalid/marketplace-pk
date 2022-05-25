@@ -16,16 +16,14 @@ import { DatePipe } from '@angular/common';
 import { BuyerCheckoutComponent } from './checkout.component';
 import { BuyerCheckoutRoutes } from './checkout.routing';
 import { FuseCardModule } from '@fuse/components/card';
-import { AddAddressComponent } from './add-address/add-address.component';
-import { EditAddressComponent } from './edit-address/edit-address.component';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
+import { AddressSettingComponent } from './address-setting/address-setting.component';
 
 @NgModule({
     declarations: [
         BuyerCheckoutComponent,
-        AddAddressComponent,
-        EditAddressComponent,
-        ModalConfirmationDeleteItemComponent
+        ModalConfirmationDeleteItemComponent,
+        AddressSettingComponent
     ],
     imports     : [
         RouterModule.forChild(BuyerCheckoutRoutes),
@@ -41,7 +39,7 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
         MatRadioModule,
         FuseCardModule,
         MatExpansionModule,
-        SharedModule
+        SharedModule,
     ],
     providers   : [
         DatePipe

@@ -23,7 +23,7 @@ export const appRoutes: Route[] = [
     // ]},
     // {path: 'coming-soon', loadChildren: () => import('app/shared/coming-soon/coming-soon.module').then(m => m.ComingSoonModule)},
 
-    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'orders'},
+    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'home'},
 
     // Redirect signed in user to the '/example'
     //
@@ -75,13 +75,20 @@ export const appRoutes: Route[] = [
 
     // Landing routes
     {
-        path: '',
+        path       : '',
+        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'empty'
+            layout: 'marketplace',
+            roles: [UserRole.Admin, UserRole.Customer]
+        },
+        resolve    : {
+            initialData: InitialDataResolver,
+            platformSetup: PlatformSetupResolver
         },
         children   : [
-            {path: 'home', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
+            {path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule)},
         ]
     },
 

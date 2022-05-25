@@ -1,14 +1,32 @@
 import { Route } from '@angular/router';
+import { AddressSettingComponent } from './address-setting/address-setting.component';
 import { BuyerCheckoutComponent } from './checkout.component';
-import { AddressResolver } from './checkout.resolver';
+import { AddressResolver, CustomerAddressResolver } from './checkout.resolver';
 
 export const BuyerCheckoutRoutes: Route[] = [
     {
         path     : '',
-        resolve  : {
-            address: AddressResolver,
-            // categories: StoreCategoriesResolver
-        },
-        component: BuyerCheckoutComponent
+        children   : [
+            {
+                path: '',
+                data: {
+                    headerTitle: 'Checkout'
+                },
+                resolve  : {
+                    address: AddressResolver,
+                },
+                component: BuyerCheckoutComponent
+            },
+            {
+                path: ':addresses',
+                data: {
+                    headerTitle: 'Address Setting'
+                },
+                resolve  : {
+                    address: CustomerAddressResolver,
+                },
+                component: AddressSettingComponent
+            }
+        ]
     }
 ];

@@ -15,17 +15,27 @@ import { AuthService } from '../auth/auth.service';
 })
 export class StoresService
 {
+    // for all store
     private _store: BehaviorSubject<Store | null> = new BehaviorSubject(null);
     private _stores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
+    private _pagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+
+    // for featured store display
+    private _featuredStore: BehaviorSubject<Store | null> = new BehaviorSubject(null);
+    private _featuredStores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
+    private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+
     private _storeCategory: BehaviorSubject<StoreCategory | null> = new BehaviorSubject(null);
     private _storeCategories: BehaviorSubject<StoreCategory[] | null> = new BehaviorSubject(null);
+
     private _storeDiscount: BehaviorSubject<StoreDiscount | null> = new BehaviorSubject(null);
     private _storeDiscounts: BehaviorSubject<StoreDiscount[] | null> = new BehaviorSubject(null);
+    
     private _storeSnooze: BehaviorSubject<StoreSnooze | null> = new BehaviorSubject(null);
-    private _pagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
     private _storeRegionCountries: ReplaySubject<StoreRegionCountry[]> = new ReplaySubject<StoreRegionCountry[]>(1);
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     private _currentStores: Store[] = [];
+
     public storeControl: FormControl = new FormControl();
     public storeCategoryControl: FormControl = new FormControl();
 
@@ -49,6 +59,62 @@ export class StoresService
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
 
+    // ----------------------
+    //    Featured Store
+    //----------------------- 
+
+    /**
+    * Getter for store
+    *
+    */
+    get featuredStore$(): Observable<Store>
+    {
+        return this._featuredStore.asObservable();
+    }
+
+    /**
+    * Setter for stores
+    *
+    * @param value
+    */
+    set featuredStore(value: Store)
+    {
+        // Store the value
+        this._featuredStore.next(value);
+    }
+
+    /**
+     * Getter for stores
+     *
+    */
+    get featuredStores$(): Observable<Store[]>
+    {
+        return this._featuredStores.asObservable();
+    }
+    
+    /**
+     * Setter for stores
+     *
+     * @param value
+     */
+    set featuredStores(value: Store[])
+    {
+        // Store the value
+        this._featuredStores.next(value);
+    }
+
+    /**
+    * Getter for stores pagination
+    */
+    get featuredStorePagination$(): Observable<StorePagination>
+    {
+        return this._featuredStorePagination.asObservable();
+    }
+
+    // ----------------------
+    //         Store
+    //-----------------------
+
     /**
      * Getter for store
      *
@@ -70,8 +136,8 @@ export class StoresService
     }
 
     /**
-     * Getter for stores
-     *
+    * Getter for stores
+    *
     */
     get stores$(): Observable<Store[]>
     {
@@ -79,15 +145,27 @@ export class StoresService
     }
     
     /**
-     * Setter for stores
-     *
-     * @param value
-     */
+    * Setter for stores
+    *
+    * @param value
+    */
     set stores(value: Store[])
     {
         // Store the value
         this._stores.next(value);
     }
+
+    /**
+    * Getter for stores pagination
+    */
+    get pagination$(): Observable<StorePagination>
+    {
+        return this._pagination.asObservable();
+    }
+
+    // ----------------------
+    //         Category
+    //----------------------- 
 
     /**
      * Getter for store Categories
@@ -217,14 +295,6 @@ export class StoresService
     }
 
     /**
-     * Getter for pagination
-     */
-    get pagination$(): Observable<StorePagination>
-    {
-        return this._pagination.asObservable();
-    }
-
-    /**
     * Getter for city
     *
     */
@@ -276,75 +346,159 @@ export class StoresService
     /**
      * Get the current logged in store data
      */
-    // getStores(id: string = "", page: number = 0, size: number = 10, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
-    //     Observable<{ pagination: StorePagination; stores: Store[] }>
-    // {
-    //     let productService = this._apiServer.settings.apiServer.productService;
-    //     let accessToken = "accessToken";
-    //     let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
+    getStores(id: string = "", page: number = 0, size: number = 10, regionCountryId: string = "" , sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
+        Observable<{ pagination: StorePagination; stores: Store[] }>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
 
-    //     const header = {
-    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-    //         params: {
-    //             clientId: clientId,
-    //             page: '' + page,
-    //             pageSize: '' + size,
-    //             sortByCol: '' + sort,
-    //             sortingOrder: '' + order.toUpperCase(),
-    //             name: '' + search
-    //         }
-    //     };
+        if(search === null) {
+            search = ""
+        }
 
-    //     if (category !== "") {
-    //         header.params["verticalCode"] = category;
-    //     }
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                // clientId: clientId,
+                page: '' + page,
+                pageSize: '' + size,
+                regionCountryId: '' + regionCountryId,
+                sortByCol: '' + sort,
+                sortingOrder: '' + order.toUpperCase(),
+                name: '' + search
+            }
+        };
 
-    //     // if ada id change url stucture
-    //     if (id !== "") { id = "/" + id } 
+        if (category !== "") {
+            header.params["verticalCode"] = category;
+        }
+
+        // if ada id change url stucture
+        if (id !== "") { id = "/" + id } 
         
-    //     return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
-    //     .pipe(
-    //         tap((response) => {
+        return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
+        .pipe(
+            tap((response) => {
                 
-    //             this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+                this._logging.debug("Response from StoresService (Before Reconstruct)",response);
 
-    //             // Pagination
-    //             let _pagination = {
-    //                 length: response["data"].totalElements,
-    //                 size: response["data"].size,
-    //                 page: response["data"].number,
-    //                 lastPage: response["data"].totalPages,
-    //                 startIndex: response["data"].pageable.offset,
-    //                 endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-    //             }
-    //             this._logging.debug("Response from StoresService (pagination)",_pagination);
+                // Pagination
+                let _pagination = {
+                    length: response["data"].totalElements,
+                    size: response["data"].size,
+                    page: response["data"].number,
+                    lastPage: response["data"].totalPages,
+                    startIndex: response["data"].pageable.offset,
+                    endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                }
+                this._logging.debug("Response from StoresService (pagination)",_pagination);
                 
-    //             // this is local
-    //             this._currentStores = response["data"].content;
+                // this is local
+                this._currentStores = response["data"].content;
                 
-    //             (this._currentStores).forEach(async (item, index) => {
-    //                 // let assets = await this.getStoreAssets(item.id);
-    //                 // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
-    //                 this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
-    //                 // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
-    //             });
+                (this._currentStores).forEach(async (item, index) => {
+                    // let assets = await this.getStoreAssets(item.id);
+                    // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
+                    // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
+                });
 
-    //             this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
+                this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
 
-    //             // this is observable service
+                // this is observable service
 
-    //             this._pagination.next(_pagination);
-    //             this._stores.next(this._currentStores);
-    //         })
-    //     );
-    // }
+                this._pagination.next(_pagination);
+                this._stores.next(this._currentStores);
+            })
+        );
+    }
+
+    /**
+    * Get the current logged in store data
+    */
+    getFeaturedStore(id: string = "", page: number = 0, size: number = 6, regionCountryId: string ="" , sort: string = 'created', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
+    Observable<{ pagination: StorePagination; stores: Store[] }>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
+
+        if(search === null || regionCountryId === null) {
+            regionCountryId = ""
+            search = ""
+        }
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                // clientId: clientId,
+                page: '' + page,
+                pageSize: '' + size,
+                regionCountryId: '' + regionCountryId,
+                sortByCol: '' + sort,
+                sortingOrder: '' + order.toUpperCase(),
+                name: '' + search
+            }
+        };
+
+        if (category !== "") {
+            header.params["verticalCode"] = category;
+        }
+
+        // if ada id change url stucture
+        if (id !== "") { id = "/" + id } 
+        
+        return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
+        .pipe(
+            tap((response) => {
+                
+                this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+
+                // Pagination
+                let _pagination = {
+                    length: response["data"].totalElements,
+                    size: response["data"].size,
+                    page: response["data"].number,
+                    lastPage: response["data"].totalPages,
+                    startIndex: response["data"].pageable.offset,
+                    endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                }
+                this._logging.debug("Response from StoresService (pagination)",_pagination);
+                
+                // this is local
+                this._currentStores = response["data"].content;
+                
+                (this._currentStores).forEach(async (item, index) => {
+                    // let assets = await this.getStoreAssets(item.id);
+                    // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
+                    this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
+                    // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
+                });
+
+                this._logging.debug("Response from StoresService (After Reconstruct)",this._currentStores);
+
+                // this is observable service
+
+                this._featuredStorePagination.next(_pagination);
+                this._featuredStores.next(this._currentStores);
+            })
+        );
+    }
 
     getStoresById(id: string): Observable<Store>
     {
@@ -433,6 +587,27 @@ export class StoresService
                     return store;
                 })
             ))
+        );
+    }
+
+    getStoreTop(countryCode:string): Observable<any>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                countryId: countryCode,
+            }
+        };
+
+        return this._httpClient.get<any>(productService + '/stores/top', header).pipe(
+            map((response) => {
+                this._logging.debug("Response from StoresService (getStoreTop)",response);
+
+                return response.data;
+            })
         );
     }
 

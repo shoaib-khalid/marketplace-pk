@@ -1,0 +1,36 @@
+<div class="flex flex-col items-center bg-card w-full px-3 h-full">
+    <div class="w-full sm:p-4">
+        <!-- Categories -->
+        <div class="flex flex-col pt-8">
+            <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
+                <ng-container *ngFor="let category of categories">
+                    <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
+                        <fuse-card class="bg-primary-50 p-2 flex flex-col h-52 w-full group-hover:border items-center cursor-pointer">
+                            <img
+                                class="object-contain w-60 h-40"
+                                [src]="category.url">
+                            <div class="m-2 group-hover:text-black text-primary text-center font-semibold">{{category.name}}</div>
+                        </fuse-card>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <!-- Join Now banner -->
+        <div class="py-4">
+            <fuse-card 
+                class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
+                <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
+                <div class="px-4">
+                    <input 
+                        type="button" 
+                        class="w-0 h-0 invisible">
+                    <label
+                        class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
+                    >
+                        <span class="text-white text-sm font-semibold">JOIN NOW</span>
+                    </label>
+                </div>
+            </fuse-card>
+        </div>
+    </div>
+</div>

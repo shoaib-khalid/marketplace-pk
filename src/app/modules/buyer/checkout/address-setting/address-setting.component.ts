@@ -1,71 +1,82 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { Loader } from '@googlemaps/js-api-loader';
 import { AuthService } from 'app/core/auth/auth.service';
 import { JwtService } from 'app/core/jwt/jwt.service';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
+import { StoresService } from 'app/core/store/store.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { EditAddressDialog } from './edit-address/edit-address.component';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { EditAddressDialog } from '../../user-profile/delivery-address/edit-address/edit-address.component';
+import { DomSanitizer} from '@angular/platform-browser';
 
 @Component({
-    selector       : 'settings-delivery-address',
-    templateUrl    : './delivery-address.component.html',
-    encapsulation  : ViewEncapsulation.None,
-    changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class EditDeliveryAddressComponent implements OnInit
-{
-    alert: any;
-    accountForm: FormGroup;
-    customerId: string;
-    customersAddresses$: Observable<CustomerAddress[]>;
+    selector     : 'address-setting',
+    templateUrl  : './address-setting.component.html',
+    encapsulation: ViewEncapsulation.None,
+    styles        : [
+        `
+        .mat-dialog-container {
+            padding: 10px !important;
+            border-radius: 0 !important;
 
+            @screen sm {
+                padding: 24px !important;
+                border-radius: 16px !important;
+            }
+        }
+        `
+    ]
+
+})
+
+
+export class AddressSettingComponent implements OnInit
+{
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    customersAddresses$: Observable<CustomerAddress[]>;
+    accountForm: FormGroup;
+
+    alert: any;
     currentScreenSize: string[] = [];
 
-    // client: Client;
+    url:any;
 
     /**
      * Constructor
      */
     constructor(
-        private _formBuilder: FormBuilder,
-        private _userService: UserService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        public _dialog: MatDialog,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _formBuilder: FormBuilder,
+        private _dialog: MatDialog,
+        private _userService: UserService,
         private _jwtService: JwtService,
         private _authService: AuthService,
-        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _domSanitizer: DomSanitizer
     )
     {
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
+    ngOnInit(): void {
 
-    /**
-     * On init
-     */
-    ngOnInit(): void
-    {
+        this.url = this._domSanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q='+'3.060279,%20101.578040'+'&t=&z=15&ie=UTF8&iwloc=&output=embed');
+
         // Create the form
         this.accountForm = this._formBuilder.group({
             name    : ['', Validators.required],
             username: ['', Validators.required],
             email   : ['', [Validators.required, Validators.email]],
-       
-        });
-
-        // ----------------------
-        // Get client Details
-        // ----------------------
-
+        
+        });        
 
         // Customer Details
         this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
@@ -74,27 +85,30 @@ export class EditDeliveryAddressComponent implements OnInit
                 this.accountForm.patchValue(response);
             })
 
-        // Observable adress
         this.customersAddresses$ = this._userService.customersAddresses$;
 
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
         this._fuseMediaWatcherService.onMediaChange$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(({matchingAliases}) => {               
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
 
-            this.currentScreenSize = matchingAliases;                
+                this.currentScreenSize = matchingAliases;                
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
+
     /**
-     * Send the form
-     */
+    * Send the form
+    */
     updateClientProfile(): void
     {
         // Do nothing if the form is invalid
@@ -125,7 +139,7 @@ export class EditDeliveryAddressComponent implements OnInit
                     },
                     actions: {
                         confirm: {
-                            label: 'OK',
+                            label: 'Ok',
                             color: "primary",
                         },
                         cancel: {
@@ -146,6 +160,29 @@ export class EditDeliveryAddressComponent implements OnInit
 
         // Enable the form
         this.accountForm.enable();
+    }
+    addAddress() {
+        const dialogRef = this._dialog.open( 
+            EditAddressDialog, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data: {
+                    type: "create",
+                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
+                    user: this.accountForm.value
+                },
+            }
+        );    
+        dialogRef.afterClosed().subscribe(result=>{
+            if (result) {
+                //Customer Addresses
+                this._userService.createCustomerAddress(result)
+                    .subscribe(()=>{});
+            }
+        });
     }
 
     editAddress(customerAddress: CustomerAddress){
@@ -189,30 +226,6 @@ export class EditDeliveryAddressComponent implements OnInit
                 // Delete the customer on the server
                 this._userService.deleteCustomerAddressById(customerAddressId)
                 .subscribe(() => {});
-            }
-        });
-    }
-
-    addAddress() {
-        const dialogRef = this._dialog.open( 
-            EditAddressDialog, {
-                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-                disableClose: true,
-                data: {
-                    type: "create",
-                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
-                    user: this.accountForm.value
-                },
-            }
-        );    
-        dialogRef.afterClosed().subscribe(result=>{
-            if (result) {
-                //Customer Addresses
-                this._userService.createCustomerAddress(result)
-                    .subscribe(()=>{});
             }
         });
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { MessagesService } from 'app/layout/common/messages/messages.service';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { NotificationsService } from 'app/layout/common/notifications/notifications.service';
@@ -12,6 +12,8 @@ import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { CartService } from './core/cart/cart.service';
 import { HttpStatService } from './mock-api/httpstat/httpstat.service';
+import { switchMap, take, map, tap, catchError, filter } from 'rxjs/operators';
+import { StoresService } from './core/store/store.service';
 
 @Injectable({
     providedIn: 'root'
@@ -73,7 +75,9 @@ export class PlatformSetupResolver implements Resolve<any>
      * Constructor
      */
     constructor(
-        private _platformsService: PlatformService
+        private _platformsService: PlatformService,
+        private _storesService: StoresService,
+
     )
     {
     }
@@ -90,6 +94,18 @@ export class PlatformSetupResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        return this._platformsService.set();
+        return this._platformsService.set().pipe(
+            take(1),
+            switchMap((response) => {
+                console.log("response",response["data"]);
+                
+                
+
+                this._storesService.getStores("",0,10,response["data"][0].platformCountry,"created","desc").subscribe(()=>{});
+                this._storesService.getFeaturedStore("",0,6,response["data"][0].platformCountry,"created","desc").subscribe(()=>{});
+
+                return of(true);
+            })
+        )
     }
 }
