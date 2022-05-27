@@ -8,6 +8,7 @@ import { landingHomeRoutes } from 'app/modules/landing/home/home.routing';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
 import { BannerModule } from 'app/layout/common/banner/banner.module';
+import { SwiperBannerModule } from 'app/layout/common/swiper-banner/swiper-banner.module';
 
 @NgModule({
     declarations: [
@@ -20,7 +21,8 @@ import { BannerModule } from 'app/layout/common/banner/banner.module';
         SharedModule,
         MatInputModule,
         FuseCardModule,
-        BannerModule
+        BannerModule,
+        SwiperBannerModule
     ]
 })
 export class LandingHomeModule

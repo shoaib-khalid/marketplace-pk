@@ -864,6 +864,25 @@ export class StoresService
             );
     }
 
+    getStoreRegionCountriesById(countryId: string): Observable<any>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+        };
+
+        return this._httpClient.get<any>(productService + '/region-countries/' + countryId, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from StoresService (getStoreRegionCountriesById)", response);
+                    return response["data"];
+                })
+            );
+    }
+
     getStoreRegionCountryState(regionCountryId: string): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
