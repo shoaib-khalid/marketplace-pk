@@ -1,19 +1,34 @@
 <div class="flex flex-col items-center bg-card w-full px-3 h-full">
     <div class="w-full sm:p-4">
+        <!-- Search -->
+        <div class="flex flex-col w-full pt-4">
+            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+                <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
+                <input
+                    class="pl-4"
+                    matInput
+                    [autocomplete]="'off'"
+                    [placeholder]="'Search..'">
+                <!-- filter -->
+                <div class="w-15 py-1">
+                    <input
+                        id="add-voucher-button"
+                        type="button"
+                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                        mat-button
+                        >
+                    <label 
+                        class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
+                        for="add-voucher-button"
+                        matRipple>
+                        <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
+                    </label>
+                </div>
+            </mat-form-field>
+        </div>
+
         <!-- Stores -->
         <div class="flex flex-col pt-8">
-            <!-- Search For xs view Mobile -->
-                <mat-form-field class="w-full fuse-mat-emphasized-affix min-w-64">
-                    <input
-                        matInput
-                        [formControl]="searchInputControl"
-                        [autocomplete]="'off'"
-                        [placeholder]="'Search products'">
-                    <mat-icon
-                    class="icon-size-4 text-primary"
-                    matSuffix
-                    [svgIcon]="'search'"></mat-icon>
-                </mat-form-field>
             <!-- store list -->
             <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
                 <ng-container *ngFor="let store of stores">
@@ -42,6 +57,7 @@
                 </ng-container>
             </div>
         </div>
+
         <!-- Pagination -->
         <ng-container *ngIf="pagination">
             <div class="flex w-full my-4 items-center justify-center">
@@ -52,7 +68,6 @@
                     (changePage)="onChangePage($event)"
                     #storesPaginator></pagination>
             </div>
-
         </ng-container>
     </div>
 </div>

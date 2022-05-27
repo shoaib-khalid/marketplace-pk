@@ -16,8 +16,6 @@ import { Location } from '@angular/common';
 })
 export class CategoryComponent implements OnInit
 {
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
-
     categories: any;
     locations: { capitalCity: string; scene: string; locationId: string; }[];
     platform: Platform;
@@ -27,6 +25,8 @@ export class CategoryComponent implements OnInit
     products: ProductOnLocation[];
     currencySymbol: string;
 
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    
     /**
      * Constructor
      */
@@ -35,7 +35,6 @@ export class CategoryComponent implements OnInit
         private _platformsService: PlatformService,
         private _storesService: StoresService,
         private _route: ActivatedRoute,
-        private _activatedRoute: ActivatedRoute,
         private _locationService: LocationService,
         private _location: Location
     )
@@ -43,16 +42,14 @@ export class CategoryComponent implements OnInit
     }
 
     ngOnInit(): void {
+
         this.categoryId = this._route.snapshot.paramMap.get('category-id');
         
         this._locationService.getParentCategoriesById(this.categoryId)
             .subscribe((category : ParentCategory) => {
                 this.category = category;
-                console.log('category', category);
-                
-            })
+            });
         
-
         this.categories = [
             {name: "Automotive", url: "https://i.pinimg.com/originals/91/06/02/910602979bda92b9f88144d313f52725.png"},
             {name: "Groceries", url: "https://www.pngmart.com/files/7/Groceries-Transparent-Images-PNG.png"},
@@ -62,7 +59,7 @@ export class CategoryComponent implements OnInit
             {name: "Electronic Devices", url: "https://www.nicepng.com/png/full/246-2469083_electronic-devices-png-live-webcasting-png.png"},
             {name: "Health & Wellbeing", url: "https://pngimg.com/uploads/no_drugs/no_drugs_PNG78.png"},
             {name: "Home Exercise Equipments", url: "https://pngimg.com/uploads/gym_equipment/gym_equipment_PNG85.png"},
-        ]
+        ];
 
         this.locations = [
             {
@@ -135,7 +132,7 @@ export class CategoryComponent implements OnInit
                 scene: "https://c0.wallpaperflare.com/preview/923/146/366/malaysia-seremban-canon-70d.jpg",
                 locationId: 'seremban'
             },
-        ]
+        ];
 
         // set currency symbol
         this._platformsService.getCurrencySymbol$
@@ -143,31 +140,22 @@ export class CategoryComponent implements OnInit
             .subscribe(currency => this.currencySymbol = currency)
             
         this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
-        .subscribe((response : ProductOnLocation[]) => {
-            console.log('response', response);
-            this.products = response;
-        } )
+            .subscribe((response : ProductOnLocation[]) => {
+                this.products = response;
+            });
 
         this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => { 
-
-            this.platform = platform;  
-
-            this._storesService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: Store[]) => { 
-                this.stores = stores;  
-                
+            .subscribe((platform: Platform) => { 
+                this.platform = platform;  
+                this._storesService.featuredStores$
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((stores: Store[]) => { 
+                        this.stores = stores;  
+                        this._changeDetectorRef.markForCheck();
+                    });
                 this._changeDetectorRef.markForCheck();
-    
             });
-    
-            
-            this._changeDetectorRef.markForCheck();
-
-        });
-
     }
 
     backClicked() {

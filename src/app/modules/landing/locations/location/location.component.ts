@@ -52,33 +52,27 @@ export class LocationComponent implements OnInit
             filter((event) => event instanceof NavigationEnd),
             distinctUntilChanged(),
         ).subscribe((response: NavigationEnd) => {
-            let categoryIdRouter = response.url.split("/")[3]
-
+            let categoryIdRouter = response.url.split("/")[3];
             this._locationService.getParentCategoriesById(categoryIdRouter)
-                .subscribe((category : ParentCategory) => {})
+                .subscribe((category : ParentCategory) => {});
         })
         
         this.locationId = this._route.snapshot.paramMap.get('location-id');
         this.categoryId = this._route.snapshot.paramMap.get('category-id');
         
         this._locationService.getParentCategoriesById(this.categoryId)
-            .subscribe((category : ParentCategory) => {})
-
-        // console.log('locationId', this.locationId);
-        // console.log('categoryId', this.categoryId);
+            .subscribe((category : ParentCategory) => {});
 
         this._locationService.parentCategory$
             .subscribe(category => {
                 this.category = category;
-                
                 this._changeDetectorRef.markForCheck();
-            })
+            });
             
         this._locationService.getLocationById(this.locationId)
             .subscribe((location : LandingLocation) => {
                 this.location = location;
-            })
-        
+            });
 
         // this.categories = [
         //     {name: "Automotive", url: "https://i.pinimg.com/originals/91/06/02/910602979bda92b9f88144d313f52725.png"},
@@ -167,39 +161,32 @@ export class LocationComponent implements OnInit
         // set currency symbol
         this._platformsService.getCurrencySymbol$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(currency => this.currencySymbol = currency)
+            .subscribe(currency => this.currencySymbol = currency);
             
         this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
-        .subscribe((response : ProductOnLocation[]) => {
-            this.products = response;
-        } )
+            .subscribe((response : ProductOnLocation[]) => {
+                this.products = response;
+            });
 
         this._locationService.getParentCategories('Subang Jaya')
             .subscribe((categories: ParentCategory[]) => {
                 this.categories = categories;
-            })
+            });
 
         this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => { 
-
-            this.platform = platform;  
-
-            this._storesService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: Store[]) => { 
-                this.stores = stores;  
-                
-                this._changeDetectorRef.markForCheck();
-    
+            .subscribe((platform: Platform) => { 
+                this.platform = platform;  
+                this._storesService.featuredStores$
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((stores: Store[]) => { 
+                        this.stores = stores;  
+                        this._changeDetectorRef.markForCheck();
+                    });
+                    this._changeDetectorRef.markForCheck();
             });
-    
-            
-            this._changeDetectorRef.markForCheck();
-
-        });
-
     }
+
     getHeaderTitle(root: ActivatedRoute): any {
         throw new Error('Method not implemented.');
     }
