@@ -19,6 +19,7 @@ import { CartModule } from 'app/layout/common/cart/cart.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { MarketplaceLayoutComponent } from 'app/layout/symplified/marketplace/marketplace.component';
 import { Error500Component } from 'app/shared/error-500/error-500.component';
+import { FooterModule } from 'app/layout/common/footer/footer.module';
 
 @NgModule({
     declarations: [
@@ -42,6 +43,7 @@ import { Error500Component } from 'app/shared/error-500/error-500.component';
         SearchModule,
         ShortcutsModule,
         UserModule,
+        FooterModule,
         CartModule,
         SharedModule
     ],

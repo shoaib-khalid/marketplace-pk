@@ -7,11 +7,9 @@ import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
-import { environment } from 'environments/environment';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { Error500Service } from 'app/core/error-500/error-500.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector     : 'marketplace-layout',
@@ -20,25 +18,22 @@ import { DOCUMENT } from '@angular/common';
 })
 export class MarketplaceLayoutComponent implements OnInit, OnDestroy
 {
+    navigation: Navigation;
     platform: Platform;
     user: User;
     
     isScreenSmall: boolean;
-    navigation: Navigation;
+    show500: boolean;
 
     headerTitle: string;
-
-    public version: string = environment.appVersion;
+    displayUsername: string = '';
+    
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-
-    displayUsername:string ='';
-    show500: boolean;
 
     /**
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _userService: UserService,
@@ -47,22 +42,9 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
         private _fuseNavigationService: FuseNavigationService,
         private _platformsService: PlatformService,
         private _error500Service: Error500Service
-
     )
     {
         this.headerTitle = this.getHeaderTitle(this._activatedRoute.root); 
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Getter for current year
-     */
-    get currentYear(): number
-    {
-        return new Date().getFullYear();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -120,7 +102,6 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
             .subscribe((any) => {
                 this.show500 = any;
             });
-        
     }
 
     /**
@@ -190,7 +171,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
         return labelName;
     }
 
-    textTruncate(str, length, ending?:any){
+    textTruncate(str, length, ending?: any){
         if (length == null) { length = 100; }
         if (ending == null) { ending = '...'; }
         

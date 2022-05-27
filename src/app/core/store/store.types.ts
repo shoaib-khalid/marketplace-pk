@@ -43,6 +43,7 @@ export interface Store
     storeAsset?: StoreAsset;
     storeAssets?: StoreAssets[];
     storeLogoUrl: string;
+    displayAddress: string;
 }
 
 export interface CreateStore

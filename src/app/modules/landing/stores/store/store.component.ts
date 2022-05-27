@@ -215,10 +215,7 @@ export class LandingStoreComponent implements OnInit
         });
 
         // Get the products
-        this.products$ = this._productsService.products$;
-
-        console.log("products$",this.products$);
-        
+        this.products$ = this._productsService.products$;        
 
         // Get the products pagination
         this._productsService.pagination$
