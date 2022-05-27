@@ -44,5 +44,13 @@
                 </div>
             </fuse-card>
         </div>
+        <div class="flex w-full mt-4 items-center justify-center">
+            <pagination 
+                *ngIf="pagination"
+                [itemLength]="pagination.length" 
+                [initialPage]="pagination.page + 1"
+                [pageSize]="pagination.size"
+                (changePage)="onChangePage($event)"></pagination>
+        </div>
     </div>
 </div>

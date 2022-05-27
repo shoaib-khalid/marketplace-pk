@@ -6,11 +6,13 @@ import { SharedModule } from 'app/shared/shared.module';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
 import { landingCategoriesRoutes } from './categories.routing';
-import { LandingCategoriesComponent } from './categories.component';
+import { LandingCategoriesComponent } from './category-list/category-list.component';
+import { CategoryComponent } from './category/category.component';
 
 @NgModule({
     declarations: [
-        LandingCategoriesComponent
+        LandingCategoriesComponent,
+        CategoryComponent
     ],
     imports     : [
         RouterModule.forChild(landingCategoriesRoutes),
@@ -21,6 +23,6 @@ import { LandingCategoriesComponent } from './categories.component';
         FuseCardModule
     ]
 })
-export class LandingCategoriesModule
+export class CategoriesModule
 {
 }

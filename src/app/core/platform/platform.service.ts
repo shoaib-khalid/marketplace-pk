@@ -20,6 +20,7 @@ export class PlatformService
     private _platforms: BehaviorSubject<Platform[] | null> = new BehaviorSubject(null);
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     public platformControl: FormControl = new FormControl();
+    private _currencySymbol: BehaviorSubject<string | null> = new BehaviorSubject<string | null>('');
 
     private url = {
         full: null,
@@ -84,6 +85,22 @@ export class PlatformService
     {
         // Store the value
         this._platforms.next(value);
+    }
+
+    /**
+     * Setter for currency symbol
+     */
+    set setCurrencySymbol$(currency: string)
+    {
+        this._currencySymbol.next(currency);        
+    }
+
+    /**
+     * Getter for currency symbol
+     */
+    get getCurrencySymbol$(): Observable<string>
+    {
+        return this._currencySymbol.asObservable();
     }
 
     // -----------------------------------------------------------------------------------------------------

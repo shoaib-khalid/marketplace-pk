@@ -14,6 +14,7 @@ import { CartService } from './core/cart/cart.service';
 import { HttpStatService } from './mock-api/httpstat/httpstat.service';
 import { switchMap, take, map, tap, catchError, filter } from 'rxjs/operators';
 import { StoresService } from './core/store/store.service';
+import { LocationService } from './core/location/location.service';
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +34,8 @@ export class InitialDataResolver implements Resolve<any>
         private _shortcutsService: ShortcutsService,
         private _cartService: CartService,
         private _userService: UserService,
-        private _httpstatService: HttpStatService
+        private _httpstatService: HttpStatService,
+        private _locationService: LocationService
     )
     {
     }
@@ -61,6 +63,8 @@ export class InitialDataResolver implements Resolve<any>
             this._shortcutsService.getAll(),
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
             this._cartService.getCartsByCustomerId(customerId),
+            this._locationService.getParentCategories('Subang Jaya'),
+            this._locationService.getLocations(0, 10, 'cityId', 'asc')
             // this._httpstatService.get(500)
         ]);
     }
@@ -96,7 +100,14 @@ export class PlatformSetupResolver implements Resolve<any>
     {
         return this._platformsService.set().pipe(
             take(1),
-            switchMap((response) => {                
+            switchMap((response) => {   
+
+                this._storesService.getStoreRegionCountriesById(response.country)
+                .subscribe(country => {
+                    // set currency symbol
+                    this._platformsService.setCurrencySymbol$ = country.currencySymbol
+                })
+                             
                 this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
                 this._storesService.getFeaturedStore("",0,6,response.platformCountry,"created","desc").subscribe(()=>{});
                 return of(true);

@@ -5,12 +5,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from 'app/shared/shared.module';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
-import { LandingLocationsComponent } from './locations.component';
 import { landingLocationsRoutes } from './locations.routing';
+import { LandingLocationsComponent } from './location-list/location-list.component';
+import { LocationComponent } from './location/location.component';
+import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 
 @NgModule({
     declarations: [
-        LandingLocationsComponent
+        LandingLocationsComponent,
+        LocationComponent
     ],
     imports     : [
         RouterModule.forChild(landingLocationsRoutes),
@@ -18,7 +21,8 @@ import { landingLocationsRoutes } from './locations.routing';
         MatIconModule,
         SharedModule,
         MatInputModule,
-        FuseCardModule
+        FuseCardModule,
+        PaginationModule
     ]
 })
 export class LandingLocationsModule

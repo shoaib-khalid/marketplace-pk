@@ -28,50 +28,56 @@
         </div>
         <!-- Promotion Banner -->
         <div class="w-full pt-4">
-                    <!-- Banner -->
-            <div class="flex flex-col relative items-center w-full h-56 mt-4 md:h-96 bg-no-repeat bg-cover bg-center overflow-hidden">
-                <!-- Store Banner -->
+
+            <!-- <div class="flex flex-col relative items-center w-full h-56 mt-4 md:h-96 bg-no-repeat bg-cover bg-center overflow-hidden">
                 <banner-slider></banner-slider>
-            </div>  
+            </div>   -->
+
+            <!-- Banner  -->
+            <div class="flex flex-col relative items-center w-full mt-4 bg-no-repeat bg-cover bg-center overflow-hidden rounded-xl">
+                <swiper-banner class="w-full "></swiper-banner>
+            </div>
         </div>
         <!-- Locations -->
         <div class="flex flex-col pt-8">
             <div class="flex flex-row w-full items-center justify-between">
                 <span class="font-semibold text-xl">Locations</span>
-                <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
+                <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
             </div>
-            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+            <div class="flex flex-nowrap items-center justify-start gap-1 overflow-x-auto">
                 <ng-container *ngFor="let location of locations">
-                    <div class="flex-wrap items-center p-1">
-                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-full filter-article cursor-pointer">
+                    <div class="flex-wrap items-center p-1" [routerLink]="['/location/' + location.cityId]">
+                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
                             <img
                                 class="object-cover h-40"
-                                [src]="location.scene">
-                            <div class="m-1 text-sm text-center font-semibold">{{location.capitalCity}}</div>
+                                [src]="location.imageUrl ? location.imageUrl : platform.logo">
+                            <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
                         </fuse-card>
                     </div>
                 </ng-container>
             </div>
         </div>
         <!-- Categories -->
-        <!-- <div class="flex flex-col pt-8">
+        <div class="flex flex-col pt-8">
             <div class="flex flex-row w-full items-center justify-between">
                 <span class="font-semibold text-xl">Categories</span>
-                <span [routerLink]="'/categories'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
+                <span [routerLink]="'/category/'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
             </div>
             <div class="grid grid-cols-4 gap-1 items-center w-full justify-between pt-2">
                 <ng-container *ngFor="let category of categories">
-                    <div class="grid col-span-1 w-full h-40 items-start justify-center">
-                        <div class="flex flex-col w-full items-center cursor-pointer group">
+                    <div 
+                    class="grid col-span-1 w-full h-40 items-start justify-center" 
+                    >
+                        <div class="flex flex-col w-full items-center cursor-pointer group" (click)="chooseCategory(category.parentId)">
                             <img
-                                class="w-20 h-20 object-contain group-hover:border-2 items-center justify-center bg-stone-200 rounded-full"
-                                [src]="category.url">
-                            <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.name}}</span>
+                                class="w-20 h-20 object-contain group-hover:border-2 items-center justify-center bg-stone-200 rounded-full p-2"
+                                [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
+                            <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.parentName}}</span>
                         </div>
                     </div>
                 </ng-container>
             </div>
-        </div> -->
+        </div>
         <!-- Trending Products -->
         <div class="flex flex-col pt-8">
             <div class="flex flex-row w-full items-center justify-between">
@@ -79,18 +85,18 @@
                 <!-- <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span> -->
             </div>
             <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                <ng-container *ngFor="let location of locations">
+                <ng-container *ngFor="let product of products">
                     <div class="flex-wrap items-center p-1">
                         <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
                             <img
                                 class="object-cover h-30"
-                                [src]="location.productUrl">
+                                [src]="product.thumbnailUrl">
                             <div class="flex flex-col mx-2 mt-1">
-                                <span class="m-0.5 font-semibold">{{location.ProductName}}</span>
-                                <span class="m-0.5 text-gray-400">{{location.storeName}}</span>
+                                <span class="m-0.5 font-semibold line-clamp-1">{{product.name}}</span>
+                                <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
                                 <div class="flex flex-row justify-between">
                                     <span class="line-through text-sm font-semibold">RM 19.44</span>
-                                    <span class="font-semibold">RM 25.00</span>
+                                    <span class="font-semibold">{{product.productInventories[0].price | currency: currencySymbol}}</span>
                                 </div>
                             </div>
                         </fuse-card>

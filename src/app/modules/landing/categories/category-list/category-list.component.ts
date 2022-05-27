@@ -6,7 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector     : 'landing-categories',
-    templateUrl  : './categories.component.html',
+    templateUrl  : './category-list.component.html',
     encapsulation: ViewEncapsulation.None
 })
 export class LandingCategoriesComponent implements OnInit
