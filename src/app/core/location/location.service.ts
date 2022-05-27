@@ -114,7 +114,7 @@ export class LocationService
     getParentCategories(city: string = '', postcode: string = '', regionCountryId: string = '', state: string = ''): Observable<ParentCategory[]>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
@@ -191,7 +191,7 @@ export class LocationService
     getChildCategories(city: string, postcode: string, regionCountryId: string, state: string): Observable<ChildCategory>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
@@ -240,7 +240,7 @@ export class LocationService
             // Observable<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
@@ -302,7 +302,7 @@ export class LocationService
         cityId: string = null, isDisplay: boolean = true): Observable<LandingLocation[]>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
