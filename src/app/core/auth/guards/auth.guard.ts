@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad
     {
 
         let currentRole = this._jwt.getJwtPayload(this._authService.jwtAccessToken).role;
-        if (route.data.roles) {
+        if (currentRole && route.data.roles) {
             // check if route is restricted by role
             this._logging.debug("Required role to access route",route.data.roles.join());
             this._logging.debug("Current user role",currentRole);
@@ -103,6 +103,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad
                            // If the user is not authenticated...
                            if ( !authenticated )
                            {
+                               console.log("masuk");
+                               
                                // Redirect to the sign-in page
                                this._router.navigate(['sign-in'], {queryParams: {redirectURL}});
 

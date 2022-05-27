@@ -10,11 +10,30 @@ import { UserRole } from 'app/core/user/user.roles';
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
+    // Landing routes
     {
-        path      : '',
-        pathMatch : 'full',
-        redirectTo: 'sign-in'
-    },  
+        path       : '',
+        // canActivate: [AuthGuard],
+        // canActivateChild: [AuthGuard],
+        component  : LayoutComponent,
+        data: {
+            layout: 'marketplace',
+            // roles: [UserRole.Admin, UserRole.Customer]
+        },
+        resolve    : {
+            initialData: InitialDataResolver,
+            platformSetup: PlatformSetupResolver
+        },
+        children   : [
+            {path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule)},
+        ]
+    },
+    
+    // {
+    //     path      : '',
+    //     pathMatch : 'full',
+    //     redirectTo: 'sign-in'
+    // },  
     
     // Error
     // {path: 'error', children: [
@@ -23,7 +42,7 @@ export const appRoutes: Route[] = [
     // ]},
     // {path: 'coming-soon', loadChildren: () => import('app/shared/coming-soon/coming-soon.module').then(m => m.ComingSoonModule)},
 
-    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'home'},
+    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: ''},
 
     // Redirect signed in user to the '/example'
     //
@@ -70,25 +89,6 @@ export const appRoutes: Route[] = [
         children: [
             {path: 'sign-out', loadChildren: () => import('app/modules/auth/sign-out/sign-out.module').then(m => m.AuthSignOutModule)},
             {path: 'unlock-session', loadChildren: () => import('app/modules/auth/unlock-session/unlock-session.module').then(m => m.AuthUnlockSessionModule)}
-        ]
-    },
-
-    // Landing routes
-    {
-        path       : '',
-        // canActivate: [AuthGuard],
-        // canActivateChild: [AuthGuard],
-        component  : LayoutComponent,
-        data: {
-            layout: 'marketplace',
-            // roles: [UserRole.Admin, UserRole.Customer]
-        },
-        resolve    : {
-            initialData: InitialDataResolver,
-            platformSetup: PlatformSetupResolver
-        },
-        children   : [
-            {path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule)},
         ]
     },
 

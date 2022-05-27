@@ -102,7 +102,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
                             } 
                             else {
                                 // Redirect to the root
-                                this._router.navigate(['/home']);
+                                this._router.navigate(['/']);
                             }
                         });
                     

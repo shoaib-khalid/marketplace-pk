@@ -201,7 +201,7 @@ export class LandingStoreComponent implements OnInit
                 // } else if (this.url.subDomainName === "symplified" && state.url.indexOf("/payment-redirect") > -1) {
                     // redirecting
                 } else {
-                    // this._router.navigate(['home']);
+                    // this._router.navigate(['']);
                     // alert("no store id");
                     console.error("No store found");
                 }

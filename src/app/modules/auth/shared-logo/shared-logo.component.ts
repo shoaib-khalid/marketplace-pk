@@ -59,7 +59,7 @@ export class SharedLogoComponent implements OnInit
     }
 
     goToHome() {
-        this._router.navigate(['home']);
+        this._router.navigate(['']);
 
         // Navigate to the internal redirect url (temporary)
         // const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";

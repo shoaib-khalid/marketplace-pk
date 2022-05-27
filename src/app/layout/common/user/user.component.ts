@@ -193,7 +193,7 @@ export class UserComponent implements OnInit, OnDestroy
         timer(1000, 1000)
             .pipe(
                 finalize(() => {
-                    this._router.navigate(['home']);
+                    this._router.navigate(['']);
                 }),
                 takeWhile(() => this.countdown > 0),
                 takeUntil(this._unsubscribeAll),
