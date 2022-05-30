@@ -106,7 +106,7 @@ export class LandingHomeComponent implements OnInit
             this.platform = platform;  
 
             // Get featured stores
-            this._locationService.getFeaturedStores(0, this.mobileView ? 4 : 15, platform.country)
+            this._locationService.getFeaturedStores(0, 15, platform.country)
             .subscribe((stores) => {
                 
                 this.featuredStores = stores;  
@@ -128,15 +128,6 @@ export class LandingHomeComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-    }
-
-
-    chooseStore(storeDomain:string) {
-        
-        let slug = storeDomain.split(".")[0]
-        
-        this._router.navigate(['/store/' + slug]);
-        
     }
 
     chooseCategory(id) {

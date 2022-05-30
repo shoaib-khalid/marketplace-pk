@@ -11,7 +11,6 @@ export interface IAppConfig {
         deliveryService:string;
         paymentService:string;
         locationService: string;
-
     };
     storeFrontDomain:string;
     marketplaceDomain:string,

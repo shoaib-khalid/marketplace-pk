@@ -230,14 +230,6 @@ export class LandingSearchComponent implements OnInit
         }
     }
 
-    chooseStore(storeDomain:string) {
-        
-        let slug = storeDomain.split(".")[0]
-        
-        this._router.navigate(['/stores/' + slug]);
-        
-    }
-
     chooseCategory(id) {
         // let index = this.storeCategories.findIndex(item => item.id === id);
         // if (index > -1) {
