@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
 import { Router } from '@angular/router';
+import { SearchService } from './search.service';
 
 @Component({
     selector     : 'search',
@@ -30,8 +31,10 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
     constructor(
         private _elementRef: ElementRef,
         private _httpClient: HttpClient,
+        private _searchService: SearchService,
         private _router: Router,
-        private _renderer2: Renderer2
+        private _renderer2: Renderer2,
+        private _changeDetectorRef: ChangeDetectorRef
     )
     {
     }
@@ -98,38 +101,14 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-        // Subscribe to the search field value changes
-        this.searchControl.valueChanges
-            .pipe(
-                debounceTime(this.debounce),
-                takeUntil(this._unsubscribeAll),
-                map((value) => {
+        this._searchService.get()
+            .subscribe((response)=>{
+                console.log("response", response);
+               
+                this.resultSets = response;
 
-                    // Set the resultSets to null if there is no value or
-                    // the length of the value is smaller than the minLength
-                    // so the autocomplete panel can be closed
-                    if ( !value || value.length < this.minLength )
-                    {
-                        this.resultSets = null;
-                    }
-
-                    // Continue
-                    return value;
-                }),
-                // Filter out undefined/null/false statements and also
-                // filter out the values that are smaller than minLength
-                filter(value => value && value.length >= this.minLength)
-            )
-            .subscribe((value) => {
-                this._httpClient.post('api/common/search', {query: value})
-                    .subscribe((resultSets: any) => {
-
-                        // Store the result sets
-                        this.resultSets = resultSets;
-
-                        // Execute the event
-                        this.search.next(resultSets);
-                    });
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
     }
 
@@ -213,8 +192,35 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
         return item.id || index;
     }
 
-    goToSearch()
+    goToSearch(value: string)
     {
+        let now = new Date();
+        let dataSearch = {
+            searchText  : value,
+            created     : (now.getMonth()+1).toString().padStart(2, '0') + "/" +
+                          now.getDate().toString().padStart(2, '0') + "/" +
+                          now.getFullYear().toString().padStart(4, '0') + " " +
+                          now.getHours().toString().padStart(2, '0') + ":" +
+                          now.getMinutes().toString().padStart(2, '0') + ":" +
+                          now.getSeconds().toString().padStart(2, '0'),
+            storeId     : null
+        };
+        
+        let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$);        
+
+        // array empty or does not exist
+        if (localDataSearch === undefined || localDataSearch.length == 0) {
+            localDataSearch = [dataSearch];
+        } else {
+            if (localDataSearch.length > 4) {
+                localDataSearch.pop();
+            }
+            localDataSearch.unshift(dataSearch);
+        }
+
+        this._searchService.localSearch = localDataSearch;
+        this.resultSets = localDataSearch;        
+
         this._router.navigate(['/search']);
     }
 }
