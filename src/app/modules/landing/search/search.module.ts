@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
 import { BannerModule } from 'app/layout/common/banner/banner.module';
 import { SwiperBannerModule } from 'app/layout/common/swiper-banner/swiper-banner.module';
+import { _SearchModule } from 'app/layout/common/_search/search.module';
 
 @NgModule({
     declarations: [
@@ -22,6 +23,7 @@ import { SwiperBannerModule } from 'app/layout/common/swiper-banner/swiper-banne
         MatInputModule,
         FuseCardModule,
         BannerModule,
+        _SearchModule,
         SwiperBannerModule
     ]
 })

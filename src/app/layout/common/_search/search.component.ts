@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
+import { Router } from '@angular/router';
 
 @Component({
     selector     : 'search',
@@ -29,6 +30,7 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
     constructor(
         private _elementRef: ElementRef,
         private _httpClient: HttpClient,
+        private _router: Router,
         private _renderer2: Renderer2
     )
     {
@@ -209,5 +211,10 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
+    }
+
+    goToSearch()
+    {
+        this._router.navigate(['/search']);
     }
 }

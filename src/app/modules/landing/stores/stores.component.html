@@ -1,73 +1,47 @@
-<div class="flex flex-col items-center bg-card w-full px-3 h-full">
-    <div class="w-full sm:p-4">
-        <!-- Search -->
-        <div class="flex flex-col w-full pt-4">
-            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
-                <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
-                <input
-                    class="pl-4"
-                    matInput
-                    [autocomplete]="'off'"
-                    [placeholder]="'Search..'">
-                <!-- filter -->
-                <div class="w-15 py-1">
-                    <input
-                        id="add-voucher-button"
-                        type="button"
-                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                        mat-button
-                        >
-                    <label 
-                        class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
-                        for="add-voucher-button"
-                        matRipple>
-                        <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
-                    </label>
+<div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
+    <!-- Search -->
+    <search class="w-full"></search>
+
+    <!-- Stores -->
+    <div class="flex flex-col mt-4">
+        <!-- store list -->
+        <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
+            <ng-container *ngFor="let store of stores">
+                <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
+                    <fuse-card
+                        (click)="chooseStore(store.domain)" 
+                        class="flex flex-col rounded-lg border border-gray-300 h-60 w-44 mb-3 cursor-pointer filter-article">
+                        <img
+                            class="object-cover h-26"
+                            [src]="displayStoreLogo(store.storeAssets)">
+                        <div class="flex flex-col m-2 font-semibold">
+                            <span class="group-hover:text-primary overflow-hidden  text-lg">{{store.name}}</span>
+                            <!-- <div class="relative h-auto">
+                                <div 
+                                    class="mt-2 mb-4 text-ellipsis overflow-hidden"
+                                    [ngClass]="h-auto"
+                                    >
+                                    <span class="font-medium text-black text-xs" [innerHtml]="store.storeDescription"></span>
+                                </div>
+                                <span class="absolute font-medium text-black text-xs bottom-0 left-0" [ngClass]="displaySeeMore(store.storeDescription) ? 'block' : 'hidden'">...more</span>
+                            </div> -->
+                            <p class="flex flex-row font-medium text-black text-xs break-all" [innerHTML]="store.storeDescription"></p>
+                        </div>
+                    </fuse-card>
                 </div>
-            </mat-form-field>
+            </ng-container>
         </div>
-
-        <!-- Stores -->
-        <div class="flex flex-col pt-8">
-            <!-- store list -->
-            <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
-                <ng-container *ngFor="let store of stores">
-                    <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
-                        <fuse-card
-                            (click)="chooseStore(store.domain)" 
-                            class="flex flex-col rounded-lg border border-gray-300 h-60 w-44 mb-3 cursor-pointer filter-article">
-                            <img
-                                class="object-cover h-26"
-                                [src]="displayStoreLogo(store.storeAssets)">
-                            <div class="flex flex-col m-2 font-semibold">
-                                <span class="group-hover:text-primary overflow-hidden  text-lg">{{store.name}}</span>
-                                <!-- <div class="relative h-auto">
-                                    <div 
-                                        class="mt-2 mb-4 text-ellipsis overflow-hidden"
-                                        [ngClass]="h-auto"
-                                        >
-                                        <span class="font-medium text-black text-xs" [innerHtml]="store.storeDescription"></span>
-                                    </div>
-                                    <span class="absolute font-medium text-black text-xs bottom-0 left-0" [ngClass]="displaySeeMore(store.storeDescription) ? 'block' : 'hidden'">...more</span>
-                                </div> -->
-                                <p class="flex flex-row font-medium text-black text-xs break-all" [innerHTML]="store.storeDescription"></p>
-                            </div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <ng-container *ngIf="pagination">
-            <div class="flex w-full my-4 items-center justify-center">
-                <pagination 
-                    [itemLength]="pagination.length" 
-                    [initialPage]="pagination.page + 1"
-                    [pageSize]="pagination.size"
-                    (changePage)="onChangePage($event)"
-                    #storesPaginator></pagination>
-            </div>
-        </ng-container>
     </div>
+
+    <!-- Pagination -->
+    <ng-container *ngIf="pagination">
+        <div class="flex w-full my-4 items-center justify-center">
+            <pagination 
+                [itemLength]="pagination.length" 
+                [initialPage]="pagination.page + 1"
+                [pageSize]="pagination.size"
+                (changePage)="onChangePage($event)"
+                #storesPaginator></pagination>
+        </div>
+    </ng-container>
 </div>

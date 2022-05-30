@@ -9,6 +9,7 @@ import { landingLocationsRoutes } from './locations.routing';
 import { LandingLocationsComponent } from './location-list/location-list.component';
 import { LocationComponent } from './location/location.component';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
+import { _SearchModule } from 'app/layout/common/_search/search.module';
 
 @NgModule({
     declarations: [
@@ -22,6 +23,7 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
         SharedModule,
         MatInputModule,
         FuseCardModule,
+        _SearchModule,
         PaginationModule
     ]
 })

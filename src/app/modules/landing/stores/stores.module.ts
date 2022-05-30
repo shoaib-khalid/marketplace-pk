@@ -16,6 +16,7 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
 import { LandingProductDetailsComponent } from './product-details/product-details.component';
 import { NgxGalleryModule } from 'ngx-gallery-9';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { _SearchModule } from 'app/layout/common/_search/search.module';
 
 @NgModule({
     declarations: [
@@ -36,6 +37,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatMenuModule,
         PaginationModule,
         NgxGalleryModule,
+        _SearchModule,
         FontAwesomeModule
     ],
     exports     : [
