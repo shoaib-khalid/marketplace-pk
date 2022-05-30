@@ -10,6 +10,7 @@ import { FuseCardModule } from '@fuse/components/card';
 import { BannerModule } from 'app/layout/common/banner/banner.module';
 import { SwiperBannerModule } from 'app/layout/common/swiper-banner/swiper-banner.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
+import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 
 @NgModule({
     declarations: [
@@ -24,6 +25,7 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
         FuseCardModule,
         BannerModule,
         _SearchModule,
+        _FeaturedStoresModule,
         SwiperBannerModule
     ]
 })

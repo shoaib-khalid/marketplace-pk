@@ -197,12 +197,4 @@ export class LandingStoresComponent implements OnInit
             return false;
         }
     }
-
-    chooseStore(storeDomain:string) {
-        
-        let slug = storeDomain.split(".")[0]
-        
-        this._router.navigate(['/store/' + slug]);
-        
-    }
 }

@@ -17,6 +17,7 @@ import { NgxGalleryModule } from 'ngx-gallery-9';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { LandingStoresComponent } from './store-list/store-list.component';
+import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 
 @NgModule({
     declarations: [
@@ -38,6 +39,7 @@ import { LandingStoresComponent } from './store-list/store-list.component';
         PaginationModule,
         NgxGalleryModule,
         _SearchModule,
+        _FeaturedStoresModule,
         FontAwesomeModule
     ],
     exports     : [

@@ -9,6 +9,7 @@ import { landingCategoriesRoutes } from './categories.routing';
 import { LandingCategoriesComponent } from './category-list/category-list.component';
 import { CategoryComponent } from './category/category.component';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
+import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 
 @NgModule({
     declarations: [
@@ -22,6 +23,7 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
         SharedModule,
         MatInputModule,
         _SearchModule,
+        _FeaturedStoresModule,
         FuseCardModule
     ]
 })
