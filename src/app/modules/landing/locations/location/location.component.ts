@@ -111,7 +111,7 @@ export class LocationComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
                 this.platform = platform;  
-                this._storesService.featuredStores$
+                this._locationService.featuredStores$
                     .pipe(takeUntil(this._unsubscribeAll))
                     .subscribe((stores: Store[]) => { 
                         this.stores = stores;  

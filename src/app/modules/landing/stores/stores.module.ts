@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from 'app/shared/shared.module';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
-import { LandingStoresComponent } from './stores.component';
 import { landingStoresRoutes } from './stores.routing';
 import { LandingStoreComponent } from './store/store.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,6 +16,7 @@ import { LandingProductDetailsComponent } from './product-details/product-detail
 import { NgxGalleryModule } from 'ngx-gallery-9';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
+import { LandingStoresComponent } from './store-list/store-list.component';
 
 @NgModule({
     declarations: [

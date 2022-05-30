@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
 import { ParentCategory, ProductOnLocation, ProductOnLocationPagination, LandingLocation } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -20,13 +21,14 @@ export class LandingHomeComponent implements OnInit
 
     locations: LandingLocation[];
     categories: ParentCategory[] = [];
-    stores: any;
+    featuredStores: any;
    
     platform: Platform;
     image: any = [];
     countryCode:string = '';
     products: ProductOnLocation[];
     currencySymbol: string;
+    mobileView: boolean = false;
 
 
     /**
@@ -38,13 +40,32 @@ export class LandingHomeComponent implements OnInit
         private _platformsService: PlatformService,
         private _storesService: StoresService,
         private _router: Router,
-        private _locationService: LocationService
+        private _locationService: LocationService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+
     )
     {
     }
 
     ngOnInit(): void {
-        
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                if ( matchingAliases.includes('lg') ) {
+                } else if ( matchingAliases.includes('md') ) {
+
+                } else if ( matchingAliases.includes('sm') ) {
+                    this.mobileView = false;
+                } else {
+                    this.mobileView = true;
+                }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         // Set currency symbol
         this._platformsService.getCurrencySymbol$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -57,17 +78,18 @@ export class LandingHomeComponent implements OnInit
             })
 
         // Get locations
-        this._locationService.locations$
+        this._locationService.getLocations(0, this.mobileView ? 5 : 10, 'cityId', 'asc')
             .subscribe((locations) => {
 
-                // to show only 5
-                if (locations.length >= 5) {
-                    const slicedArray = locations.slice(0, 5);
-                    this.locations = slicedArray;
-                }    
-                else {
-                    this.locations = locations;
-                }            
+                // // to show only 5
+                // if (locations.length >= 5) {
+                //     const slicedArray = locations.slice(0, 5);
+                //     this.locations = slicedArray;
+                // }    
+                // else {
+                //     this.locations = locations;
+                // }            
+                this.locations = locations;
                 
             })    
 
@@ -83,19 +105,18 @@ export class LandingHomeComponent implements OnInit
 
             this.platform = platform;  
 
-            this._storesService.featuredStores$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: Store[]) => { 
-                this.stores = stores;  
+            // Get featured stores
+            this._locationService.getFeaturedStores(0, this.mobileView ? 4 : 15, platform.country)
+            .subscribe((stores) => {
                 
-                this._changeDetectorRef.markForCheck();
-    
-            });
+                this.featuredStores = stores;  
+            })  
     
             this._changeDetectorRef.markForCheck();
 
         });
 
+        
 
     }
 
@@ -109,20 +130,12 @@ export class LandingHomeComponent implements OnInit
         this._unsubscribeAll.complete();
     }
 
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
-        } else {
-            return 'assets/branding/symplified/logo/symplified.png'
-        }
-    }
 
     chooseStore(storeDomain:string) {
         
         let slug = storeDomain.split(".")[0]
         
-        this._router.navigate(['/stores/' + slug]);
+        this._router.navigate(['/store/' + slug]);
         
     }
 

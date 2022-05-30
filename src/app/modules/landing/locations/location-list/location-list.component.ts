@@ -47,7 +47,6 @@ export class LandingLocationsComponent implements OnInit
                 this._changeDetectorRef.markForCheck();           
             });
 
-        // Get customer voucher pagination, isUsed = false 
         this._locationService.locationPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: LocationPagination) => {
@@ -107,7 +106,7 @@ export class LandingLocationsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getLocations(0, 10);
+                        return this._locationService.getLocations(0, 20);
                     }),
                     map(() => {
                         this.isLoading = false;

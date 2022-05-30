@@ -1,19 +1,24 @@
 import { Route } from '@angular/router';
 import { LandingProductDetailsComponent } from './product-details/product-details.component';
 import { ProductResolver } from './product-details/product-details.resolver';
+import { LandingStoresComponent } from './store-list/store-list.component';
 import { LandingStoreComponent } from './store/store.component';
-import { LandingStoresComponent } from './stores.component';
 import { StoresResolver } from './stores.resolvers';
 
 export const landingStoresRoutes: Route[] = [
     {
-        path     : '',
+        path      : '',
+        pathMatch : 'full',
+        redirectTo: 'store-list'
+    },
+    {
+        path     : 'store-list',
         data: {
             headerTitle: 'All Stores'
         },
-        // resolve  : {
-        //     stores: StoresResolver,
-        // },
+        resolve  : {
+            stores: StoresResolver,
+        },
         component: LandingStoresComponent
     },
     {

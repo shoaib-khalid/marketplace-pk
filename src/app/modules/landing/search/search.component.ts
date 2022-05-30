@@ -195,7 +195,7 @@ export class LandingSearchComponent implements OnInit
 
             this.platform = platform;  
 
-            this._storesService.featuredStores$
+            this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: Store[]) => { 
                 this.stores = stores;  

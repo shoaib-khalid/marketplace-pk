@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { LocationService } from 'app/core/location/location.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -12,7 +13,7 @@ import { switchMap, debounceTime } from 'rxjs/operators';
 
 @Component({
     selector     : 'landing-stores',
-    templateUrl  : './stores.component.html',
+    templateUrl  : './store-list.component.html',
     encapsulation: ViewEncapsulation.None
 })
 export class LandingStoresComponent implements OnInit
@@ -42,6 +43,8 @@ export class LandingStoresComponent implements OnInit
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _storesService: StoresService,
         private _router: Router,
+        private _locationService: LocationService,
+
     )
     {
     }
@@ -57,16 +60,16 @@ export class LandingStoresComponent implements OnInit
             this._changeDetectorRef.markForCheck();
 
         });
-        this._storesService.stores$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((stores: Store[]) => { 
-            this.stores = stores;             
+        this._locationService.featuredStores$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((stores: Store[]) => { 
+                this.stores = stores;             
 
-            this._changeDetectorRef.markForCheck();
-        });
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get the store pagination
-        this._storesService.pagination$
+        this._locationService.featuredStorePagination$
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((pagination: StorePagination) => {
             
@@ -89,7 +92,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._storesService.getStores("",0, 10, this.platform.country,this.sortName, this.sortOrder,this.searchName);
+                return this._locationService.getFeaturedStores(0, 20, this.platform.country);
             }),
             map(() => {
                 // set loading to false
@@ -138,7 +141,7 @@ export class LandingStoresComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._storesService.getStores("",this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country, this.sortName, this.sortOrder,this.searchName);
+                        return this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -159,7 +162,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._storesService.getStores("", this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country, this.sortName, this.sortOrder, this.searchName)
+                this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country)
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;
@@ -169,15 +172,6 @@ export class LandingStoresComponent implements OnInit
         
         // Mark for check
         this._changeDetectorRef.markForCheck();
-    }
-
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
-        } else {
-            return 'assets/branding/symplified/logo/symplified.png'
-        }
     }
 
     /**
@@ -208,7 +202,7 @@ export class LandingStoresComponent implements OnInit
         
         let slug = storeDomain.split(".")[0]
         
-        this._router.navigate(['/stores/' + slug]);
+        this._router.navigate(['/store/' + slug]);
         
     }
 }

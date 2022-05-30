@@ -64,7 +64,6 @@ export class InitialDataResolver implements Resolve<any>
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
             this._cartService.getCartsByCustomerId(customerId),
             this._locationService.getParentCategories('Subang Jaya'),
-            this._locationService.getLocations(0, 10, 'cityId', 'asc')
             // this._httpstatService.get(500)
         ]);
     }
@@ -81,7 +80,7 @@ export class PlatformSetupResolver implements Resolve<any>
     constructor(
         private _platformsService: PlatformService,
         private _storesService: StoresService,
-
+        private _locationService: LocationService
     )
     {
     }
@@ -109,7 +108,7 @@ export class PlatformSetupResolver implements Resolve<any>
                 })
                              
                 this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
-                this._storesService.getFeaturedStore("",0,6,response.platformCountry,"created","desc").subscribe(()=>{});
+                // this._locationService.getFeaturedStores(0, 20, response.platformCountry,"created","desc").subscribe(()=>{});
                 return of(true);
             })
         )

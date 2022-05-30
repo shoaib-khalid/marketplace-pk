@@ -20,10 +20,10 @@ export class StoresService
     private _stores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
     private _pagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
 
-    // for featured store display
-    private _featuredStore: BehaviorSubject<Store | null> = new BehaviorSubject(null);
-    private _featuredStores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
-    private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+    // // for featured store display
+    // private _featuredStore: BehaviorSubject<Store | null> = new BehaviorSubject(null);
+    // private _featuredStores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
+    // private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
 
     private _storeCategory: BehaviorSubject<StoreCategory | null> = new BehaviorSubject(null);
     private _storeCategories: BehaviorSubject<StoreCategory[] | null> = new BehaviorSubject(null);
@@ -58,58 +58,6 @@ export class StoresService
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
-
-    // ----------------------
-    //    Featured Store
-    //----------------------- 
-
-    /**
-    * Getter for store
-    *
-    */
-    get featuredStore$(): Observable<Store>
-    {
-        return this._featuredStore.asObservable();
-    }
-
-    /**
-    * Setter for stores
-    *
-    * @param value
-    */
-    set featuredStore(value: Store)
-    {
-        // Store the value
-        this._featuredStore.next(value);
-    }
-
-    /**
-     * Getter for stores
-     *
-    */
-    get featuredStores$(): Observable<Store[]>
-    {
-        return this._featuredStores.asObservable();
-    }
-    
-    /**
-     * Setter for stores
-     *
-     * @param value
-     */
-    set featuredStores(value: Store[])
-    {
-        // Store the value
-        this._featuredStores.next(value);
-    }
-
-    /**
-    * Getter for stores pagination
-    */
-    get featuredStorePagination$(): Observable<StorePagination>
-    {
-        return this._featuredStorePagination.asObservable();
-    }
 
     // ----------------------
     //         Store
@@ -414,82 +362,6 @@ export class StoresService
 
                 this._pagination.next(_pagination);
                 this._stores.next(this._currentStores);
-            })
-        );
-    }
-
-    /**
-    * Get the current logged in store data
-    */
-    getFeaturedStore(id: string = "", page: number = 0, size: number = 6, regionCountryId: string ="" , sort: string = 'created', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
-    Observable<{ pagination: StorePagination; stores: Store[] }>
-    {
-        let productService = this._apiServer.settings.apiServer.productService;
-        let accessToken = this._authService.publicToken;
-        // let clientId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
-
-        if(search === null || regionCountryId === null) {
-            regionCountryId = ""
-            search = ""
-        }
-
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                // clientId: clientId,
-                page: '' + page,
-                pageSize: '' + size,
-                regionCountryId: '' + regionCountryId,
-                sortByCol: '' + sort,
-                sortingOrder: '' + order.toUpperCase(),
-                name: '' + search
-            }
-        };
-
-        if (category !== "") {
-            header.params["verticalCode"] = category;
-        }
-
-        // if ada id change url stucture
-        if (id !== "") { id = "/" + id } 
-        
-        return this._httpClient.get<{ pagination: StorePagination; stores: Store[] }>(productService + '/stores' + id, header)
-        .pipe(
-            tap((response) => {
-                
-                this._logging.debug("Response from StoresService (getFeaturedStore)",response);
-
-                // Pagination
-                let _pagination = {
-                    length: response["data"].totalElements,
-                    size: response["data"].size,
-                    page: response["data"].number,
-                    lastPage: response["data"].totalPages,
-                    startIndex: response["data"].pageable.offset,
-                    endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                }
-                
-                // this is local
-                this._currentStores = response["data"].content;
-                
-                (this._currentStores).forEach(async (item, index) => {
-                    // let assets = await this.getStoreAssets(item.id);
-                    // this._currentStores[index] = Object.assign(this._currentStores[index],{storeLogo: "" });
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{slug: item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{duration: 30});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{totalSteps: 3});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{featured: true});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{progress: { completed: 2, currentStep: 2  }});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{category: item.type});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{completed: 2});
-                    this._currentStores[index] = Object.assign(this._currentStores[index],{currentStep: 3});
-                    // this._currentStores[index]["storeLogo"] = (assets && assets !== null) ? assets["logoUrl"] : "";
-                });
-
-                // this is observable service
-
-                this._featuredStorePagination.next(_pagination);
-                this._featuredStores.next(this._currentStores);
             })
         );
     }

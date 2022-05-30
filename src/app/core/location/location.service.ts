@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
 import { ApiResponseModel, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductOnLocation, ProductOnLocationPagination } from './location.types';
+import { Store, StorePagination } from '../store/store.types';
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +21,12 @@ export class LocationService
     private _locations: BehaviorSubject<LandingLocation[] | null> = new BehaviorSubject<LandingLocation[]>(null);
     private _location: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
     private _locationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
+
+    // for featured store display
+    private _featuredStore: BehaviorSubject<Store | null> = new BehaviorSubject(null);
+    private _featuredStores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
+    private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+    
     
 
     /**
@@ -103,6 +110,58 @@ export class LocationService
     {
         return this._locationPagination.asObservable();
     }
+
+    // ----------------------
+    //    Featured Store
+    //----------------------- 
+
+    /**
+    * Getter for store
+    *
+    */
+     get featuredStore$(): Observable<Store>
+     {
+         return this._featuredStore.asObservable();
+     }
+ 
+     /**
+     * Setter for stores
+     *
+     * @param value
+     */
+     set featuredStore(value: Store)
+     {
+         // Store the value
+         this._featuredStore.next(value);
+     }
+ 
+     /**
+      * Getter for stores
+      *
+     */
+     get featuredStores$(): Observable<Store[]>
+     {
+         return this._featuredStores.asObservable();
+     }
+     
+     /**
+      * Setter for stores
+      *
+      * @param value
+      */
+     set featuredStores(value: Store[])
+     {
+         // Store the value
+         this._featuredStores.next(value);
+     }
+ 
+     /**
+     * Getter for stores pagination
+     */
+     get featuredStorePagination$(): Observable<StorePagination>
+     {
+         return this._featuredStorePagination.asObservable();
+     }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
@@ -235,7 +294,7 @@ export class LocationService
      * @returns 
      */
     getLocationBasedProducts(page: number = 0, pageSize: number = 5, sortByCol: string = 'name', sortingOrder: 'asc' | 'desc' | '' = 'asc',
-        city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '', status: string = 'ACTIVE'): 
+        city: string = '', regionCountryId: string = '', postcode: string = '', stateId: string = '', status: string = 'ACTIVE'): 
             Observable<any>
             // Observable<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>
     {        
@@ -298,7 +357,7 @@ export class LocationService
      * @param isDisplay 
      * @returns 
      */
-    getLocations(page: number = 0, pageSize: number = 10, sortByCol: string = 'cityId', sortingOrder: 'asc' | 'desc' | '' = 'asc',
+    getLocations(page: number = 0, pageSize: number = 20, sortByCol: string = 'cityId', sortingOrder: 'asc' | 'desc' | '' = 'asc',
         cityId: string = null, isDisplay: boolean = true): Observable<LandingLocation[]>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
@@ -342,7 +401,6 @@ export class LocationService
                     return response["data"].content;
                 })
             );
-
     }
  
      /**
@@ -379,5 +437,45 @@ export class LocationService
                 return of(location);
             })
         );
+    }
+
+    getFeaturedStores(page: number = 0, pageSize: number = 20, regionCountryId: string = '', isDisplay: boolean = true): Observable<Store[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                page        : '' + page,
+                pageSize    : '' + pageSize,
+
+                regionCountryId : regionCountryId,
+                isDisplay   : isDisplay,
+            }
+        };
+
+        if (!regionCountryId) {delete header.params.regionCountryId}
+
+        return this._httpClient.get<Store[]>(locationService + '/config/store', header)
+            .pipe(
+                switchMap(async (response:Store[]) => {
+                                
+                    this._logging.debug("Response from LocationService (getFeaturedStores)", response);
+
+                    let _pagination = {
+                        length: response["data"].totalElements,
+                        size: response["data"].size,
+                        page: response["data"].number,
+                        lastPage: response["data"].totalPages,
+                        startIndex: response["data"].pageable.offset,
+                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    }
+                    this._featuredStorePagination.next(_pagination);
+                    this._featuredStores.next(response["data"].content);
+
+                    return response["data"].content;
+                })
+            );
     }
 }

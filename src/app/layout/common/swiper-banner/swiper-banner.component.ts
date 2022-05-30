@@ -166,14 +166,14 @@ export class SwiperBannerComponent
         }
  
         this._fuseMediaWatcherService.onMediaChange$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(({matchingAliases}) => {               
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
 
-            this.currentScreenSize = matchingAliases;                
+                this.currentScreenSize = matchingAliases;                
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     /**
