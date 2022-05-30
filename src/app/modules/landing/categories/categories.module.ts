@@ -8,6 +8,7 @@ import { FuseCardModule } from '@fuse/components/card';
 import { landingCategoriesRoutes } from './categories.routing';
 import { LandingCategoriesComponent } from './category-list/category-list.component';
 import { CategoryComponent } from './category/category.component';
+import { _SearchModule } from 'app/layout/common/_search/search.module';
 
 @NgModule({
     declarations: [
@@ -20,6 +21,7 @@ import { CategoryComponent } from './category/category.component';
         MatIconModule,
         SharedModule,
         MatInputModule,
+        _SearchModule,
         FuseCardModule
     ]
 })

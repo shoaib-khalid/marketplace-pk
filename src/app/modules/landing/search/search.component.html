@@ -1,30 +1,6 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
     <!-- Search -->
-    <div class="flex flex-col w-full mt-2 sm:mt-0">
-        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
-            <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
-            <input
-                class="pl-4"
-                matInput
-                [autocomplete]="'off'"
-                [placeholder]="'Search..'">
-            <!-- filter -->
-            <div class="w-15 py-1">
-                <input
-                    id="add-voucher-button"
-                    type="button"
-                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                    mat-button
-                    >
-                <label 
-                    class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
-                    for="add-voucher-button"
-                    matRipple>
-                    <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
-                </label>
-            </div>
-        </mat-form-field>
-    </div>
+    <search class="w-full"></search>
     
     <!-- Featured store -->
     <div class="flex flex-row items-center justify-between w-full mt-4">
