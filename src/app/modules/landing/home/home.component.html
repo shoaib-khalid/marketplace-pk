@@ -1,170 +1,165 @@
-<div class="flex flex-col items-center bg-card w-full px-3 h-full">
-    <div class="w-full sm:p-4">
-        <!-- Search -->
-        <div class="flex flex-col w-full pt-4">
-            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
-                <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
+<div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
+    <!-- Search -->
+    <div class="flex flex-col w-full mt-2 sm:mt-0">
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+            <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
+            <input
+                class="pl-4"
+                matInput
+                [autocomplete]="'off'"
+                [placeholder]="'Search..'">
+            <div class="w-15 py-1">
                 <input
-                    class="pl-4"
-                    matInput
-                    [autocomplete]="'off'"
-                    [placeholder]="'Search..'">
-                <!-- filter -->
-                <div class="w-15 py-1">
-                    <input
-                        id="add-voucher-button"
-                        type="button"
-                        class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                        mat-button
-                        >
-                    <label 
-                        class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
-                        for="add-voucher-button"
-                        matRipple>
-                        <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
-                    </label>
-                </div>
-            </mat-form-field>
-        </div>
-        <!-- Promotion Banner -->
-        <div class="w-full pt-4">
-
-            <!-- <div class="flex flex-col relative items-center w-full h-56 mt-4 md:h-96 bg-no-repeat bg-cover bg-center overflow-hidden">
-                <banner-slider></banner-slider>
-            </div>   -->
-
-            <!-- Banner  -->
-            <div class="flex flex-col relative items-center w-full mt-4 bg-no-repeat bg-cover bg-center overflow-hidden rounded-xl">
-                <swiper-banner class="w-full "></swiper-banner>
+                    id="add-voucher-button"
+                    type="button"
+                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                    mat-button
+                    >
+                <label 
+                    class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
+                    for="add-voucher-button"
+                    matRipple>
+                    <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
+                </label>
             </div>
+        </mat-form-field>
+    </div>
+    <!-- Promotion Banner -->
+    <div class="w-full">
+        <!-- <div class="flex flex-col relative items-center w-full h-56 mt-4 md:h-96 bg-no-repeat bg-cover bg-center overflow-hidden">
+            <banner-slider></banner-slider>
+        </div>   -->
+        <!-- Banner  -->
+        <div class="flex flex-col relative items-center w-full mt-4 bg-no-repeat bg-cover bg-center overflow-hidden rounded-xl">
+            <swiper-banner class="w-full"></swiper-banner>
+        </div>
+    </div>
+    <!-- Locations -->
+    <div class="flex flex-col w-full mt-4">
+        <!-- See More -->
+        <div class="flex flex-row w-full items-center justify-between">
+            <span class="font-semibold text-xl">Locations</span>
+            <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
         </div>
         <!-- Locations -->
-        <div class="flex flex-col pt-8">
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Locations</span>
-                <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
-            </div>
-            <div class="flex flex-nowrap items-center justify-start gap-1 overflow-x-auto">
-                <ng-container *ngFor="let location of locations">
-                    <div class="flex-wrap items-center p-1" [routerLink]="['/location/' + location.cityId]">
-                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
-                            <img
-                                class="object-cover h-40"
-                                [src]="location.imageUrl ? location.imageUrl : platform.logo">
-                            <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- Categories -->
-        <div class="flex flex-col pt-8">
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Categories</span>
-                <span [routerLink]="'/category/'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
-            </div>
-            <div class="grid grid-cols-4 gap-1 items-center w-full justify-between pt-2">
-                <ng-container *ngFor="let category of categories">
-                    <div 
-                    class="grid col-span-1 w-full h-40 items-start justify-center" 
-                    >
-                        <div class="flex flex-col w-full items-center cursor-pointer group" (click)="chooseCategory(category.parentId)">
-                            <img
-                                class="w-20 h-20 object-contain group-hover:border-2 items-center justify-center bg-stone-200 rounded-full p-2"
-                                [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
-                            <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.parentName}}</span>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- Trending Products -->
-        <div class="flex flex-col pt-8">
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Trending Products</span>
-                <!-- <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span> -->
-            </div>
-            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                <ng-container *ngFor="let product of products">
-                    <div class="flex-wrap items-center p-1">
-                        <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
-                            <img
-                                class="object-cover h-30"
-                                [src]="product.thumbnailUrl">
-                            <div class="flex flex-col mx-2 mt-1">
-                                <span class="m-0.5 font-semibold line-clamp-1">{{product.name}}</span>
-                                <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
-                                <div class="flex flex-row justify-between">
-                                    <span class="line-through text-sm font-semibold">RM 19.44</span>
-                                    <span class="font-semibold">{{product.productInventories[0].price | currency: currencySymbol}}</span>
-                                </div>
-                            </div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- Featured store -->
-        <div class="flex flex-row w-full items-center justify-between pt-8">
-            <span class="font-semibold text-xl">Featured Stores</span>
-            <span [routerLink]="'/stores'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
-        </div>
-        <!-- Stores -->
-        <div class="flex flex-col pt-2">
-            <div class="grid md:grid-cols-3 grid-cols-6 gap-2 items-center w-full justify-between">
-                <ng-container *ngFor="let store of stores">
-                    <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
-                        <fuse-card
-                            (click)="chooseStore(store.domain)" 
-                            class="flex flex-col rounded-lg border border-gray-300 h-60 w-44 mb-1 cursor-pointer filter-article">
-                            <img
-                                class="object-cover h-26"
-                                [src]="displayStoreLogo(store.storeAssets)">
-                            <div class="flex flex-col m-2 font-semibold">
-                                <span class="group-hover:text-primary  text-lg">{{store.name}}</span>
-                                <p class="flex flex-row text-black text-xs" [innerHTML]="store.storeDescription"></p>
-                            </div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- New Stores -->
-        <!-- <div class="flex flex-col pt-8">
-            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                <ng-container *ngFor="let store of stores">
-                    <div class="flex-wrap items-center p-1">
-                        <fuse-card 
-                            (click)="chooseStore(store.domain)" 
-                            class="flex flex-col rounded-lg border border-gray-300 min-w-40 h-60 w-full cursor-pointer filter-article group">
-                            <img
-                                class="object-cover h-26"
-                                [src]="displayStoreLogo(store.storeAssets)">
-                            <div class="flex flex-col m-2 font-semibold">
-                                <span class="text-lg group-hover:text-primary">{{store.name}}</span>
-                                <p class="flex flex-row text-black text-xs" [innerHTML]="store.storeDescription"></p>
-                            </div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div> -->
-        <!-- Join Now banner -->
-        <div class="py-4">
-            <fuse-card 
-                class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
-                <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
-                <div class="px-4">
-                    <input 
-                        type="button" 
-                        class="w-0 h-0 invisible">
-                    <label
-                        class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
-                    >
-                        <span class="text-white text-sm font-semibold">JOIN NOW</span>
-                    </label>
+        <div class="flex flex-nowrap items-center justify-around gap-1 sm:gap-4 overflow-x-auto">
+            <ng-container *ngFor="let location of locations">
+                <div class="flex-wrap items-center p-1" [routerLink]="['/location/' + location.cityId]">
+                    <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
+                        <img
+                            class="object-cover h-40"
+                            [src]="location.imageUrl ? location.imageUrl : platform.logo">
+                        <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
+                    </fuse-card>
                 </div>
-            </fuse-card>
+            </ng-container>
         </div>
+    </div>
+    <!-- Categories -->
+    <div class="flex flex-col w-full mt-4">
+        <div class="flex flex-row w-full items-center justify-between">
+            <span class="font-semibold text-xl">Categories</span>
+            <span [routerLink]="'/category/'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1 items-start w-full justify-between mt-2">
+            <ng-container *ngFor="let category of categories">
+                <div class="grid col-span-1 w-full justify-center">
+                    <div class="flex flex-col w-full items-center cursor-pointer group" (click)="chooseCategory(category.parentId)">
+                        <img
+                            class="w-20 h-20 object-contain group-hover:border-2 items-start justify-start bg-stone-200 rounded-full p-2"
+                            [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
+                        <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.parentName}}</span>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <!-- Trending Products -->
+    <div class="flex flex-col w-full mt-4">
+        <div class="flex flex-row w-full items-center justify-between">
+            <span class="font-semibold text-xl">Trending Products</span>
+            <!-- <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span> -->
+        </div>
+        <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+            <ng-container *ngFor="let product of products">
+                <div class="flex-wrap items-center p-1">
+                    <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
+                        <img
+                            class="object-cover h-30"
+                            [src]="product.thumbnailUrl">
+                        <div class="flex flex-col mx-2 mt-1">
+                            <span class="m-0.5 font-semibold line-clamp-1">{{product.name}}</span>
+                            <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
+                            <div class="flex flex-row justify-between">
+                                <span class="line-through text-sm font-semibold">RM 19.44</span>
+                                <span class="font-semibold">{{product.productInventories[0].price | currency: currencySymbol}}</span>
+                            </div>
+                        </div>
+                    </fuse-card>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <!-- Featured store -->
+    <div class="flex flex-row items-center justify-between w-full mt-4">
+        <span class="font-semibold text-xl">Featured Stores</span>
+        <span [routerLink]="'/stores'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
+    </div>
+    <!-- Stores -->
+    <div class="flex flex-col w-full mt-4">
+        <div class="grid md:grid-cols-3 grid-cols-6 gap-2 items-center w-full justify-between">
+            <ng-container *ngFor="let store of stores">
+                <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
+                    <fuse-card
+                        (click)="chooseStore(store.domain)" 
+                        class="flex flex-col rounded-lg border border-gray-300 h-60 w-44 mb-1 cursor-pointer filter-article">
+                        <img
+                            class="object-cover h-26"
+                            [src]="displayStoreLogo(store.storeAssets)">
+                        <div class="flex flex-col m-2 font-semibold">
+                            <span class="group-hover:text-primary  text-lg">{{store.name}}</span>
+                            <p class="flex flex-row text-black text-xs" [innerHTML]="store.storeDescription"></p>
+                        </div>
+                    </fuse-card>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <!-- New Stores -->
+    <!-- <div class="flex flex-col pt-8">
+        <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+            <ng-container *ngFor="let store of stores">
+                <div class="flex-wrap items-center p-1">
+                    <fuse-card 
+                        (click)="chooseStore(store.domain)" 
+                        class="flex flex-col rounded-lg border border-gray-300 min-w-40 h-60 w-full cursor-pointer filter-article group">
+                        <img
+                            class="object-cover h-26"
+                            [src]="displayStoreLogo(store.storeAssets)">
+                        <div class="flex flex-col m-2 font-semibold">
+                            <span class="text-lg group-hover:text-primary">{{store.name}}</span>
+                            <p class="flex flex-row text-black text-xs" [innerHTML]="store.storeDescription"></p>
+                        </div>
+                    </fuse-card>
+                </div>
+            </ng-container>
+        </div>
+    </div> -->
+    <!-- Join Now banner -->
+    <div class="w-full mt-4">
+        <fuse-card 
+            class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
+            <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
+            <div class="px-4">
+                <input 
+                    type="button" 
+                    class="w-0 h-0 invisible">
+                <label
+                    class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
+                >
+                    <span class="text-white text-sm font-semibold">JOIN NOW</span>
+                </label>
+            </div>
+        </fuse-card>
     </div>
 </div>

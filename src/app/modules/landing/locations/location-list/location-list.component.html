@@ -1,56 +1,85 @@
-<div class="flex flex-col items-center bg-card w-full px-3 h-full">
-    <div class="w-full sm:p-4">
-        <!-- Categories -->
-        <div class="flex flex-col pt-8">
-            <div class="grid md:grid-cols-5 grid-cols-6 gap-2 items-center w-full justify-between pt-2">
-                <ng-container *ngFor="let location of locations">
-                    <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
-                        <fuse-card class="flex flex-col rounded-lg w-40 h-40  group-hover:bg-primary-50 group-hover:border filter-article cursor-pointer">
-                            <img
-                                class="object-cover h-32"
-                                [src]="location.scene">
-                            <div class="m-1 text-sm text-center group-hover:text-primary font-semibold">{{location.capitalCity}}</div>
-                        </fuse-card>
-                    </div>
-                    <!-- <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                        <ng-container *ngFor="let location of locations">
-                            <div class="flex-wrap items-center p-1">
-                                <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-full filter-article cursor-pointer">
-                                    <img
-                                        class="object-cover h-40"
-                                        [src]="location.scene">
-                                    <div class="m-1 text-sm text-center font-semibold">{{location.capitalCity}}</div>
-                                </fuse-card>
-                            </div>
-                        </ng-container>
-                    </div> -->
-                </ng-container>
-            </div>
-        </div>
-        <!-- Join Now banner -->
-        <div class="py-4">
-            <fuse-card 
-                class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
-                <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
-                <div class="px-4">
-                    <input 
-                        type="button" 
-                        class="w-0 h-0 invisible">
-                    <label
-                        class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
+<div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
+    
+    <!-- Search -->
+    <div class="flex flex-col w-full mt-2 sm:mt-0">
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+            <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
+            <input
+                class="pl-4"
+                matInput
+                [autocomplete]="'off'"
+                [placeholder]="'Search..'">
+            <!-- filter -->
+            <div class="w-15 py-1">
+                <input
+                    id="add-voucher-button"
+                    type="button"
+                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                    mat-button
                     >
-                        <span class="text-white text-sm font-semibold">JOIN NOW</span>
-                    </label>
+                <label 
+                    class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
+                    for="add-voucher-button"
+                    matRipple>
+                    <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
+                </label>
+            </div>
+        </mat-form-field>
+    </div>
+
+    <!-- Locations -->
+    <div class="flex flex-col w-full mt-4">
+        <div class="grid md:grid-cols-5 grid-cols-6 gap-4 sm:gap-8 items-center w-full justify-between pt-2">
+            <ng-container *ngFor="let location of locations">
+                <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
+                    <fuse-card class="flex flex-col rounded-lg w-40 h-40  group-hover:bg-primary-50 group-hover:border filter-article cursor-pointer">
+                        <img
+                            class="object-cover h-32"
+                            [src]="location.scene">
+                        <div class="m-1 text-sm text-center group-hover:text-primary font-semibold">{{location.capitalCity}}</div>
+                    </fuse-card>
                 </div>
-            </fuse-card>
+                <!-- <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+                    <ng-container *ngFor="let location of locations">
+                        <div class="flex-wrap items-center p-1">
+                            <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-full filter-article cursor-pointer">
+                                <img
+                                    class="object-cover h-40"
+                                    [src]="location.scene">
+                                <div class="m-1 text-sm text-center font-semibold">{{location.capitalCity}}</div>
+                            </fuse-card>
+                        </div>
+                    </ng-container>
+                </div> -->
+            </ng-container>
         </div>
-        <div class="flex w-full mt-4 items-center justify-center">
-            <pagination 
-                *ngIf="pagination"
-                [itemLength]="pagination.length" 
-                [initialPage]="pagination.page + 1"
-                [pageSize]="pagination.size"
-                (changePage)="onChangePage($event)"></pagination>
-        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex w-full mt-8 items-center justify-center">
+        <pagination 
+            *ngIf="pagination"
+            [itemLength]="pagination.length" 
+            [initialPage]="pagination.page + 1"
+            [pageSize]="pagination.size"
+            (changePage)="onChangePage($event)"></pagination>
+    </div>
+
+    <!-- Join Now banner -->
+    <div class="w-full mt-4">
+        <fuse-card 
+            class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
+            <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
+            <div class="px-4">
+                <input 
+                    type="button" 
+                    class="w-0 h-0 invisible">
+                <label
+                    class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
+                >
+                    <span class="text-white text-sm font-semibold">JOIN NOW</span>
+                </label>
+            </div>
+        </fuse-card>
     </div>
 </div>
