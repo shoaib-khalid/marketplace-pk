@@ -124,5 +124,9 @@ export const appRoutes: Route[] = [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule)},
             // {path: 'buyer', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule)},
         ]
+    },
+    {
+        path: '**', redirectTo: ''
     }
+
 ];
