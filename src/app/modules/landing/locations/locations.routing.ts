@@ -22,7 +22,7 @@ export const landingLocationsRoutes: Route[] = [
             {
                 path: '',
                 data: {
-                    headerTitle: 'Category Details'
+                    headerTitle: 'Location Details'
                 },
                 component: LocationComponent,
             }
@@ -42,5 +42,10 @@ export const landingLocationsRoutes: Route[] = [
             
         ],
     },
+    // {
+    //     path      : '**/location-list',
+    //     pathMatch : 'full',
+    //     redirectTo: 'location-list'
+    // },
     
 ];

@@ -19,7 +19,7 @@
             <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
         </div>
         <!-- Locations -->
-        <div class="flex flex-nowrap items-center justify-around gap-1 sm:gap-4 overflow-x-auto">
+        <div class="flex flex-nowrap items-center justify-start sm:justify-around gap-1 sm:gap-4 overflow-x-auto">
             <ng-container *ngFor="let location of locations">
                 <div class="flex-wrap items-center p-1" [routerLink]="['/location/' + location.cityId]">
                     <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
@@ -60,7 +60,8 @@
         <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
             <ng-container *ngFor="let product of products">
                 <div class="flex-wrap items-center p-1">
-                    <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
+                    <fuse-card class="flex flex-col rounded-lg min-w-[10rem] sm:min-w-60 h-50 w-full filter-article cursor-pointer"
+                    (click)="redirectToProduct(product.seoUrl)">
                         <img
                             class="object-cover h-30"
                             [src]="product.thumbnailUrl">

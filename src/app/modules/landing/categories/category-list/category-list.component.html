@@ -8,11 +8,12 @@
         <div class="grid md:grid-cols-5 grid-cols-6 gap-4 sm:gap-8 items-center w-full justify-between pt-2">
             <ng-container *ngFor="let category of categories">
                 <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center group">
-                    <fuse-card class="bg-primary-50 p-2 flex flex-col h-52 w-full group-hover:border items-center cursor-pointer">
+                    <fuse-card class="bg-primary-50 p-2 flex flex-col h-52 w-full group-hover:border items-center cursor-pointer"
+                    (click)="chooseCategory(category.parentId)">
                         <img
                             class="object-contain w-60 h-40"
-                            [src]="category.url">
-                        <div class="m-2 group-hover:text-black text-primary text-center font-semibold">{{category.name}}</div>
+                            [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
+                        <div class="m-2 group-hover:text-black text-primary text-center font-semibold">{{category.parentName}}</div>
                     </fuse-card>
                 </div>
             </ng-container>

@@ -4,7 +4,7 @@
         <div class="relative flex py-8 px-4 sm:p-16 overflow-hidden bg-white h-52 sm:h-70 lg:h-75 justify-center items-center">
             <!-- Background -->
             <div class="absolute inset-0 pointer-events-none">
-                <img src="https://i.pinimg.com/originals/91/06/02/910602979bda92b9f88144d313f52725.png" alt="">
+                <img [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo" alt="">
             </div>
             <!-- Black filter  -->
             <div class="absolute inset-0 pointer-events-none bg-black opacity-70"></div>
@@ -17,7 +17,9 @@
             </div>
             <!-- Text  -->
             <div class="z-10 relative flex flex-col items-center tracking-wide">
-                <h2 class="text-xl text-white sm:text-2xl">{{category.parentName ? category.parentName : 'Category'}}</h2>
+                <h2 class="text-xl text-white sm:text-2xl">{{category ? category.parentName : 'Category'}}</h2>
+                <h2 *ngIf="locationId" class="text-lg text-white sm:text-xl">{{location.cityDetails.name}}</h2>
+
                 <div class="border-t w-40 border-white"></div>
                 <div class="max-w-2xl mt-2 sm:text-xl text-center text-secondary text-white">
                     50 products
@@ -27,21 +29,23 @@
     </div>
     <!-- Content  -->
     <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
+        <!-- [routerLink]="['/category/' + categoryId + '/location-list']" -->
         <!-- Locations -->
-        <div class="flex flex-col w-full">
+        <div class="flex flex-col w-full mt-4">
+            <!-- See More -->
             <div class="flex flex-row w-full items-center justify-between">
                 <span class="font-semibold text-xl">Locations</span>
                 <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
             </div>
-            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
+            <!-- Locations -->
+            <div class="flex flex-nowrap items-center justify-start sm:justify-around gap-1 sm:gap-4 overflow-x-auto">
                 <ng-container *ngFor="let location of locations">
-                    <div class="flex-wrap items-center p-1">
-                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-full filter-article cursor-pointer"
-                        [routerLink]="['/location/' + location.locationId]">
+                    <div class="flex-wrap items-center p-1" [routerLink]="['/category/' + categoryId + '/' + location.cityId]">
+                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
                             <img
                                 class="object-cover h-40"
-                                [src]="location.scene">
-                            <div class="m-1 text-sm text-center font-semibold">{{location.capitalCity}}</div>
+                                [src]="location.imageUrl ? location.imageUrl : platform.logo">
+                            <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
                         </fuse-card>
                     </div>
                 </ng-container>
@@ -78,7 +82,8 @@
             <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
                 <ng-container *ngFor="let product of products">
                     <div class="flex-wrap items-center p-1">
-                        <fuse-card class="flex flex-col rounded-lg min-w-60 h-50 w-full filter-article cursor-pointer">
+                        <fuse-card class="flex flex-col rounded-lg min-w-[10rem] sm:min-w-60 h-50 w-full filter-article cursor-pointer"
+                        (click)="redirectToProduct(product.seoUrl)">
                             <img
                                 class="object-cover h-30"
                                 [src]="product.thumbnailUrl">
