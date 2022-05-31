@@ -17,6 +17,7 @@ export class SearchService
 {
     private _customerSearch: BehaviorSubject<CustomerSearch[] | null> = new BehaviorSubject(null);
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    public searchControl: FormControl = new FormControl();
 
     /**
      * Constructor
@@ -73,7 +74,28 @@ export class SearchService
     {
         // Store the value
         localStorage.setItem('@customerSearch', JSON.stringify(value));
+        
     }  
+
+    /**
+     * Getter for search value
+     *
+    */
+     get searchValue$(): Observable<CustomerSearch[]>
+     {
+         return this.searchControl.value;
+     }
+ 
+     /**
+      * Setter for search value
+      *
+      * @param value
+      */
+     set searchValue(value: string)
+     {
+         // Store the value
+         this.searchControl.setValue(value)
+     }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods

@@ -293,6 +293,16 @@ export class StoresService
 
     /**
      * Get the current logged in store data
+     * 
+     * @param id 
+     * @param page 
+     * @param size 
+     * @param regionCountryId 
+     * @param sort 
+     * @param order 
+     * @param search 
+     * @param category 
+     * @returns 
      */
     getStores(id: string = "", page: number = 0, size: number = 10, regionCountryId: string = "" , sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', category: string = ''): 
         Observable<{ pagination: StorePagination; stores: Store[] }>

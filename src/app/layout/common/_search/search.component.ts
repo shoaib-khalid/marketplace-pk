@@ -102,9 +102,7 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
     ngOnInit(): void
     {
         this._searchService.get()
-            .subscribe((response)=>{
-                console.log("response", response);
-               
+            .subscribe((response)=>{               
                 this.resultSets = response;
 
                 // Mark for check
@@ -221,6 +219,12 @@ export class _SearchComponent implements OnChanges, OnInit, OnDestroy
         this._searchService.localSearch = localDataSearch;
         this.resultSets = localDataSearch;        
 
+        this._searchService.searchValue = value;
+
         this._router.navigate(['/search']);
+    }
+
+    selectResult(result: any, event: ElementRef) {
+        
     }
 }
