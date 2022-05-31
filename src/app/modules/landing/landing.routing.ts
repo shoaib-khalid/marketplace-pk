@@ -1,12 +1,13 @@
 import { Route } from '@angular/router';
+import { LandingDataResolver } from './landing.resolvers';
 
 export const landingRoutes: Route[] = [
-    // Merchant routes
-
+    // Landing routes
     {
         path       : '',
-        // canActivate: [WithStoreIdGuard],
-        // canActivateChild: [WithStoreIdGuard],
+        resolve: {
+            landingDataResolver: LandingDataResolver
+        },
         children   : [
             {path: '', pathMatch : 'full', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
             {path: 'search', loadChildren: () => import('app/modules/landing/search/search.module').then(m => m.LandingSearchModule)},

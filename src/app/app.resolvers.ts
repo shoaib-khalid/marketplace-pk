@@ -63,7 +63,6 @@ export class InitialDataResolver implements Resolve<any>
             this._shortcutsService.getAll(),
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
             this._cartService.getCartsByCustomerId(customerId),
-            this._locationService.getParentCategories('Subang Jaya'),
             // this._httpstatService.get(500)
         ]);
     }

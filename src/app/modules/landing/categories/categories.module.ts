@@ -10,6 +10,7 @@ import { LandingCategoriesComponent } from './category-list/category-list.compon
 import { CategoryComponent } from './category/category.component';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
+import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 
 @NgModule({
     declarations: [
@@ -24,6 +25,7 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
         MatInputModule,
         _SearchModule,
         _FeaturedStoresModule,
+        _FeaturedLocationsModule,
         FuseCardModule
     ]
 })

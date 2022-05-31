@@ -31,47 +31,7 @@
     <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
         <!-- [routerLink]="['/category/' + categoryId + '/location-list']" -->
         <!-- Locations -->
-        <div class="flex flex-col w-full mt-4">
-            <!-- See More -->
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Locations</span>
-                <span [routerLink]="'/location/'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span>
-            </div>
-            <!-- Locations -->
-            <div class="flex flex-nowrap items-center justify-start sm:justify-around gap-1 sm:gap-4 overflow-x-auto">
-                <ng-container *ngFor="let location of locations">
-                    <div class="flex-wrap items-center p-1" [routerLink]="['/category/' + categoryId + '/' + location.cityId]">
-                        <fuse-card class="flex flex-col rounded-lg min-w-30 h-30 w-30 filter-article cursor-pointer">
-                            <img
-                                class="object-cover h-40"
-                                [src]="location.imageUrl ? location.imageUrl : platform.logo">
-                            <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- Categories -->
-        <!-- <div class="flex flex-col w-full mt-4">
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Categories</span>
-                <span [routerLink]="'/category/'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
-            </div>
-            <div class="grid grid-cols-4 gap-1 items-center w-full justify-between pt-2">
-                <ng-container *ngFor="let category of categories">
-                    <div 
-                    class="grid col-span-1 w-full h-40 items-start justify-center" 
-                    (click)="chooseCategory(category.parentId)" >
-                        <div class="flex flex-col w-full items-center cursor-pointer group">
-                            <img
-                                class="w-20 h-20 object-contain group-hover:border-2 items-center justify-center bg-stone-200 rounded-full p-2"
-                                [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
-                            <span class="w-full text-center group-hover:text-primary mt-2 font-semibold">{{category.parentName}}</span>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </div> -->
+        <featured-locations class="w-full" [locations]="locations" [category]="categoryId"></featured-locations>
 
         <!-- Trending Products -->
         <div class="flex flex-col w-full mt-4">

@@ -49,6 +49,47 @@ export class LandingHomeComponent implements OnInit
 
     ngOnInit(): void {
 
+        this._locationService.locations$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((locations) => {
+                this.locations = locations;
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get parent categories
+        this._locationService.parentCategories$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((categories: ParentCategory[]) => {
+                this.categories = categories;
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+
+        // Set currency symbol
+        this._platformsService.getCurrencySymbol$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(currency => this.currencySymbol = currency);
+
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+
+                this.platform = platform;  
+
+                // Get featured stores
+                this._locationService.getFeaturedStores(0, 15, platform.country)
+                .subscribe((stores) => {
+                    
+                    this.featuredStores = stores;  
+                });
+        
+                this._changeDetectorRef.markForCheck();
+            });
+
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {               
@@ -66,58 +107,6 @@ export class LandingHomeComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Set currency symbol
-        this._platformsService.getCurrencySymbol$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(currency => this.currencySymbol = currency)
-
-        // Get parent categories
-        this._locationService.parentCategories$
-            .subscribe((categories: ParentCategory[]) => {
-                this.categories = categories;
-            })
-
-        // Get locations
-        this._locationService.getLocations(0, this.mobileView ? 5 : 10, 'cityId', 'asc')
-            .subscribe((locations) => {
-
-                // // to show only 5
-                // if (locations.length >= 5) {
-                //     const slicedArray = locations.slice(0, 5);
-                //     this.locations = slicedArray;
-                // }    
-                // else {
-                //     this.locations = locations;
-                // }            
-                this.locations = locations;
-                
-            })    
-
-        // Get products
-        this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
-        .subscribe((response : ProductOnLocation[]) => {
-            this.products = response;
-        } )
-
-        this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => { 
-
-            this.platform = platform;  
-
-            // Get featured stores
-            this._locationService.getFeaturedStores(0, 15, platform.country)
-            .subscribe((stores) => {
-                
-                this.featuredStores = stores;  
-            })  
-    
-            this._changeDetectorRef.markForCheck();
-
-        });
-
-        
-
     }
 
     /**
@@ -128,10 +117,6 @@ export class LandingHomeComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-    }
-
-    chooseCategory(id) {
-        this._router.navigate(['/category/' + id]);
     }
 
     redirectToProduct(url: string) {
