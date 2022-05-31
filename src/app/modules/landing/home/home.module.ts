@@ -13,6 +13,7 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 import { _FeaturedCategoriesModule } from 'app/layout/common/_featured-categories/featured-categories.module';
 import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
+import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/
         _FeaturedStoresModule,
         _FeaturedCategoriesModule,
         _FeaturedLocationsModule,
+        _FeaturedProductsModule,
         SwiperBannerModule
     ]
 })

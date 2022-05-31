@@ -29,38 +29,11 @@
     </div>
     <!-- Content  -->
     <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
-        <!-- [routerLink]="['/category/' + categoryId + '/location-list']" -->
-        <!-- Locations -->
+        <!-- Featured Locations -->
         <featured-locations class="w-full" [locations]="locations" [category]="categoryId"></featured-locations>
-
-        <!-- Trending Products -->
-        <div class="flex flex-col w-full mt-4">
-            <div class="flex flex-row w-full items-center justify-between">
-                <span class="font-semibold text-xl">Trending Products</span>
-                <!-- <span [routerLink]="'/locations'" class="font-semibold cursor-pointer text-primary hover:text-primary-600">View All</span> -->
-            </div>
-            <div class="flex flex-nowrap items-center justify-between overflow-x-auto">
-                <ng-container *ngFor="let product of products">
-                    <div class="flex-wrap items-center p-1">
-                        <fuse-card class="flex flex-col rounded-lg min-w-[10rem] sm:min-w-60 h-50 w-full filter-article cursor-pointer"
-                        (click)="redirectToProduct(product.seoUrl)">
-                            <img
-                                class="object-cover h-30"
-                                [src]="product.thumbnailUrl">
-                            <div class="flex flex-col mx-2 mt-1">
-                                <span class="m-0.5 font-semibold line-clamp-1">{{product.name}}</span>
-                                <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
-                                <div class="flex flex-row justify-between">
-                                    <span class="line-through text-sm font-semibold">RM 19.44</span>
-                                    <span class="font-semibold">{{product.productInventories[0].price | currency: currencySymbol}}</span>
-                                </div>
-                            </div>
-                        </fuse-card>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-        <!-- Featured store -->
-        <featured-stores class="w-full" [featuredStores]="stores"></featured-stores>
+        <!-- Featured Products -->
+        <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
+        <!-- Featured Stores -->
+        <featured-stores class="w-full" [stores]="stores"></featured-stores>
     </div>
 </div>
