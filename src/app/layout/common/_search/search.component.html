@@ -2,6 +2,7 @@
     <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
         <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
         <input
+            #search
             class="pl-4"
             matInput
             [formControl]="searchControl"
@@ -52,7 +53,8 @@
 <ng-template
     #historyResult
     let-result>
-    <div class="flex items-center justify-between w-full">
+    <div class="flex items-center justify-between w-full"
+        (click)="selectResult(result, $event)">
         <div class="flex flex-row items-center">
             <div class="flex shrink-0 items-center justify-center w-8 h-8 p-0.5 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
                 <img
