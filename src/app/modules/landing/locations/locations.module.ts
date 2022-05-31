@@ -11,6 +11,7 @@ import { LocationComponent } from './location/location.component';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
+import { _FeaturedCategoriesModule } from 'app/layout/common/_featured-categories/featured-categories.module';
 
 @NgModule({
     declarations: [
@@ -26,6 +27,7 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
         FuseCardModule,
         _SearchModule,
         _FeaturedStoresModule,
+        _FeaturedCategoriesModule,
         PaginationModule
     ]
 })

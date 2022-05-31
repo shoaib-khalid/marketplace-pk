@@ -32,9 +32,7 @@ export class LocationResolver implements Resolve<any>
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        console.log('LocationResolver');
-        
-        // Fork join multiple API endpoint calls to wait all of them to finish
+                // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
             this._locationService.getLocations(0, 20, 'cityId', 'asc')
         ])

@@ -359,7 +359,7 @@ export class LocationService
      */
     getLocations(page: number = 0, pageSize: number = 20, sortByCol: string = 'cityId', sortingOrder: 'asc' | 'desc' | '' = 'asc',
         cityId: string = null, isDisplay: boolean = true): Observable<LandingLocation[]>
-    {        
+    {
         let locationService = this._apiServer.settings.apiServer.locationService;
         let accessToken = this._authService.publicToken;
 

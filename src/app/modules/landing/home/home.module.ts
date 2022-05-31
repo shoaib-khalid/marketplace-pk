@@ -11,6 +11,8 @@ import { BannerModule } from 'app/layout/common/banner/banner.module';
 import { SwiperBannerModule } from 'app/layout/common/swiper-banner/swiper-banner.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
+import { _FeaturedCategoriesModule } from 'app/layout/common/_featured-categories/featured-categories.module';
+import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 
 @NgModule({
     declarations: [
@@ -26,6 +28,8 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
         BannerModule,
         _SearchModule,
         _FeaturedStoresModule,
+        _FeaturedCategoriesModule,
+        _FeaturedLocationsModule,
         SwiperBannerModule
     ]
 })

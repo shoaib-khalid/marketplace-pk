@@ -50,7 +50,7 @@ export class CategoryComponent implements OnInit
 
         this.locationId = this._route.snapshot.paramMap.get('location-id');
         this.categoryId = this._route.snapshot.paramMap.get('category-id');
-
+        
         // Get location when change route - this is when we pick one location
         this._router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
@@ -68,18 +68,6 @@ export class CategoryComponent implements OnInit
                     });
             }
         })
-        // Get location detail - this is when we pick one location    
-        if (this.locationId) {
-            this._locationService.getLocationById(this.locationId)
-                .subscribe((location : LandingLocation) => {
-                });
-            }
-            
-        this._locationService.location$
-            .subscribe(location => {
-                this.location = location;
-                this._changeDetectorRef.markForCheck();
-            });
 
         // Get category detail
         this._locationService.getParentCategoriesById(this.categoryId)
@@ -87,11 +75,28 @@ export class CategoryComponent implements OnInit
                 this.category = category;
             });
 
+        // Get location detail - this is when we pick one location    
+        if (this.locationId) {
+            this._locationService.getLocationById(this.locationId)
+                .subscribe((location : LandingLocation) => {
+                });
+        }
+
         // Get all locations
         this._locationService.locations$
             .subscribe((locations : LandingLocation[]) => {
                 this.locations = locations;
             })
+            
+        // Get Current selected location
+        this._locationService.location$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(location => {
+                this.location = location;                
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
         
         // set currency symbol
         this._platformsService.getCurrencySymbol$
