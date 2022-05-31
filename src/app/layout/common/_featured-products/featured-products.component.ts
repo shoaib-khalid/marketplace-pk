@@ -7,15 +7,15 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 
 @Component({
-    selector     : 'featured-stores',
-    templateUrl  : './featured-stores.component.html',
+    selector     : 'featured-products',
+    templateUrl  : './featured-products.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class _FeaturedStoresComponent implements OnInit, OnDestroy
+export class _FeaturedProductsComponent implements OnInit, OnDestroy
 {
 
     platform: Platform;
-    @Input() stores: any;
+    @Input() products: any;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

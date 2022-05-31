@@ -28,16 +28,6 @@ export const appRoutes: Route[] = [
             {path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule)},
         ]
     },
-
-    // Store Front Redirect
-    {
-        path: 'payment-redirect', 
-        data: { 
-            layout: 'empty', 
-            breadcrumb: 'Payment Redirect' 
-        }, 
-        loadChildren: () => import('app/modules/landing/payment-redirect/payment-redirect.module').then(m => m.LandingPaymentRedirectModule)
-    },
     
     // {
     //     path      : '',
