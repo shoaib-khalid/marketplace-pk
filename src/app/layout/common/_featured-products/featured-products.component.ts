@@ -16,7 +16,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
     platform: Platform;
     @Input() products: any;
     @Input() title: string = "Product";
-
+    @Input() showViewAll: boolean = true;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

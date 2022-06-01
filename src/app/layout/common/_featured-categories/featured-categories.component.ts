@@ -1,7 +1,5 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
@@ -17,6 +15,8 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
     platform: Platform;
     @Input() categories: any;
     @Input() location: any;
+    @Input() title: string = "Categories";
+    @Input() showViewAll: boolean = true;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

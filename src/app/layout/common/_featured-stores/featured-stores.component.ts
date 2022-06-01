@@ -17,6 +17,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     platform: Platform;
     @Input() stores: any;
     @Input() title: string = "Store";
+    @Input() showViewAll: boolean = true;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
