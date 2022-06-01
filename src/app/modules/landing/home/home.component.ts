@@ -1,14 +1,10 @@
-import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { ParentCategory, ProductOnLocation, ProductOnLocationPagination, LandingLocation } from 'app/core/location/location.types';
+import { ParentCategory, ProductOnLocation, LandingLocation } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreAssets } from 'app/core/store/store.types';
 import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
@@ -54,77 +50,73 @@ export class LandingHomeComponent implements OnInit
     }
 
     ngOnInit(): void {
-
-        this._locationService.locations$
+        // Get Platform Data
+        this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((locations) => {
-                this.locations = locations;
-                
+            .subscribe((platform: Platform) => { 
+                if (platform) {
+                    this.platform = platform;  
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get parent categories
+        // Get all parentCategories
         this._locationService.parentCategories$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((categories: ParentCategory[]) => {
-                
-                if (categories.length > 8) {
-                    this.categoriesViewAll = true;
+                if (categories) {
+                    // to show only 8
+                    this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
                 }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
-                // to show only 8
-                if (categories.length >= 8) {
-                    const slicedArray = categories.slice(0, 8);
-                    this.categories = slicedArray;
+        // Get all locations
+        this._locationService.locations$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((locations) => {
+                if (locations) {
+                    this.locations = locations;
                 }
-                else {
-                    this.categories = categories;
-                }
-                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         // Get featured stores
         this._locationService.featuredStores$
-        .subscribe((stores) => {
-            
-            this.featuredStores = stores;  
-        });
-
-        // Get featured stores
-        this._locationService.featuredStorePagination$
-        .subscribe((storesPagination) => {
-
-            if (storesPagination.length > storesPagination.size) {
-                this.storesViewAll = true;
-            }
-            this.featuredStoresPagination = storesPagination;  
-        });
-
-        this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => { 
+            .subscribe((stores) => {
+                if (stores) {
+                    this.featuredStores = stores;  
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
-                this.platform = platform;  
-        
+        // Get featured stores pagination
+        this._locationService.featuredStorePagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((storesPagination) => {
+                if (storesPagination) {
+                    this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
+                    this.featuredStoresPagination = storesPagination;  
+                }
+                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {               
-
                 if ( matchingAliases.includes('lg') ) {
                 } else if ( matchingAliases.includes('md') ) {
-
                 } else if ( matchingAliases.includes('sm') ) {
                     this.mobileView = false;
                 } else {
                     this.mobileView = true;
                 }
-
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -156,7 +148,7 @@ export class LandingHomeComponent implements OnInit
                 merge(this._storesPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country);
+                        return this._locationService.getFeaturedStores({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -177,7 +169,7 @@ export class LandingHomeComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country)
+                this._locationService.getFeaturedStores({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

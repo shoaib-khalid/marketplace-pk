@@ -60,6 +60,7 @@ export class LocationComponent implements OnInit
             }
         });
 
+        // Get Platform Data
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
