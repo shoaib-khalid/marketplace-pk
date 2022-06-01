@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
@@ -17,11 +18,14 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class LandingHomeComponent implements OnInit
 {
+    @ViewChild("storesPaginator", {read: MatPaginator}) private _storesPaginator: MatPaginator;
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     locations: LandingLocation[];
     categories: ParentCategory[] = [];
     featuredStores: any;
+    featuredStoresPagination: any;
    
     platform: Platform;
     image: any = [];
@@ -57,24 +61,39 @@ export class LandingHomeComponent implements OnInit
         this._locationService.parentCategories$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((categories: ParentCategory[]) => {
-                this.categories = categories;
+                
+                // to show only 8
+                if (categories.length >= 8) {
+                    const slicedArray = categories.slice(0, 8);
+                    this.categories = slicedArray;
+                }
+                else {
+                    this.categories = categories;
+                }
                 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Get featured stores
+        this._locationService.featuredStores$
+        .subscribe((stores) => {
+            
+            this.featuredStores = stores;  
+        });
+
+        // Get featured stores
+        this._locationService.featuredStorePagination$
+        .subscribe((storesPagination) => {
+            
+            this.featuredStoresPagination = storesPagination;  
+        });
 
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
 
                 this.platform = platform;  
-
-                // Get featured stores
-                this._locationService.getFeaturedStores(0, 15, platform.country)
-                .subscribe((stores) => {
-                    
-                    this.featuredStores = stores;  
-                });
         
                 this._changeDetectorRef.markForCheck();
             });

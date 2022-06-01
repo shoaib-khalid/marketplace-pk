@@ -47,7 +47,6 @@ export class StoresResolver implements Resolve<any>
     // }
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        console.log('StoresResolver');
 
         // this._platformsService.platform$
         // .pipe(takeUntil(this._unsubscribeAll))
@@ -72,6 +71,8 @@ export class StoresResolver implements Resolve<any>
             .pipe(
                 take(1),
                 switchMap((response) => {   
+                    console.log('response StoresResolver', response);
+                    
                                      
                     // this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
                     this._locationService.getFeaturedStores(0, 20, response.country).subscribe(()=>{});

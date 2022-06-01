@@ -51,7 +51,7 @@ export class LandingSearchComponent implements OnInit
 
                         if (this.searchValue) {
                             // Get stores
-                            this._locationService.getStoresDetails(this.searchValue,0,5,"Subang Jaya",null,this.platform.country,null)
+                            this._locationService.getStoresDetails(this.searchValue,0,5,"SubangJaya",null,this.platform.country,null)
                                 .subscribe(()=>{});
 
                             // Get products
@@ -69,8 +69,9 @@ export class LandingSearchComponent implements OnInit
         this._locationService.storesDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => {
-                this.stores = stores;
-
+                if (stores){
+                    this.stores = stores;
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -79,7 +80,9 @@ export class LandingSearchComponent implements OnInit
         this._locationService.productsDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products : ProductDetails[]) => {
-                this.products = products;
+                if (products) {
+                    this.products = products;
+                }
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

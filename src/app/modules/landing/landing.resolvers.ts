@@ -33,7 +33,7 @@ export class LandingDataResolver implements Resolve<any>
         private _quickChatService: QuickChatService,
         private _shortcutsService: ShortcutsService,
         private _cartService: CartService,
-        private _userService: UserService,
+        private _platformsService: PlatformService,
         private _httpstatService: HttpStatService,
         private _locationService: LocationService
     )
@@ -52,11 +52,14 @@ export class LandingDataResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
+        console.log('2 landing resolver');
+        
         // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
             this._locationService.getLocations(0, 10, 'cityId', 'asc'),
             this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya'),
-            this._locationService.getParentCategories('Subang Jaya'),
+            // this._locationService.getParentCategories('', '', 'MYS'),
+            // this._locationService.getFeaturedStores(0, 10, 'MYS')
             // this._locationService.getStoresDetails("",0,5,"Subang Jaya",null,"MYS",null)
             // this._locationService.getProductsDetails("",0,5,"","SubangJaya",null,"MYS",null)
         ]);
