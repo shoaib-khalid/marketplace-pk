@@ -15,8 +15,22 @@
     <featured-locations class="w-full" [locations]="locations"></featured-locations>
     <!-- Categories -->
     <featured-categories class="w-full" [categories]="categories"></featured-categories>
-    <!-- Featured Stores -->
-    <featured-stores class="w-full" [stores]="featuredStores"></featured-stores>
+    <div>
+        <!-- Featured Stores -->
+        <featured-stores class="w-full" [stores]="featuredStores"></featured-stores>
+        <!-- Pagination -->
+        <!-- <ng-container *ngIf="storesPagination">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="storesPagination.length" 
+                    [initialPage]="storesPagination.page + 1"
+                    [pageSize]="storesPagination.size"
+                    (changePage)="onChangePage($event)"
+                    #storesPaginator></pagination>
+            </div>
+        </ng-container> -->
+    </div>
+
     <!-- Featured Products -->
     <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
     <!-- Join Now Banner -->

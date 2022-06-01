@@ -11,6 +11,7 @@ import { PlatformLocation } from '@angular/common';
 import { Platform } from './platform.types';
 import { AuthService } from '../auth/auth.service';
 import { StoresService } from 'app/core/store/store.service';
+import { LocationService } from '../location/location.service';
 
 @Injectable({
     providedIn: 'root'
@@ -39,7 +40,9 @@ export class PlatformService
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _jwt: JwtService,
-        private _logging: LogService
+        private _logging: LogService,
+        private _locationService: LocationService,
+
     )
     {
     }
@@ -162,6 +165,13 @@ export class PlatformService
                             // Return the store
                             return newPlatform;
                         });
+
+                        this._locationService.getLocations(0, 10, 'cityId', 'asc').subscribe(()=>{});
+                        this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya').subscribe(()=>{});
+                        this._locationService.getParentCategories('', '', response["data"][0].platformCountry).subscribe(()=>{});
+                        this._locationService.getFeaturedStores(0, 10, response["data"][0].platformCountry).subscribe(()=>{});
+                        // this._locationService.getStoresDetails("", 0, 5, null, null, response["data"][0].platformCountry,null).subscribe(()=>{});
+                        // this._locationService.getProductsDetails("", 0, 5, null, null, null, response["data"][0].platformCountry,null).subscribe(()=>{});
                 })
             );
     }

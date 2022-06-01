@@ -184,6 +184,17 @@ export class LocationService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
+    /**
+     * 
+     * @param storeName 
+     * @param page 
+     * @param pageSize 
+     * @param city 
+     * @param postcode 
+     * @param regionCountryId 
+     * @param stateId 
+     * @returns 
+     */
     getStoresDetails(storeName: string = '', page: number = 0, pageSize: number = 0, city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
         : Observable<StoresDetails[]>
     {
@@ -218,6 +229,18 @@ export class LocationService
             );
     }
 
+    /**
+     * 
+     * @param name 
+     * @param page 
+     * @param pageSize 
+     * @param storeName 
+     * @param cityId 
+     * @param postcode 
+     * @param regionCountryId 
+     * @param stateId 
+     * @returns 
+     */
     getProductsDetails(name: string = '', page: number = 0, pageSize: number = 0, storeName: string = '', cityId: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
         : Observable<ProductDetails[]>
     {
@@ -255,9 +278,14 @@ export class LocationService
     }
 
     /**
-     * Get parent categories
+     * 
+     * @param city 
+     * @param postcode 
+     * @param regionCountryId 
+     * @param stateId 
+     * @returns 
      */
-    getParentCategories(city: string = '', postcode: string = '', regionCountryId: string = '', state: string = ''): Observable<ParentCategory[]>
+    getParentCategories(city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = ''): Observable<ParentCategory[]>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
         let accessToken = this._authService.publicToken;
@@ -265,12 +293,17 @@ export class LocationService
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params: {
-                city: '' + city,
-                postcode: '' + postcode,
-                regionCountryId: '' + regionCountryId,
-                state: '' + state
+                city,
+                postcode,
+                regionCountryId,
+                stateId
             }
         };
+
+        if (header.params.city === '') delete header.params.city;
+        if (header.params.postcode === '') delete header.params.postcode;
+        if (header.params.regionCountryId === '') delete header.params.regionCountryId;
+        if (header.params.stateId === '') delete header.params.stateId;
 
         return this._httpClient.get<ParentCategory[]>(locationService + '/categories-location/parent-category', header)
             .pipe(

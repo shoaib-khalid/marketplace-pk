@@ -14,6 +14,7 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
 import { _FeaturedCategoriesModule } from 'app/layout/common/_featured-categories/featured-categories.module';
 import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
+import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/fe
         _FeaturedCategoriesModule,
         _FeaturedLocationsModule,
         _FeaturedProductsModule,
-        SwiperBannerModule
+        SwiperBannerModule,
+        PaginationModule
     ]
 })
 export class LandingHomeModule

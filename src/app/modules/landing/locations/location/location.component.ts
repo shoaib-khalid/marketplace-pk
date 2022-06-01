@@ -86,28 +86,42 @@ export class LocationComponent implements OnInit
             });
             
         // Get products for this location
-        this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
-            .subscribe((response : ProductOnLocation[]) => {
-                this.products = response;
-            });
+        // this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
+        //     .subscribe((response : ProductOnLocation[]) => {
+        //         this.products = response;
+        //     });
 
         // Get all locations
-        this._locationService.getParentCategories('Subang Jaya')
+        this._locationService.parentCategories$
             .subscribe((categories: ParentCategory[]) => {
-                this.categories = categories;
+                // to show only 8
+                if (categories.length >= 8) {
+                    const slicedArray = categories.slice(0, 8);
+                    this.categories = slicedArray;
+                }
+                else {
+                    this.categories = categories;
+                }
+
             });
 
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
                 this.platform = platform;  
-                this._locationService.featuredStores$
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((stores: StoresDetails[]) => { 
-                        this.stores = stores;  
-                        this._changeDetectorRef.markForCheck();
-                    });
+
+                this._locationService.getStoresDetails('', 0, 5, "SubangJaya", null, this.platform.country, null)
+                    .subscribe(()=>{});
+
+                
                     this._changeDetectorRef.markForCheck();
+            });
+
+        this._locationService.featuredStores$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((stores: StoresDetails[]) => { 
+                this.stores = stores;  
+                this._changeDetectorRef.markForCheck();
             });
     }
 

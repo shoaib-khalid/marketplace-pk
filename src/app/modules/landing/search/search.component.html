@@ -11,7 +11,11 @@
         </div>
     </ng-container>
     <!-- Featured Stores -->
-    <featured-stores class="w-full" [stores]="stores" [title]="'Stores'"></featured-stores>
+    <ng-container *ngIf="stores">
+        <featured-stores class="w-full" [stores]="stores" [title]="'Stores'"></featured-stores>
+    </ng-container>
     <!-- Featured Products -->
-    <featured-products class="w-full" [products]="products" [title]="'Products'"></featured-products>
+    <ng-container *ngIf="products">
+        <featured-products class="w-full" [products]="products" [title]="'Products'"></featured-products>
+    </ng-container>
 </div>
