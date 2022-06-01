@@ -9,7 +9,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets } from 'app/core/store/store.types';
-import { Subject, takeUntil } from 'rxjs';
+import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
     selector     : 'landing-home',
@@ -22,9 +22,13 @@ export class LandingHomeComponent implements OnInit
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    // Use for _common_layouts
     locations: LandingLocation[];
     categories: ParentCategory[] = [];
     featuredStores: any;
+    storesViewAll : boolean = false;
+    categoriesViewAll : boolean = false;
+
     featuredStoresPagination: any;
    
     platform: Platform;
@@ -32,6 +36,9 @@ export class LandingHomeComponent implements OnInit
     countryCode:string = '';
     products: ProductOnLocation[];
     mobileView: boolean = false;
+    
+    pageOfItems: Array<any>;
+    isLoading: boolean = false;
 
 
     /**
@@ -62,6 +69,10 @@ export class LandingHomeComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((categories: ParentCategory[]) => {
                 
+                if (categories.length > 8) {
+                    this.categoriesViewAll = true;
+                }
+
                 // to show only 8
                 if (categories.length >= 8) {
                     const slicedArray = categories.slice(0, 8);
@@ -85,7 +96,10 @@ export class LandingHomeComponent implements OnInit
         // Get featured stores
         this._locationService.featuredStorePagination$
         .subscribe((storesPagination) => {
-            
+
+            if (storesPagination.length > storesPagination.size) {
+                this.storesViewAll = true;
+            }
             this.featuredStoresPagination = storesPagination;  
         });
 
@@ -125,5 +139,82 @@ export class LandingHomeComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+    }
+
+    /**
+    * After view init
+    */
+    ngAfterViewInit(): void
+    {
+        setTimeout(() => {
+            if (this._storesPaginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._storesPaginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country);
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+        }, 0);
+    }
+ 
+    onChangePage(pageOfItems: Array<any>) {
+        
+        // update current page of items
+        this.pageOfItems = pageOfItems;
+
+        if( this.featuredStoresPagination && this.pageOfItems['currentPage']) {
+
+            if (this.pageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
+                // set loading to true
+                this.isLoading = true;
+    
+                this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country)
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
+            }
+        }
+        
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    scrollToTop(el) {
+        var to = 0;
+        var duration = 1000;
+        var start = el.scrollTop,
+            change = to - start,
+            currentTime = 0,
+            increment = 20;
+    
+        var easeInOutQuad = function(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) 
+                return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+    
+        var animateScroll = function() {        
+            currentTime += increment;
+            var val = easeInOutQuad(currentTime, start, change, duration);
+    
+            el.scrollTop = val;
+            if(currentTime < duration) {
+                setTimeout(animateScroll, increment);
+                el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+        }
+        animateScroll();    
     }
 }

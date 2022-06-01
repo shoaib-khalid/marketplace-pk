@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { debounceTime, filter, map, Subject, switchMap, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
 import { Router } from '@angular/router';
 import { SearchService } from './search.service';
+import { MatInput } from '@angular/material/input';
 
 @Component({
     selector     : 'search',
@@ -15,10 +16,12 @@ import { SearchService } from './search.service';
 export class _SearchComponent implements OnInit, OnDestroy
 {
     @Output() search: EventEmitter<any> = new EventEmitter<any>();
-    
+    @ViewChild('searchInput') public searchElement: ElementRef;
     searchControl: FormControl = new FormControl();
     resultSets: any[];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    autoCompleteList: any[]
+    minLength: number = 2;
 
     /**
      * Constructor
@@ -45,12 +48,49 @@ export class _SearchComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
         this._searchService.get()
-            .subscribe((response)=>{               
-                this.resultSets = response;
-
+            .subscribe((response)=> {    
+                this.resultSets = response;                
+                this.autoCompleteList = response;                
+                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Subscribe to search control reactive form
+        this.searchControl.valueChanges.subscribe(userInput => {
+            this.autoCompleteSetList(userInput);
+          })
+    }
+
+    /**
+     * Set the filtered value to an array to be displayed
+     * 
+     * @param input 
+     */
+    autoCompleteSetList(input: string) {
+        let resultList = this.filterSetList(input)
+        this.autoCompleteList = resultList;
+        
+    }
+
+    /**
+     * Filter the set list based on user input
+     * 
+     * @param val 
+     * @returns 
+     */
+    filterSetList(val: string) {        
+        // if user input is other that string, return the initial resultSets
+        if (typeof val != "string") {
+            return this.resultSets;
+        }
+        // if user input is empty, return the initial resultSets
+        if (val === '' || val === null) {
+            return this.resultSets;
+        }
+        // if val is null, return the initial resultSets, else, do the filtering
+        return val ? this.resultSets.filter(s => s.searchText.toLowerCase().indexOf(val.toLowerCase()) != -1)
+            : this.resultSets;
     }
 
     /**
@@ -72,7 +112,7 @@ export class _SearchComponent implements OnInit, OnDestroy
      *
      * @param event
      */
-    onKeydown(event: KeyboardEvent): void
+    onKeypress(event: KeyboardEvent): void
     {
         // Listen for escape to close the search
         // if the appearance is 'bar'
@@ -98,6 +138,11 @@ export class _SearchComponent implements OnInit, OnDestroy
 
     goToSearch(value: string)
     {
+        // Do nothing if value is empty string
+        if (value === '') {
+            return;
+        }
+
         let now = new Date();
         let dataSearch = {
             searchText  : value,
@@ -123,14 +168,36 @@ export class _SearchComponent implements OnInit, OnDestroy
         }
 
         this._searchService.localSearch = localDataSearch;
-        this.resultSets = localDataSearch;        
+        this.resultSets = localDataSearch; 
+
+        // to avoid 'no records' from showing after search has been done 
+        // this.autoCompleteList.unshift(dataSearch);  
 
         this._searchService.searchValue = value;
+
+        // Remove focus
+        // this.searchControl.setValue('')
+        setTimeout(() => this.searchElement.nativeElement.blur());
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
 
         this._router.navigate(['/search'], {queryParams: {keyword: value}});
     }
 
-    selectResult(result: any, event: ElementRef) {
+    selectResult(result: any, event: any) {
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
         this._router.navigate(['/search'], {queryParams: {keyword: result.searchText}});
+        
+    }
+
+    blurInput() {
+        // Remove focus
+        setTimeout(() => this.searchElement.nativeElement.blur());
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 }
