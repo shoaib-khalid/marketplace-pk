@@ -52,28 +52,24 @@ export class CategoryComponent implements OnInit
             distinctUntilChanged(),
             takeUntil(this._unsubscribeAll)
         ).subscribe((responseCategory: NavigationEnd) => {
-            
             let locationIdRouter = responseCategory.url.split("/")[3];
             if (locationIdRouter) {
-                
-                this._locationService.getLocationById(locationIdRouter)
-                    .subscribe((location : LandingLocation) => {
-                        this._changeDetectorRef.markForCheck();
-                        
+                this._locationService.getLocations({pageSize: 10, regionCountryId: 'MYS', cityId: locationIdRouter})
+                    .subscribe((location : LandingLocation[]) => {                        
                     });
             }
         })
 
         // Get category detail
-        this._locationService.getParentCategoriesById(this.categoryId)
-            .subscribe((category : ParentCategory) => {
-                this.category = category;
+        this._locationService.getParentCategories({pageSize: 8, regionCountryId: 'MYS', cityId: this.locationId})
+            .subscribe((category : ParentCategory[]) => {
+                this.category = category[0];
             });
 
         // Get location detail - this is when we pick one location    
         if (this.locationId) {
-            this._locationService.getLocationById(this.locationId)
-                .subscribe((location : LandingLocation) => {
+            this._locationService.getLocations({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
+                .subscribe((location : LandingLocation[]) => {
                 });
         }
 
@@ -94,7 +90,7 @@ export class CategoryComponent implements OnInit
             });
             
         // Get products
-        this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
+        this._locationService.getLocationBasedProducts({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
             .subscribe((response : ProductOnLocation[]) => {
                 this.products = response;
             });

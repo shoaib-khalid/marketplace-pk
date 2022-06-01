@@ -6,7 +6,7 @@ import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
 import { ApiResponseModel, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, ProductOnLocation, ProductOnLocationPagination, StoresDetails } from './location.types';
-import { Store, StorePagination } from '../store/store.types';
+import { ProductPagination, Store, StorePagination } from '../store/store.types';
 
 @Injectable({
     providedIn: 'root'
@@ -28,6 +28,11 @@ export class LocationService
     private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
     private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
     private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+
+    // for featured product display
+    private _featuredProduct: BehaviorSubject<ProductDetails | null> = new BehaviorSubject(null);
+    private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
+    private _featuredProductPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
     
     
 
@@ -91,10 +96,10 @@ export class LocationService
     /**
      * Getter for locationProducts
      */
-     get locationProducts$(): Observable<ProductOnLocation[]>
-     {
-         return this._locationProducts.asObservable();
-     }
+    get locationProducts$(): Observable<ProductOnLocation[]>
+    {
+        return this._locationProducts.asObservable();
+    }
 
      /**
      * Getter for locationProducts pagination
@@ -115,10 +120,10 @@ export class LocationService
     /**
      * Getter for location
      */
-     get location$(): Observable<LandingLocation>
-     {
-         return this._location.asObservable();
-     }
+    get location$(): Observable<LandingLocation>
+    {
+        return this._location.asObservable();
+    }
 
      /**
      * Getter for locationProducts pagination
@@ -129,6 +134,58 @@ export class LocationService
     }
 
     // ----------------------
+    // Featured Product
+    //----------------------- 
+
+    /**
+    * Getter for store
+    *
+    */
+    get featuredProduct$(): Observable<ProductDetails>
+    {
+        return this._featuredProduct.asObservable();
+    }
+ 
+     /**
+     * Setter for stores
+     *
+     * @param value
+     */
+    set featuredProduct(value: ProductDetails)
+    {
+        // Store the value
+        this._featuredProduct.next(value);
+    }
+ 
+     /**
+      * Getter for stores
+      *
+     */
+    get featuredProducts$(): Observable<ProductDetails[]>
+    {
+        return this._featuredProducts.asObservable();
+    }
+     
+     /**
+      * Setter for stores
+      *
+      * @param value
+      */
+    set featuredProducts(value: ProductDetails[])
+    {
+        // Store the value
+        this._featuredProducts.next(value);
+    }
+ 
+     /**
+     * Getter for stores pagination
+     */
+    get featuredProductPagination$(): Observable<ProductPagination>
+    {
+        return this._featuredStorePagination.asObservable();
+    }
+
+    // ----------------------
     //    Featured Store
     //----------------------- 
 
@@ -136,66 +193,231 @@ export class LocationService
     * Getter for store
     *
     */
-     get featuredStore$(): Observable<StoresDetails>
-     {
-         return this._featuredStore.asObservable();
-     }
+    get featuredStore$(): Observable<StoresDetails>
+    {
+        return this._featuredStore.asObservable();
+    }
  
      /**
      * Setter for stores
      *
      * @param value
      */
-     set featuredStore(value: StoresDetails)
-     {
-         // Store the value
-         this._featuredStore.next(value);
-     }
+    set featuredStore(value: StoresDetails)
+    {
+        // Store the value
+        this._featuredStore.next(value);
+    }
  
      /**
       * Getter for stores
       *
      */
-     get featuredStores$(): Observable<StoresDetails[]>
-     {
-         return this._featuredStores.asObservable();
-     }
+    get featuredStores$(): Observable<StoresDetails[]>
+    {
+        return this._featuredStores.asObservable();
+    }
      
      /**
       * Setter for stores
       *
       * @param value
       */
-     set featuredStores(value: StoresDetails[])
-     {
-         // Store the value
-         this._featuredStores.next(value);
-     }
+    set featuredStores(value: StoresDetails[])
+    {
+        // Store the value
+        this._featuredStores.next(value);
+    }
  
      /**
      * Getter for stores pagination
      */
-     get featuredStorePagination$(): Observable<StorePagination>
-     {
-         return this._featuredStorePagination.asObservable();
-     }
+    get featuredStorePagination$(): Observable<StorePagination>
+    {
+        return this._featuredStorePagination.asObservable();
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
+
     /**
      * 
-     * @param storeName 
-     * @param page 
-     * @param pageSize 
-     * @param city 
-     * @param postcode 
-     * @param regionCountryId 
-     * @param stateId 
+     * @param params
      * @returns 
      */
-    getStoresDetails(storeName: string = '', page: number = 0, pageSize: number = 0, city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
+    getFeaturedStores(params: {
+        storeName?      : string,
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string,
+        isDisplay?      : boolean
+    } = {
+        storeName       : null,
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'name', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null,
+        isDisplay       : false
+    }): Observable<StoresDetails[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: params
+        };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
+
+        return this._httpClient.get<StoresDetails[]>(locationService + '/config/store', header)
+            .pipe(
+                switchMap(async (response:StoresDetails[]) => {
+                                
+                    this._logging.debug("Response from LocationService (getFeaturedStores)", response);
+
+                    let _pagination = {
+                        length: response["data"].totalElements,
+                        size: response["data"].size,
+                        page: response["data"].number,
+                        lastPage: response["data"].totalPages,
+                        startIndex: response["data"].pageable.offset,
+                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    }
+                    this._featuredStorePagination.next(_pagination);
+                    this._featuredStores.next(response["data"].content);
+
+                    return response["data"].content;
+                })
+            );
+    }
+
+    /**
+     * 
+     * @param params
+     * @returns 
+     */
+     getFeaturedProducts(params: {
+        storeName?      : string,
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string,
+        isDisplay?      : boolean
+    } = {
+        storeName       : null,
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'name', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null,
+        isDisplay       : false
+    }): Observable<ProductDetails[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: params
+        };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
+
+        return this._httpClient.get<ProductDetails[]>(locationService + '/config/product', header)
+            .pipe(
+                switchMap(async (response:ProductDetails[]) => {
+                                
+                    this._logging.debug("Response from LocationService (getFeaturedProducts)", response);
+
+                    let _pagination = {
+                        length: response["data"].totalElements,
+                        size: response["data"].size,
+                        page: response["data"].number,
+                        lastPage: response["data"].totalPages,
+                        startIndex: response["data"].pageable.offset,
+                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    }
+                    this._featuredProductPagination.next(_pagination);
+                    this._featuredProducts.next(response["data"].content);
+
+                    return response["data"].content;
+                })
+            );
+    }
+
+    /**
+     * 
+     * @param params
+     * @returns 
+     */
+    getStoresDetails(params: {
+        storeName?      : string,
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string
+    } = {
+        storeName       : null,
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'name', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null
+    }) 
         : Observable<StoresDetails[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;
@@ -203,16 +425,15 @@ export class LocationService
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page,
-                pageSize,
-                storeName,
-                city,
-                postcode,
-                regionCountryId,
-                stateId
-            }
+            params: params
         };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
 
         return this._httpClient.get<StoresDetails[]>(locationService + '/stores', header)
             .pipe(
@@ -231,17 +452,40 @@ export class LocationService
 
     /**
      * 
-     * @param name 
-     * @param page 
-     * @param pageSize 
-     * @param storeName 
-     * @param cityId 
-     * @param postcode 
-     * @param regionCountryId 
-     * @param stateId 
+     * @param params
      * @returns 
      */
-    getProductsDetails(name: string = '', page: number = 0, pageSize: number = 0, storeName: string = '', cityId: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
+    getProductsDetails(params: {
+        name?           : string,
+        storeName?      : string,
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string,
+        status?         : string[]
+    } = {
+        name            : null,
+        storeName       : null,
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'name', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null,
+        status          : ['ACTIVE', 'OUTOFSTOCK']
+    }) 
         : Observable<ProductDetails[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;
@@ -249,18 +493,15 @@ export class LocationService
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page,
-                pageSize,
-                name,
-                storeName,
-                cityId,
-                postcode,
-                regionCountryId,
-                stateId,
-                status: ['ACTIVE', 'OUTOFSTOCK']
-            }
+            params: params
         };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
 
         return this._httpClient.get<ProductDetails[]>(locationService + '/products', header)
             .pipe(
@@ -279,31 +520,50 @@ export class LocationService
 
     /**
      * 
-     * @param city 
-     * @param postcode 
-     * @param regionCountryId 
-     * @param stateId 
+     * @param params
      * @returns 
      */
-    getParentCategories(city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = ''): Observable<ParentCategory[]>
+    getParentCategories(params: {
+        parentCategoryId?   : string;
+        page?               : number, 
+        pageSize?           : number, 
+        sortByCol?          : string, 
+        sortingOrder?       : 'ASC' | 'DESC' | '',
+        regionCountryId?    : string, 
+        country?            : string, 
+        stateId?            : string, 
+        state?              : string, 
+        cityId?             : string, 
+        city?               : string, 
+        postcode?           : string
+    } = {
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'cityId', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null
+    }): Observable<ParentCategory[]>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
         let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                city,
-                postcode,
-                regionCountryId,
-                stateId
-            }
+            params: params
         };
 
-        if (header.params.city === '') delete header.params.city;
-        if (header.params.postcode === '') delete header.params.postcode;
-        if (header.params.regionCountryId === '') delete header.params.regionCountryId;
-        if (header.params.stateId === '') delete header.params.stateId;
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
 
         return this._httpClient.get<ParentCategory[]>(locationService + '/categories-location/parent-category', header)
             .pipe(
@@ -313,73 +573,65 @@ export class LocationService
                 ),
                 switchMap(async (response: ParentCategory[]) => {
                                 
-                    this._logging.debug("Response from LocationService (getParentCategories)", response);
+                    this._logging.debug("Response from LocationService (getParentCategories)" + (params.parentCategoryId ? " - "  + params.parentCategoryId : ""), response);
 
-                    this._parentCategories.next(response["data"]);
-                    return response["data"];
+                    if (params.parentCategoryId) {
+                        this._parentCategory.next(response["data"].content[0]);
+                    } else {
+                        this._parentCategories.next(response["data"].content);
+                    }
+                    return response["data"].content;
                 })
             );
     }
 
     /**
-     * Get parent category by ID
-     * 
-     * @param id 
-     * @returns 
-     */
-    getParentCategoriesById(id: string): Observable<ParentCategory>
-    {        
-  
-        return this._parentCategories.pipe(
-            take(1),
-            map((categories) => {
-
-                // Find the product
-                const category = categories ? categories.find(item => item.parentId === id) : null;
-
-                this._logging.debug("Response from LocationService (Current Category)", category);
-
-                // Update the product
-                this._parentCategory.next(category);
-
-                // Return the product
-                return category;
-            }),
-            switchMap((category) => {
-
-                if ( !category )
-                {
-                    return throwError('Could not found category with id of ' + id + '!');
-                }
-
-                return of(category);
-            })
-        );
-    }
-
-    /**
      * Get child categories
      * 
-     * @param city 
-     * @param postcode 
-     * @param regionCountryId 
-     * @param state 
+     * @param params
      * @returns 
      */
-    getChildCategories(city: string, postcode: string, regionCountryId: string, state: string): Observable<ChildCategory>
+    
+    getChildCategories(params: {
+        page            : number, 
+        pageSize        : number, 
+        sortByCol       : string, 
+        sortingOrder    : 'ASC' | 'DESC' | '',
+        regionCountryId : string, 
+        country         : string, 
+        stateId         : string, 
+        state           : string, 
+        cityId          : string, 
+        city            : string, 
+        postcode        : string,
+    } = {
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'cityId', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null,
+    }): Observable<ChildCategory>
     {        
         let locationService = this._apiServer.settings.apiServer.locationService;
         let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                city: '' + city,
-                postcode: '' + postcode,
-                regionCountryId: '' + regionCountryId,
-                state: '' + state
-            }
+            params: params
         };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
 
         return this._httpClient.get<ChildCategory>(locationService + '/categories-location/child-category', header)
             .pipe(
@@ -401,19 +653,36 @@ export class LocationService
     /**
      * Get products based on location
      * 
-     * @param page 
-     * @param pageSize 
-     * @param sortByCol 
-     * @param sortingOrder 
-     * @param city 
-     * @param postcode 
-     * @param regionCountryId 
-     * @param stateId 
-     * @param status 
+     * @param params
      * @returns 
      */
-    getLocationBasedProducts(page: number = 0, pageSize: number = 5, sortByCol: string = 'name', sortingOrder: 'asc' | 'desc' | '' = 'asc',
-        city: string = '', regionCountryId: string = '', postcode: string = '', stateId: string = '', status: string = 'ACTIVE'): 
+    getLocationBasedProducts(params: {
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string,
+        status?         : string
+    } = {
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'cityId', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null,
+        status          : 'ACTIVE'
+    }): 
             Observable<any>
             // Observable<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>
     {        
@@ -422,19 +691,15 @@ export class LocationService
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page        : '' + page,
-                pageSize    : '' + pageSize,
-                sortByCol   : '' + sortByCol,
-                sortingOrder : '' + sortingOrder.toUpperCase(),
-            
-                city: '' + city,
-                postcode: '' + postcode,
-                regionCountryId: '' + regionCountryId,
-                stateId: '' + stateId,
-                status: '' + status
-            }
+            params: params
         };
+
+        // delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
         
         // return this._httpClient.get<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>(locationService + '/products-location', header)
         return this._httpClient.get<any>(locationService + '/products-location', header)
@@ -468,34 +733,50 @@ export class LocationService
     /**
      * Get locations
      * 
-     * @param page 
-     * @param pageSize 
-     * @param sortByCol 
-     * @param sortingOrder 
-     * @param cityId 
-     * @param isDisplay 
+     * @param params
      * @returns 
      */
-    getLocations(page: number = 0, pageSize: number = 20, sortByCol: string = 'cityId', sortingOrder: 'asc' | 'desc' | '' = 'asc',
-        cityId: string = null, isDisplay: boolean = true): Observable<LandingLocation[]>
+
+    getLocations(params: {
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string
+    } = {
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'cityId', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null
+    }): Observable<LandingLocation[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;
         let accessToken = this._authService.publicToken;
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page        : '' + page,
-                pageSize    : '' + pageSize,
-                sortByCol   : '' + sortByCol,
-                sortingOrder : '' + sortingOrder.toUpperCase(),
-
-                cityId      : cityId,
-                isDisplay   : isDisplay,
-            }
+            params: params
         };
 
-        if (!cityId) {delete header.params.cityId}
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
 
         return this._httpClient.get<LandingLocation[]>(locationService + '/config/location', header)
             .pipe(
@@ -504,95 +785,24 @@ export class LocationService
                     of(false)
                 ),
                 switchMap(async (response:LandingLocation[]) => {
-                                
-                    this._logging.debug("Response from LocationService (getLocations)", response);
-
-                    let _pagination = {
-                        length: response["data"].totalElements,
-                        size: response["data"].size,
-                        page: response["data"].number,
-                        lastPage: response["data"].totalPages,
-                        startIndex: response["data"].pageable.offset,
-                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    
+                    this._logging.debug("Response from LocationService (getLocations)" + (params.cityId ? " - " + params.cityId : ""), response);
+                    
+                    if (params.cityId) {
+                        this._location.next(response["data"].content[0]);
+                    } else {
+                        let _pagination = {
+                            length: response["data"].totalElements,
+                            size: response["data"].size,
+                            page: response["data"].number,
+                            lastPage: response["data"].totalPages,
+                            startIndex: response["data"].pageable.offset,
+                            endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                        }
+    
+                        this._locationPagination.next(_pagination);
+                        this._locations.next(response["data"].content);
                     }
-                    this._locationPagination.next(_pagination);
-                    this._locations.next(response["data"].content);
-                    return response["data"].content;
-                })
-            );
-    }
- 
-     /**
-      * Get location by ID
-      * 
-      * @param id 
-      * @returns 
-      */
-    getLocationById(id: string): Observable<LandingLocation>
-    {        
-
-        return this._locations.pipe(
-            take(1),
-            map((locations) => {
-
-                // Find the product
-                const location = locations ? locations.find(item => item.cityId === id) : null;
-
-                this._logging.debug("Response from LocationService (Current Location)", location);
-
-                // Update the product
-                this._location.next(location);
-
-                // Return the product
-                return location;
-            }),
-            switchMap((location) => {
-
-                if ( !location )
-                {
-                    return throwError('Could not found location with id of ' + id + '!');
-                }
-
-                return of(location);
-            })
-        );
-    }
-
-    getFeaturedStores(page: number = 0, pageSize: number = 20, regionCountryId: string = '', isDisplay: boolean = true): Observable<Store[]>
-    {
-        let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._authService.publicToken;
-
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page        : '' + page,
-                pageSize    : '' + pageSize,
-
-                regionCountryId : regionCountryId,
-                isDisplay   : isDisplay,
-            }
-        };
-
-        if (!regionCountryId) {delete header.params.regionCountryId}
-
-        return this._httpClient.get<Store[]>(locationService + '/config/store', header)
-            .pipe(
-                switchMap(async (response:Store[]) => {
-                                
-                    this._logging.debug("Response from LocationService (getFeaturedStores)", response);
-
-                    let _pagination = {
-                        length: response["data"].totalElements,
-                        size: response["data"].size,
-                        page: response["data"].number,
-                        lastPage: response["data"].totalPages,
-                        startIndex: response["data"].pageable.offset,
-                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                    }
-                    this._featuredStorePagination.next(_pagination);
-                    this._featuredStores.next(response["data"].content);
-
                     return response["data"].content;
                 })
             );

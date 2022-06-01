@@ -74,14 +74,16 @@
                     </ng-container>
     
                     <!-- Logo -->
-                    <div class="flex items-center">
-                        <img
-                            (click)="goToHome()"
-                            class="w-24 cursor-pointer"
-                            [src]="platform.logo"
-                            alt="Logo image">
-                        <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
-                    </div>
+                    <ng-container *ngIf="platform">
+                        <div class="flex items-center">
+                            <img
+                                (click)="goToHome()"
+                                class="w-24 cursor-pointer"
+                                [src]="platform.logo"
+                                alt="Logo image">
+                            <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
+                        </div>
+                    </ng-container>
                     
                     <!-- Components -->
                     <div class="flex items-center pl-2 space-x-0.5 sm:space-x-2">

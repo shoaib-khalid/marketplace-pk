@@ -34,8 +34,7 @@ export class InitialDataResolver implements Resolve<any>
         private _shortcutsService: ShortcutsService,
         private _cartService: CartService,
         private _userService: UserService,
-        private _httpstatService: HttpStatService,
-        private _locationService: LocationService
+        private _httpstatService: HttpStatService
     )
     {
     }

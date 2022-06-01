@@ -15,9 +15,9 @@ export const landingLocationsRoutes: Route[] = [
         data: {
             headerTitle: 'Locations'
         },
-        resolve  : {
-            location: LocationResolver,
-        },
+        // resolve  : {
+        //     location: LocationResolver,
+        // },
         component: LandingLocationsComponent
     },
     {
@@ -28,9 +28,9 @@ export const landingLocationsRoutes: Route[] = [
                 data: {
                     headerTitle: 'Location Details'
                 },
-                resolve  : {
-                    location: LocationResolver,
-                },
+                // resolve  : {
+                //     location: LocationResolver,
+                // },
                 component: LocationComponent,
             }
             
@@ -44,9 +44,9 @@ export const landingLocationsRoutes: Route[] = [
                 data: {
                     headerTitle: 'Category Details'
                 },
-                resolve  : {
-                    location: LocationResolver,
-                },
+                // resolve  : {
+                //     location: LocationResolver,
+                // },
                 component: LocationComponent,
             }
             

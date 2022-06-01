@@ -93,7 +93,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getFeaturedStores(0, 20, this.platform.country);
+                return this._locationService.getFeaturedStores({ pageSize: 20, regionCountryId: this.platform.country});
             }),
             map(() => {
                 // set loading to false
@@ -142,7 +142,7 @@ export class LandingStoresComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country);
+                        return this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -163,7 +163,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedStores(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.platform.country)
+                this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

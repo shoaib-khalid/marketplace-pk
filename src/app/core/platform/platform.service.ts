@@ -166,12 +166,12 @@ export class PlatformService
                             return newPlatform;
                         });
 
-                        this._locationService.getLocations(0, 10, 'cityId', 'asc').subscribe(()=>{});
-                        this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya').subscribe(()=>{});
-                        this._locationService.getParentCategories('', '', response["data"][0].platformCountry).subscribe(()=>{});
-                        this._locationService.getFeaturedStores(0, 10, response["data"][0].platformCountry).subscribe(()=>{});
-                        // this._locationService.getStoresDetails("", 0, 5, null, null, response["data"][0].platformCountry,null).subscribe(()=>{});
-                        // this._locationService.getProductsDetails("", 0, 5, null, null, null, response["data"][0].platformCountry,null).subscribe(()=>{});
+                        this._locationService.getLocations({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
+                        this._locationService.getLocationBasedProducts({ pageSize: 5, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{});
+                        this._locationService.getParentCategories({ pageSize: 8, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{});
+                        this._locationService.getFeaturedStores({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
+                        this._locationService.getStoresDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
+                        this._locationService.getProductsDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
                 })
             );
     }

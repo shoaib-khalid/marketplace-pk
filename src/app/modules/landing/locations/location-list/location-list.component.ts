@@ -69,22 +69,20 @@ export class LandingLocationsComponent implements OnInit
     }
 
     onChangePage(pageOfItems: Array<any>) {
-        
+
         // update current page of items
         this.pageOfItems = pageOfItems;
         
         if(this.pagination && this.pageOfItems['currentPage']) {
-
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getLocations(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._locationService.getLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;
                     });
-    
             }
         }
         // Mark for check
@@ -106,7 +104,7 @@ export class LandingLocationsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getLocations(0, 20);
+                        return this._locationService.getLocations({pageSize:20 , regionCountryId: "MYS"});
                     }),
                     map(() => {
                         this.isLoading = false;

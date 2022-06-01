@@ -9,15 +9,12 @@
         <div class="flex flex-nowrap items-center justify-start overflow-x-auto w-full mt-1 sm:mt-2">
             <div class="grid grid-flow-col grid-rows-1 gap-1 sm:gap-4">
                 <ng-container *ngFor="let location of locations">
-                    <div class="flex-wrap items-center p-1" 
-                        (click)="chooseLocation(location.cityId, category)">
-                        <fuse-card class="flex flex-col rounded-lg h-30 w-40 filter-article cursor-pointer">
-                            <img
-                                class="object-cover h-24"
-                                [src]="location.imageUrl ? location.imageUrl : platform.logo">
-                            <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
-                        </fuse-card>
-                    </div>
+                    <fuse-card class="flex flex-col h-30 w-40 filter-article cursor-pointer shadow rounded-lg mb-2 ml-2" (click)="chooseLocation(location.cityId, category)">
+                        <img
+                            class="object-cover h-24 rounded-t-lg"
+                            [src]="location.imageUrl ? location.imageUrl : platform.logo">
+                        <div class="m-1 text-sm text-center font-semibold">{{location.cityDetails.name}}</div>
+                    </fuse-card>
                 </ng-container>
             </div>
         </div>

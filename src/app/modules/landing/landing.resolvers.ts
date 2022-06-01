@@ -56,8 +56,8 @@ export class LandingDataResolver implements Resolve<any>
         
         // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
-            this._locationService.getLocations(0, 10, 'cityId', 'asc'),
-            this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya'),
+            // this._locationService.getLocations(0, 10, 'cityId', 'ASC', 'MYS'),
+            // this._locationService.getLocationBasedProducts(0, 5, 'name', 'ASC', 'MYS', 'Subang Jaya'),
             // this._locationService.getParentCategories('', '', 'MYS'),
             // this._locationService.getFeaturedStores(0, 10, 'MYS')
             // this._locationService.getStoresDetails("",0,5,"Subang Jaya",null,"MYS",null)

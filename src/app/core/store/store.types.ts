@@ -197,6 +197,16 @@ export interface StorePagination
     endIndex: number;
 }
 
+export interface ProductPagination
+{
+    length: number;
+    size: number;
+    page: number;
+    lastPage: number;
+    startIndex: number;
+    endIndex: number;
+}
+
 export interface City
 {
     city: String;

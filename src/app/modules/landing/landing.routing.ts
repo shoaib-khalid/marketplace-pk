@@ -5,9 +5,9 @@ export const landingRoutes: Route[] = [
     // Landing routes
     {
         path       : '',
-        resolve: {
-            landingDataResolver: LandingDataResolver
-        },
+        // resolve: {
+        //     landingDataResolver: LandingDataResolver
+        // },
         children   : [
             {path: '', pathMatch : 'full', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
             {path: 'search', loadChildren: () => import('app/modules/landing/search/search.module').then(m => m.LandingSearchModule)},

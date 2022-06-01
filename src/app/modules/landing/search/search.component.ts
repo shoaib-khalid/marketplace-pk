@@ -51,11 +51,11 @@ export class LandingSearchComponent implements OnInit
 
                         if (this.searchValue) {
                             // Get stores
-                            this._locationService.getStoresDetails(this.searchValue,0,5,"SubangJaya",null,this.platform.country,null)
+                            this._locationService.getStoresDetails({storeName: this.searchValue, pageSize: 5, cityId: "SubangJaya", regionCountryId: this.platform.country})
                                 .subscribe(()=>{});
 
                             // Get products
-                            this._locationService.getProductsDetails(this.searchValue,0,5,"","SubangJaya",null,this.platform.country,null)
+                            this._locationService.getProductsDetails({name: this.searchValue, pageSize: 5, cityId: "SubangJaya", regionCountryId: this.platform.country})
                                 .subscribe(()=>{});
                         }
                     });

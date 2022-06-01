@@ -1,7 +1,7 @@
-<div class="flex flex-col items-center bg-card w-full h-full">
-    <!-- Header -->
-    <div class="w-full">
-        <div class="relative flex py-8 px-4 sm:p-16 overflow-hidden bg-white h-52 sm:h-70 lg:h-75 justify-center items-center">
+<ng-container *ngIf="location">
+    <div class="flex flex-col items-center bg-card w-full h-full">
+        <!-- Header -->
+        <div class="w-full relative flex p-2 sm:p-4 overflow-hidden bg-white h-52 sm:h-70 lg:h-75 justify-center items-center">
             <!-- Background -->
             <div class="absolute inset-0 pointer-events-none">
                 <img [src]="location.imageUrl ? location.imageUrl : platform.logo" alt="">
@@ -18,21 +18,21 @@
             <!-- Text  -->
             <div class="z-10 relative flex flex-col items-center tracking-wide">
                 <h2 class="text-xl text-white sm:text-2xl">{{location.cityDetails.name}}</h2>
-                <h2 *ngIf="categoryId" class="text-lg text-white sm:text-xl">{{category.parentName}}</h2>
+                <h2 *ngIf="category" class="text-lg text-white sm:text-xl">{{category.parentName}}</h2>
                 <div class="border-t w-40 border-white"></div>
                 <div class="max-w-2xl mt-2 sm:text-xl text-center text-secondary text-white">
                     50 products
                 </div>
             </div>
         </div>
+        <!-- Content  -->
+        <div class="flex flex-col items-center bg-card w-full px-2 sm:px-4 h-full">
+            <!-- Featured Categories -->
+            <featured-categories class="w-full" [categories]="categories" [location]="locationId"></featured-categories>
+            <!-- Featured Products -->
+            <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
+            <!-- Featured Stores -->
+            <featured-stores class="w-full" [stores]="stores"></featured-stores>
+        </div>
     </div>
-    <!-- Content  -->
-    <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
-        <!-- Featured Categories -->
-        <featured-categories class="w-full" [categories]="categories" [location]="locationId"></featured-categories>
-        <!-- Featured Products -->
-        <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
-        <!-- Featured Stores -->
-        <featured-stores class="w-full" [stores]="stores"></featured-stores>
-    </div>
-</div>
+</ng-container>

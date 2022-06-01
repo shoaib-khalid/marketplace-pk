@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, ProductOnLocation, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, ProductDetails, ProductOnLocation, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -53,74 +53,92 @@ export class LocationComponent implements OnInit
             distinctUntilChanged(),
             takeUntil(this._unsubscribeAll)
         ).subscribe((responseLocation: NavigationEnd) => {
-            
-            let categoryIdRouter = responseLocation.url.split("/")[3];
-            if (categoryIdRouter) {
-                this._locationService.getParentCategoriesById(categoryIdRouter)
-                    .subscribe((category : ParentCategory) => {this._changeDetectorRef.markForCheck();});
+            this.categoryId = responseLocation.url.split("/")[3];
+            if (this.categoryId) {
+                this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
+                    .subscribe((category : ParentCategory[]) => {});
             }
-        })
-        // Get parent category by Id - this is when we pick the category
-        if (this.categoryId) {
-            this._locationService.getParentCategoriesById(this.categoryId)
-                .subscribe((category : ParentCategory) => {});
-
-        }
-        this._locationService.parentCategory$
-            .subscribe(category => {
-                this.category = category;
-                this._changeDetectorRef.markForCheck();
-            });
-            
-        // Get the current location    
-        this._locationService.getLocationById(this.locationId)
-            .subscribe((location : LandingLocation) => {
-                this.location = location;
-
-                // Get products for this location - this is for later, i guess
-                // this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', location.cityDetails.name)
-                // .subscribe((response : ProductOnLocation[]) => {
-                //     this.products = response;
-                // });
-
-            });
-            
-        // Get products for this location
-        // this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
-        //     .subscribe((response : ProductOnLocation[]) => {
-        //         this.products = response;
-        //     });
-
-        // Get all locations
-        this._locationService.parentCategories$
-            .subscribe((categories: ParentCategory[]) => {
-                // to show only 8
-                if (categories.length >= 8) {
-                    const slicedArray = categories.slice(0, 8);
-                    this.categories = slicedArray;
-                }
-                else {
-                    this.categories = categories;
-                }
-
-            });
+        });
 
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
-                this.platform = platform;  
+                if (platform) {
+                    this.platform = platform;
 
-                this._locationService.getStoresDetails('', 0, 5, "SubangJaya", null, this.platform.country, null)
-                    .subscribe(()=>{});
+                    // Get url locationId 
+                    this._locationService.getLocations({cityId: this.locationId, regionCountryId: this.platform.country})
+                        .subscribe((location : LandingLocation[]) => {});
 
-                
-                    this._changeDetectorRef.markForCheck();
+                    // Get url parentCategoryId
+                    if (this.categoryId) {
+                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId})
+                            .subscribe((category : ParentCategory[]) => {});
+                    }
+
+                    // Get Featured Stores
+                    this._locationService.getStoresDetails({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
+                        .subscribe(()=>{});
+
+                    // Get Featured Products
+                    this._locationService.getProductsDetails({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
+                        .subscribe(()=>{});
+                    
+                }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
+
+        // Get Current parentCategory
+        this._locationService.parentCategory$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(category => {
+                if (category) {
+                    this.category = category;
+                }                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+            
+        // Get all parentCategories
+        this._locationService.parentCategories$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((categories: ParentCategory[]) => {
+                if (categories) {
+                    // to show only 8
+                    this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get Current Location
+        this._locationService.location$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((location: LandingLocation) => {
+                if (location) {
+                    this.location = location;                    
+                }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+        
+        // Get Featured Stores
         this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
                 this.stores = stores;  
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get Featured Products
+        this._locationService.featuredProducts$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((products: ProductDetails[]) => { 
+                this.products = products;  
                 this._changeDetectorRef.markForCheck();
             });
     }
