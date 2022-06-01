@@ -4,12 +4,10 @@ import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { Cart, CartItem, CartPagination, CustomerCart } from 'app/core/cart/cart.types';
 import { AppConfig } from 'app/config/service.config';
-import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
-import { StoresService } from '../store/store.service';
 import { AuthService } from '../auth/auth.service';
 import { DOCUMENT } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -29,13 +27,9 @@ export class CartService
         @Inject(DOCUMENT) private _document: Document,
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
-        private _storeService: StoresService,
-        private _jwt: JwtService,
         private _authService: AuthService,
         private _router: Router,
-        private _logging: LogService,
-        private _activatedRoute: ActivatedRoute,
-
+        private _logging: LogService
     )
     {
     }

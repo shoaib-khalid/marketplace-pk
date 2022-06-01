@@ -10,6 +10,7 @@ import { FormControl } from '@angular/forms';
 import { PlatformLocation } from '@angular/common';
 import { Platform } from './platform.types';
 import { AuthService } from '../auth/auth.service';
+import { StoresService } from 'app/core/store/store.service';
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +21,6 @@ export class PlatformService
     private _platforms: BehaviorSubject<Platform[] | null> = new BehaviorSubject(null);
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     public platformControl: FormControl = new FormControl();
-    private _currencySymbol: BehaviorSubject<string | null> = new BehaviorSubject<string | null>('');
 
     private url = {
         full: null,
@@ -35,6 +35,7 @@ export class PlatformService
     constructor(
         private _authService: AuthService,
         private _platformLocation: PlatformLocation,
+        private _storesService: StoresService,
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _jwt: JwtService,
@@ -87,22 +88,6 @@ export class PlatformService
         this._platforms.next(value);
     }
 
-    /**
-     * Setter for currency symbol
-     */
-    set setCurrencySymbol$(currency: string)
-    {
-        this._currencySymbol.next(currency);        
-    }
-
-    /**
-     * Getter for currency symbol
-     */
-    get getCurrencySymbol$(): Observable<string>
-    {
-        return this._currencySymbol.asObservable();
-    }
-
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -150,28 +135,33 @@ export class PlatformService
                     of(false)
                 ),
                 switchMap(async (response: any) => {
-                                
+                    
                     this._logging.debug("Response from PlatformsService (Set)",response);
 
-                    let newPlatform = {
-                        id          : response ? response["data"][0].platformId : null,
-                        name        : response ? response["data"][0].platformName : null,
-                        logo        : response ? response["data"][0].platformLogo : null,
-                        logoDark    : response ? response["data"][0].platformLogoDark : null,
-                        country     : response ? response["data"][0].platformCountry : null,
-                        favicon16   : response ? response["data"][0].platformFavIcon : null,
-                        favicon32   : response ? response["data"][0].platformFavIcon32 : null,
-                        gacode      : response ? response["data"][0].gaCode : null
-                    };
-                        
-                    // set this
-                    this.platformControl.setValue(newPlatform);
+                    // Get currency
+                    this._storesService.getStoreRegionCountriesById(response["data"][0].platformCountry)
+                        .subscribe((country) => {
+                            let newPlatform = {
+                                id          : response ? response["data"][0].platformId : null,
+                                name        : response ? response["data"][0].platformName : null,
+                                logo        : response ? response["data"][0].platformLogo : null,
+                                logoDark    : response ? response["data"][0].platformLogoDark : null,
+                                country     : response ? response["data"][0].platformCountry : null,
+                                favicon16   : response ? response["data"][0].platformFavIcon : null,
+                                favicon32   : response ? response["data"][0].platformFavIcon32 : null,
+                                gacode      : response ? response["data"][0].gaCode : null,
+                                currency    : country  ? country.currencySymbol: null
+                            };
 
-                    // Update the store
-                    this._platform.next(newPlatform);
-
-                    // Return the store
-                    return newPlatform;
+                            // set this
+                            this.platformControl.setValue(newPlatform);
+        
+                            // Update the store
+                            this._platform.next(newPlatform);
+        
+                            // Return the store
+                            return newPlatform;
+                        });
                 })
             );
     }

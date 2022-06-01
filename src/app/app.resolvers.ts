@@ -77,9 +77,7 @@ export class PlatformSetupResolver implements Resolve<any>
      * Constructor
      */
     constructor(
-        private _platformsService: PlatformService,
-        private _storesService: StoresService,
-        private _locationService: LocationService
+        private _platformsService: PlatformService
     )
     {
     }
@@ -96,20 +94,6 @@ export class PlatformSetupResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        return this._platformsService.set().pipe(
-            take(1),
-            switchMap((response) => {   
-
-                this._storesService.getStoreRegionCountriesById(response.country)
-                .subscribe(country => {
-                    // set currency symbol
-                    this._platformsService.setCurrencySymbol$ = country.currencySymbol
-                })
-                             
-                this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
-                // this._locationService.getFeaturedStores(0, 20, response.platformCountry,"created","desc").subscribe(()=>{});
-                return of(true);
-            })
-        )
+        return this._platformsService.set()
     }
 }

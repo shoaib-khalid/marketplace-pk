@@ -9,11 +9,21 @@ export interface ApiResponseModel<T>
     timestamp:string;
 }
 
+export interface StoresDetails
+{
+    id              : string;
+    name            : string;
+    city            : string;
+    state           : string;
+    postcode        : string;
+    regionCountryId : string;
+}
+
 export interface ParentCategory 
 {
-    parentId    : string;
-    parentName  : string;
-    parentThumbnailUrl : string;
+    parentId            : string;
+    parentName          : string;
+    parentThumbnailUrl  : string;
 }
 
 export interface ChildCategory 
@@ -33,6 +43,16 @@ export interface StoreDetails
     state           : string;
     postcode        : string;
     regionCountryId : string;
+}
+
+export interface ProductDetails
+{
+    id              : string;
+    name            : string;
+    thumbnailUrl    : string;
+    status          : string;
+    storeDetails    : StoreDetails;
+    productInventories : ProductInventory[];
 }
 
 export interface ProductOnLocation

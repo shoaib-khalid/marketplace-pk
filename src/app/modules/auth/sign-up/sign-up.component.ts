@@ -13,8 +13,6 @@ import { takeUntil } from 'rxjs/operators';
 import { AppleLoginProvider } from '../sign-in/apple.provider';
 import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
-import { DOCUMENT } from '@angular/common';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { CartService } from 'app/core/cart/cart.service';
@@ -62,18 +60,15 @@ export class AuthSignUpComponent implements OnInit
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
-        private _router: Router,
         private _route: ActivatedRoute,
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
         private _apiServer: AppConfig,
         private _userService: UserService,
-        private _fuseConfirmationService: FuseConfirmationService,
         private _cartsService: CartService,
         private _appleLoginService: AppleLoginService
 

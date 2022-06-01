@@ -1,10 +1,8 @@
-import { Inject, Injectable } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, of, Subject } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
+import { Observable, of } from 'rxjs';
 import { AuthService } from 'app/core/auth/auth.service';
-import { switchMap, takeUntil } from 'rxjs/operators';
-import { DOCUMENT } from '@angular/common';
-import { AppConfig } from 'app/config/service.config';
+import { switchMap } from 'rxjs/operators';
 import { CartService } from 'app/core/cart/cart.service';
 import { CustomerAuthenticate } from '../auth.types';
 
@@ -18,12 +16,9 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _authService: AuthService,
-        private _apiServer: AppConfig,
         private _router: Router,
-        private _cartsService: CartService,
-        // private _changeDetectorRef: ChangeDetectorRef,
+        private _cartsService: CartService
     )
     {
     }

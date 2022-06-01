@@ -1,14 +1,13 @@
-import { ChangeDetectorRef, Component, Inject, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { PlatformService } from 'app/core/platform/platform.service';
-import { map, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Platform } from 'app/core/platform/platform.types';
 import { AuthService } from 'app/core/auth/auth.service';
 import { ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
-import { DOCUMENT } from '@angular/common';
 import { AppleLoginService } from './apple-login.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart } from 'app/core/cart/cart.types';
@@ -38,12 +37,10 @@ export class AppleLoginComponent
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _changeDetectorRef: ChangeDetectorRef,
         private _activatedRoute: ActivatedRoute,
         private _jwtService: JwtService,
         private _authService: AuthService,
-        private _router: Router,
         private _platformsService: PlatformService,
         private _apiServer: AppConfig,
         private _appleLoginService: AppleLoginService,

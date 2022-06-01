@@ -3,13 +3,10 @@ import { Router } from '@angular/router';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { Subject, takeUntil } from 'rxjs';
 import { Cart, CustomerCart } from 'app/core/cart/cart.types';
-import { UserService } from 'app/core/user/user.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
-import { AuthService } from 'app/core/auth/auth.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { User } from 'app/core/user/user.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreAssets } from 'app/core/store/store.types';
+import { Store } from 'app/core/store/store.types';
 import { DOCUMENT } from '@angular/common';
 
 
@@ -48,10 +45,7 @@ export class CartComponent implements OnInit, OnDestroy
         @Inject(DOCUMENT) private _document: Document,
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
-        private _cartService: CartService,
-        private _authService: AuthService,
-        private _storesService: StoresService
-
+        private _cartService: CartService
     )
     {
     }

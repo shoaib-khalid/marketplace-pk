@@ -7,14 +7,12 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate, ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
 import { UserService } from 'app/core/user/user.service';
-import { DOCUMENT } from '@angular/common';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { takeUntil } from 'rxjs/operators';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject } from 'rxjs';
 import { AppleLoginProvider } from './apple.provider';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
@@ -60,17 +58,14 @@ export class AuthSignInComponent implements OnInit
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         public _dialog: MatDialog,
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
         private _apiServer: AppConfig,
-        private _router: Router,
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
-        private _fuseConfirmationService: FuseConfirmationService,
         private _httpstatService: HttpStatService,
         private _cartsService: CartService,
         private _appleLoginService: AppleLoginService

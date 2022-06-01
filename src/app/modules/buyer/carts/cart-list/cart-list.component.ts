@@ -8,10 +8,8 @@ import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartPagination } from 'app/core/cart/cart.types';
 import { JwtService } from 'app/core/jwt/jwt.service';
-import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreAssets } from 'app/core/store/store.types';
+import { Store } from 'app/core/store/store.types';
 import { User } from 'app/core/user/user.types';
 import { merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
@@ -109,12 +107,9 @@ export class CartListComponent implements OnInit, OnDestroy
         public _dialog: MatDialog,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _platformService : PlatformService,
         private _cartService: CartService,
-        private _storesService: StoresService,
         private _jwtService: JwtService,
         private _authService: AuthService
-
     )
     {
     }

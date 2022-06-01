@@ -1,8 +1,17 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
-    <!-- Search -->
+    <!-- Search Bar -->
     <search class="w-full"></search>
+    <!-- No Results -->
+    <ng-container *ngIf="!stores && !products">
+        <div class="flex flex-auto flex-col items-center justify-center h-56 border-gray-300 dark:bg-transparent">
+            <mat-icon
+                class="icon-size-20"
+                [svgIcon]="'heroicons_outline:document-search'"></mat-icon>
+            <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">Product not found!</div>
+        </div>
+    </ng-container>
     <!-- Featured Stores -->
-    <featured-stores class="w-full" [stores]="null"></featured-stores>
+    <featured-stores class="w-full" [stores]="stores" [title]="'Stores'"></featured-stores>
     <!-- Featured Products -->
-    <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
+    <featured-products class="w-full" [products]="products" [title]="'Products'"></featured-products>
 </div>

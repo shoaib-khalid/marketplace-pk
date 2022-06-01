@@ -27,7 +27,6 @@ export class LandingHomeComponent implements OnInit
     image: any = [];
     countryCode:string = '';
     products: ProductOnLocation[];
-    currencySymbol: string;
     mobileView: boolean = false;
 
 
@@ -35,14 +34,10 @@ export class LandingHomeComponent implements OnInit
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
-        private _storesService: StoresService,
-        private _router: Router,
         private _locationService: LocationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-
     )
     {
     }
@@ -67,12 +62,6 @@ export class LandingHomeComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
-
-        // Set currency symbol
-        this._platformsService.getCurrencySymbol$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(currency => this.currencySymbol = currency);
 
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -117,9 +106,5 @@ export class LandingHomeComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-    }
-
-    redirectToProduct(url: string) {
-        this._document.location.href = url;
     }
 }

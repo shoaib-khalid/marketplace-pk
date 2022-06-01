@@ -6,7 +6,7 @@ import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { AuthService } from 'app/core/auth/auth.service';
-import { DOCUMENT, PlatformLocation } from '@angular/common';
+import { PlatformLocation } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { AppConfig } from 'app/config/service.config';
 
@@ -43,7 +43,6 @@ export class UserComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformLocation: PlatformLocation,
         private _cookieService: CookieService,

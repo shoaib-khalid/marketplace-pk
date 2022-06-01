@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { ApiResponseModel, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductOnLocation, ProductOnLocationPagination } from './location.types';
+import { ApiResponseModel, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, ProductOnLocation, ProductOnLocationPagination, StoresDetails } from './location.types';
 import { Store, StorePagination } from '../store/store.types';
 
 @Injectable({
@@ -13,6 +13,8 @@ import { Store, StorePagination } from '../store/store.types';
 })
 export class LocationService
 {
+    private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
+    private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
     private _parentCategories: BehaviorSubject<ParentCategory[] | null> = new BehaviorSubject<ParentCategory[]>(null);
     private _parentCategory: BehaviorSubject<ParentCategory | null> = new BehaviorSubject<ParentCategory>(null);
     private _childCategory: BehaviorSubject<ChildCategory | null> = new BehaviorSubject<ChildCategory>(null);
@@ -23,8 +25,8 @@ export class LocationService
     private _locationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
 
     // for featured store display
-    private _featuredStore: BehaviorSubject<Store | null> = new BehaviorSubject(null);
-    private _featuredStores: BehaviorSubject<Store[] | null> = new BehaviorSubject(null);
+    private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
+    private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
     private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
     
     
@@ -46,6 +48,21 @@ export class LocationService
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
 
+    /**
+     * Getter for parent categories
+     */
+    get storesDetails$(): Observable<StoresDetails[]>
+    {
+        return this._storesDetails.asObservable();
+    }
+
+    /**
+     * Getter for parent categories
+     */
+    get productsDetails$(): Observable<ProductDetails[]>
+    {
+        return this._productsDetails.asObservable();
+    }
 
     /**
      * Getter for parent categories
@@ -58,10 +75,10 @@ export class LocationService
     /**
      * Getter for parentCategory
      */
-     get parentCategory$(): Observable<ParentCategory>
-     {
-         return this._parentCategory.asObservable();
-     }
+    get parentCategory$(): Observable<ParentCategory>
+    {
+        return this._parentCategory.asObservable();
+    }
 
     /**
      * Getter for childCategory
@@ -119,7 +136,7 @@ export class LocationService
     * Getter for store
     *
     */
-     get featuredStore$(): Observable<Store>
+     get featuredStore$(): Observable<StoresDetails>
      {
          return this._featuredStore.asObservable();
      }
@@ -129,7 +146,7 @@ export class LocationService
      *
      * @param value
      */
-     set featuredStore(value: Store)
+     set featuredStore(value: StoresDetails)
      {
          // Store the value
          this._featuredStore.next(value);
@@ -139,7 +156,7 @@ export class LocationService
       * Getter for stores
       *
      */
-     get featuredStores$(): Observable<Store[]>
+     get featuredStores$(): Observable<StoresDetails[]>
      {
          return this._featuredStores.asObservable();
      }
@@ -149,7 +166,7 @@ export class LocationService
       *
       * @param value
       */
-     set featuredStores(value: Store[])
+     set featuredStores(value: StoresDetails[])
      {
          // Store the value
          this._featuredStores.next(value);
@@ -166,6 +183,76 @@ export class LocationService
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+
+    getStoresDetails(storeName: string = '', page: number = 0, pageSize: number = 0, city: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
+        : Observable<StoresDetails[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                page,
+                pageSize,
+                storeName,
+                city,
+                postcode,
+                regionCountryId,
+                stateId
+            }
+        };
+
+        return this._httpClient.get<StoresDetails[]>(locationService + '/stores', header)
+            .pipe(
+                catchError(() =>
+                    of(false)
+                ),
+                switchMap(async (response: StoresDetails[]) => {
+                                
+                    this._logging.debug("Response from LocationService (getStoresDetails)", response);
+
+                    this._storesDetails.next(response["data"].content);
+                    return response["data"].content;
+                })
+            );
+    }
+
+    getProductsDetails(name: string = '', page: number = 0, pageSize: number = 0, storeName: string = '', cityId: string = '', postcode: string = '', regionCountryId: string = '', stateId: string = '') 
+        : Observable<ProductDetails[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                page,
+                pageSize,
+                name,
+                storeName,
+                cityId,
+                postcode,
+                regionCountryId,
+                stateId,
+                status: ['ACTIVE', 'OUTOFSTOCK']
+            }
+        };
+
+        return this._httpClient.get<ProductDetails[]>(locationService + '/products', header)
+            .pipe(
+                catchError(() =>
+                    of(false)
+                ),
+                switchMap(async (response: ProductDetails[]) => {
+                                
+                    this._logging.debug("Response from LocationService (getProductsDetails)", response);
+
+                    this._productsDetails.next(response["data"].content);
+                    return response["data"].content;
+                })
+            );
+    }
 
     /**
      * Get parent categories
@@ -199,7 +286,6 @@ export class LocationService
                     return response["data"];
                 })
             );
-
     }
 
     /**

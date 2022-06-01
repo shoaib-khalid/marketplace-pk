@@ -1,13 +1,11 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, ProductOnLocation } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, ProductOnLocation, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store } from 'app/core/store/store.types';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
     selector     : 'category',
@@ -19,11 +17,10 @@ export class CategoryComponent implements OnInit
     categories: any;
     locations: LandingLocation[];
     platform: Platform;
-    stores: Store[];
+    stores: StoresDetails[];
     categoryId: string;
     category: ParentCategory;
     products: ProductOnLocation[];
-    currencySymbol: string;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     locationId: string;
@@ -33,10 +30,8 @@ export class CategoryComponent implements OnInit
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
-        private _storesService: StoresService,
         private _route: ActivatedRoute,
         private _locationService: LocationService,
         private _location: Location,
@@ -97,11 +92,6 @@ export class CategoryComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-        
-        // set currency symbol
-        this._platformsService.getCurrencySymbol$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(currency => this.currencySymbol = currency)
             
         // Get products
         this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya')
@@ -115,7 +105,7 @@ export class CategoryComponent implements OnInit
                 this.platform = platform;  
                 this._locationService.featuredStores$
                     .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((stores: Store[]) => { 
+                    .subscribe((stores: StoresDetails[]) => { 
                         this.stores = stores;  
                         this._changeDetectorRef.markForCheck();
                     });
@@ -135,10 +125,5 @@ export class CategoryComponent implements OnInit
 
     backClicked() {
         this._location.back();
-    }
-
-    
-    redirectToProduct(url: string) {
-        this._document.location.href = url;
     }
 }

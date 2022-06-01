@@ -16,6 +16,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
 
     platform: Platform;
     @Input() stores: any;
+    @Input() title: string = "Store";
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -71,11 +72,6 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
-    }
-
-    goToSearch()
-    {
-        this._router.navigate(['/search']);
     }
 
     chooseStore(storeDomain:string) {

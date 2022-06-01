@@ -1,10 +1,9 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
+import { Component, Inject, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector     : 'featured-products',
@@ -16,12 +15,15 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
 
     platform: Platform;
     @Input() products: any;
+    @Input() title: string = "Product";
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _platformService: PlatformService,
         private _router: Router
     )
@@ -73,13 +75,12 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
         return item.id || index;
     }
 
-    goToSearch()
-    {
-        this._router.navigate(['/search']);
-    }
-
     chooseStore(storeDomain:string) {
         let slug = storeDomain.split(".")[0]
         this._router.navigate(['/store/' + slug]);
+    }
+
+    redirectToProduct(url: string) {
+        this._document.location.href = url;
     }
 }

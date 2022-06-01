@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
+import { StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -21,7 +22,7 @@ export class LandingStoresComponent implements OnInit
     @ViewChild("storesPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
    
-    stores: Store [] = [];
+    stores: StoresDetails [] = [];
     pagination: StorePagination;
     currentScreenSize: string[] = [];
     productViewOrientation: string = 'grid';
@@ -62,7 +63,7 @@ export class LandingStoresComponent implements OnInit
         });
         this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: Store[]) => { 
+            .subscribe((stores: StoresDetails[]) => { 
                 this.stores = stores;             
 
                 this._changeDetectorRef.markForCheck();

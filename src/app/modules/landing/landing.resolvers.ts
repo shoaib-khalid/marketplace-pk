@@ -56,7 +56,9 @@ export class LandingDataResolver implements Resolve<any>
         return forkJoin([
             this._locationService.getLocations(0, 10, 'cityId', 'asc'),
             this._locationService.getLocationBasedProducts(0, 5, 'name', 'asc', 'Subang Jaya'),
-            this._locationService.getParentCategories('Subang Jaya')
+            this._locationService.getParentCategories('Subang Jaya'),
+            // this._locationService.getStoresDetails("",0,5,"Subang Jaya",null,"MYS",null)
+            // this._locationService.getProductsDetails("",0,5,"","SubangJaya",null,"MYS",null)
         ]);
     }
 }
