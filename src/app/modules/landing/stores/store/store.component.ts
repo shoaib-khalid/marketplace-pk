@@ -93,6 +93,11 @@ export class LandingStoreComponent implements OnInit
     quantity: number = 0;
     pageOfItems: Array<any>;
 
+    storeDetails: {
+        image: string,
+        domain: string
+    }
+    searchValue: string;
 
     /**
      * Constructor
@@ -120,24 +125,42 @@ export class LandingStoreComponent implements OnInit
     }
 
     ngOnInit(): void {
-        this.storeDomain = this._route.snapshot.paramMap.get('store-slug');     
+        this.storeDomain = this._route.snapshot.paramMap.get('store-slug');    
+        
+        
+        
         
         this._storesService.getStoreByDomainName(this.storeDomain)
         .pipe(
+            takeUntil(this._unsubscribeAll),
             take(1),
             switchMap((response) => {
+                // set loading to true
+                this.isLoading = true;
+                this.store = response
+
+                let storeLogo = this.displayStoreLogo(this.store.storeAssets);
+                // To be sent to _search component
+                this.storeDetails = {
+                    image : storeLogo,
+                    domain: this.storeDomain
+                }
                 // check if store id exists
                 if (this._storesService.storeId$ && this._storesService.storeId$ !== null) {
+
+                    
 
                     // -----------------------
                     // Get Store Category
                     // -----------------------
 
                     this._storesService.getStoreCategories()
+                        .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((response)=>{
                             this.storeCategories = response.data.content
 
                             this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                            
                             let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
                             this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
                          
@@ -146,16 +169,31 @@ export class LandingStoreComponent implements OnInit
                             if (this._storeService.getPreviousUrl() && this._storeService.getPreviousUrl().split("/").length > 3) {                            
                                 this.oldPaginationIndex = this.pagination ? this.pagination.page : 0;
                             }
-                            
-                            this._productsService.getProducts(this.oldPaginationIndex, 12, "name", "asc", "", 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
-                                .pipe(takeUntil(this._unsubscribeAll))
-                                .subscribe(()=>{
-                                    // set loading to false
-                                    this.isLoading = false;
 
-                                    // Mark for check
-                                    this._changeDetectorRef.markForCheck();
-                                });
+                            // Get searches from url parameter 
+                            this._activatedRoute.queryParams.subscribe(params => {
+                                this.searchValue = params['keyword'];
+
+                                if (this.searchValue) {
+                                    
+                                    // Get products
+                                    this.searchInputControl.patchValue(this.searchValue);
+
+                                }
+                                else {
+                                    this._productsService.getProducts(this.oldPaginationIndex, 12, "name", "asc", "", 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
+                                        .pipe(takeUntil(this._unsubscribeAll))
+                                        .subscribe(()=>{
+                                            // set loading to false
+                                            this.isLoading = false;
+        
+                                            // Mark for check
+                                            this._changeDetectorRef.markForCheck();
+                                        });
+
+                                }
+                            });
+                            
                             
                         });
 
@@ -194,6 +232,7 @@ export class LandingStoreComponent implements OnInit
                     // -----------------------
                     
                     this._storesService.getStoreSnooze()
+                        .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe(() => {
                              
                         });
@@ -206,7 +245,6 @@ export class LandingStoreComponent implements OnInit
                     console.error("No store found");
                 }
 
-                this.store = response
                                 
                 return of(true);
             })
@@ -312,6 +350,16 @@ export class LandingStoreComponent implements OnInit
             }); 
     }
 
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
+
     reload(){
         this._router.routeReuseStrategy.shouldReuseRoute = () => false;
         this._router.onSameUrlNavigation = 'reload';
@@ -392,9 +440,9 @@ export class LandingStoreComponent implements OnInit
         // since all-product is not a real category, it will set to null
         this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
         // catalogue slug will be use in url
-        this.catalogueSlug = value;        
+        this.catalogueSlug = value;       
         
-        this._router.navigate(['stores/' + this.storeDomain + '/' + value]);
+        this._router.navigate(['store/' + this.storeDomain + '/' + value]);
 
         this.reload();
 

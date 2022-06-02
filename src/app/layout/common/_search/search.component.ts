@@ -5,6 +5,10 @@ import { fuseAnimations } from '@fuse/animations/public-api';
 import { Router } from '@angular/router';
 import { SearchService } from './search.service';
 import { MatInput } from '@angular/material/input';
+import { Store, StoreAssets } from 'app/core/store/store.types';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
+import { CustomerSearch } from './search.types';
 
 @Component({
     selector     : 'search',
@@ -17,11 +21,15 @@ export class _SearchComponent implements OnInit, OnDestroy
 {
     @Output() search: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('searchInput') public searchElement: ElementRef;
+    @Input() storeId: string;
+    @Input() store: { image: string, domain: string };
     searchControl: FormControl = new FormControl();
     resultSets: any[];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     autoCompleteList: any[]
     minLength: number = 2;
+    customer: User;
+    custSearchResults: any[];
 
     /**
      * Constructor
@@ -29,7 +37,9 @@ export class _SearchComponent implements OnInit, OnDestroy
     constructor(
         private _searchService: SearchService,
         private _router: Router,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _userService: UserService
+
     )
     {
     }
@@ -47,10 +57,18 @@ export class _SearchComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User)=>{
+                this.customer = user
+            });
+
         this._searchService.get()
+            .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response)=> {    
                 this.resultSets = response;                
-                this.autoCompleteList = response;                
+                this.autoCompleteList = response;  
                 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -143,53 +161,111 @@ export class _SearchComponent implements OnInit, OnDestroy
             return;
         }
 
+        // Set current date
         let now = new Date();
-        let dataSearch = {
-            searchText  : value,
-            created     : (now.getMonth()+1).toString().padStart(2, '0') + "/" +
-                          now.getDate().toString().padStart(2, '0') + "/" +
-                          now.getFullYear().toString().padStart(4, '0') + " " +
-                          now.getHours().toString().padStart(2, '0') + ":" +
-                          now.getMinutes().toString().padStart(2, '0') + ":" +
-                          now.getSeconds().toString().padStart(2, '0'),
-            storeId     : null
-        };
-        
-        let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$);        
+        const currentDate = now.getDate().toString().padStart(2, '0') + "-" +
+                            (now.getMonth()+1).toString().padStart(2, '0') + "-" +
+                            now.getFullYear().toString().padStart(4, '0') + " " +
+                            now.getHours().toString().padStart(2, '0') + ":" +
+                            now.getMinutes().toString().padStart(2, '0') + ":" +
+                            now.getSeconds().toString().padStart(2, '0')
 
-        // array empty or does not exist
-        if (localDataSearch === undefined || localDataSearch.length == 0) {
-            localDataSearch = [dataSearch];
-        } else {
-            if (localDataSearch.length > 4) {
-                localDataSearch.pop();
+
+        // If logged in search
+        if (this.customer) {
+
+            let dataSearch = {
+                created     : currentDate,
+                customerId  : this.customer.id,                
+                searchText  : value,
+                storeId     : this.storeId ? this.storeId : null,
+                domain      : this.store.domain,
+                image       : this.store.image
             }
-            localDataSearch.unshift(dataSearch);
-        }
 
-        this._searchService.localSearch = localDataSearch;
-        this.resultSets = localDataSearch; 
+            this._searchService.postCustomerSearch(dataSearch)
+                .pipe(
+                    takeUntil(this._unsubscribeAll),
+                    switchMap(() => {
+                        return this._searchService.get()
+                    }),
+                    map((searches) => {
+                        this.resultSets = searches;
+                    })
+                    )
+                .subscribe()
+        }
+        // if guest search
+        else {
+
+            let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$); 
+
+            let index = localDataSearch.findIndex(x => x.searchText === value);
+            
+            // If the search doesn't exist in dataset, then create
+            if (index < 0) {
+                let dataSearch = {
+                    searchText  : value,
+                    created     : currentDate,
+                    storeId     : this.storeId ? this.storeId : null,
+                    domain      : this.store ? this.store.domain : null,
+                    image       : this.store ? this.store.image : null
+                };
+
+                // array empty or does not exist
+                if (localDataSearch === undefined || localDataSearch.length == 0) {
+                    localDataSearch = [dataSearch];
+                } else {
+                    if (localDataSearch.length > 4) {
+                        localDataSearch.pop();
+                    }
+                    localDataSearch.unshift(dataSearch);
+                }
+                this._searchService.localSearch = localDataSearch;
+
+                this.resultSets = localDataSearch; 
+            }
+            // else if search already exist in local
+            else {                
+                this.moveResultSets(localDataSearch[index]);
+            }
+    
+        }
 
         // to avoid 'no records' from showing after search has been done 
         // this.autoCompleteList.unshift(dataSearch);  
 
-        this._searchService.searchValue = value;
+        // this._searchService.searchValue = value;
 
         // Remove focus
-        // this.searchControl.setValue('')
         setTimeout(() => this.searchElement.nativeElement.blur());
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
-        this._router.navigate(['/search'], {queryParams: {keyword: value}});
+        // Route to respective page
+        if (this.store) {
+            this._router.navigate(['/store/' + this.store.domain], {queryParams: {keyword: value}});
+        }
+        else {
+            this._router.navigate(['/search'], {queryParams: {keyword: value}});
+        }
+
     }
 
-    selectResult(result: any, event: any) {
+    selectResult(result: any) {
+
+        this.moveResultSets(result);
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
-        this._router.navigate(['/search'], {queryParams: {keyword: result.searchText}});
+
+        if (result.store) {
+            this._router.navigate(['/store/' + result.store.domain], {queryParams: {keyword: result.searchText}});
+        }
+        else {
+            this._router.navigate(['/search'], {queryParams: {keyword: result.searchText}});
+        }
         
     }
 
@@ -199,5 +275,86 @@ export class _SearchComponent implements OnInit, OnDestroy
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+    moveResultSets(result: any) {
+
+        // Set current date
+        let now = new Date();
+        const currentDate = now.getDate().toString().padStart(2, '0') + "-" +
+                            (now.getMonth()+1).toString().padStart(2, '0') + "-" +
+                            now.getFullYear().toString().padStart(4, '0') + " " +
+                            now.getHours().toString().padStart(2, '0') + ":" +
+                            now.getMinutes().toString().padStart(2, '0') + ":" +
+                            now.getSeconds().toString().padStart(2, '0')
+
+        // If logged in search
+        if (this.customer) {
+
+            let dataSearch = {
+                created     : currentDate,
+                customerId  : this.customer.id,                
+                searchText  : result.searchText,
+                storeId     : result.storeId ? result.storeId : null,
+                domain      : result.domain,
+                image       : result.image
+            }
+
+            this._searchService.postCustomerSearch(dataSearch)
+                .pipe(
+                    takeUntil(this._unsubscribeAll),
+                    switchMap(() => {
+                        return this._searchService.get()
+                    }),
+                    map((searches) => {
+                        this.resultSets = searches;
+                        this.autoCompleteList = searches;
+                        
+                        // Mark for check
+                        this._changeDetectorRef.markForCheck();
+                    })
+                    )
+                .subscribe()
+        }
+        // if guest search
+        else {
+
+            let index = this.resultSets.findIndex(x => x.searchText === result.searchText);
+    
+            // create new set
+            let now = new Date();
+            let dataSearch = {
+                searchText  : result.searchText,
+                created     : (now.getMonth()+1).toString().padStart(2, '0') + "/" +
+                              now.getDate().toString().padStart(2, '0') + "/" +
+                              now.getFullYear().toString().padStart(4, '0') + " " +
+                              now.getHours().toString().padStart(2, '0') + ":" +
+                              now.getMinutes().toString().padStart(2, '0') + ":" +
+                              now.getSeconds().toString().padStart(2, '0'),
+                storeId     : result.storeId,
+                domain      : result.domain,
+                image       : result.image
+            };
+            
+            let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$);  
+            // Remove old element
+            localDataSearch.splice(index, 1);
+            // Unshift new element
+            localDataSearch.unshift(dataSearch);
+    
+            this._searchService.localSearch = localDataSearch;
+            this.resultSets = localDataSearch; 
+        }
+
+        
+    }
+
+    displayStoreLogo(storeAssets: StoreAssets[]) {
+        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (storeAssetsIndex > -1) {
+            return storeAssets[storeAssetsIndex].assetUrl;
+        } else {
+            return 'assets/branding/symplified/logo/symplified.png'
+        }
     }
 }
