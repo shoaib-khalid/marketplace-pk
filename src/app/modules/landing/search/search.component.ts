@@ -1,5 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { AdsService } from 'app/core/ads/ads.service';
+import { Ad } from 'app/core/ads/ads.types';
 import { LocationService } from 'app/core/location/location.service';
 import { ParentCategory, LandingLocation, StoresDetails, ProductDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -13,7 +16,6 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class LandingSearchComponent implements OnInit
 {
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     platform    : Platform;
     locations   : LandingLocation[] = [];
@@ -23,6 +25,11 @@ export class LandingSearchComponent implements OnInit
 
     searchValue: string;
 
+    currentScreenSize: string[] = [];
+    ads: Ad[] = [];
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
     /**
      * Constructor
      */
@@ -31,6 +38,8 @@ export class LandingSearchComponent implements OnInit
         private _platformsService: PlatformService,
         private _activatedRoute: ActivatedRoute,
         private _locationService: LocationService,
+        private _adsService: AdsService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
     )
     {
     }
@@ -82,6 +91,32 @@ export class LandingSearchComponent implements OnInit
                 if (products) {
                     this.products = products;
                 }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get banners
+        this._adsService.ads$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((ads: Ad[]) => {
+                if (ads) {
+                    // to show only 8
+                    this.ads = ads;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;                
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

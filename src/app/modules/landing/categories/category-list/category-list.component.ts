@@ -1,6 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { AdsService } from 'app/core/ads/ads.service';
+import { Ad } from 'app/core/ads/ads.types';
 import { LocationService } from 'app/core/location/location.service';
 import { CategoryPagination, ParentCategory } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -23,6 +26,10 @@ export class LandingCategoriesComponent implements OnInit
     isLoading: boolean = false;
     pageOfItems: Array<any>;
 
+    currentScreenSize: string[] = [];
+
+    ads: Ad[] = [];
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -32,6 +39,8 @@ export class LandingCategoriesComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _locationService: LocationService,
+        private _adsService: AdsService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
     )
     {
@@ -65,12 +74,39 @@ export class LandingCategoriesComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
         
+        // Get parent categories pagination
         this._locationService.parentCategoriesPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: CategoryPagination) => {
                 if (pagination) {
                     this.pagination = pagination;
                 }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get banners
+        this._adsService.ads$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((ads: Ad[]) => {
+                if (ads) {
+                    // to show only 8
+                    this.ads = ads;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });            
+
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;                
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

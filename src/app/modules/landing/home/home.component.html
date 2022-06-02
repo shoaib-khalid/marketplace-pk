@@ -1,11 +1,8 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
     <!-- Search -->
-    <search class="w-full"></search>
+    <search *ngIf="!currentScreenSize.includes('md')" class="w-full"></search>
     <!-- Promotion Banner -->
     <div class="w-full">
-        <!-- <div class="flex flex-col relative items-center w-full h-56 mt-4 md:h-96 bg-no-repeat bg-cover bg-center overflow-hidden">
-            <banner-slider></banner-slider>
-        </div>   -->
         <!-- Banner  -->
         <div class="flex flex-col relative items-center w-full mt-4 bg-no-repeat bg-cover bg-center overflow-hidden rounded-xl">
             <swiper-banner class="w-full"></swiper-banner>
@@ -46,5 +43,5 @@
         </ng-container>
     </ng-container>
     <!-- Ads Banner -->
-    <ads-banner class="w-full" [banners]="banners"></ads-banner>
+    <ads-banner class="w-full" [banners]="ads"></ads-banner>
 </div>

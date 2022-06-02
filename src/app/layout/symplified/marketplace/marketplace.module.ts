@@ -12,7 +12,6 @@ import { LanguagesModule } from 'app/layout/common/languages/languages.module';
 import { MessagesModule } from 'app/layout/common/messages/messages.module';
 import { NotificationsModule } from 'app/layout/common/notifications/notifications.module';
 import { QuickChatModule } from 'app/layout/common/quick-chat/quick-chat.module';
-import { SearchModule } from 'app/layout/common/search/search.module';
 import { ShortcutsModule } from 'app/layout/common/shortcuts/shortcuts.module';
 import { UserModule } from 'app/layout/common/user/user.module';
 import { CartModule } from 'app/layout/common/cart/cart.module';
@@ -20,6 +19,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { MarketplaceLayoutComponent } from 'app/layout/symplified/marketplace/marketplace.component';
 import { Error500Component } from 'app/shared/error-500/error-500.component';
 import { FooterModule } from 'app/layout/common/footer/footer.module';
+import { _SearchModule } from 'app/layout/common/_search/search.module';
 
 @NgModule({
     declarations: [
@@ -40,11 +40,11 @@ import { FooterModule } from 'app/layout/common/footer/footer.module';
         MessagesModule,
         NotificationsModule,
         QuickChatModule,
-        SearchModule,
         ShortcutsModule,
         UserModule,
         FooterModule,
         CartModule,
+        _SearchModule,
         SharedModule
     ],
     exports     : [

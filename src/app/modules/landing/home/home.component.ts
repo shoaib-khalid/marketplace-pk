@@ -7,6 +7,9 @@ import { Platform } from 'app/core/platform/platform.types';
 import { StorePagination } from 'app/core/store/store.types';
 import { AppConfig } from 'app/config/service.config';
 import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
+import { AdsService } from 'app/core/ads/ads.service';
+import { Ad } from 'app/core/ads/ads.types';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 
 @Component({
     selector     : 'landing-home',
@@ -38,7 +41,8 @@ export class LandingHomeComponent implements OnInit
 
     isLoading: boolean = false;
 
-    banners: any;
+    currentScreenSize: string[] = [];
+    ads: Ad[] = [];
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -49,6 +53,8 @@ export class LandingHomeComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _locationService: LocationService,
+        private _adsService: AdsService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _apiServer: AppConfig
     )
     {
@@ -114,13 +120,31 @@ export class LandingHomeComponent implements OnInit
 
             let orderService = this._apiServer.settings.apiServer.orderService;
 
-        // hardcode banner
-        this.banners = [
-            {
-                bannerUrl: "assets/images/example/join_now.png",
-                redirectUrl: "https://" + this._apiServer.settings.merchantPortalDomain + "/sign-up"
-            }
-        ];
+        // Get banners
+        this._adsService.ads$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((ads: Ad[]) => {
+                if (ads) {
+                    // to show only 8
+                    this.ads = ads;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;                
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     /**

@@ -16,7 +16,7 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
     @Input() categories: any;
     @Input() location: any;
     @Input() title: string = "Categories";
-    @Input() showViewAll: boolean = true;
+    @Input() showViewAll: boolean = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

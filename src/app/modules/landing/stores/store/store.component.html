@@ -1,11 +1,9 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
-    <!-- Search -->
     <ng-container *ngIf="store">
-        <search class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
-    </ng-container>
-    <ng-container *ngIf="store">
+        <!-- Search -->
+        <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
         <!-- Selected Store -->
-        <fuse-card class="flex flex-row h-32 mt-4 md:h-full w-full border border-primary rounded-lg filter-article">
+        <fuse-card class="flex flex-row h-32 mt-4 md:mt-2 md:h-full w-full border border-primary rounded-lg filter-article">
             <div class="flex-0 w-30 md:w-44 ">
                 <img
                     class="w-full h-full shadow object-cover"
@@ -177,7 +175,6 @@
             
             <!-- Products -->
             <div class="flex flex-col md:flex-wrap relative w-full md:pl-4">
-
                 <!-- Sort -->
                 <div class="flex flex-row items-start justify-between md:justify-end mt-2 md:mt-0 md:mb-2 w-full pb-2 sm:pb-0">
                     <mat-select
@@ -249,7 +246,7 @@
                                             <!-- Product -->
                                             <div class="flex flex-col h-120 w-full lg:w-60 shadow border group hover:border-2 rounded-lg overflow-hidden cursor-pointer"
                                                 [ngClass]="isProductOutOfStock(product) ? 'bg-card hover:border-primary' : 'bg-gray-200 hover:border-gray-600'"
-                                                [routerLink]="['/stores/' + storeDomain + '/' + catalogueSlug + '/' + product.seoName]"
+                                                [routerLink]="[ catalogueSlug + '/' + product.seoName]"
                                             >
                                                 <!-- Product Header -->
                                                 <div class="relative flex flex-col p-2 h-60 bg-white bg-no-repeat bg-cover bg-center" 
@@ -361,7 +358,7 @@
                                         <ng-container *ngFor="let product of products">
                                             <div class="flex flex-wrap flex-row h-40 sm:h-48 mb-4 w-full bg-card shadow border group hover:border-2 rounded-lg justify-between items-center cursor-pointer"
                                                 [ngClass]="isProductOutOfStock(product) ? 'bg-card hover:border-primary' : 'bg-gray-200 hover:border-gray-600'"
-                                                [routerLink]="['/stores/' + storeDomain + '/' + catalogueSlug + '/' + product.seoName]"
+                                                [routerLink]="[catalogueSlug + '/' + product.seoName]"
                                             >
                                                 <!-- Image Thumbnail -->
                                                 <div class="relative h-full w-2/5 sm:w-2/6 max-w-52 rounded-l-lg p-2 bg-white bg-no-repeat bg-cover bg-center" 
@@ -417,6 +414,7 @@
                                     </div>
                                 </div>
                             </ng-container>
+                            <!-- Pagination -->
                             <div class="flex w-full mt-4 items-center justify-center">
                                 <pagination 
                                     [itemLength]="pagination.length" 
@@ -505,18 +503,9 @@
                 </ng-template>
 
                 <div class="mb-12"></div>
-                
-                <!-- <mat-paginator
-                    class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 sm:mx-4 z-10 rounded-lg shadow bg-gray-50 dark:bg-transparent"
-                    [ngClass]="{'pointer-events-none': isLoading}"
-                    [length]="pagination.length"
-                    [pageIndex]="pagination.page"
-                    [pageSize]="pagination.size"
-                    [pageSizeOptions]="[5, 10, 25, 100]"
-                    [showFirstLastButtons]="true"></mat-paginator> -->
+
             </div>
             
-
         </div>
     </ng-container>
 </div>

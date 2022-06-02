@@ -14,7 +14,6 @@ import { CustomerSearch } from './search.types';
     selector     : 'search',
     templateUrl  : './search.component.html',
     encapsulation: ViewEncapsulation.None,
-    exportAs     : 'fuseSearch',
     animations   : fuseAnimations
 })
 export class _SearchComponent implements OnInit, OnDestroy

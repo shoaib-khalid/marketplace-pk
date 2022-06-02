@@ -1,23 +1,21 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
     
     <!-- Search -->
-    <search class="w-full"></search>
+    <search *ngIf="!currentScreenSize.includes('md')" class="w-full"></search>
 
     <!-- Locations -->
-    <div class="flex flex-col w-full mt-4">
-        <div class="grid md:grid-cols-5 grid-cols-6 gap-4 sm:gap-8 items-center w-full justify-between pt-2">
-            <ng-container *ngFor="let location of locations">
-                <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center">
-                    <fuse-card class="flex flex-col rounded-lg w-40 h-40 group hover:bg-primary-50 hover:border filter-article cursor-pointer"
-                    [routerLink]="['/location/' + location.cityId]">
-                        <img
-                            class="object-cover h-32"
-                            [src]="location.imageUrl ? location.imageUrl : platform.logo">
-                        <div class="m-1 text-sm text-center group-hover:text-primary font-semibold">{{location.cityDetails.name}}</div>
-                    </fuse-card>
-                </div>
-            </ng-container>
-        </div>
+    <div class="grid md:grid-cols-5 grid-cols-6 gap-4 sm:gap-8 items-center w-full justify-between mt-2 sm:mt-4 md:mt-0">
+        <ng-container *ngFor="let location of locations">
+            <div class="grid col-span-3 sm:col-span-2 md:col-span-1 w-full items-start justify-center">
+                <fuse-card class="flex flex-col rounded-lg w-40 h-40 group hover:bg-primary-50 hover:border filter-article cursor-pointer"
+                [routerLink]="['/location/' + location.cityId]">
+                    <img
+                        class="object-cover h-32"
+                        [src]="location.imageUrl ? location.imageUrl : platform.logo">
+                    <div class="m-1 text-sm text-center group-hover:text-primary font-semibold">{{location.cityDetails.name}}</div>
+                </fuse-card>
+            </div>
+        </ng-container>
     </div>
 
     <!-- Pagination -->
@@ -30,21 +28,6 @@
             (changePage)="onChangePage($event)"></pagination>
     </div>
 
-    <!-- Join Now banner -->
-    <div class="w-full mt-4">
-        <fuse-card 
-            class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
-            <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
-            <div class="px-4">
-                <input 
-                    type="button" 
-                    class="w-0 h-0 invisible">
-                <label
-                    class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
-                >
-                    <span class="text-white text-sm font-semibold">JOIN NOW</span>
-                </label>
-            </div>
-        </fuse-card>
-    </div>
+    <!-- Ads Banner -->
+    <ads-banner class="w-full" [banners]="ads"></ads-banner>
 </div>

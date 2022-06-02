@@ -16,9 +16,9 @@ export const landingStoresRoutes: Route[] = [
         data: {
             headerTitle: 'All Stores'
         },
-        resolve  : {
-            stores: StoresResolver,
-        },
+        // resolve  : {
+        //     stores: StoresResolver,
+        // },
         component: LandingStoresComponent
     },
     {

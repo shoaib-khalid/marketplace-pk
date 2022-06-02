@@ -18,7 +18,7 @@ export class _FeaturedLocationsComponent implements OnInit, OnDestroy
     @Input() locations: any;
     @Input() category: any;
     @Input() title: string = "Locations";
-    @Input() showViewAll: boolean = true;
+    @Input() showViewAll: boolean = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

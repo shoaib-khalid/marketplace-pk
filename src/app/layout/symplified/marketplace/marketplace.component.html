@@ -102,13 +102,14 @@
             </div>
             <!-- Bottom bar -->
             <ng-container *ngIf="!isScreenSmall">
-                <div class="flex flex-auto justify-center px-4 md:px-8 bg-card dark:bg-gray-700">
+                <div class="flex flex-auto justify-center items-center px-4 md:px-8 bg-card dark:bg-gray-700">
                     <div class="relative flex items-center w-full max-w-360 h-16">
                         <fuse-horizontal-navigation
                             class="-mx-4"
                             [name]="'mainNavigation'"
                             [navigation]="navigation.horizontal"></fuse-horizontal-navigation>
                     </div>
+                    <search *ngIf="currentScreenSize.includes('md')" class="w-full"></search>
                 </div>
             </ng-container>
         </div>

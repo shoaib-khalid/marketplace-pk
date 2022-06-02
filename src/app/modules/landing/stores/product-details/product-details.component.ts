@@ -1,15 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CartService } from 'app/core/cart/cart.service';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
-
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
-import { debounceTime, take, map, of, switchMap, takeUntil } from 'rxjs';
-import { FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { take, of, switchMap, takeUntil, Subject } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 
 @Component({
     selector     : 'landing-product-details',
@@ -122,14 +120,17 @@ export class LandingProductDetailsComponent implements OnInit
     galleryImages: NgxGalleryImage[] = [];
     specialInstructionForm: FormGroup;
 
+    currentScreenSize: string[] = [];
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
     /**
      * Constructor
      */
     constructor(
         private _storesService: StoresService,
         private _productsService: ProductsService,
-        private _cartService: CartService,
-        private _fuseConfirmationService: FuseConfirmationService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
         private _route: ActivatedRoute,
         private _formBuilder: FormBuilder,
@@ -320,7 +321,6 @@ export class LandingProductDetailsComponent implements OnInit
                 return of(true);
             })
         ).subscribe(() => {
-            
         });
         
         // initialise gallery
@@ -360,6 +360,19 @@ export class LandingProductDetailsComponent implements OnInit
             }
         ];
 
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;                
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     // -----------------------------------------------------------------------------------------------------

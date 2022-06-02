@@ -67,17 +67,15 @@ export class StoresResolver implements Resolve<any>
         // });
 
         return forkJoin([
-            this._platformsService.platform$
-            .pipe(
-                take(1),
-                switchMap((response) => {   
-                    console.log('response StoresResolver', response);
-                         
-                    // this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
-                    this._locationService.getFeaturedStores({pageSize:20, regionCountryId:response.country}).subscribe(()=>{});
-                    return of(true);
-                })
-            ),
+            // this._platformsService.platform$
+            // .pipe(
+            //     take(1),
+            //     switchMap((response) => {                            
+            //         // this._storesService.getStores("",0,10,response.platformCountry,"created","desc").subscribe(()=>{});
+            //         this._locationService.getFeaturedStores({pageSize:20, regionCountryId:response.country}).subscribe(()=>{});
+            //         return of(true);
+            //     })
+            // ),
             // this._locationService.getFeaturedStores(0, 20, response.platformCountry,"created","desc").subscribe(()=>{});
         ]);
     }

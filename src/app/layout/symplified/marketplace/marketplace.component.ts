@@ -23,6 +23,7 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
     user: User;
     
     isScreenSmall: boolean;
+    currentScreenSize: string[] = [];
     show500: boolean;
 
     headerTitle: string;
@@ -84,6 +85,8 @@ export class MarketplaceLayoutComponent implements OnInit, OnDestroy
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
+
+                this.currentScreenSize = matchingAliases;
 
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');

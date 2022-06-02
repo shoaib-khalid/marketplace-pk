@@ -12,9 +12,6 @@ import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { CartService } from './core/cart/cart.service';
 import { HttpStatService } from './mock-api/httpstat/httpstat.service';
-import { switchMap, take, map, tap, catchError, filter } from 'rxjs/operators';
-import { StoresService } from './core/store/store.service';
-import { LocationService } from './core/location/location.service';
 
 @Injectable({
     providedIn: 'root'

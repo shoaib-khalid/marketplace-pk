@@ -13,6 +13,7 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
 import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
+import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.module';
 
 @NgModule({
     declarations: [
@@ -29,6 +30,7 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
         _FeaturedStoresModule,
         _FeaturedLocationsModule,
         _FeaturedProductsModule,
+        _AdsBannerModule,
         PaginationModule,
         FuseCardModule
     ]
