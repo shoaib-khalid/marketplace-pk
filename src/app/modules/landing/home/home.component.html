@@ -16,8 +16,8 @@
     <!-- Categories -->
     <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll"></featured-categories>
     <!-- Featured Stores -->
-    <div #featuredStoresContainer>
-        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="storesViewAll"></featured-stores>
+    <ng-container *ngIf="featuredStores && featuredStores.length">
+        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="storesViewAll" [title]="'Featured Stores'"></featured-stores>
         <!-- Pagination -->
         <ng-container *ngIf="featuredStoresPagination">
             <div class="flex w-full my-4 items-center justify-center">
@@ -29,24 +29,22 @@
                     #storesPaginator></pagination>
             </div>
         </ng-container>
-    </div>
+    </ng-container>
     <!-- Featured Products -->
-    <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
-    <!-- Join Now Banner -->
-    <div class="w-full mt-4">
-        <fuse-card 
-            class="flex flex-col w-full rounded-lg h-30 sm:h-40" [style]="'background-image: url(\'assets/images/example/join_now.png\'); background-size: cover;'">
-            <span class="m-4 max-w-60 md:max-w-max text-lg font-serif text-white">Market and sell at any time subject to your business needs.</span>
-            <div class="px-4">
-                <input 
-                    type="button" 
-                    class="w-0 h-0 invisible">
-                <label
-                    class="p-2 px-6 w-16 bg-primary rounded-full cursor-pointer"
-                >
-                    <span class="text-white text-sm font-semibold">JOIN NOW</span>
-                </label>
+    <ng-container *ngIf="featuredProducts && featuredProducts.length">
+        <featured-products *ngIf="false" class="w-full" [products]="featuredProducts" [title]="'Featured Products'"></featured-products>
+        <!-- Pagination -->
+        <ng-container *ngIf="featuredProductsPagination">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="featuredProductsPagination.length" 
+                    [initialPage]="featuredProductsPagination.page + 1"
+                    [pageSize]="featuredProductsPagination.size"
+                    (changePage)="onChangePage($event)"
+                    #productsPaginator></pagination>
             </div>
-        </fuse-card>
-    </div>
+        </ng-container>
+    </ng-container>
+    <!-- Ads Banner -->
+    <ads-banner class="w-full" [banners]="banners"></ads-banner>
 </div>

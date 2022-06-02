@@ -15,6 +15,7 @@ import { _FeaturedCategoriesModule } from 'app/layout/common/_featured-categorie
 import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
+import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.module';
 
 @NgModule({
     declarations: [
@@ -33,6 +34,7 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
         _FeaturedCategoriesModule,
         _FeaturedLocationsModule,
         _FeaturedProductsModule,
+        _AdsBannerModule,
         SwiperBannerModule,
         PaginationModule
     ]

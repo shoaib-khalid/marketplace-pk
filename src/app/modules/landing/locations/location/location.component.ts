@@ -1,13 +1,11 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, ProductDetails, ProductOnLocation, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, ProductDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, } from 'app/core/store/store.types';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
     selector     : 'location',
@@ -16,17 +14,20 @@ import { DOCUMENT, Location } from '@angular/common';
 })
 export class LocationComponent implements OnInit
 {
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    categories: ParentCategory[] = [];
-    // locations: { capitalCity: string; scene: string; locationId: string; }[];
     platform: Platform;
-    stores: StoresDetails[];
-    locationId: string;
-    location: LandingLocation;
-    products: ProductOnLocation[];
+    
     categoryId: string;
     category: ParentCategory;
+    categories: ParentCategory[] = [];
+    
+    locationId: string;
+    location: LandingLocation;
+    
+    stores: StoresDetails[] = [];
+    products: ProductDetails[] = [];
+    
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -41,6 +42,10 @@ export class LocationComponent implements OnInit
     )
     {
     }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
 
     ngOnInit(): void {
 
@@ -148,16 +153,16 @@ export class LocationComponent implements OnInit
     /**
      * On destroy
      */
-     ngOnDestroy(): void
-     {
-         // Unsubscribe from all subscriptions
-         this._unsubscribeAll.next(null);
-         this._unsubscribeAll.complete();
-     }
-
-    getHeaderTitle(root: ActivatedRoute): any {
-        throw new Error('Method not implemented.');
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
     }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Method
+    // -----------------------------------------------------------------------------------------------------
 
     backClicked() {
         this._location.back();

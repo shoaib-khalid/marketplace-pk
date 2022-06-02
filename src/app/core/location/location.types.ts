@@ -35,6 +35,16 @@ export interface ChildCategory
     storeDetails   : StoreDetails;
 }
 
+export interface CategoryPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
+}
+
 export interface StoreDetails
 {
     id              : string;
@@ -46,16 +56,6 @@ export interface StoreDetails
 }
 
 export interface ProductDetails
-{
-    id              : string;
-    name            : string;
-    thumbnailUrl    : string;
-    status          : string;
-    storeDetails    : StoreDetails;
-    productInventories : ProductInventory[];
-}
-
-export interface ProductOnLocation
 {
     id              : string;
     name            : string;

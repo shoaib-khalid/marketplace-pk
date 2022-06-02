@@ -14,12 +14,14 @@
             <ng-container fuseVerticalNavigationContentHeader>
                 <div class="flex items-center w-full p-4 pl-6">
                     <!-- Logo -->
-                    <div class="flex items-center justify-start">
-                        <img
-                            (click)="goToHome()"
-                            class="w-1/2 py-1 cursor-pointer"
-                            [src]="platform.logoDark">
-                    </div>
+                    <ng-container *ngIf="platform">
+                        <div class="flex items-center justify-start">
+                            <img
+                                (click)="goToHome()"
+                                class="w-1/2 py-1 cursor-pointer"
+                                [src]="platform.logoDark">
+                        </div>
+                    </ng-container>
                     <!-- Components -->
                     <div class="flex items-center ml-auto">
                         <user [showAvatar]="true"></user>

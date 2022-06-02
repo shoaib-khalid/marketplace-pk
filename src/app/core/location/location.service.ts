@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, ProductOnLocation, ProductOnLocationPagination, StoresDetails } from './location.types';
+import { CategoryPagination, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, StoresDetails } from './location.types';
 import { ProductPagination, StorePagination } from '../store/store.types';
 
 @Injectable({
@@ -34,10 +34,10 @@ export class LocationService
     // for featured category display
     private _parentCategory: BehaviorSubject<ParentCategory | null> = new BehaviorSubject<ParentCategory>(null);
     private _parentCategories: BehaviorSubject<ParentCategory[] | null> = new BehaviorSubject<ParentCategory[]>(null);
-    // private _parentCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
+    private _parentCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
     private _childCategory: BehaviorSubject<ChildCategory | null> = new BehaviorSubject<ChildCategory>(null);
     private _childCategories: BehaviorSubject<ChildCategory[] | null> = new BehaviorSubject<ChildCategory[]>(null);
-    // private _childCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
+    private _childCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -73,6 +73,14 @@ export class LocationService
     }
 
     /**
+     * Getter for parentCategory
+     */
+    get parentCategory$(): Observable<ParentCategory>
+    {
+        return this._parentCategory.asObservable();
+    }
+
+    /**
      * Getter for parent categories
      */
     get parentCategories$(): Observable<ParentCategory[]>
@@ -81,12 +89,12 @@ export class LocationService
     }
 
     /**
-     * Getter for parentCategory
+     * Getter for parent categories
      */
-    get parentCategory$(): Observable<ParentCategory>
+    get parentCategoriesPagination$(): Observable<CategoryPagination>
     {
-        return this._parentCategory.asObservable();
-    }
+        return this._parentCategoriesPagination.asObservable();
+    }  
 
     /**
      * Getter for childCategory
@@ -285,7 +293,7 @@ export class LocationService
             }
         });
 
-        return this._httpClient.get<StoresDetails[]>(locationService + '/config/store', header)
+        return this._httpClient.get<StoresDetails[]>(locationService + '/featured/store', header)
             .pipe(
                 switchMap(async (response:StoresDetails[]) => {
                                 
@@ -357,7 +365,7 @@ export class LocationService
             }
         });
 
-        return this._httpClient.get<ProductDetails[]>(locationService + '/config/product', header)
+        return this._httpClient.get<ProductDetails[]>(locationService + '/featured/product', header)
             .pipe(
                 switchMap(async (response:ProductDetails[]) => {
                                 
@@ -427,7 +435,7 @@ export class LocationService
             }
         });
 
-        return this._httpClient.get<LandingLocation[]>(locationService + '/config/location', header)
+        return this._httpClient.get<LandingLocation[]>(locationService + '/featured/location', header)
             .pipe(
                 catchError(() =>
                     // Return false
@@ -636,7 +644,7 @@ export class LocationService
             }
         });
 
-        return this._httpClient.get<ParentCategory[]>(locationService + '/categories-location/parent-category', header)
+        return this._httpClient.get<ParentCategory[]>(locationService + '/categories/parent-category', header)
             .pipe(
                 catchError(() =>
                     // Return false
@@ -649,7 +657,17 @@ export class LocationService
                     if (params.parentCategoryId) {
                         this._parentCategory.next(response["data"].content[0]);
                     } else {
+                        let _pagination = {
+                            length: response["data"].totalElements,
+                            size: response["data"].size,
+                            page: response["data"].number,
+                            lastPage: response["data"].totalPages,
+                            startIndex: response["data"].pageable.offset,
+                            endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                        }
+
                         this._parentCategories.next(response["data"].content);
+                        this._parentCategoriesPagination.next(_pagination);
                     }
                     return response["data"].content;
                 })
@@ -704,7 +722,7 @@ export class LocationService
             }
         });
 
-        return this._httpClient.get<ChildCategory>(locationService + '/categories-location/child-category', header)
+        return this._httpClient.get<ChildCategory>(locationService + '/categories/child-category', header)
             .pipe(
                 catchError(() =>
                     // Return false

@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { ParentCategory, ProductOnLocation, LandingLocation } from 'app/core/location/location.types';
+import { ParentCategory, LandingLocation, StoresDetails, ProductDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { StorePagination } from 'app/core/store/store.types';
+import { AppConfig } from 'app/config/service.config';
 import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
@@ -15,27 +16,31 @@ import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 export class LandingHomeComponent implements OnInit
 {
     @ViewChild("storesPaginator", {read: MatPaginator}) private _storesPaginator: MatPaginator;
+    @ViewChild("productsPaginator", {read: MatPaginator}) private _productsPaginator: MatPaginator;
 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    platform: Platform;
 
-    // Use for _common_layouts
-    locations: LandingLocation[];
+    locations: LandingLocation[] = [];
+    locationsViewAll : boolean = false;
+
     categories: ParentCategory[] = [];
-    featuredStores: any;
-    storesViewAll : boolean = false;
     categoriesViewAll : boolean = false;
 
-    featuredStoresPagination: any;
-   
-    platform: Platform;
-    image: any = [];
-    countryCode:string = '';
-    products: ProductOnLocation[];
-    mobileView: boolean = false;
-    
-    pageOfItems: Array<any>;
+    featuredStores: StoresDetails[] = [];
+    featuredStoresPagination: StorePagination;
+    featuredStoresPageOfItems: Array<any>;
+    storesViewAll : boolean = false;
+
+    featuredProducts: ProductDetails[] = [];
+    featuredProductsPagination: StorePagination;
+    featuredProductsPageOfItems: Array<any>;
+    productsViewAll : boolean = false;
+
     isLoading: boolean = false;
 
+    banners: any;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -44,7 +49,7 @@ export class LandingHomeComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _locationService: LocationService,
-        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _apiServer: AppConfig
     )
     {
     }
@@ -56,18 +61,6 @@ export class LandingHomeComponent implements OnInit
             .subscribe((platform: Platform) => { 
                 if (platform) {
                     this.platform = platform;  
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get all parentCategories
-        this._locationService.parentCategories$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((categories: ParentCategory[]) => {
-                if (categories) {
-                    // to show only 8
-                    this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -107,20 +100,27 @@ export class LandingHomeComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._fuseMediaWatcherService.onMediaChange$
+        // Get all parentCategories
+        this._locationService.parentCategories$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(({matchingAliases}) => {               
-                if ( matchingAliases.includes('lg') ) {
-                } else if ( matchingAliases.includes('md') ) {
-                } else if ( matchingAliases.includes('sm') ) {
-                    this.mobileView = false;
-                } else {
-                    this.mobileView = true;
+            .subscribe((categories: ParentCategory[]) => {
+                if (categories) {
+                    // to show only 8
+                    this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
+            let orderService = this._apiServer.settings.apiServer.orderService;
+
+        // hardcode banner
+        this.banners = [
+            {
+                bannerUrl: "assets/images/example/join_now.png",
+                redirectUrl: "https://" + this._apiServer.settings.merchantPortalDomain + "/sign-up"
+            }
+        ];
     }
 
     /**
@@ -148,7 +148,23 @@ export class LandingHomeComponent implements OnInit
                 merge(this._storesPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country});
+                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country});
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+            if (this._productsPaginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._productsPaginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -161,15 +177,28 @@ export class LandingHomeComponent implements OnInit
     onChangePage(pageOfItems: Array<any>) {
         
         // update current page of items
-        this.pageOfItems = pageOfItems;
-
-        if( this.featuredStoresPagination && this.pageOfItems['currentPage']) {
-
-            if (this.pageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
+        this.featuredStoresPageOfItems = pageOfItems;
+        if( this.featuredStoresPagination && this.featuredStoresPageOfItems['currentPage']) {
+            if (this.featuredStoresPageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedStores({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country})
+                this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
+            }
+        }
+
+        // update current page of items
+        this.featuredProductsPageOfItems = pageOfItems;
+        if( this.featuredProductsPagination && this.featuredProductsPageOfItems['currentPage']) {
+            if (this.featuredProductsPageOfItems['currentPage'] - 1 !== this.featuredProductsPagination.page) {
+                // set loading to true
+                this.isLoading = true;
+    
+                this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

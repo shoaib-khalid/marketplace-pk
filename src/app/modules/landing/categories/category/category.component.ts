@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, ProductOnLocation, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
@@ -14,17 +14,18 @@ import { Location } from '@angular/common';
 })
 export class CategoryComponent implements OnInit
 {
-    categories: any;
-    locations: LandingLocation[];
     platform: Platform;
-    stores: StoresDetails[];
+
     categoryId: string;
     category: ParentCategory;
-    products: ProductOnLocation[];
 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
     locationId: string;
     location: LandingLocation;
+    locations: LandingLocation[] = [];
+
+    stores: StoresDetails[] = [];
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
     
     /**
      * Constructor
@@ -40,6 +41,10 @@ export class CategoryComponent implements OnInit
     )
     {
     }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
 
     ngOnInit(): void {
 
@@ -58,28 +63,44 @@ export class CategoryComponent implements OnInit
                     .subscribe((location : LandingLocation[]) => {                        
                     });
             }
-        })
+        });
 
-        // Get category detail
-        this._locationService.getParentCategories({pageSize: 8, regionCountryId: 'MYS', cityId: this.locationId})
-            .subscribe((category : ParentCategory[]) => {
-                this.category = category[0];
+        // Get platform data
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                if (platform) {
+                    this.platform = platform;
+
+                    // Get category detail
+                    this._locationService.getParentCategories({pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId})
+                        .subscribe((category : ParentCategory[]) => {
+                            this.category = category[0];
+                        });
+
+                    // Get location detail - this is when we pick one location    
+                    if (this.locationId) {
+                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId})
+                            .subscribe((location : LandingLocation[]) => {
+                            });
+                    }
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
-
-        // Get location detail - this is when we pick one location    
-        if (this.locationId) {
-            this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
-                .subscribe((location : LandingLocation[]) => {
-                });
-        }
 
         // Get all locations
         this._locationService.featuredLocations$
+            .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((locations : LandingLocation[]) => {
-                this.locations = locations;
-            })
-            
-        // Get Current selected location
+                if (locations) {
+                    this.locations = locations;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get current selected location
         this._locationService.featuredLocation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(location => {
@@ -89,16 +110,14 @@ export class CategoryComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._platformsService.platform$
+        // Get Featured Storess
+        this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => { 
-                this.platform = platform;  
-                this._locationService.featuredStores$
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((stores: StoresDetails[]) => { 
-                        this.stores = stores;  
-                        this._changeDetectorRef.markForCheck();
-                    });
+            .subscribe((stores: StoresDetails[]) => { 
+                if (stores) {
+                    this.stores = stores;
+                }
+                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -106,12 +125,16 @@ export class CategoryComponent implements OnInit
     /**
      * On destroy
      */
-     ngOnDestroy(): void
-     {
-         // Unsubscribe from all subscriptions
-         this._unsubscribeAll.next(null);
-         this._unsubscribeAll.complete();
-     }
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Method
+    // -----------------------------------------------------------------------------------------------------
 
     backClicked() {
         this._location.back();

@@ -1,10 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { ParentCategory, ProductOnLocation, ProductOnLocationPagination, LandingLocation, StoresDetails, ProductDetails } from 'app/core/location/location.types';
+import { ParentCategory, LandingLocation, StoresDetails, ProductDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoreAssets } from 'app/core/store/store.types';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -19,7 +18,7 @@ export class LandingSearchComponent implements OnInit
     platform    : Platform;
     locations   : LandingLocation[] = [];
     stores      : StoresDetails[] = [];
-    products    : ProductOnLocation[] = [];
+    products    : ProductDetails[] = [];
     categories  : ParentCategory[] = [];
 
     searchValue: string;

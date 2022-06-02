@@ -15,14 +15,15 @@ import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 export class LandingLocationsComponent implements OnInit
 {
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    
+    platform: Platform;
 
     locations: LandingLocation[] = [];
     pagination: LocationPagination;
-
     pageOfItems: Array<any>;
     isLoading: boolean = false;
-    platform: Platform;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -35,14 +36,28 @@ export class LandingLocationsComponent implements OnInit
     {
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
+
     ngOnInit(): void {
+
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                if (platform) {
+                    this.platform = platform;  
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         this._locationService.featuredLocations$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((locations: LandingLocation[]) => {
-
-                this.locations = locations; 
-                
+                if (locations) {
+                    this.locations = locations; 
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();           
             });
@@ -50,43 +65,12 @@ export class LandingLocationsComponent implements OnInit
         this._locationService.featuredLocationPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: LocationPagination) => {
-
-                this.pagination = response; 
-                
+                if (response) {
+                    this.pagination = response; 
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();           
             });
-
-        this._platformsService.platform$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => { 
-
-                this.platform = platform;  
-        
-                this._changeDetectorRef.markForCheck();
-
-            });
-    }
-
-    onChangePage(pageOfItems: Array<any>) {
-
-        // update current page of items
-        this.pageOfItems = pageOfItems;
-        
-        if(this.pagination && this.pageOfItems['currentPage']) {
-            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
-                // set loading to true
-                this.isLoading = true;
-    
-                this._locationService.getFeaturedLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
-            }
-        }
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
     }
 
     /**
@@ -112,5 +96,28 @@ export class LandingLocationsComponent implements OnInit
                 ).subscribe();
             }
         }, 0);
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Method
+    // -----------------------------------------------------------------------------------------------------
+
+    onChangePage(pageOfItems: Array<any>) {
+        // update current page of items
+        this.pageOfItems = pageOfItems;
+        
+        if(this.pagination && this.pageOfItems['currentPage']) {
+            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+                // set loading to true
+                this.isLoading = true;
+                this._locationService.getFeaturedLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
+            }
+        }
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 }

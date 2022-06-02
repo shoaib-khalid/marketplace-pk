@@ -12,6 +12,7 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/featured-locations.module';
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
+import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 
 @NgModule({
     declarations: [
@@ -28,6 +29,7 @@ import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/fe
         _FeaturedStoresModule,
         _FeaturedLocationsModule,
         _FeaturedProductsModule,
+        PaginationModule,
         FuseCardModule
     ]
 })
