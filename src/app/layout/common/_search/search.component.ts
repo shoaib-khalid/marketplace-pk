@@ -260,8 +260,8 @@ export class _SearchComponent implements OnInit, OnDestroy
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
-        if (result.store) {
-            this._router.navigate(['/store/' + result.store.domain], {queryParams: {keyword: result.searchText}});
+        if (result.domain) {
+            this._router.navigate(['/store/' + result.domain], {queryParams: {keyword: result.searchText}});
         }
         else {
             this._router.navigate(['/search'], {queryParams: {keyword: result.searchText}});
