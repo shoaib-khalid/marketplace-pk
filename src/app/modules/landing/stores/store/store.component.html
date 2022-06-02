@@ -1,6 +1,8 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">
     <!-- Search -->
-    <search class="w-full"></search>
+    <ng-container *ngIf="store">
+        <search class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
+    </ng-container>
     <ng-container *ngIf="store">
         <!-- Selected Store -->
         <fuse-card class="flex flex-row h-32 mt-4 md:h-full w-full border border-primary rounded-lg filter-article">
@@ -22,7 +24,7 @@
                     </div>
                     <div class="flex flex-row">
                         <span class="text-xs sm:text-sm md:text-base">Products:</span>
-                        <span class="text-xs sm:text-sm md:text-base font-bold">80</span>
+                        <span class="text-xs sm:text-sm md:text-base font-bold">{{pagination?.length}}</span>
                     </div>
                 </div>
                 <div class="flex flex-row px-2">
@@ -148,7 +150,7 @@
                             <div @expandCollapse *ngIf="!collapseCategory">
                                 <div class="border-t w-full"></div>
                                 <mat-checkbox
-                                    [checked]="catalogueSlug === 'all-products' ? true : false"
+                                    [checked]="catalogueSlug === 'all-products' || catalogueSlug === null ? true : false"
                                     value="all-products"
                                     [disabled]="catalogueSlug === 'all-products' ? true : false"
                                     (change)="changeCatalogue($event.source.value)"

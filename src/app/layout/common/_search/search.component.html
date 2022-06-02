@@ -55,13 +55,15 @@
     #historyResult
     let-result>
     <div class="flex items-center justify-between w-full"
-        (click)="selectResult(result, $event); blurInput()">
+        (click)="selectResult(result); blurInput()">
         <div class="flex flex-row items-center">
-            <div class="flex shrink-0 items-center justify-center w-8 h-8 p-0.5 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
+            <div class="flex shrink-0 items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
                 <img
-                    *ngIf="result.storeId"
-                    [src]="'https://i.pinimg.com/236x/58/3b/02/583b02d69515cc8c9eaa198a39309c56.jpg'">
+                    class="object-cover"
+                    *ngIf="result.image"
+                    [src]="result.image">
                 <img
+                    class="p-0.5"
                     *ngIf="!result.storeId"
                     [src]="'https://symplified.it/store-assets/deliverin-logo.png'">
             </div>

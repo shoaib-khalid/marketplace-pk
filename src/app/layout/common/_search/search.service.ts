@@ -102,7 +102,7 @@ export class SearchService
     // -----------------------------------------------------------------------------------------------------
 
     /**
-    * Get the current logged in store data
+    * Get search history
     */
     get(): Observable<any>
     {
@@ -119,43 +119,38 @@ export class SearchService
                 .pipe(
                     map((response) => {
                         
-                        this._logging.debug("Response from StoresService (Before Reconstruct)",response);
+                        this._logging.debug("Response from SearchService (Logged In)", response);
     
-                        this._customerSearch.next(response["data"]);
+                        this._customerSearch.next(response["data"].content);
+
+                        return response["data"].content;
                     })
                 );
         } else {
+            // this._customerSearch.next(JSON.parse(this.localSearch$));
             return of(JSON.parse(this.localSearch$))
         }
     }
 
     getCustomerSearchById(id: string): Observable<any>
     {
-        return this._customerSearch.pipe(
-            take(1),
-            map((platforms) => {
+        let userService = this._apiServer.settings.apiServer.userService;
+        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
-                // Find the store
-                const platform = platforms.find(item => item.id === id) || null;
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+        };
+        
+        return this._httpClient.get<any>(userService + '/customer/' + customerId + '/search/' + id, header)
+        .pipe(
+            map((response) => {
+                this._logging.debug("Response from SearchService (getCustomerSearchById)", response);
+                this._customerSearch.next(response["data"].content);
 
-                this._logging.debug("Response from PlatformsService (getPlatformsById)",platform);
-
-                // Update the store
-                this._customerSearch.next([platform]);
-
-                // Return the store
-                return platform;
-            }),
-            switchMap((platform) => {
-
-                if ( !platform )
-                {
-                    return throwError('Could not found store with id of ' + id + '!');
-                }
-
-                return of(platform);
+                return response["data"].content;
             })
-        );
+        )
     }
 
     getCustomerSearchByCustomerId(id: string): Observable<any>
@@ -177,6 +172,33 @@ export class SearchService
                 return response["data"];
             })
         )
+    }
+
+    postCustomerSearch(searchBody: any): Observable<any>
+    {
+        let userService = this._apiServer.settings.apiServer.userService;
+        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+        };
+
+        return this.customerSearch$.pipe(
+            take(1),
+            switchMap(search => this._httpClient.post<any>(userService + '/customer/' + customerId + '/search', searchBody, header).pipe(
+                map((response) => {
+
+                    this._logging.debug("Response from SearchService (createSearch)", response);
+
+                    let newResponse = response["data"];
+
+                    this._customerSearch.next([newResponse, ...search]);
+
+                    return response["data"];
+                })
+            ))
+        );
     }
 
     post(storeBody: any): Observable<any>
