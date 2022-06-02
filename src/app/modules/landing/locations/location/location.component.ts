@@ -91,6 +91,11 @@ export class LocationComponent implements OnInit
                     // Get Featured Stores
                     this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
                         .subscribe(()=>{});
+
+                    // Get featured products
+                    // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    //     .subscribe((products : ProductDetails[]) => {
+                    //     });
                 }
 
                 // Mark for check

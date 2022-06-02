@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, ProductDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
@@ -73,7 +73,7 @@ export class CategoryComponent implements OnInit
                     this.platform = platform;
 
                     // Get category detail
-                    this._locationService.getParentCategories({pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId})
+                    this._locationService.getParentCategories({pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
                         .subscribe((category : ParentCategory[]) => {
                             this.category = category[0];
                         });
@@ -83,8 +83,20 @@ export class CategoryComponent implements OnInit
                         this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId})
                             .subscribe((location : LandingLocation[]) => {
                             });
+
                     }
+
+                    // Get featured stores
+                    this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                        .subscribe((stores : StoresDetails[]) => {
+                        });
+
+                    // Get featured products
+                    // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    //     .subscribe((products : ProductDetails[]) => {
+                    //     });
                 }
+                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

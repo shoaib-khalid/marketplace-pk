@@ -321,21 +321,23 @@ export class LocationService
      * @returns 
      */
      getFeaturedProducts(params: {
-        storeName?      : string,
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string, 
-        city?           : string, 
-        postcode?       : string,
-        isDisplay?      : boolean
+        storeName?          : string,
+        parentCategoryId?   : string,
+        page?               : number, 
+        pageSize?           : number, 
+        sortByCol?          : string, 
+        sortingOrder?       : 'ASC' | 'DESC' | '',
+        regionCountryId?    : string, 
+        country?            : string, 
+        stateId?            : string, 
+        state?              : string, 
+        cityId?             : string, 
+        city?               : string, 
+        postcode?           : string,
+        isDisplay?          : boolean
     } = {
         storeName       : null,
+        parentCategoryId: null,
         page            : 0, 
         pageSize        : 20, 
         sortByCol       : 'name', 
