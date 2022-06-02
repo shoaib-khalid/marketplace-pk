@@ -27,15 +27,8 @@ export class LandingDataResolver implements Resolve<any>
     constructor(
         private _jwtService: JwtService,
         private _authService: AuthService,
-        private _messagesService: MessagesService,
-        private _navigationService: NavigationService,
-        private _notificationsService: NotificationsService,
-        private _quickChatService: QuickChatService,
-        private _shortcutsService: ShortcutsService,
-        private _cartService: CartService,
         private _platformsService: PlatformService,
         private _httpstatService: HttpStatService,
-        private _locationService: LocationService
     )
     {
     }
@@ -51,17 +44,9 @@ export class LandingDataResolver implements Resolve<any>
      * @param state
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
-    {
-        console.log('2 landing resolver');
-        
+    {        
         // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
-            // this._locationService.getLocations(0, 10, 'cityId', 'ASC', 'MYS'),
-            // this._locationService.getLocationBasedProducts(0, 5, 'name', 'ASC', 'MYS', 'Subang Jaya'),
-            // this._locationService.getParentCategories('', '', 'MYS'),
-            // this._locationService.getFeaturedStores(0, 10, 'MYS')
-            // this._locationService.getStoresDetails("",0,5,"Subang Jaya",null,"MYS",null)
-            // this._locationService.getProductsDetails("",0,5,"","SubangJaya",null,"MYS",null)
         ]);
     }
 }

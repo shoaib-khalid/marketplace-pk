@@ -74,7 +74,7 @@ export class LandingHomeComponent implements OnInit
             });
 
         // Get all locations
-        this._locationService.locations$
+        this._locationService.featuredLocations$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((locations) => {
                 if (locations) {

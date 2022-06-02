@@ -4,21 +4,12 @@ import { StoresResolver } from '../stores/stores.resolvers';
 
 export const landingHomeRoutes: Route[] = [
     {
-        // path     : '',
-        // component: LandingHomeComponent
-
         path     : '',
         children   : [
             {
                 path: '',
-                // resolve  : {
-                //     stores: StoresResolver,
-                // },
                 component: LandingHomeComponent,
             }
         ],
     },
-
-    
-    
 ];

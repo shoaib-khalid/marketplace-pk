@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { ApiResponseModel, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, ProductOnLocation, ProductOnLocationPagination, StoresDetails } from './location.types';
-import { ProductPagination, Store, StorePagination } from '../store/store.types';
+import { ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, ProductOnLocation, ProductOnLocationPagination, StoresDetails } from './location.types';
+import { ProductPagination, StorePagination } from '../store/store.types';
 
 @Injectable({
     providedIn: 'root'
@@ -15,14 +15,11 @@ export class LocationService
 {
     private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
     private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
-    private _parentCategories: BehaviorSubject<ParentCategory[] | null> = new BehaviorSubject<ParentCategory[]>(null);
-    private _parentCategory: BehaviorSubject<ParentCategory | null> = new BehaviorSubject<ParentCategory>(null);
-    private _childCategory: BehaviorSubject<ChildCategory | null> = new BehaviorSubject<ChildCategory>(null);
-    private _locationProducts: BehaviorSubject<ProductOnLocation[] | null> = new BehaviorSubject<ProductOnLocation[]>(null);
-    private _locationProductsPagination: BehaviorSubject<ProductOnLocationPagination | null> = new BehaviorSubject(null);
-    private _locations: BehaviorSubject<LandingLocation[] | null> = new BehaviorSubject<LandingLocation[]>(null);
-    private _location: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
-    private _locationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
+
+    // for featured location display
+    private _featuredLocation: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
+    private _featuredLocations: BehaviorSubject<LandingLocation[] | null> = new BehaviorSubject<LandingLocation[]>(null);
+    private _featuredLocationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
 
     // for featured store display
     private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
@@ -34,7 +31,13 @@ export class LocationService
     private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
     private _featuredProductPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
     
-    
+    // for featured category display
+    private _parentCategory: BehaviorSubject<ParentCategory | null> = new BehaviorSubject<ParentCategory>(null);
+    private _parentCategories: BehaviorSubject<ParentCategory[] | null> = new BehaviorSubject<ParentCategory[]>(null);
+    // private _parentCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
+    private _childCategory: BehaviorSubject<ChildCategory | null> = new BehaviorSubject<ChildCategory>(null);
+    private _childCategories: BehaviorSubject<ChildCategory[] | null> = new BehaviorSubject<ChildCategory[]>(null);
+    // private _childCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -93,44 +96,32 @@ export class LocationService
         return this._childCategory.asObservable();
     }
 
-    /**
-     * Getter for locationProducts
-     */
-    get locationProducts$(): Observable<ProductOnLocation[]>
-    {
-        return this._locationProducts.asObservable();
-    }
-
-     /**
-     * Getter for locationProducts pagination
-     */
-    get locationProductsPagination$(): Observable<ProductOnLocationPagination>
-    {
-        return this._locationProductsPagination.asObservable();
-    }
+    // ----------------------
+    // Featured Location
+    //----------------------- 
 
     /**
      * Getter for locations
      */
-    get locations$(): Observable<LandingLocation[]>
+    get featuredLocations$(): Observable<LandingLocation[]>
     {
-        return this._locations.asObservable();
+        return this._featuredLocations.asObservable();
     }
 
     /**
      * Getter for location
      */
-    get location$(): Observable<LandingLocation>
+    get featuredLocation$(): Observable<LandingLocation>
     {
-        return this._location.asObservable();
+        return this._featuredLocation.asObservable();
     }
 
      /**
      * Getter for locationProducts pagination
      */
-    get locationPagination$(): Observable<LocationPagination>
+    get featuredLocationPagination$(): Observable<LocationPagination>
     {
-        return this._locationPagination.asObservable();
+        return this._featuredLocationPagination.asObservable();
     }
 
     // ----------------------
@@ -248,21 +239,23 @@ export class LocationService
      * @returns 
      */
     getFeaturedStores(params: {
-        storeName?      : string,
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string, 
-        city?           : string, 
-        postcode?       : string,
-        isDisplay?      : boolean
+        storeName?          : string,
+        parentCategoryId?   : string,
+        page?               : number, 
+        pageSize?           : number, 
+        sortByCol?          : string, 
+        sortingOrder?       : 'ASC' | 'DESC' | '',
+        regionCountryId?    : string, 
+        country?            : string, 
+        stateId?            : string, 
+        state?              : string, 
+        cityId?             : string, 
+        city?               : string, 
+        postcode?           : string,
+        isDisplay?          : boolean
     } = {
         storeName       : null,
+        parentCategoryId: null,
         page            : 0, 
         pageSize        : 20, 
         sortByCol       : 'name', 
@@ -381,6 +374,84 @@ export class LocationService
                     this._featuredProductPagination.next(_pagination);
                     this._featuredProducts.next(response["data"].content);
 
+                    return response["data"].content;
+                })
+            );
+    }
+
+    /**
+     * Get featured location
+     * 
+     * @param params
+     * @returns 
+     */
+
+    getFeaturedLocations(params: {
+        page?           : number, 
+        pageSize?       : number, 
+        sortByCol?      : string, 
+        sortingOrder?   : 'ASC' | 'DESC' | '',
+        regionCountryId?: string, 
+        country?        : string, 
+        stateId?        : string, 
+        state?          : string, 
+        cityId?         : string, 
+        city?           : string, 
+        postcode?       : string
+    } = {
+        page            : 0, 
+        pageSize        : 20, 
+        sortByCol       : 'cityId', 
+        sortingOrder    : 'ASC',
+        regionCountryId : null, 
+        country         : null, 
+        stateId         : null, 
+        state           : null, 
+        cityId          : null, 
+        city            : null, 
+        postcode        : null
+    }): Observable<LandingLocation[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: params
+        };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (header.params[key] === null) {
+                delete header.params[key];
+            }
+        });
+
+        return this._httpClient.get<LandingLocation[]>(locationService + '/config/location', header)
+            .pipe(
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response:LandingLocation[]) => {
+                    
+                    this._logging.debug("Response from LocationService (getLocations)" + (params.cityId ? " - " + params.cityId : ""), response);
+                    
+                    if (params.cityId) {
+                        this._featuredLocation.next(response["data"].content[0]);
+                    } else {
+                        let _pagination = {
+                            length: response["data"].totalElements,
+                            size: response["data"].size,
+                            page: response["data"].number,
+                            lastPage: response["data"].totalPages,
+                            startIndex: response["data"].pageable.offset,
+                            endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                        }
+
+                        this._featuredLocationPagination.next(_pagination);
+                        this._featuredLocations.next(response["data"].content);
+                    }
                     return response["data"].content;
                 })
             );
@@ -645,165 +716,6 @@ export class LocationService
 
                     this._childCategory.next(response["data"]);
                     return response["data"];
-                })
-            );
-
-    }
-
-    /**
-     * Get products based on location
-     * 
-     * @param params
-     * @returns 
-     */
-    getLocationBasedProducts(params: {
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string, 
-        city?           : string, 
-        postcode?       : string,
-        status?         : string
-    } = {
-        page            : 0, 
-        pageSize        : 20, 
-        sortByCol       : 'cityId', 
-        sortingOrder    : 'ASC',
-        regionCountryId : null, 
-        country         : null, 
-        stateId         : null, 
-        state           : null, 
-        cityId          : null, 
-        city            : null, 
-        postcode        : null,
-        status          : 'ACTIVE'
-    }): 
-            Observable<any>
-            // Observable<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>
-    {        
-        let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._authService.publicToken;
-
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: params
-        };
-
-        // delete empty value
-        Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
-                delete header.params[key];
-            }
-        });
-        
-        // return this._httpClient.get<{ products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }>(locationService + '/products-location', header)
-        return this._httpClient.get<any>(locationService + '/products-location', header)
-            .pipe(
-                catchError(() =>
-                    // Return false
-                    of(false)
-                ),
-                switchMap(async (response) => {
-                // switchMap(async (response: { products: ProductOnLocation[], productsPagination: ProductOnLocationPagination }) => {
-                                
-                    this._logging.debug("Response from LocationService (getLocationBasedProducts)", response);
-
-                    let _pagination = {
-                        length: response["data"].totalElements,
-                        size: response["data"].size,
-                        page: response["data"].number,
-                        lastPage: response["data"].totalPages,
-                        startIndex: response["data"].pageable.offset,
-                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                    }
-                    this._locationProductsPagination.next(_pagination);
-                    this._locationProducts.next(response["data"].content);
-
-                    return response["data"].content;
-                    // return {product: ProductOnLocation}
-                })
-            );
-    }
-
-    /**
-     * Get locations
-     * 
-     * @param params
-     * @returns 
-     */
-
-    getLocations(params: {
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string, 
-        city?           : string, 
-        postcode?       : string
-    } = {
-        page            : 0, 
-        pageSize        : 20, 
-        sortByCol       : 'cityId', 
-        sortingOrder    : 'ASC',
-        regionCountryId : null, 
-        country         : null, 
-        stateId         : null, 
-        state           : null, 
-        cityId          : null, 
-        city            : null, 
-        postcode        : null
-    }): Observable<LandingLocation[]>
-    {
-        let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._authService.publicToken;
-
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: params
-        };
-
-        // Delete empty value
-        Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
-                delete header.params[key];
-            }
-        });
-
-        return this._httpClient.get<LandingLocation[]>(locationService + '/config/location', header)
-            .pipe(
-                catchError(() =>
-                    // Return false
-                    of(false)
-                ),
-                switchMap(async (response:LandingLocation[]) => {
-                    
-                    this._logging.debug("Response from LocationService (getLocations)" + (params.cityId ? " - " + params.cityId : ""), response);
-                    
-                    if (params.cityId) {
-                        this._location.next(response["data"].content[0]);
-                    } else {
-                        let _pagination = {
-                            length: response["data"].totalElements,
-                            size: response["data"].size,
-                            page: response["data"].number,
-                            lastPage: response["data"].totalPages,
-                            startIndex: response["data"].pageable.offset,
-                            endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                        }
-    
-                        this._locationPagination.next(_pagination);
-                        this._locations.next(response["data"].content);
-                    }
-                    return response["data"].content;
                 })
             );
     }

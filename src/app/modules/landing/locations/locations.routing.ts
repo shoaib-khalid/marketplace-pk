@@ -1,8 +1,6 @@
 import { Route } from '@angular/router';
-import { CategoryComponent } from '../categories/category/category.component';
 import { LandingLocationsComponent } from './location-list/location-list.component';
 import { LocationComponent } from './location/location.component';
-import { LocationResolver } from './locations.resolver';
 
 export const landingLocationsRoutes: Route[] = [
     {
@@ -15,9 +13,6 @@ export const landingLocationsRoutes: Route[] = [
         data: {
             headerTitle: 'Locations'
         },
-        // resolve  : {
-        //     location: LocationResolver,
-        // },
         component: LandingLocationsComponent
     },
     {
@@ -28,9 +23,6 @@ export const landingLocationsRoutes: Route[] = [
                 data: {
                     headerTitle: 'Location Details'
                 },
-                // resolve  : {
-                //     location: LocationResolver,
-                // },
                 component: LocationComponent,
             }
             
@@ -44,9 +36,6 @@ export const landingLocationsRoutes: Route[] = [
                 data: {
                     headerTitle: 'Category Details'
                 },
-                // resolve  : {
-                //     location: LocationResolver,
-                // },
                 component: LocationComponent,
             }
             

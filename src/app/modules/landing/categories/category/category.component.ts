@@ -54,7 +54,7 @@ export class CategoryComponent implements OnInit
         ).subscribe((responseCategory: NavigationEnd) => {
             let locationIdRouter = responseCategory.url.split("/")[3];
             if (locationIdRouter) {
-                this._locationService.getLocations({pageSize: 10, regionCountryId: 'MYS', cityId: locationIdRouter})
+                this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: 'MYS', cityId: locationIdRouter})
                     .subscribe((location : LandingLocation[]) => {                        
                     });
             }
@@ -68,31 +68,25 @@ export class CategoryComponent implements OnInit
 
         // Get location detail - this is when we pick one location    
         if (this.locationId) {
-            this._locationService.getLocations({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
+            this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
                 .subscribe((location : LandingLocation[]) => {
                 });
         }
 
         // Get all locations
-        this._locationService.locations$
+        this._locationService.featuredLocations$
             .subscribe((locations : LandingLocation[]) => {
                 this.locations = locations;
             })
             
         // Get Current selected location
-        this._locationService.location$
+        this._locationService.featuredLocation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(location => {
                 this.location = location;                
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
-            });
-            
-        // Get products
-        this._locationService.getLocationBasedProducts({pageSize: 10, regionCountryId: 'MYS', cityId: this.locationId})
-            .subscribe((response : ProductOnLocation[]) => {
-                this.products = response;
             });
 
         this._platformsService.platform$

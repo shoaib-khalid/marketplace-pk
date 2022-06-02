@@ -166,10 +166,11 @@ export class PlatformService
                             return newPlatform;
                         });
 
-                        this._locationService.getLocations({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
-                        this._locationService.getLocationBasedProducts({ pageSize: 5, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{});
-                        this._locationService.getParentCategories({ pageSize: 8, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{});
+                        this._locationService.getFeaturedLocations({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
                         this._locationService.getFeaturedStores({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
+                        // this._locationService.getFeaturedProducts({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
+                        
+                        this._locationService.getParentCategories({ pageSize: 8, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{})
                         this._locationService.getStoresDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
                         this._locationService.getProductsDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
                 })

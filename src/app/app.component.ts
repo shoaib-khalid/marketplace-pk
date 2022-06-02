@@ -27,13 +27,11 @@ export class AppComponent
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         private _titleService: Title,
         private _router: Router,
         private _platformsService: PlatformService,
         private _cookieService: CookieService,
         private _activatedRoute: ActivatedRoute,
-
     )
     {
     }

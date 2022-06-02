@@ -37,7 +37,7 @@ export class LandingLocationsComponent implements OnInit
 
     ngOnInit(): void {
 
-        this._locationService.locations$
+        this._locationService.featuredLocations$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((locations: LandingLocation[]) => {
 
@@ -47,7 +47,7 @@ export class LandingLocationsComponent implements OnInit
                 this._changeDetectorRef.markForCheck();           
             });
 
-        this._locationService.locationPagination$
+        this._locationService.featuredLocationPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: LocationPagination) => {
 
@@ -78,7 +78,7 @@ export class LandingLocationsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
+                this._locationService.getFeaturedLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;
@@ -104,7 +104,7 @@ export class LandingLocationsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getLocations({pageSize:20 , regionCountryId: "MYS"});
+                        return this._locationService.getFeaturedLocations({pageSize:20 , regionCountryId: "MYS"});
                     }),
                     map(() => {
                         this.isLoading = false;

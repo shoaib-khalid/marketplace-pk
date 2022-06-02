@@ -92,9 +92,7 @@ export class PlatformSetupResolver implements Resolve<any>
      * @param state
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
-    {
-        console.log('1 app resolver');
-        
+    {        
         return this._platformsService.set()
     }
 }

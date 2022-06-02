@@ -55,8 +55,14 @@ export class LocationComponent implements OnInit
         ).subscribe((responseLocation: NavigationEnd) => {
             this.categoryId = responseLocation.url.split("/")[3];
             if (this.categoryId) {
+
+                // Catagory is Changed
                 this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
                     .subscribe((category : ParentCategory[]) => {});
+
+                // Get Featured Stores
+                this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId})
+                    .subscribe(()=>{});
             }
         });
 
@@ -68,7 +74,7 @@ export class LocationComponent implements OnInit
                     this.platform = platform;
 
                     // Get url locationId 
-                    this._locationService.getLocations({cityId: this.locationId, regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedLocations({cityId: this.locationId, regionCountryId: this.platform.country})
                         .subscribe((location : LandingLocation[]) => {});
 
                     // Get url parentCategoryId
@@ -78,13 +84,8 @@ export class LocationComponent implements OnInit
                     }
 
                     // Get Featured Stores
-                    this._locationService.getStoresDetails({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
                         .subscribe(()=>{});
-
-                    // Get Featured Products
-                    this._locationService.getProductsDetails({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
-                        .subscribe(()=>{});
-                    
                 }
 
                 // Mark for check
@@ -116,7 +117,7 @@ export class LocationComponent implements OnInit
             });
 
         // Get Current Location
-        this._locationService.location$
+        this._locationService.featuredLocation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((location: LandingLocation) => {
                 if (location) {
