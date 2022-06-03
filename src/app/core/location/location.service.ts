@@ -181,7 +181,7 @@ export class LocationService
      */
     get featuredProductPagination$(): Observable<ProductPagination>
     {
-        return this._featuredStorePagination.asObservable();
+        return this._featuredProductPagination.asObservable();
     }
 
     // ----------------------

@@ -22,14 +22,14 @@
                     [itemLength]="featuredStoresPagination.length" 
                     [initialPage]="featuredStoresPagination.page + 1"
                     [pageSize]="featuredStoresPagination.size"
-                    (changePage)="onChangePage($event)"
+                    (changePage)="onChangePage($event, 'store')"
                     #storesPaginator></pagination>
             </div>
         </ng-container>
     </ng-container>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products class="w-full" [products]="featuredProducts" [title]="'Featured Products'"></featured-products>
+        <featured-products class="w-full" [products]="featuredProducts" [title]="'Featured Products'" [showViewAll]="productsViewAll"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="featuredProductsPagination">
             <div class="flex w-full my-4 items-center justify-center">
@@ -37,7 +37,7 @@
                     [itemLength]="featuredProductsPagination.length" 
                     [initialPage]="featuredProductsPagination.page + 1"
                     [pageSize]="featuredProductsPagination.size"
-                    (changePage)="onChangePage($event)"
+                    (changePage)="onChangePage($event, 'product')"
                     #productsPaginator></pagination>
             </div>
         </ng-container>

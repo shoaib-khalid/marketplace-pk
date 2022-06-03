@@ -1,0 +1,17 @@
+<div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 sm:pt-0 h-full">
+    <!-- Search -->
+    <search *ngIf="!currentScreenSize.includes('md')" class="w-full sm:mt-4"></search>
+    <!-- Featured Stores -->
+    <featured-products class="w-full" [products]="products"></featured-products>
+    <!-- Pagination -->
+    <ng-container *ngIf="pagination">
+        <div class="flex w-full my-4 items-center justify-center">
+            <pagination 
+                [itemLength]="pagination.length" 
+                [initialPage]="pagination.page + 1"
+                [pageSize]="pagination.size"
+                (changePage)="onChangePage($event)"
+                #storesPaginator></pagination>
+        </div>
+    </ng-container>
+</div>

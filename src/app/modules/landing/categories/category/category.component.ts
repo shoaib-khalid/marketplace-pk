@@ -23,7 +23,9 @@ export class CategoryComponent implements OnInit
     location: LandingLocation;
     locations: LandingLocation[] = [];
 
+    redirectUrl: { categoryId?: string, locationId?: string }
     stores: StoresDetails[] = [];
+    storesViewAll: boolean = false;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     
@@ -50,6 +52,11 @@ export class CategoryComponent implements OnInit
 
         this.locationId = this._route.snapshot.paramMap.get('location-id');
         this.categoryId = this._route.snapshot.paramMap.get('category-id');
+
+        this.redirectUrl = {
+            locationId : this.locationId,
+            categoryId : this.categoryId
+        }
         
         // Get location when change route - this is when we pick one location
         this._router.events.pipe(
@@ -67,7 +74,7 @@ export class CategoryComponent implements OnInit
                 }
 
                 // Get featured stores
-                this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
                     .subscribe((stores : StoresDetails[]) => {
                     });
 
@@ -106,7 +113,7 @@ export class CategoryComponent implements OnInit
                     }
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
@@ -147,6 +154,17 @@ export class CategoryComponent implements OnInit
             .subscribe((stores: StoresDetails[]) => { 
                 if (stores) {
                     this.stores = stores;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+        // Get Featured Stores pagination
+        this._locationService.featuredStorePagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => { 
+                
+                if (pagination) {                    
+                    this.storesViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

@@ -27,7 +27,9 @@ export class LocationComponent implements OnInit
     stores: StoresDetails[] = [];
     products: ProductDetails[] = [];
     
+    redirectUrl: { categoryId?: string, locationId?: string }
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    storesViewAll: boolean = false;
 
     /**
      * Constructor
@@ -52,6 +54,11 @@ export class LocationComponent implements OnInit
         this.locationId = this._route.snapshot.paramMap.get('location-id');
         this.categoryId = this._route.snapshot.paramMap.get('category-id');
 
+        this.redirectUrl = {
+            locationId : this.locationId,
+            categoryId : this.categoryId
+        }
+
         // Get parent category by Id when change route - this is when we pick the category
         this._router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
@@ -65,7 +72,7 @@ export class LocationComponent implements OnInit
                     this._locationService.getParentCategories({ pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
                         .subscribe((category : ParentCategory[]) => {});
                 }
-
+                
                 // Get Featured Stores
                 this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId})
                     .subscribe(()=>{});
@@ -85,12 +92,12 @@ export class LocationComponent implements OnInit
                     this.platform = platform;
 
                     // Get url locationId 
-                    this._locationService.getFeaturedLocations({cityId: this.locationId, regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedLocations({cityId: this.locationId, regionCountryId: this.platform.country })
                         .subscribe((location : LandingLocation[]) => {});
 
                     // Get url parentCategoryId
                     if (this.categoryId) {
-                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId})
+                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
                             .subscribe((category : ParentCategory[]) => {});
                     }
 
@@ -101,7 +108,7 @@ export class LocationComponent implements OnInit
                     }
 
                     // Get Featured Stores
-                    this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
                         .subscribe(()=>{});
 
                     // Get featured products
@@ -154,9 +161,23 @@ export class LocationComponent implements OnInit
         this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
-                this.stores = stores;  
+                if (stores) {
+                    this.stores = stores;  
+                }
+                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+        // Get Featured Stores
+        this._locationService.featuredStorePagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => { 
+                if (pagination) {                    
+                    this.storesViewAll = (pagination.length > pagination.size) ? true : false;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+        
 
         // Get Featured Products
         this._locationService.featuredProducts$

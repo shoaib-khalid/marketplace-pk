@@ -26,13 +26,29 @@
             </div>
         </div>
         <!-- Content  -->
-        <div class="flex flex-col items-center bg-card w-full px-2 sm:px-4 h-full">
+        <div class="flex flex-col bg-card w-full px-2 sm:px-4 h-full">
             <!-- Featured Categories -->
             <featured-categories class="w-full" [categories]="categories" [location]="locationId"></featured-categories>
             <!-- Featured Products -->
-            <featured-products *ngIf="false" class="w-full" [products]="products"></featured-products>
+            <ng-container *ngIf="false">
+                <featured-products class="w-full" [products]="products"></featured-products>
+            </ng-container>
+            <ng-template #noProduct>
+                <span class="font-semibold text-xl items-start mt-4">Product</span>
+                <span class=" items-start">
+                    No product found.
+                </span>
+            </ng-template>
             <!-- Featured Stores -->
-            <featured-stores class="w-full" [stores]="stores"></featured-stores>
+            <ng-container *ngIf="stores; else noStore">
+                <featured-stores class="w-full" [stores]="stores" [showViewAll]="storesViewAll" [redirectURL]="redirectUrl"></featured-stores>
+            </ng-container>
+            <ng-template #noStore>
+                <span class="font-semibold text-xl items-start mt-4">Store</span>
+                <span class=" items-start">
+                    No store found.
+                </span>
+            </ng-template>
         </div>
     </div>
 </ng-container>

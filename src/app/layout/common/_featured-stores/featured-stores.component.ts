@@ -5,6 +5,7 @@ import { debounceTime, filter, map, Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { StoreAssets } from 'app/core/store/store.types';
 
 @Component({
     selector     : 'featured-stores',
@@ -18,6 +19,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     @Input() stores: any;
     @Input() title: string = "Store";
     @Input() showViewAll: boolean = false;
+    @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -78,5 +80,22 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     chooseStore(storeDomain:string) {
         let slug = storeDomain.split(".")[0]
         this._router.navigate(['/store/' + slug]);
+    }
+
+    viewAll(){
+        if (this.redirectURL) {
+            this._router.navigate(['/store/store-list'], {queryParams: this.redirectURL});
+        } else {
+            this._router.navigate(['/store/store-list']);
+        }
+    }
+    
+    displayStoreLogo(storeAssets: StoreAssets[]) {
+        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (storeAssetsIndex > -1) {
+            return storeAssets[storeAssetsIndex].assetUrl;
+        } else {
+            return 'assets/branding/symplified/logo/symplified.png'
+        }
     }
 }

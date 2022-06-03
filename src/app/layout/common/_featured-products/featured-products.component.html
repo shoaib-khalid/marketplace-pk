@@ -14,8 +14,8 @@
                 (click)="redirectToProduct(product.productDetails.seoUrl)"
                 class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
                 <img
-                    class="object-fit h-30 rounded-t-lg  shadow"
-                    [src]="product.thumbnailUrl ? product.thumbnailUrl : product.productDetails.storeDetails.storeAsset.logoUrl ? product.productDetails.storeDetails.storeAsset.logoUrl : platform.logo">
+                    class="object-cover min-h-30 rounded-t-lg shadow"
+                    [src]="product.productDetails.thumbnailUrl ? product.productDetails.thumbnailUrl : platform.logo">
                 <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
                     <div class="flex flex-col">
                         <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.productDetails.name}}</span>

@@ -80,12 +80,12 @@ export class LandingHomeComponent implements OnInit
                             });
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedStores({pageSize: 10, regionCountryId: this.platform.country })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({pageSize: 10, regionCountryId: this.platform.country })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }
@@ -105,7 +105,7 @@ export class LandingHomeComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get featured stores
+        // Get featured products
         this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products) => {
@@ -116,13 +116,13 @@ export class LandingHomeComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get featured stores pagination
-        this._locationService.featuredStorePagination$
+        // Get featured product pagination
+        this._locationService.featuredProductPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((productsPagination) => {
                 if (productsPagination) {
                     this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
-                    this.featuredProductsPagination = productsPagination;  
+                    this.featuredProductsPagination = productsPagination; 
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -158,6 +158,7 @@ export class LandingHomeComponent implements OnInit
                 if (categories) {
                     // to show only 8
                     this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
+                    if (categories.length >= 8) this.categoriesViewAll = true;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -243,38 +244,40 @@ export class LandingHomeComponent implements OnInit
         }, 0);
     }
  
-    onChangePage(pageOfItems: Array<any>) {
+    onChangePage(pageOfItems: Array<any>, type: string) {
         
         // update current page of items
-        this.featuredStoresPageOfItems = pageOfItems;
-        if( this.featuredStoresPagination && this.featuredStoresPageOfItems['currentPage']) {
-            if (this.featuredStoresPageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
-                // set loading to true
-                this.isLoading = true;
-    
-                this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country})
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
-            }
-        }
-
-        // update current page of items
-        this.featuredProductsPageOfItems = pageOfItems;
-        if( this.featuredProductsPagination && this.featuredProductsPageOfItems['currentPage']) {
-            if (this.featuredProductsPageOfItems['currentPage'] - 1 !== this.featuredProductsPagination.page) {
-                // set loading to true
-                this.isLoading = true;
-    
-                this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country})
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
-            }
-        }
+        if (type === 'store') {
+            this.featuredStoresPageOfItems = pageOfItems;
+            if( this.featuredStoresPagination && this.featuredStoresPageOfItems['currentPage']) {
+                if (this.featuredStoresPageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
         
+                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });
+                }
+            }        
+        }
+        if (type === 'product') {
+            // update current page of items
+            this.featuredProductsPageOfItems = pageOfItems;
+            if( this.featuredProductsPagination && this.featuredProductsPageOfItems['currentPage']) {
+                if (this.featuredProductsPageOfItems['currentPage'] - 1 !== this.featuredProductsPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
+        
+                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });
+                }
+            }
+        }
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }

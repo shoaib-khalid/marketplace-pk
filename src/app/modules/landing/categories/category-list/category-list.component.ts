@@ -58,6 +58,11 @@ export class LandingCategoriesComponent implements OnInit
             .subscribe((platform: Platform) => { 
                 if (platform) {
                     this.platform = platform;  
+
+                    // Get categories
+                    this._locationService.getParentCategories({pageSize: 10, regionCountryId: this.platform.country })
+                        .subscribe((category : ParentCategory[]) => {
+                        });
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -135,7 +140,7 @@ export class LandingCategoriesComponent implements OnInit
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._locationService.getParentCategories({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
+                this._locationService.getParentCategories({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country})
                     .subscribe((response)=>{
                         // set loading to false
                         this.isLoading = false;

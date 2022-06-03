@@ -290,9 +290,6 @@ export class LandingStoreComponent implements OnInit
             debounceTime(300),
             switchMap((query) => {     
                 
-                console.log('query', query);
-                
-
                 this.searchName = query;
                 
                 // set loading to true

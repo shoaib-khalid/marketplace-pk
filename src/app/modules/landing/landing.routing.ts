@@ -14,6 +14,7 @@ export const landingRoutes: Route[] = [
             {path: 'category', loadChildren: () => import('app/modules/landing/categories/categories.module').then(m => m.CategoriesModule)},
             {path: 'location', loadChildren: () => import('app/modules/landing/locations/locations.module').then(m => m.LandingLocationsModule)},
             {path: 'store', loadChildren: () => import('app/modules/landing/stores/stores.module').then(m => m.LandingStoresModule)},
+            {path: 'product', loadChildren: () => import('app/modules/landing/products/products.module').then(m => m.LandingProductsModule)},
         ]
     }
 ]; 

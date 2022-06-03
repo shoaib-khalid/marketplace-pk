@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { DOCUMENT } from '@angular/common';
+import { StoreAssets } from 'app/core/store/store.types';
 
 @Component({
     selector     : 'featured-products',
@@ -82,5 +83,14 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
 
     redirectToProduct(url: string) {
         this._document.location.href = url;
+    }
+
+    displayStoreLogo(storeAssets: StoreAssets[]) {
+        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (storeAssetsIndex > -1) {
+            return storeAssets[storeAssetsIndex].assetUrl;
+        } else {
+            return 'assets/branding/symplified/logo/symplified.png'
+        }
     }
 }

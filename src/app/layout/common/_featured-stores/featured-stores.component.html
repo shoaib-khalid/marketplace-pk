@@ -2,7 +2,7 @@
 <ng-container *ngIf="stores && stores.length">
     <div class="flex flex-row items-center justify-between w-full mt-2 sm:mt-4">
         <span class="font-semibold text-xl">{{title}}</span>
-        <span *ngIf="showViewAll || stores.length === 1" [routerLink]="'/store'" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
+        <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
     </div>
 </ng-container>
 
@@ -13,7 +13,7 @@
         class="flex flex-row rounded-lg border border-gray-300 cursor-pointer filter-article w-full mt-1 sm:mt-2">
         <img
             class="object-fit h-26 w-26 p-2"
-            [src]="stores[0].storeDetails.storeAsset ? stores[0].storeDetails.storeAsset.logoUrl : platform.logo">
+            [src]="displayStoreLogo(stores[0].storeDetails.storeAssets)">
         <div class="flex flex-col m-2 font-semibold">
             <span class="group-hover:text-primary text-lg line-clamp-1">{{stores[0].storeDetails.name}}</span>
             <span class="group-hover:text-primary font-medium">{{stores[0].storeDetails.state}}</span>
@@ -30,8 +30,8 @@
                 (click)="chooseStore(store.storeDetails.domain)" 
                 class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
                 <img
-                    class="object-fit h-30 rounded-t-lg shadow"
-                    [src]="store.storeDetails.storeAsset ? store.storeDetails.storeAsset.logoUrl : platform.logo">
+                    class="object-cover min-h-30 max-h-30 rounded-t-lg shadow"
+                    [src]="displayStoreLogo(store.storeDetails.storeAssets)">
                 <div class="flex flex-col m-2 font-semibold">
                     <span class="group-hover:text-primary text-lg line-clamp-1">{{store.storeDetails.name}}</span>
                     <span class="group-hover:text-primary text-gray-600 font-normal">{{store.storeDetails.state}}</span>

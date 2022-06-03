@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { StoresDetails } from 'app/core/location/location.types';
+import { ProductDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -13,16 +13,15 @@ import { Subject, takeUntil, map, merge } from 'rxjs';
 import { switchMap, debounceTime } from 'rxjs/operators';
 
 @Component({
-    selector     : 'landing-stores',
-    templateUrl  : './store-list.component.html',
+    selector     : 'landing-products',
+    templateUrl  : './product-list.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class LandingStoresComponent implements OnInit
+export class LandingProductsComponent implements OnInit
 {
-    @ViewChild("storesPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
+    @ViewChild("productsPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
    
-    stores: StoresDetails [] = [];
     pagination: StorePagination;
     currentScreenSize: string[] = [];
     productViewOrientation: string = 'grid';
@@ -36,6 +35,7 @@ export class LandingStoresComponent implements OnInit
     sortOrder: 'asc' | 'desc' | '' = 'desc';
     categoryId: string;
     locationId: string;
+    products: ProductDetails[];
 
     /**
      * Constructor
@@ -69,10 +69,9 @@ export class LandingStoresComponent implements OnInit
                     this.categoryId = params.categoryId ? params.categoryId : null;
                     this.locationId = params.locationId ? params.locationId : null;
 
-                    // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
-                        .subscribe((stores : StoresDetails[]) => {});
-
+                    // Get featured products
+                    this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                        .subscribe((products : ProductDetails[]) => {});
                 });
 
             }
@@ -80,25 +79,14 @@ export class LandingStoresComponent implements OnInit
             this._changeDetectorRef.markForCheck();
 
         });
-        this._locationService.featuredStores$
+        this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: StoresDetails[]) => { 
-                this.stores = stores;             
-
+            .subscribe((products: ProductDetails[]) => { 
+                if (products) {
+                    this.products = products;
+                }
                 this._changeDetectorRef.markForCheck();
             });
-
-        // Get the store pagination
-        this._locationService.featuredStorePagination$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((pagination: StorePagination) => {
-            
-            // Update the pagination
-            this.pagination = pagination;                   
-
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
@@ -112,7 +100,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getFeaturedStores({ pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                return this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
             }),
             map(() => {
                 // set loading to false
@@ -161,7 +149,7 @@ export class LandingStoresComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                        return this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -182,7 +170,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
+                this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;
