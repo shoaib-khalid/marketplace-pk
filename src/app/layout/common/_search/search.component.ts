@@ -178,8 +178,8 @@ export class _SearchComponent implements OnInit, OnDestroy
                 customerId  : this.customer.id,                
                 searchText  : value,
                 storeId     : this.storeId ? this.storeId : null,
-                domain      : this.store.domain,
-                image       : this.store.image
+                domain      : this.store ? this.store.domain : null,
+                image       : this.store ? this.store.image : null
             }
 
             this._searchService.postCustomerSearch(dataSearch)

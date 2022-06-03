@@ -1,7 +1,8 @@
 <div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 h-full">            
     <ng-container *ngIf="store">
         <!-- Search -->
-        <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
+        <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search> -->
+        <search class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
         <!-- Selected Store -->
         <fuse-card class="flex flex-row h-32 md:h-full w-full border border-primary rounded-lg filter-article mt-4 sm:mt-2">
             <div class="flex-0 w-30 md:w-44">

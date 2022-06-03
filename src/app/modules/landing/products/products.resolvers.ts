@@ -11,7 +11,7 @@ import { map } from 'lodash';
 @Injectable({
     providedIn: 'root'
 })
-export class StoresResolver implements Resolve<any>
+export class ProductsResolver implements Resolve<any>
 {
     storeDomain: string;
     /**
