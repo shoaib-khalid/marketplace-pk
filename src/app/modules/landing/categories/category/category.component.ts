@@ -57,10 +57,23 @@ export class CategoryComponent implements OnInit
             distinctUntilChanged(),
             takeUntil(this._unsubscribeAll)
         ).subscribe((responseCategory: NavigationEnd) => {
-            let locationIdRouter = responseCategory.url.split("/")[3];
-            if (locationIdRouter) {
-                this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: 'MYS', cityId: locationIdRouter})
-                    .subscribe((location : LandingLocation[]) => {                        
+            if (responseCategory) {
+                this.locationId = responseCategory.url.split("/")[3];
+                if (this.locationId) {
+                    // Location is changed
+                    this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId})
+                        .subscribe((location : LandingLocation[]) => {                        
+                        });
+                }
+
+                // Get featured stores
+                this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    .subscribe((stores : StoresDetails[]) => {
+                    });
+
+                // Get featured products
+                this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    .subscribe((products : ProductDetails[]) => {
                     });
             }
         });
@@ -80,10 +93,16 @@ export class CategoryComponent implements OnInit
 
                     // Get location detail - this is when we pick one location    
                     if (this.locationId) {
-                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId})
+                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId })
                             .subscribe((location : LandingLocation[]) => {
                             });
+                    }
 
+                    // Get locations, if there already locations, dont calll                    
+                    if (this.locations.length < 1) {
+                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country })
+                            .subscribe((locations : LandingLocation[]) => {
+                            });
                     }
 
                     // Get featured stores
@@ -92,9 +111,9 @@ export class CategoryComponent implements OnInit
                         });
 
                     // Get featured products
-                    // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
-                    //     .subscribe((products : ProductDetails[]) => {
-                    //     });
+                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                        .subscribe((products : ProductDetails[]) => {
+                        });
                 }
                 
                 // Mark for check

@@ -4,7 +4,7 @@ import { StoresResolver } from '../stores/stores.resolvers';
 
 export const landingHomeRoutes: Route[] = [
     {
-        path     : '',
+        path     : '',  
         children   : [
             {
                 path: '',

@@ -296,8 +296,10 @@ export class LocationService
         return this._httpClient.get<StoresDetails[]>(locationService + '/featured/store', header)
             .pipe(
                 switchMap(async (response:StoresDetails[]) => {
-                                
-                    this._logging.debug("Response from LocationService (getFeaturedStores)", response);
+                    
+                    let city = params.cityId ? (" - " + params.cityId) : "";
+                    let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
+                    this._logging.debug("Response from LocationService (getFeaturedStores)" + city + category, response);
 
                     let _pagination = {
                         length: response["data"].totalElements,
@@ -445,7 +447,7 @@ export class LocationService
                 ),
                 switchMap(async (response:LandingLocation[]) => {
                     
-                    this._logging.debug("Response from LocationService (getLocations)" + (params.cityId ? " - " + params.cityId : ""), response);
+                    this._logging.debug("Response from LocationService (getFeaturedLocations)" + (params.cityId ? " - " + params.cityId : ""), response);
                     
                     if (params.cityId) {
                         this._featuredLocation.next(response["data"].content[0]);

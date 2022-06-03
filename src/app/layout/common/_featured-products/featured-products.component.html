@@ -11,19 +11,19 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 w-full mt-2 sm:mt-4">
         <ng-container *ngFor="let product of products">
             <fuse-card
-                (click)="redirectToProduct(product.seoUrl)"
-                class="flex flex-col rounded-lg border border-gray-300 h-72 cursor-pointer filter-article">
+                (click)="redirectToProduct(product.productDetails.seoUrl)"
+                class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
                 <img
-                    class="object-fit h-40 shadow"
-                    [src]="product.thumbnailUrl ? product.thumbnailUrl : product.storeDetails.storeAsset.logoUrl ? product.storeDetails.storeAsset.logoUrl : platform.logo">
+                    class="object-fit h-30 rounded-t-lg  shadow"
+                    [src]="product.thumbnailUrl ? product.thumbnailUrl : product.productDetails.storeDetails.storeAsset.logoUrl ? product.productDetails.storeDetails.storeAsset.logoUrl : platform.logo">
                 <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
                     <div class="flex flex-col">
-                        <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.name}}</span>
-                        <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
+                        <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.productDetails.name}}</span>
+                        <span class="m-0.5 text-gray-400 line-clamp-1">{{product.productDetails.storeDetails.name}}</span>
                     </div>
                     <div class="flex flex-row items-end justify-between">
                         <span class="line-through text-sm font-semibold">RM 19.44</span>
-                        <span class="text-lg font-semibold">{{product.productInventories[0].price | currency: platform.currency}}</span>
+                        <span class="text-lg font-semibold">{{product.productDetails.productInventories[0].price | currency: platform.currency}}</span>
                     </div>
                 </div>
             </fuse-card>

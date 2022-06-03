@@ -22,8 +22,8 @@ export const landingCategoriesRoutes: Route[] = [
         ],
     },
     {
-        path     : ':category-id',
-        children   : [
+        path        : ':category-id',
+        children    : [
             {
                 path: '',
                 data: {
@@ -34,8 +34,8 @@ export const landingCategoriesRoutes: Route[] = [
         ],
     },
     {
-        path     : ':category-id/:location-id',
-        children   : [
+        path        : ':category-id/:location-id',
+        children    : [
             {
                 path: '',
                 data: {

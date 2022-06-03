@@ -29,7 +29,7 @@
     </ng-container>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products *ngIf="false" class="w-full" [products]="featuredProducts" [title]="'Featured Products'"></featured-products>
+        <featured-products class="w-full" [products]="featuredProducts" [title]="'Featured Products'"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="featuredProductsPagination">
             <div class="flex w-full my-4 items-center justify-center">

@@ -166,63 +166,64 @@ export class FnbLayoutComponent implements OnDestroy
 
         // Get the store categories
         this._storesService.storeCategories$
-        .subscribe((response: StoreCategory[]) => {
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: StoreCategory[]) => {
 
-            
-            this.storeCategories = response;
+                this.storeCategories = response;
 
-            if (this.storeCategories && this.storeCategories.length > 0) {
-                this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                if (this.storeCategories && this.storeCategories.length > 0) {
+                    this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                    
+                    let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
+                    this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
+
+                    // set loading to true
+                    this.isLoading = true;
+                    
+                    // this._productsService.getProducts(0, 12, "name", "asc", "", 'ACTIVE', this.storeCategory ? this.storeCategory.id : '')
+                    //     .subscribe(()=>{
+                    //         // set loading to false
+                    //         this.isLoading = false;
+                    //     });
+                }
                 
-                let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
-                this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
-
-                // set loading to true
-                this.isLoading = true;
-                
-                // this._productsService.getProducts(0, 12, "name", "asc", "", 'ACTIVE', this.storeCategory ? this.storeCategory.id : '')
-                //     .subscribe(()=>{
-                //         // set loading to false
-                //         this.isLoading = false;
-                //     });
-            }
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         this._authService.customerAuthenticate$
+            .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: CustomerAuthenticate) => {
-                
                 this.customerAuthenticate = response;
-
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         this._userService.get(this.customerAuthenticate.session.ownerId)
-        .subscribe((response)=>{
-
-            this.user = response.data;
-            
-            
-        });
+            .subscribe((response)=>{
+                this.user = response.data;
+            });
 
         // Subscribe to platform data
         this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => {
-            this.platform = platform;
-        });
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                this.platform = platform;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(({matchingAliases}) => {
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {
+                // Check if the screen is small
+                this.isScreenSmall = !matchingAliases.includes('md');
 
-            // Check if the screen is small
-            this.isScreenSmall = !matchingAliases.includes('md');
-        });
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
 
         // this._notificationService.notification$

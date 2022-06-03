@@ -61,13 +61,35 @@ export class LandingHomeComponent implements OnInit
     }
 
     ngOnInit(): void {
-        // Get Platform Data
+
+        // Get platform data
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
                 if (platform) {
-                    this.platform = platform;  
+                    this.platform = platform;
+
+                    // Get categories
+                    this._locationService.getParentCategories({pageSize: 8, regionCountryId: this.platform.country })
+                        .subscribe((category : ParentCategory[]) => {
+                        });
+
+                    // Get locations
+                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country })
+                            .subscribe((location : LandingLocation[]) => {
+                            });
+
+                    // Get featured stores
+                    this._locationService.getFeaturedStores({pageSize: 9, regionCountryId: this.platform.country })
+                        .subscribe((stores : StoresDetails[]) => {
+                        });
+
+                    // Get featured products
+                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country })
+                        .subscribe((products : ProductDetails[]) => {
+                        });
                 }
+                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -78,6 +100,29 @@ export class LandingHomeComponent implements OnInit
             .subscribe((locations) => {
                 if (locations) {
                     this.locations = locations;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get featured stores
+        this._locationService.featuredProducts$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((products) => {
+                if (products) {
+                    this.featuredProducts = products;  
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get featured stores pagination
+        this._locationService.featuredStorePagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((productsPagination) => {
+                if (productsPagination) {
+                    this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
+                    this.featuredProductsPagination = productsPagination;  
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

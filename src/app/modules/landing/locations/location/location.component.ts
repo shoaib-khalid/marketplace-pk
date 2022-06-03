@@ -58,16 +58,22 @@ export class LocationComponent implements OnInit
             distinctUntilChanged(),
             takeUntil(this._unsubscribeAll)
         ).subscribe((responseLocation: NavigationEnd) => {
-            this.categoryId = responseLocation.url.split("/")[3];
-            if (this.categoryId) {
-
-                // Catagory is Changed
-                this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
-                    .subscribe((category : ParentCategory[]) => {});
+            if (responseLocation) {
+                this.categoryId = responseLocation.url.split("/")[3];
+                if (this.categoryId) {
+                    // Catagory is Changed
+                    this._locationService.getParentCategories({ pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                        .subscribe((category : ParentCategory[]) => {});
+                }
 
                 // Get Featured Stores
-                this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId})
+                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId})
                     .subscribe(()=>{});
+
+                // Get featured products
+                // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: locationIdRouter, parentCategoryId: this.categoryId })
+                //     .subscribe((products : ProductDetails[]) => {
+                //     });
             }
         });
 
@@ -85,6 +91,12 @@ export class LocationComponent implements OnInit
                     // Get url parentCategoryId
                     if (this.categoryId) {
                         this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId})
+                            .subscribe((category : ParentCategory[]) => {});
+                    }
+
+                    // Get categories
+                    if (this.categories.length < 1) {
+                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country })
                             .subscribe((category : ParentCategory[]) => {});
                     }
 

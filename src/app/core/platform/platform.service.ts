@@ -41,8 +41,6 @@ export class PlatformService
         private _apiServer: AppConfig,
         private _jwt: JwtService,
         private _logging: LogService,
-        private _locationService: LocationService,
-
     )
     {
     }
@@ -165,14 +163,6 @@ export class PlatformService
                             // Return the store
                             return newPlatform;
                         });
-
-                        this._locationService.getFeaturedLocations({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
-                        this._locationService.getFeaturedStores({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
-                        // this._locationService.getFeaturedProducts({ pageSize: 10, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
-                        
-                        this._locationService.getParentCategories({ pageSize: 8, regionCountryId: response["data"][0].platformCountry, city: 'Subang Jaya'}).subscribe(()=>{})
-                        this._locationService.getStoresDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
-                        this._locationService.getProductsDetails({ pageSize: 5, regionCountryId: response["data"][0].platformCountry}).subscribe(()=>{});
                 })
             );
     }
