@@ -152,17 +152,17 @@ export class LandingProductDetailsComponent implements OnInit
 
         this.storeDomain = this._route.snapshot.paramMap.get('store-slug');             
 
-        this._storesService.getStoreByDomainName(this.storeDomain)
+        this._storesService.store$
         .pipe(
             take(1),
-            switchMap((response) => {
+            switchMap((store : Store) => {
 
-                this.store = response
+                this.store = store;
                 
                 // get product
                 this._productsService.product$
-                .subscribe((response: Product) => {
-                    this.product = response;                
+                .subscribe((product: Product) => {
+                    this.product = product;                
 
                     // ----------------------------------
                     // Get category info by category id
@@ -170,10 +170,10 @@ export class LandingProductDetailsComponent implements OnInit
 
                     if (this.product && this.product.productInventories.length > 0) {
                         
-                        this._storesService.getStoreCategoriesById(response.categoryId)
-                            .subscribe((response: StoreCategory) => {
-                                this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
-                            });
+                        // this._storesService.getStoreCategoriesById(response.categoryId)
+                        //     .subscribe((response: StoreCategory) => {
+                        //         this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
+                        //     });
                         
                         //Check condition if the product inventory got itemDiscount or not
                         const checkItemDiscount = this.product.productInventories.filter((x:any)=>x.itemDiscount);
@@ -212,7 +212,7 @@ export class LandingProductDetailsComponent implements OnInit
                         this.productAssets = this.product.productAssets;
 
                         // first this will push all images expect the one that are currently display
-                        response.productAssets.forEach( object => {
+                        product.productAssets.forEach( object => {
                             let _imageObject = {
                                 small   : '' + object.url,
                                 medium  : '' + object.url,
@@ -225,7 +225,7 @@ export class LandingProductDetailsComponent implements OnInit
                         });
 
                         // loop second one to push the one that are currently display in first array
-                        response.productAssets.forEach( object => {
+                        product.productAssets.forEach( object => {
                             let _imageObject = {
                                 small   : '' + object.url,
                                 medium  : '' + object.url,

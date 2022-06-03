@@ -25,11 +25,9 @@ export const landingStoresRoutes: Route[] = [
         path     : ':store-slug',
         children   : [
             {
-                path: '',
-                data: {
-                    headerTitle: ''
-                },
-                component: LandingStoreComponent,
+                path     : '',
+                pathMatch : 'full',
+                redirectTo: 'all-products',
             },
             {
                 path: ':catalogue-slug',
@@ -60,12 +58,11 @@ export const landingStoresRoutes: Route[] = [
             //         breadcrumb: ''
             //     }
             // },
-            {
-                path     : '',
-                redirectTo: 'all-products',
-                component: LandingStoreComponent
-            }
+            
         ],
+        resolve  : {
+            stores: StoresResolver,
+        }
     },
 
 ];

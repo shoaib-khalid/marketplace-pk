@@ -127,10 +127,7 @@ export class LandingStoreComponent implements OnInit
     ngOnInit(): void {
         this.storeDomain = this._route.snapshot.paramMap.get('store-slug');    
         
-        
-        
-        
-        this._storesService.getStoreByDomainName(this.storeDomain)
+        this._storesService.store$
         .pipe(
             takeUntil(this._unsubscribeAll),
             take(1),
@@ -146,20 +143,26 @@ export class LandingStoreComponent implements OnInit
                     domain: this.storeDomain
                 }
                 // check if store id exists
-                if (this._storesService.storeId$ && this._storesService.storeId$ !== null) {
-
-                    
+                if (this.store.id && this.store.id !== null) {
 
                     // -----------------------
                     // Get Store Category
                     // -----------------------
 
-                    this._storesService.getStoreCategories()
+                    this._storesService.storeCategories$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((response)=>{
-                            this.storeCategories = response.data.content
+                            
+                            this.storeCategories = response
 
-                            this.catalogueSlug = this.catalogueSlug ? this.catalogueSlug : this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                            // If keyword from search exist, set catalogueSlug to null so that checkbox won't be checked
+                            if (!this.catalogueSlug && this._activatedRoute.snapshot.queryParamMap.get('keyword')){
+                                this.catalogueSlug = null;
+                            }
+                            // Else, set the catalogueSlug
+                            else if (!this.catalogueSlug) {
+                                this.catalogueSlug = this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                            }
                             
                             let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
                             this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
@@ -173,13 +176,23 @@ export class LandingStoreComponent implements OnInit
                             // Get searches from url parameter 
                             this._activatedRoute.queryParams.subscribe(params => {
                                 this.searchValue = params['keyword'];
-
+                                
+                                // If keyword exist
                                 if (this.searchValue) {
                                     
-                                    // Get products
-                                    this.searchInputControl.patchValue(this.searchValue);
+                                    // Get searched product
+                                    this._productsService.getProducts(0, 12, "name", "asc", this.searchValue, 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
+                                        .pipe(takeUntil(this._unsubscribeAll))
+                                        .subscribe(()=>{
+                                            // set loading to false
+                                            this.isLoading = false;
+        
+                                            // Mark for check
+                                            this._changeDetectorRef.markForCheck();
+                                        });
 
                                 }
+                                // Else, get all products
                                 else {
                                     this._productsService.getProducts(this.oldPaginationIndex, 12, "name", "asc", "", 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
                                         .pipe(takeUntil(this._unsubscribeAll))
@@ -193,8 +206,9 @@ export class LandingStoreComponent implements OnInit
 
                                 }
                             });
-                            
-                            
+
+                        // Mark for check
+                        this._changeDetectorRef.markForCheck();
                         });
 
                     // -----------------------
@@ -231,11 +245,11 @@ export class LandingStoreComponent implements OnInit
                     // Get Store Snooze
                     // -----------------------
                     
-                    this._storesService.getStoreSnooze()
-                        .pipe(takeUntil(this._unsubscribeAll))
-                        .subscribe(() => {
+                    // this._storesService.getStoreSnooze()
+                    //     .pipe(takeUntil(this._unsubscribeAll))
+                    //     .subscribe(() => {
                              
-                        });
+                    //     });
 
                 // } else if (this.url.subDomainName === "symplified" && state.url.indexOf("/payment-redirect") > -1) {
                     // redirecting
@@ -245,7 +259,9 @@ export class LandingStoreComponent implements OnInit
                     console.error("No store found");
                 }
 
-                                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();   
+                             
                 return of(true);
             })
         ).subscribe(() => {
@@ -272,7 +288,10 @@ export class LandingStoreComponent implements OnInit
         .pipe(
             takeUntil(this._unsubscribeAll),
             debounceTime(300),
-            switchMap((query) => {                    
+            switchMap((query) => {     
+                
+                console.log('query', query);
+                
 
                 this.searchName = query;
                 
@@ -411,7 +430,7 @@ export class LandingStoreComponent implements OnInit
         div.style.width ="15rem";
         document.body.appendChild(div)
 
-        if (div.offsetHeight > 120) {
+        if (div.offsetHeight > 100) {
             div.setAttribute("class","hidden")
             return true;
         } else {
@@ -448,6 +467,11 @@ export class LandingStoreComponent implements OnInit
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+    viewProduct(product: Product) {
+        let catalogue = this.catalogueSlug ? this.catalogueSlug : 'all-products'
+        this._router.navigate(['store/' + this.storeDomain + '/' + catalogue + '/' + product.seoName]);
     }
 
 }

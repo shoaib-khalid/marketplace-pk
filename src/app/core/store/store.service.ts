@@ -632,7 +632,7 @@ export class StoresService
     // Store Categories Section
     // ---------------------------
 
-    getStoreCategories(name: string="", id: string = "", page: number = 0, size: number = 30, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc'): Observable<any>
+    getStoreCategories(storeId: string = "", name: string="", page: number = 0, size: number = 30, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc'): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
         //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
@@ -642,7 +642,8 @@ export class StoresService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params: {
                 name        : '' + name,
-                storeId     : this.storeId$,
+                // storeId     : this.storeId$,
+                storeId     : '' + storeId,
                 page        : '' + page,
                 pageSize    : '' + size,
                 sortByCol   : '' + sort,
@@ -675,7 +676,7 @@ export class StoresService
                     // set this
                     this.storeControl.setValue(storeCategory);
     
-                    this._logging.debug("Response from StoresService (getStoresById)", storeCategory);
+                    this._logging.debug("Response from StoresService (getStoreCategoriesById)", storeCategory);
     
                     // Update the storeCategory
                     this._storeCategory.next(storeCategory);
