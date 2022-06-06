@@ -15,7 +15,7 @@
     <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll"></featured-categories>
     <!-- Featured Stores -->
     <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="storesViewAll" [title]="'Featured Stores'"></featured-stores>
+        <featured-stores class="w-full" [stores]="featuredStores" [title]="'Featured Stores'" [showViewAll]="storesViewAll"></featured-stores>
         <!-- Pagination -->
         <ng-container *ngIf="featuredStoresPagination">
             <div class="flex w-full my-4 items-center justify-center">

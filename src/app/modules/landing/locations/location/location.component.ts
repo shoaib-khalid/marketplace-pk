@@ -28,8 +28,10 @@ export class LocationComponent implements OnInit
     products: ProductDetails[] = [];
     
     redirectUrl: { categoryId?: string, locationId?: string }
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
     storesViewAll: boolean = false;
+    productsViewAll: boolean = false;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -112,9 +114,9 @@ export class LocationComponent implements OnInit
                         .subscribe(()=>{});
 
                     // Get featured products
-                    // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
-                    //     .subscribe((products : ProductDetails[]) => {
-                    //     });
+                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                        .subscribe((products : ProductDetails[]) => {
+                        });
                 }
 
                 // Mark for check
@@ -152,7 +154,6 @@ export class LocationComponent implements OnInit
                 if (location) {
                     this.location = location;                    
                 }
-
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -162,7 +163,7 @@ export class LocationComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
                 if (stores) {
-                    this.stores = stores;  
+                    this.stores = stores;                     
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -183,7 +184,21 @@ export class LocationComponent implements OnInit
         this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
-                this.products = products;  
+                if (products) {
+                    this.products = products;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get Featured Products pagination
+        this._locationService.featuredProductPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => { 
+                if (pagination) {                    
+                    this.productsViewAll = (pagination.length > pagination.size) ? true : false;
+                }
+                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
     }

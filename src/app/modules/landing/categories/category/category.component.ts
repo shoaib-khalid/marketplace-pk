@@ -23,9 +23,12 @@ export class CategoryComponent implements OnInit
     location: LandingLocation;
     locations: LandingLocation[] = [];
 
-    redirectUrl: { categoryId?: string, locationId?: string }
     stores: StoresDetails[] = [];
+    products: ProductDetails[] = [];
+    
+    redirectUrl: { categoryId?: string, locationId?: string }
     storesViewAll: boolean = false;
+    productsViewAll: boolean = false;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     
@@ -158,6 +161,7 @@ export class CategoryComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
         // Get Featured Stores pagination
         this._locationService.featuredStorePagination$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -165,6 +169,28 @@ export class CategoryComponent implements OnInit
                 
                 if (pagination) {                    
                     this.storesViewAll = (pagination.length > pagination.size) ? true : false;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get Featured Products
+        this._locationService.featuredProducts$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((products: ProductDetails[]) => { 
+                if (products) {
+                    this.products = products;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get Featured Products pagination
+        this._locationService.featuredProductPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => { 
+                if (pagination) {                    
+                    this.productsViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

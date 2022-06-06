@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -103,6 +104,7 @@ export class LandingStoreComponent implements OnInit
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _storesService: StoresService,
         private _productsService: ProductsService,
         private _storeService: StoreService,
@@ -469,6 +471,10 @@ export class LandingStoreComponent implements OnInit
     viewProduct(product: Product) {
         let catalogue = this.catalogueSlug ? this.catalogueSlug : 'all-products'
         this._router.navigate(['store/' + this.storeDomain + '/' + catalogue + '/' + product.seoName]);
+    }
+
+    redirectToProduct(url: string) {
+        this._document.location.href = url;
     }
 
 }
