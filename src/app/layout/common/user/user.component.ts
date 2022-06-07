@@ -31,7 +31,7 @@ export class UserComponent implements OnInit, OnDestroy
 
     sanatiseUrl: string;
 
-    countdown: number = 5;
+    countdown: number = 0;
     countdownMapping: any = {
         '=1'   : '# second',
         'other': '# seconds'
@@ -189,10 +189,10 @@ export class UserComponent implements OnInit, OnDestroy
         //     '?redirectURL=' + encodeURI('https://' + this.sanatiseUrl);
 
         // Redirect after the countdown
-        timer(1000, 1000)
+        timer(0, 1000)
             .pipe(
                 finalize(() => {
-                    this._router.navigate(['']);
+                    this._router.navigate(['sign-out']);
                 }),
                 takeWhile(() => this.countdown > 0),
                 takeUntil(this._unsubscribeAll),

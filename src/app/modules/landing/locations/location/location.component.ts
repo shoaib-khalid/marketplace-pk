@@ -77,7 +77,7 @@ export class LocationComponent implements OnInit
                 }
                 
                 // Get Featured Stores
-                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId})
+                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId})
                     .subscribe(()=>{});
 
                 // Get featured products
@@ -94,7 +94,7 @@ export class LocationComponent implements OnInit
                     this.platform = platform;
 
                     // Get url locationId 
-                    this._locationService.getFeaturedLocations({cityId: this.locationId, regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedLocations({cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((location : LandingLocation[]) => {});
 
                     // Get url parentCategoryId
@@ -110,11 +110,11 @@ export class LocationComponent implements OnInit
                     }
 
                     // Get Featured Stores
-                    this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
-                        .subscribe((stores: StoreDetails[])=>{});
+                    this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                        .subscribe(()=>{});
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }

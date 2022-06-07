@@ -10,30 +10,40 @@
 <ng-container *ngIf="products && products.length > 0">
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 w-full mt-2 sm:mt-4">
         <ng-container *ngFor="let product of products">
-            <fuse-card
-                (click)="redirectToProduct(product.productDetails.seoUrl)"
-                class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
-                <div class="relative w-full">
-                    <div *ngIf="!product.productDetails.thumbnailUrl" class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black opacity-40">
-                        <span class="text-white font-semibold text-lg opacity-100">{{product.productDetails.storeCategory ? product.productDetails.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
-                        <span class="text-white opacity-100">Product image not available</span>
-                    </div>
-                    <img
-                        class="object-cover h-30 rounded-t-lg shadow"
-                        [src]="product.productDetails.thumbnailUrl ? product.productDetails.thumbnailUrl :
-                               product.productDetails.storeCategory ? product.productDetails.storeCategory.parentCategory.parentThumbnailUrl : platform.logo">
-                </div>
-                <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
-                    <div class="flex flex-col">
-                        <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.productDetails.name}}</span>
-                        <span class="m-0.5 text-gray-400 line-clamp-1">{{product.productDetails.storeDetails.name}}</span>
-                    </div>
-                    <div class="flex flex-row items-end justify-between">
-                        <span class="line-through text-sm font-semibold">RM 19.44</span>
-                        <span class="text-lg font-semibold">{{product.productDetails.productInventories[0].price | currency: platform.currency}}</span>
-                    </div>
-                </div>
-            </fuse-card>
+            <ng-container *ngTemplateOutlet="productResult; context: {$implicit: product.productDetails ? product.productDetails : product}">
+            </ng-container>
         </ng-container>
     </div>
 </ng-container>
+
+<!-- Contact result template -->
+<ng-template
+    #productResult
+    let-product>
+    <fuse-card
+        (click)="redirectToProduct(product.seoUrl)"
+        class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
+        <div class="relative w-full">
+            <div *ngIf="!product.thumbnailUrl" class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black opacity-40">
+                <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                <span class="text-white opacity-100">Product image not available</span>
+            </div>
+            <img
+                class="object-cover h-30 rounded-t-lg shadow"
+                [src]="product.thumbnailUrl ? product.thumbnailUrl :
+                        product.storeCategory ? product.storeCategory.parentCategory.parentThumbnailUrl : platform.logo">
+        </div>
+        <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
+            <div class="flex flex-col">
+                <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.name}}</span>
+                <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
+            </div>
+            <div class="flex flex-row items-end justify-between">
+                <ng-container *ngIf="product.productInventories[0].itemDiscount">
+                    <span class="line-through text-sm font-semibold">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</span>
+                </ng-container>
+                <span class="text-lg font-semibold">{{product.productInventories[0].price | currency: platform.currency}}</span>
+            </div>
+        </div>
+    </fuse-card>
+</ng-template>
