@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, ParentCategory, ProductDetails, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, ParentCategory, ProductDetails, StoreDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
@@ -30,6 +30,7 @@ export class LocationComponent implements OnInit
     redirectUrl: { categoryId?: string, locationId?: string }
     storesViewAll: boolean = false;
     productsViewAll: boolean = false;
+    categoriesViewAll: boolean = false;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -71,7 +72,7 @@ export class LocationComponent implements OnInit
                 this.categoryId = responseLocation.url.split("/")[3];
                 if (this.categoryId) {
                     // Catagory is Changed
-                    this._locationService.getParentCategories({ pageSize: 8, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getParentCategories({ pageSize: 4, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
                         .subscribe((category : ParentCategory[]) => {});
                 }
                 
@@ -80,9 +81,8 @@ export class LocationComponent implements OnInit
                     .subscribe(()=>{});
 
                 // Get featured products
-                // this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: locationIdRouter, parentCategoryId: this.categoryId })
-                //     .subscribe((products : ProductDetails[]) => {
-                //     });
+                this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    .subscribe(() => {});
             }
         });
 
@@ -99,19 +99,19 @@ export class LocationComponent implements OnInit
 
                     // Get url parentCategoryId
                     if (this.categoryId) {
-                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
+                        this._locationService.getParentCategories({ pageSize: 1, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
                             .subscribe((category : ParentCategory[]) => {});
                     }
 
                     // Get categories
                     if (this.categories.length < 1) {
-                        this._locationService.getParentCategories({ pageSize: 8, cityId: this.locationId, regionCountryId: this.platform.country })
+                        this._locationService.getParentCategories({ pageSize: 4, cityId: this.locationId, regionCountryId: this.platform.country })
                             .subscribe((category : ParentCategory[]) => {});
                     }
 
                     // Get Featured Stores
                     this._locationService.getFeaturedStores({pageSize: 5, cityId: this.locationId, regionCountryId: this.platform.country, parentCategoryId: this.categoryId })
-                        .subscribe(()=>{});
+                        .subscribe((stores: StoreDetails[])=>{});
 
                     // Get featured products
                     this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
@@ -142,6 +142,17 @@ export class LocationComponent implements OnInit
                 if (categories) {
                     // to show only 8
                     this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get parentCategories pagination
+        this._locationService.parentCategoriesPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => { 
+                if (pagination) {                    
+                    this.categoriesViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

@@ -1,10 +1,10 @@
 <ng-container *ngIf="location && (stores.length > 0 || products.length > 0); else noStoreProductAvailable">
     <div class="flex flex-col items-center bg-card w-full h-full">
         <!-- Header -->
-        <div class="w-full relative flex p-2 sm:p-4 overflow-hidden bg-white h-52 sm:h-70 lg:h-75 justify-center items-center">
+        <div class="w-full relative flex p-2 sm:p-4 overflow-hidden bg-white h-52 sm:h-70 lg:h-100 justify-center items-center">
             <!-- Background -->
             <div class="absolute inset-0 pointer-events-none">
-                <img [src]="location.imageUrl ? location.imageUrl : platform.logo" alt="">
+                <img class="object-cover w-full h-full" [src]="location.imageUrl ? location.imageUrl : platform.logo" alt="">
             </div>
             <!-- Black filter  -->
             <div class="absolute inset-0 pointer-events-none bg-black opacity-70"></div>
@@ -28,7 +28,7 @@
         <!-- Content  -->
         <div class="flex flex-col bg-card w-full px-2 sm:px-4 h-full">
             <!-- Featured Categories -->
-            <featured-categories class="w-full" [categories]="categories" [location]="locationId"></featured-categories>
+            <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll" [location]="locationId"></featured-categories>
             <!-- Featured Products -->
             <featured-products class="w-full" [products]="products" [showViewAll]="productsViewAll" [redirectURL]="redirectUrl"></featured-products>
             <!-- Featured Stores -->
