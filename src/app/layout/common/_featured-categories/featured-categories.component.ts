@@ -17,6 +17,7 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
     @Input() location: any;
     @Input() title: string = "Categories";
     @Input() showViewAll: boolean = false;
+    @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -79,6 +80,14 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
             this._router.navigate(['/location/' + locationId + '/' + parentCategoryId]);
         } else {
             this._router.navigate(['/category/' + parentCategoryId]);
+        }
+    }
+
+    viewAll(){
+        if (this.redirectURL) {
+            this._router.navigate(['/category/category-list'], {queryParams: this.redirectURL});
+        } else {
+            this._router.navigate(['/category/category-list']);
         }
     }
 }

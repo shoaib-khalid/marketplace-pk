@@ -39,20 +39,6 @@ import { StoreService } from './store.service';
           outline: none !important;
         }
 
-        /** Custom mat-checkbox theme **/
-
-        body.light .mat-checkbox-disabled.mat-checkbox-checked .mat-checkbox-background {
-            background-color: var(--fuse-primary);
-        }
-        
-        body.light .mat-checkbox-disabled .mat-checkbox-label {
-            color: black;
-        }
-
-        body.light .mat-checkbox-frame {
-            border-color: var(--fuse-primary);
-        }
-
         `
     ],
     encapsulation: ViewEncapsulation.None,
@@ -296,7 +282,6 @@ export class LandingStoreComponent implements OnInit
                 
                 // set loading to true
                 this.isLoading = true;
-                
                 return this._productsService.getProducts(0, 12, this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '');
             }),
             map(() => {
@@ -335,7 +320,6 @@ export class LandingStoreComponent implements OnInit
                     
                     // set loading to true
                     this.isLoading = true;
-
                     return this._productsService.getProducts(0, 12, this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '');
                 }),
                 map(() => {
@@ -408,11 +392,11 @@ export class LandingStoreComponent implements OnInit
         // update current page of items
         this.pageOfItems = pageOfItems;
         
-        if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+        if ( ( (this.pageOfItems['currentPage'] - 1) > -1 ) && (this.pageOfItems['currentPage'] - 1 !== this.pagination.page)) {
             // set loading to true
             this.isLoading = true;
-
-            this._productsService.getProducts(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '')
+            this._productsService.getProducts((this.pageOfItems['currentPage'] - 1) < 0 ? 0 : (this.pageOfItems['currentPage'] - 1), this.pageOfItems['pageSize'], this.sortName, this.sortOrder, this.searchName, "ACTIVE,OUTOFSTOCK" , this.storeCategory ? this.storeCategory.id : '')
+                .pipe(takeUntil(this._unsubscribeAll))
                 .subscribe(()=>{
                     // set loading to false
                     this.isLoading = false;
@@ -420,22 +404,6 @@ export class LandingStoreComponent implements OnInit
         }
         // Mark for check
         this._changeDetectorRef.markForCheck();
-    }
-
-    displaySeeMore(productDescription){
-
-        var div = document.createElement("div")
-        div.innerHTML = productDescription
-        div.style.width ="15rem";
-        document.body.appendChild(div)
-
-        if (div.offsetHeight > 100) {
-            div.setAttribute("class","hidden")
-            return true;
-        } else {
-            div.setAttribute("class","hidden")
-            return false;
-        }
     }
 
     displayStoreLogo(storeAssets: StoreAssets[]) {

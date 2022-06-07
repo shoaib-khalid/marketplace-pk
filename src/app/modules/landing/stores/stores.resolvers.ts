@@ -40,9 +40,6 @@ export class StoresResolver implements Resolve<any>
     */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-
-        this.storeDomain = this._route.snapshot.paramMap.get('store-slug')   
-
         return this._storesService.getStoreByDomainName(route.paramMap.get('store-slug'))
             .pipe(
                 switchMap((store) => {

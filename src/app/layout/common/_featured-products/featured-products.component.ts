@@ -19,6 +19,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
     @Input() products: any;
     @Input() title: string = "Product";
     @Input() showViewAll: boolean = false;
+    @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -91,11 +92,20 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
 
     displayProductImage(product: any) {
         
     } 
+
+    viewAll(){
+        if (this.redirectURL) {
+            this._router.navigate(['/product/product-list'], {queryParams: this.redirectURL});
+        } else {
+            this._router.navigate(['/product/product-list']);
+        }
+    }
 }
+

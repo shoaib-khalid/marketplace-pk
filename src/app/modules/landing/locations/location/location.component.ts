@@ -151,7 +151,7 @@ export class LocationComponent implements OnInit
         this._locationService.parentCategoriesPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination) => { 
-                if (pagination) {                    
+                if (pagination) {       
                     this.categoriesViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check

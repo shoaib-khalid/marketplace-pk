@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
@@ -27,7 +27,8 @@ export class LandingCategoriesComponent implements OnInit
     pageOfItems: Array<any>;
 
     currentScreenSize: string[] = [];
-
+    categoryId: string;
+    locationId: string;
     ads: Ad[] = [];
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -42,6 +43,7 @@ export class LandingCategoriesComponent implements OnInit
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
+        private _activatedRoute: ActivatedRoute,
     )
     {
     }
@@ -59,10 +61,19 @@ export class LandingCategoriesComponent implements OnInit
                 if (platform) {
                     this.platform = platform;  
 
-                    // Get categories
-                    this._locationService.getParentCategories({pageSize: 10, regionCountryId: this.platform.country })
-                        .subscribe((category : ParentCategory[]) => {
+                    if (this.platform) {
+                
+                        // Get searches from url parameter 
+                        this._activatedRoute.queryParams.subscribe(params => {
+                            this.categoryId = params.categoryId ? params.categoryId : null;
+                            this.locationId = params.locationId ? params.locationId : null;
+        
+                            // Get featured stores
+                            this._locationService.getParentCategories({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId })
+                                .subscribe((category : ParentCategory[]) => {});
+        
                         });
+                    }
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -140,7 +151,7 @@ export class LandingCategoriesComponent implements OnInit
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._locationService.getParentCategories({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country})
+                this._locationService.getParentCategories({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, cityId: this.locationId})
                     .subscribe((response)=>{
                         // set loading to false
                         this.isLoading = false;

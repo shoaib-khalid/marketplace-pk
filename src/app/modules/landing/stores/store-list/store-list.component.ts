@@ -62,7 +62,6 @@ export class LandingStoresComponent implements OnInit
             this.platform = platform;          
             
             if (this.platform) {
-
                 
                 // Get searches from url parameter 
                 this._activatedRoute.queryParams.subscribe(params => {
@@ -74,7 +73,6 @@ export class LandingStoresComponent implements OnInit
                         .subscribe((stores : StoresDetails[]) => {});
 
                 });
-
             }
             
             this._changeDetectorRef.markForCheck();

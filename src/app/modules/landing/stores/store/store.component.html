@@ -39,47 +39,15 @@
                 </div>
             </div>
         </fuse-card>
+
         <!-- Store product list -->
+        
+
         <div class="flex flex-col md:flex-row justify-between w-full mt-2 sm:pt-2">
-            <!-- categories for xs view mobile -->
-            <div class="md:hidden w-full truncate pt-2">
-                <div class="flex flex-nowrap items-center overflow-x-scroll">
-                    <div class="flex flex-wrap items-center p-0.5">
-                        <input 
-                            [id]="'categories-btn-all-product'" 
-                            type="button" 
-                            class="w-0 h-0 invisible"
-                            (click)="changeCatalogue('')">
-                        <label
-                            class="font-bold p-2.5 rounded-full cursor-pointer"
-                            [ngClass]="{'bg-primary text-black' : !storeCategory,
-                                        'bg-gray-300 text-black' : storeCategory}"
-                            [for]="'categories-btn-all-product'"
-                        >
-                            <span class="">All Products</span>
-                        </label>
-                    </div>
-                    <div *ngFor="let category of storeCategories" class="justify-around pl-3">
-                        <input 
-                            [id]="'categories-btn' + category.id" 
-                            [value]="getCategorySlug(category.name)"
-                            type="button" 
-                            class="w-0 h-0 invisible"
-                            (click)="changeCatalogue($event.target.value, $event)">
-                        <label
-                            class="font-bold p-3 rounded-full cursor-pointer"
-                            [ngClass]="{
-                                        'bg-slate-300 text-black' : !storeCategory,
-                                        'bg-primary text-black' : (storeCategory && storeCategory.id === category.id),
-                                        'bg-gray-300 text-black' : (storeCategory && storeCategory.id !== category.id)      
-                                        }"
-                            [for]="'categories-btn' + category.id"
-                        >
-                            <span class="">{{category.name}}</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
+            <ng-container *ngIf="!currentScreenSize.includes('md')">
+                <store-categories-top class="w-full" [categories]="storeCategories" [category]="storeCategory" [store]="store"
+                    [catalogueSlug]="catalogueSlug"></store-categories-top>
+            </ng-container>
 
             <!-- Search & Filter -->
             <ng-container *ngIf="currentScreenSize.includes('md')">
@@ -98,85 +66,9 @@
                     </mat-form-field>
     
                     <!-- Filter -->
-                    <div class="flex flex-col mt-2 border border-gray-300 rounded-lg py-2 px-4 mb-4">
-                        <!-- Price -->
-                        <div class="flex flex-col">
-                            <!-- <div class="flex flex-row items-center justify-between w-full">
-                                <h3>Price</h3>
-                                <input
-                                    id="filter-product-button"
-                                    type="button"
-                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                                    mat-button>
-                                <label 
-                                    class="flex items-center justify-center h-10 px-1.5 cursor-pointer mr-2"
-                                    for="filter-product-button"
-                                    matRipple>
-                                    <mat-icon
-                                        class="icon-size-5"
-                                        [svgIcon]="'heroicons_outline:filter'"></mat-icon>
-                                </label>
-                            </div> -->
-                            <!-- Price Range Input -->
-                            <!-- <div class="flex flex-row w-full px-2 mt-2">
-                                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-1/2">
-                                    <input
-                                        matInput
-                                        [autocomplete]="'off'"
-                                        [placeholder]="'Min price'">
-                                </mat-form-field>
-                                <span class="p-2">-</span>
-                                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-1/2">
-                                    <input
-                                        matInput
-                                        [autocomplete]="'off'"
-                                        [placeholder]="'Max price'">
-                                </mat-form-field>
-                            </div> -->
-                        </div>
-                        <div class="flex flex-col">
-                            <div class="flex flex-row items-center justify-between cursor-pointer w-full"
-                                (click)="collapseCategory = !collapseCategory">
-                                <h3 class="font-semibold">Categories</h3>
-                                <input
-                                    id="collapse-category-button"
-                                    type="button"
-                                    (click)="collapseCategory = !collapseCategory"
-                                    class="h-0 w-0 opacity-0 invisible pointer-events-none"
-                                    mat-button>
-                                <label 
-                                    class="flex items-center justify-center cursor-pointer h-10"
-                                    for="collapse-category-button"
-                                    matRipple>
-                                    <mat-icon
-                                        class="icon-size-5 text-primary"
-                                        [svgIcon]="collapseCategory ? 'heroicons_outline:chevron-up' : 'heroicons_outline:chevron-down'"></mat-icon>
-                                </label>
-                            </div>
-                            <div @expandCollapse *ngIf="!collapseCategory">
-                                <div class="border-t w-full"></div>
-                                <mat-checkbox
-                                    [checked]="catalogueSlug === 'all-products' ? true : false"
-                                    value="all-products"
-                                    [disabled]="catalogueSlug === 'all-products' ? true : false"
-                                    (change)="changeCatalogue($event.source.value)"
-                                    class="flex items-center h-10 min-h-10 px-4"
-                                    [color]="'primary'">
-                                    All Products
-                                </mat-checkbox>
-                                <ng-container *ngFor="let category of storeCategories">
-                                    <mat-checkbox
-                                        [checked]="catalogueSlug === getCategorySlug(category.name) ? true : false"
-                                        [value]="getCategorySlug(category.name)"
-                                        [disabled]="catalogueSlug === getCategorySlug(category.name) ? true : false"
-                                        (change)="changeCatalogue($event.source.value)"
-                                        class="flex items-center h-10 min-h-10 px-4"
-                                        [color]="'primary'">
-                                        {{category.name}}
-                                    </mat-checkbox>
-                                </ng-container>
-                            </div>
-                        </div>
+                    <div class="flex flex-col mt-2 mb-4">
+                        <store-categories-side class="w-full" [categories]="storeCategories" [category]="storeCategory" [store]="store"
+                            [catalogueSlug]="catalogueSlug"></store-categories-side>
                     </div>
                 </div>
             </ng-container>
@@ -184,7 +76,7 @@
             <!-- Products -->
             <div class="flex flex-col md:flex-wrap relative w-full md:pl-4">
                 <!-- Sort -->
-                <div class="flex flex-row items-start justify-between md:justify-end mt-2 md:mt-0 md:mb-2 w-full pb-2 sm:pb-0">
+                <div class="flex flex-row items-start justify-between md:justify-end mt-1 md:mt-0 md:mb-2 w-full pb-2 sm:pb-0">
                     <mat-select
                         class="order-1 md:order-2 border border-gray-300 w-40 p-2 rounded text-sm"
                         placeholder="Sort by name"
@@ -246,14 +138,16 @@
                     <ng-container *ngIf="isLoading === false; else productLoading">
                         <store-products class="w-full" [products]="products" [productViewOrientation]="productViewOrientation" [store]="store"></store-products>
                         <!-- Pagination -->
-                        <div class="flex w-full mt-4 items-center justify-center">
-                            <pagination 
-                                [itemLength]="pagination.length" 
-                                [initialPage]="pagination.page + 1"
-                                [pageSize]="pagination.size"
-                                (changePage)="onChangePage($event)"
-                                #productPaginator></pagination>
-                        </div>
+                        <ng-container *ngIf="pagination">
+                            <div class="flex w-full mt-4 items-center justify-center">
+                                <pagination 
+                                    [itemLength]="pagination.length" 
+                                    [initialPage]="pagination.page + 1"
+                                    [pageSize]="pagination.size"
+                                    (changePage)="onChangePage($event)"
+                                    #productPaginator></pagination>
+                            </div>
+                        </ng-container>
                     </ng-container>
                 </ng-container>
 

@@ -92,7 +92,7 @@ export class _StoreProductsComponent implements OnInit, OnDestroy
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
     
