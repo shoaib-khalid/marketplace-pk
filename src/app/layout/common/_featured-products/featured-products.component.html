@@ -29,7 +29,9 @@
                         <span class="m-0.5 text-gray-400 line-clamp-1">{{product.productDetails.storeDetails.name}}</span>
                     </div>
                     <div class="flex flex-row items-end justify-between">
-                        <span class="line-through text-sm font-semibold">RM 19.44</span>
+                        <ng-container *ngIf="product.productDetails.productInventories[0].itemDiscount">
+                            <span class="line-through text-sm font-semibold">{{product.productDetails.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</span>
+                        </ng-container>
                         <span class="text-lg font-semibold">{{product.productDetails.productInventories[0].price | currency: platform.currency}}</span>
                     </div>
                 </div>

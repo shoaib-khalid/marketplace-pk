@@ -18,6 +18,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { LandingStoresComponent } from './store-list/store-list.component';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
+import { _StoreProductsModule } from 'app/layout/common/_store-products/store-products.module';
 
 @NgModule({
     declarations: [
@@ -40,7 +41,8 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
         NgxGalleryModule,
         _SearchModule,
         _FeaturedStoresModule,
-        FontAwesomeModule
+        FontAwesomeModule,
+        _StoreProductsModule
     ],
     exports     : [
         FontAwesomeModule,

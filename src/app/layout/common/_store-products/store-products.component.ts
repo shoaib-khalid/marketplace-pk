@@ -6,19 +6,20 @@ import { Platform } from 'app/core/platform/platform.types';
 import { DOCUMENT } from '@angular/common';
 import { StoreAssets } from 'app/core/store/store.types';
 import { ProductDetails } from 'app/core/location/location.types';
+import { Product } from 'app/core/product/product.types';
 
 @Component({
-    selector     : 'featured-products',
-    templateUrl  : './featured-products.component.html',
+    selector     : 'store-products',
+    templateUrl  : './store-products.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class _FeaturedProductsComponent implements OnInit, OnDestroy
+export class _StoreProductsComponent implements OnInit, OnDestroy
 {
 
     platform: Platform;
     @Input() products: any;
-    @Input() title: string = "Product";
-    @Input() showViewAll: boolean = false;
+    @Input() store: any;
+    @Input() productViewOrientation: string = "grid"; 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -44,7 +45,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void
-    {
+    {        
         this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform)=>{
@@ -94,8 +95,41 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
             return 'assets/branding/symplified/logo/symplified.png'
         }
     }
+    
+    isProductOutOfStock(product: Product): boolean
+    {
+        if (product.allowOutOfStockPurchases === true) {
+            return true;
+        } else {
+            if (product.productInventories.length > 0) {
+                let productInventoryQuantities = product.productInventories.map(item => item.quantity);
+                let totalProductInventoryQuantity = productInventoryQuantities.reduce((partialSum, a) => partialSum + a, 0);
+    
+                if (totalProductInventoryQuantity > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
 
-    displayProductImage(product: any) {
-        
-    } 
+    displaySeeMore(productDescription){
+
+        var div = document.createElement("div")
+        div.innerHTML = productDescription
+        div.style.width ="15rem";
+        document.body.appendChild(div)
+
+        if (div.offsetHeight > 100) {
+            div.setAttribute("class","hidden")
+            return true;
+        } else {
+            div.setAttribute("class","hidden")
+            return false;
+        }
+    }
+    
 }

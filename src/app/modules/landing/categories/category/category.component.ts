@@ -71,18 +71,18 @@ export class CategoryComponent implements OnInit
                 this.locationId = responseCategory.url.split("/")[3];
                 if (this.locationId) {
                     // Location is changed
-                    this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId})
+                    this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', cityId: this.locationId})
                         .subscribe((location : LandingLocation[]) => {                        
                         });
                 }
 
                 // Get featured stores
-                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                     .subscribe((stores : StoresDetails[]) => {
                     });
 
                 // Get featured products
-                this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                     .subscribe((products : ProductDetails[]) => {
                     });
             }
@@ -103,25 +103,25 @@ export class CategoryComponent implements OnInit
 
                     // Get location detail - this is when we pick one location    
                     if (this.locationId) {
-                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId })
+                        this._locationService.getFeaturedLocations({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, cityId: this.locationId })
                             .subscribe((location : LandingLocation[]) => {
                             });
                     }
 
                     // Get locations, if there already locations, dont calll                    
                     if (this.locations.length < 1) {
-                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country })
+                        this._locationService.getFeaturedLocations({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                             .subscribe((locations : LandingLocation[]) => {
                             });
                     }
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getFeaturedStores({pageSize: 5, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getFeaturedProducts({pageSize: 9, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }

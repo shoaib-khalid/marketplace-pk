@@ -70,7 +70,7 @@ export class LandingProductsComponent implements OnInit
                     this.locationId = params.locationId ? params.locationId : null;
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                    this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', cityId: this.locationId, parentCategoryId: this.categoryId })
                         .subscribe((products : ProductDetails[]) => {});
                 });
 
@@ -100,7 +100,7 @@ export class LandingProductsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.locationId, parentCategoryId: this.categoryId })
+                return this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', cityId: this.locationId, parentCategoryId: this.categoryId })
             }),
             map(() => {
                 // set loading to false
@@ -149,7 +149,7 @@ export class LandingProductsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                        return this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -170,7 +170,7 @@ export class LandingProductsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
+                this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

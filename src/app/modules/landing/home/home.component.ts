@@ -75,17 +75,17 @@ export class LandingHomeComponent implements OnInit
                         });
 
                     // Get locations
-                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country })
+                        this._locationService.getFeaturedLocations({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                             .subscribe((location : LandingLocation[]) => {
                             });
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 10, regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedStores({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: 10, regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }
@@ -218,7 +218,7 @@ export class LandingHomeComponent implements OnInit
                 merge(this._storesPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country});
+                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -234,7 +234,7 @@ export class LandingHomeComponent implements OnInit
                 merge(this._productsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country});
+                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -254,7 +254,7 @@ export class LandingHomeComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;
@@ -270,7 +270,7 @@ export class LandingHomeComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;

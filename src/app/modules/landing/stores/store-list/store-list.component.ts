@@ -70,7 +70,7 @@ export class LandingStoresComponent implements OnInit
                     this.locationId = params.locationId ? params.locationId : null;
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
+                    this._locationService.getFeaturedStores({pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, cityId: this.locationId })
                         .subscribe((stores : StoresDetails[]) => {});
 
                 });
@@ -112,7 +112,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getFeaturedStores({ pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                return this._locationService.getFeaturedStores({ pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, cityId: this.locationId });
             }),
             map(() => {
                 // set loading to false
@@ -161,7 +161,7 @@ export class LandingStoresComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                        return this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -182,7 +182,7 @@ export class LandingStoresComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
+                this._locationService.getFeaturedStores({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

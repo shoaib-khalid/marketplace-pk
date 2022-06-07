@@ -123,7 +123,7 @@ export class LandingLocationsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedLocations({pageSize:20 , regionCountryId: "MYS"});
+                        return this._locationService.getFeaturedLocations({pageSize:20 , sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: "MYS"});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -145,7 +145,7 @@ export class LandingLocationsComponent implements OnInit
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._locationService.getFeaturedLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize']})
+                this._locationService.getFeaturedLocations({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC'})
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;
