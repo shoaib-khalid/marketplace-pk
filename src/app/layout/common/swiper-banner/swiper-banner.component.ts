@@ -147,9 +147,9 @@ export class SwiperBannerComponent
     {
 
         this.banner = [
-            {display: "assets/images/example/order-now.png"},
-            {display: "assets/images/example/special-offer.png"},
-            {display: "assets/images/example/discount.png"},
+            // {display: "assets/images/example/order-now.png"},
+            // {display: "assets/images/example/special-offer.png"},
+            // {display: "assets/images/example/discount.png"},
         ] 
         
         if(this.banner.length > 0) {
@@ -161,8 +161,8 @@ export class SwiperBannerComponent
             });
         } 
         else {
-            this.galleryImages.push('https://symplified.biz/store-assets/banner-fnb.png')
-            this.mobileGalleryImages.push('https://symplified.biz/store-assets/banner-fnb.png') 
+            this.galleryImages.push('https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png')
+            this.mobileGalleryImages.push('https://symplified.it/store-assets/Landing-Page-Banner_304X224.png') 
         }
  
         this._fuseMediaWatcherService.onMediaChange$
