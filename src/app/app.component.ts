@@ -94,6 +94,16 @@ export class AppComponent
                             }
                         });
                     }
+
+                    // -----------------------
+                    // Create meta description for product
+                    // -----------------------
+
+                    const meta = document.createElement('meta');
+                    meta["property"] = 'og:title';
+                    meta.content = this.platform.name + " - Marketplace";
+                    document.head.appendChild(meta);
+
                 }
             });
     }
