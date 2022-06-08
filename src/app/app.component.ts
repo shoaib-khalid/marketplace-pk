@@ -100,7 +100,7 @@ export class AppComponent
                         [
                             { property: 'og:title', content: "Welcome to " + this.platform.name + " Marketplace" },
                             { property: 'og:description', content: "Order your food, beverages and daily essentials from our local heroes" },
-                            { property: 'og:description', content: this.platform.logo }
+                            { property: 'og:image', content: this.platform.logo }
                         ] as MetaDefinition[], true);
                 }
             });
