@@ -13,7 +13,6 @@ import { LayoutModule } from 'app/layout/layout.module';
 import { AppComponent } from 'app/app.component';
 import { appRoutes } from 'app/app.routing';
 import { AppConfig } from 'app/config/service.config';
-import { HeaderComponent } from './title.component';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -22,8 +21,7 @@ const routerConfig: ExtraOptions = {
 
 @NgModule({
     declarations: [
-        AppComponent,
-        HeaderComponent
+        AppComponent
     ],
     imports     : [
         BrowserModule,
@@ -45,8 +43,7 @@ const routerConfig: ExtraOptions = {
         MarkdownModule.forRoot({})
     ],
     bootstrap   : [
-        AppComponent,
-        HeaderComponent
+        AppComponent
     ],
     providers: [
         AppConfig,
