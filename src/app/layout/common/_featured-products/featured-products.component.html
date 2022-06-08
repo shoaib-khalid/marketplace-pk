@@ -37,8 +37,8 @@
         </div>
         <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
             <div class="flex flex-col">
-                <span class="m-0.5 text-lg font-semibold leading-3 line-clamp-1">{{product.name}}</span>
-                <span class="m-0.5 text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
+                <span class="text-lg font-semibold line-clamp-1">{{product.name}}</span>
+                <span class="text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
             </div>
             <div class="flex flex-row items-end justify-between">
                 <ng-container *ngIf="product.productInventories[0].itemDiscount">

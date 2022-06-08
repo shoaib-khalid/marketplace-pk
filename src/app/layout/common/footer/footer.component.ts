@@ -65,7 +65,7 @@ export class FooterComponent implements OnInit
             filter((event) => event instanceof NavigationEnd),
             distinctUntilChanged(),
         ).subscribe((response: NavigationEnd) => {
-            if (!response.url.includes("/stores/")) {
+            if (!response.url.includes("/store/")) {
                 this.store = null;
             }
             // Mark for check
