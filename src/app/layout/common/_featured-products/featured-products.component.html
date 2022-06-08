@@ -25,14 +25,15 @@
         (click)="redirectToProduct(product.seoUrl)"
         class="flex flex-col rounded-lg border border-gray-300 h-60 cursor-pointer filter-article">
         <div class="relative w-full">
-            <div *ngIf="!product.thumbnailUrl" class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black opacity-40">
-                <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
-                <span class="text-white opacity-100">Product image not available</span>
-            </div>
+            <ng-container *ngIf="!product.thumbnailUrl" >
+                <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black opacity-40 rounded-t-lg">
+                    <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                    <span class="text-white text-center opacity-100">Product image not available</span>
+                </div>
+            </ng-container>
             <img
-                class="object-cover h-30 rounded-t-lg shadow"
-                [src]="product.thumbnailUrl ? product.thumbnailUrl :
-                        product.storeCategory ? product.storeCategory.parentCategory.parentThumbnailUrl : platform.logo">
+                class="object-cover w-full h-30 rounded-t-lg shadow"
+                [src]="product.thumbnailUrl ? product.thumbnailUrl : (product.storeCategory ? product.storeCategory.parentCategory.parentThumbnailUrl : platform.logo)">
         </div>
         <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
             <div class="flex flex-col">

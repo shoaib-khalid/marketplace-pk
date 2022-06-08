@@ -34,9 +34,7 @@ export class AppComponent
         private _activatedRoute: ActivatedRoute,
     )
     {
-    }
 
-    ngOnInit() {
         console.log("navigator.userAgent", navigator.userAgent);
 
         // Subscribe to platform data
