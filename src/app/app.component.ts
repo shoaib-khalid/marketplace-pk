@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
@@ -33,7 +33,7 @@ export class AppComponent
         private _platformsService: PlatformService,
         private _cookieService: CookieService,
         private _activatedRoute: ActivatedRoute,
-
+        private _meta: Meta
     )
     {
     }
@@ -99,11 +99,11 @@ export class AppComponent
                     // Create meta description for product
                     // -----------------------
 
-                    const meta = document.createElement('meta') as HTMLMetaElement;
-                    meta.name = 'og:title';
-                    meta.content = this.platform.name + " - Marketplace";
-                    document.head.appendChild(meta);
-
+                    this._meta.addTags(
+                        [
+                            { property: 'og:title', content: "Welcome to " + this.platform.name + " Marketplace" },
+                            { property: 'og:description', content: "Order your food, beverages and daily essentials from our local heroes" }
+                        ] as MetaDefinition[], true);
                 }
             });
     }
