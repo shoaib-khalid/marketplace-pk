@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { CategoryPagination, ChildCategory, LandingLocation, LocationPagination, ParentCategory, ProductDetails, StoresDetails } from './location.types';
+import { CategoryPagination, ChildCategory, LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetails, StoresDetails } from './location.types';
 import { ProductPagination, StorePagination } from '../store/store.types';
 
 @Injectable({
@@ -81,6 +81,14 @@ export class LocationService
     }
 
     /**
+     * Getter for parentCategory
+     */
+    set parentCategory(value: ParentCategory)
+    {
+        this._parentCategory.next(value);
+    }
+
+    /**
      * Getter for parent categories
      */
     get parentCategories$(): Observable<ParentCategory[]>
@@ -124,7 +132,15 @@ export class LocationService
         return this._featuredLocation.asObservable();
     }
 
-     /**
+    /**
+     * Setter for location
+     */
+    set featuredLocation(value: LandingLocation)
+    {
+        this._featuredLocation.next(value);
+    }
+
+    /**
      * Getter for locationProducts pagination
      */
     get featuredLocationPagination$(): Observable<LocationPagination>
@@ -257,8 +273,8 @@ export class LocationService
         country?            : string, 
         stateId?            : string, 
         state?              : string, 
-        cityId?             : string, 
-        city?               : string, 
+        cityId?             : string | string[],
+        city?               : string,
         postcode?           : string,
         isDisplay?          : boolean
     } = {
@@ -288,7 +304,7 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -333,7 +349,7 @@ export class LocationService
         country?            : string, 
         stateId?            : string, 
         state?              : string, 
-        cityId?             : string, 
+        cityId?             : string | string[],
         city?               : string, 
         postcode?           : string,
         isDisplay?          : boolean
@@ -360,11 +376,11 @@ export class LocationService
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params: params
-        };
+        };        
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -373,7 +389,9 @@ export class LocationService
             .pipe(
                 switchMap(async (response:ProductDetails[]) => {
                                 
-                    this._logging.debug("Response from LocationService (getFeaturedProducts)", response);
+                    let city = params.cityId ? (" - " + params.cityId) : "";
+                    let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
+                    this._logging.debug("Response from LocationService (getFeaturedProducts)" + city + category, response);
 
                     let _pagination = {
                         length: response["data"].totalElements,
@@ -407,7 +425,7 @@ export class LocationService
         country?        : string, 
         stateId?        : string, 
         state?          : string, 
-        cityId?         : string, 
+        cityId?         : string | string[],
         city?           : string, 
         postcode?       : string
     } = {
@@ -434,10 +452,10 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
-        });
+        });        
 
         return this._httpClient.get<LandingLocation[]>(locationService + '/featured/location', header)
             .pipe(
@@ -513,7 +531,7 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -581,7 +599,7 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -616,7 +634,7 @@ export class LocationService
         country?            : string, 
         stateId?            : string, 
         state?              : string, 
-        cityId?             : string, 
+        cityId?             : string | string[],
         city?               : string, 
         postcode?           : string
     } = {
@@ -639,11 +657,11 @@ export class LocationService
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params: params
-        };
+        };        
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -656,9 +674,11 @@ export class LocationService
                 ),
                 switchMap(async (response: ParentCategory[]) => {
                                 
-                    this._logging.debug("Response from LocationService (getParentCategories)" + (params.parentCategoryId ? " - "  + params.parentCategoryId : ""), response);
+                    let city = params.cityId ? (" - " + params.cityId) : "";
+                    let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
+                    this._logging.debug("Response from LocationService (getParentCategories)" + city + (params.parentCategoryId ? " - "  + params.parentCategoryId : "") , response);
 
-                    if (params.parentCategoryId) {
+                    if (params.parentCategoryId) {                        
                         this._parentCategory.next(response["data"].content[0]);
                     } else {
                         let _pagination = {
@@ -721,7 +741,7 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
-            if (header.params[key] === null) {
+            if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
         });
@@ -737,6 +757,40 @@ export class LocationService
                     this._logging.debug("Response from LocationService (getChildCategories)", response);
 
                     this._childCategory.next(response["data"]);
+                    return response["data"];
+                })
+            );
+    }
+
+    getLocationArea(userLocationCityId: string, sortByCol: string = null, sortingOrder: 'ASC' | 'DESC' = 'ASC'): Observable<LocationArea[]>
+    {
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const headers = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                userLocationCityId,
+                sortByCol,
+                sortingOrder
+            }
+        };
+
+        // Delete empty value
+        Object.keys(headers.params).forEach(key => {
+            if (headers.params[key] === null) {
+                delete headers.params[key];
+            }
+        });
+
+        return this._httpClient.get<LocationArea[]>(locationService + '/location-area', headers)
+            .pipe(
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                map((response: LocationArea[]) => {
+                    this._logging.debug("Response from LocationService (getLocationArea)", response);
                     return response["data"];
                 })
             );

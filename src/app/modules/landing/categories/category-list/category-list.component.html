@@ -8,7 +8,7 @@
     <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-8 items-center w-full justify-between mt-2 sm:mt-4 md:mt-0">
         <ng-container *ngFor="let category of categories">
             <fuse-card class="bg-primary-50 flex flex-col h-28 sm:h-52 w-full group-hover:border items-center cursor-pointer"
-            (click)="chooseCategory(category.parentId)">
+            (click)="chooseCategory(category.parentId, locationId)">
                 <img
                     class="object-cover sm:object-fit h-20 sm:h-40"
                     [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">

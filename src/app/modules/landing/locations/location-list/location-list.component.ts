@@ -5,7 +5,7 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { LocationService } from 'app/core/location/location.service';
-import { LandingLocation, LocationPagination } from 'app/core/location/location.types';
+import { LandingLocation, LocationArea, LocationPagination } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -28,6 +28,8 @@ export class LandingLocationsComponent implements OnInit
     isLoading: boolean = false;
 
     currentScreenSize: string[] = [];
+    categoryId: string;
+    adjacentLocationIds: string[] = [];
     ads: Ad[] = [];
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -40,7 +42,8 @@ export class LandingLocationsComponent implements OnInit
         private _platformsService: PlatformService,
         private _locationService: LocationService,
         private _adsService: AdsService,
-        private _fuseMediaWatcherService: FuseMediaWatcherService
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _activatedRoute: ActivatedRoute
     )
     {
     }
@@ -51,11 +54,25 @@ export class LandingLocationsComponent implements OnInit
 
     ngOnInit(): void {
 
+        // Get searches from url parameter 
+        this._activatedRoute.queryParams.subscribe(params => {
+            this.categoryId = params.categoryId ? params.categoryId : null;
+        });
+
+
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => { 
                 if (platform) {
-                    this.platform = platform;  
+                    this.platform = platform;
+                    
+                    // This is when user directly open /location/location-list
+                    if (this.locations.length < 1){
+                        // Get all the available location
+                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC'})
+                            .subscribe((location : LandingLocation[]) => {                        
+                            });
+                    }
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

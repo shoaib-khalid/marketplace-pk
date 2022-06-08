@@ -21,18 +21,26 @@
                 <h2 *ngIf="category" class="text-lg text-white sm:text-xl">{{category.parentName}}</h2>
                 <div class="border-t w-40 border-white"></div>
                 <div class="max-w-2xl mt-2 sm:text-xl text-center text-secondary text-white">
-                    50 products
+                    <span>
+                        {{ featuredStoresPagination && featuredStoresPagination.length > 0 ? (featuredStoresPagination.length === 1 ? featuredStoresPagination.length + ' store' : featuredStoresPagination.length + ' stores') : '' }} 
+                    </span>
+                    <span >
+                        {{ featuredStoresPagination && featuredStoresPagination.length > 0 && featuredProductsPagination && featuredProductsPagination.length > 0 ? ',' : '' }}
+                    </span>
+                    <span>
+                        {{ featuredProductsPagination && featuredProductsPagination.length > 0 ? (featuredProductsPagination.length === 1 ? featuredProductsPagination.length + ' product' : featuredProductsPagination.length + ' products') : '' }} 
+                    </span>
                 </div>
             </div>
         </div>
         <!-- Content  -->
         <div class="flex flex-col bg-card w-full px-2 sm:px-4 h-full">
             <!-- Featured Categories -->
-            <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll" [location]="locationId" [redirectURL]="redirectUrl"></featured-categories>
+            <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Discover your favorites'"></featured-categories>
             <!-- Featured Products -->
-            <featured-products class="w-full" [products]="products" [showViewAll]="productsViewAll" [redirectURL]="redirectUrl"></featured-products>
+            <featured-products class="w-full" [products]="products" [showViewAll]="productsViewAll" [redirectURL]="redirectUrl" [title]="'Try our featured products'"></featured-products>
             <!-- Featured Stores -->
-            <featured-stores class="w-full" [stores]="stores" [showViewAll]="storesViewAll" [redirectURL]="redirectUrl"></featured-stores>
+            <featured-stores class="w-full" [stores]="stores" [showViewAll]="storesViewAll" [redirectURL]="redirectUrl" [title]="'Check out our featured merchants'"></featured-stores>
         </div>
     </div>
 </ng-container>

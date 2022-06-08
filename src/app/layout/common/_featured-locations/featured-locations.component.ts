@@ -19,6 +19,7 @@ export class _FeaturedLocationsComponent implements OnInit, OnDestroy
     @Input() category: any;
     @Input() title: string = "Locations";
     @Input() showViewAll: boolean = false;
+    @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -87,5 +88,13 @@ export class _FeaturedLocationsComponent implements OnInit, OnDestroy
     chooseStore(storeDomain:string) {
         let slug = storeDomain.split(".")[0]
         this._router.navigate(['/store/' + slug]);
+    }
+
+    viewAll(){
+        if (this.redirectURL) {
+            this._router.navigate(['/location/location-list'], {queryParams: this.redirectURL});
+        } else {
+            this._router.navigate(['/location/location-list']);
+        }
     }
 }

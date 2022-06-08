@@ -109,6 +109,12 @@ export interface RegionCountryState
     regionCountryId : string
 }
 
+export interface LocationArea
+{
+    storeCityId         : string;
+    userLocationCityId  : string;
+}
+
 // export interface ProductOnLocationPagination
 // {
 //     totalElements  : number;

@@ -56,9 +56,9 @@ export class FooterComponent implements OnInit
     ngOnInit(): void
     {
         this.marketplaceInfo = {
-            email: "hello@kalsym.com",
-            phonenumber: "+60312345565",
-            address: "First Subang, Unit S-14-09, Level 14, Jalan SS15/4G, 47500 Subang Jaya, Selangor"
+            email: "hello@deliverin.my",
+            phonenumber: "+60125033299",
+            address: "First Subang, Unit S-14-06, Level 14, Jalan SS15/4G, 47500 Subang Jaya, Selangor"
         };
 
         this._router.events.pipe(

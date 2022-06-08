@@ -4,7 +4,7 @@ import { LocationService } from 'app/core/location/location.service';
 import { ParentCategory, LandingLocation, StoresDetails, ProductDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StorePagination } from 'app/core/store/store.types';
+import { ProductPagination, StorePagination } from 'app/core/store/store.types';
 import { AppConfig } from 'app/config/service.config';
 import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 import { AdsService } from 'app/core/ads/ads.service';
@@ -35,7 +35,7 @@ export class LandingHomeComponent implements OnInit
     storesViewAll : boolean = false;
 
     featuredProducts: ProductDetails[] = [];
-    featuredProductsPagination: StorePagination;
+    featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     productsViewAll : boolean = false;
 
@@ -100,6 +100,17 @@ export class LandingHomeComponent implements OnInit
             .subscribe((locations) => {
                 if (locations) {
                     this.locations = locations;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get all locations
+        this._locationService.featuredLocationPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination) => {
+                if (pagination) {
+                    this.locationsViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

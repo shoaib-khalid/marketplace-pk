@@ -5,7 +5,7 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { LocationService } from 'app/core/location/location.service';
-import { CategoryPagination, ParentCategory } from 'app/core/location/location.types';
+import { CategoryPagination, LocationArea, ParentCategory } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
@@ -27,8 +27,8 @@ export class LandingCategoriesComponent implements OnInit
     pageOfItems: Array<any>;
 
     currentScreenSize: string[] = [];
-    categoryId: string;
     locationId: string;
+    adjacentLocationIds: string[] = [];
     ads: Ad[] = [];
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -43,7 +43,7 @@ export class LandingCategoriesComponent implements OnInit
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
-        private _activatedRoute: ActivatedRoute,
+        private _activatedRoute: ActivatedRoute
     )
     {
     }
@@ -60,20 +60,27 @@ export class LandingCategoriesComponent implements OnInit
             .subscribe((platform: Platform) => { 
                 if (platform) {
                     this.platform = platform;  
+        
+                    // Get searches from url parameter 
+                    this._activatedRoute.queryParams.subscribe(params => {
+                        this.locationId = params.locationId ? params.locationId : null;
 
-                    if (this.platform) {
-                
-                        // Get searches from url parameter 
-                        this._activatedRoute.queryParams.subscribe(params => {
-                            this.categoryId = params.categoryId ? params.categoryId : null;
-                            this.locationId = params.locationId ? params.locationId : null;
-        
-                            // Get featured stores
-                            this._locationService.getParentCategories({pageSize: 10, regionCountryId: this.platform.country, cityId: this.locationId })
-                                .subscribe((category : ParentCategory[]) => {});
-        
-                        });
-                    }
+                        // Get adjacent city first
+                        this._locationService.getLocationArea(this.locationId)
+                            .subscribe((response: LocationArea[]) => {
+                                this.adjacentLocationIds = [];
+                                this.adjacentLocationIds = response.map(item => {
+                                    return item.storeCityId;
+                                });
+
+                                // put the original this.locationId in the adjacentLocationIds
+                                this.adjacentLocationIds.unshift(this.locationId);
+    
+                                // Get featured stores
+                                this._locationService.getParentCategories({pageSize: 10, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds })
+                                    .subscribe((category : ParentCategory[]) => {});
+                            });
+                    });
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -133,14 +140,12 @@ export class LandingCategoriesComponent implements OnInit
     // @ Public Method
     // -----------------------------------------------------------------------------------------------------
     
-    chooseCategory(id) {
-        // let index = this.storeCategories.findIndex(item => item.id === id);
-        // if (index > -1) {
-        //     let slug = this.storeCategories[index].name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
-        // } else {
-        //     console.error("Invalid category: Category not found");
-        // }
-        this._router.navigate(['/category/' + id]);
+    chooseCategory(categoryId: string, locationId?: string) {
+        if (locationId) {
+            this._router.navigate(['/location/' + locationId + '/' + categoryId]);
+        } else {
+            this._router.navigate(['/category/' + categoryId]);
+        }
     }
 
     onChangePage(pageOfItems: Array<any>) {

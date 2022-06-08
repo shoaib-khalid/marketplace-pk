@@ -10,12 +10,12 @@
         </div>
     </div>
     <!-- Locations -->
-    <featured-locations class="w-full" [locations]="locations"></featured-locations>
+    <featured-locations class="w-full" [locations]="locations" [showViewAll]="locationsViewAll" [title]="'Explore these locations'"></featured-locations>
     <!-- Categories -->
-    <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll"></featured-categories>
+    <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll" [title]="'Discover your favorites'"></featured-categories>
     <!-- Featured Stores -->
     <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores class="w-full" [stores]="featuredStores" [title]="'Featured Stores'" [showViewAll]="storesViewAll"></featured-stores>
+        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="storesViewAll" [title]="'Check out our featured merchants'"></featured-stores>
         <!-- Pagination -->
         <ng-container *ngIf="featuredStoresPagination">
             <div class="flex w-full my-4 items-center justify-center">
@@ -30,7 +30,7 @@
     </ng-container>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products class="w-full" [products]="featuredProducts" [title]="'Featured Products'" [showViewAll]="productsViewAll"></featured-products>
+        <featured-products class="w-full" [products]="featuredProducts" [showViewAll]="productsViewAll" [title]="'Try our featured products'"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="featuredProductsPagination">
             <div class="flex w-full my-4 items-center justify-center">
