@@ -8,7 +8,7 @@
             matInput
             [formControl]="searchControl"
             [autocomplete]="'off'"
-            [placeholder]="'Search..'"
+            [placeholder]="'Search for your favorite food, categories or merchants e.g: ikan bakar'"
             [matAutocomplete]="matAutocomplete"
             (keypress)="onKeypress($event)"
             (keydown.enter)="goToSearch($event.target.value)">
