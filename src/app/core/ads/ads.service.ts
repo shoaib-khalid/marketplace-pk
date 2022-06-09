@@ -80,8 +80,8 @@ export class AdsService
                 this._logging.debug("Response from AdsService (Set)", response);
 
                 const ads = {
-                    bannerUrl: "assets/images/example/join_now.png",
-                    redirectUrl: "https://" + this._apiServer.settings.merchantPortalDomain + "/sign-up"
+                    bannerUrl: "https://symplified.biz/store-assets/Join-Us-Banner_1366X700.png",
+                    redirectUrl: "https://wa.me/60125033299"
                 };
                 this._ads.next([ads]);
 
