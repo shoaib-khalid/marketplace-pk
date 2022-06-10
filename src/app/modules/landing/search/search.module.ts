@@ -13,6 +13,8 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
 import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.module';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 
 @NgModule({
     declarations: [
@@ -30,7 +32,9 @@ import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.modul
         _FeaturedStoresModule,
         _FeaturedProductsModule,
         _AdsBannerModule,
-        SwiperBannerModule
+        SwiperBannerModule,
+        MatPaginatorModule,
+        PaginationModule
     ]
 })
 export class LandingSearchModule

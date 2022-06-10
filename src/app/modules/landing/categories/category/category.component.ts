@@ -103,9 +103,7 @@ export class CategoryComponent implements OnInit
                         });
 
                         // put the original this.locationId in the adjacentLocationIds
-                        if (this.adjacentLocationIds.length > 0) {
-                            this.adjacentLocationIds.unshift(this.locationId);
-                        }
+                        this.adjacentLocationIds.unshift(this.locationId);
 
                         this._locationService.getFeaturedLocations({pageSize: this.maxLocationsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds,  sortByCol: 'sequence', sortingOrder: 'ASC' })
                             .subscribe((locations : LandingLocation[]) => {});
@@ -151,9 +149,7 @@ export class CategoryComponent implements OnInit
                             });
 
                             // put the original this.locationId in the adjacentLocationIds
-                            if (this.adjacentLocationIds.length > 0) {
-                                this.adjacentLocationIds.unshift(this.locationId);
-                            }
+                            this.adjacentLocationIds.unshift(this.locationId);
 
                             this._locationService.getFeaturedLocations({pageSize: this.maxLocationsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds,  sortByCol: 'sequence', sortingOrder: 'ASC' })
                                 .subscribe((locations : LandingLocation[]) => {});

@@ -18,9 +18,12 @@ export class FooterComponent implements OnInit
 
     store: Store;
     marketplaceInfo: { phonenumber: string; email: string; address: string };
+    landingPage: boolean = true;
+    paymentLogos: string[] = [];
     
     public version: string = environment.appVersion;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    providerLogos: string[] = [];
 
     /**
      * Constructor
@@ -61,13 +64,42 @@ export class FooterComponent implements OnInit
             address: "First Subang, Unit S-14-06, Level 14, Jalan SS15/4G, 47500 Subang Jaya, Selangor"
         };
 
+        this.paymentLogos = [
+            'assets/images/logo/payments/tng-ewallet.png',
+            'assets/images/logo/payments/grabpay.png',
+            'assets/images/logo/payments/fpx.png',
+            'assets/images/logo/payments/visa-mastercard.png',
+            'assets/images/logo/payments/boost.png'
+        ]
+
+        this.providerLogos = [
+            'https://symplified.it/delivery-assets/provider-logo/borzo.png',
+            'https://symplified.it/delivery-assets/provider-logo/jnt.png',
+            'https://symplified.it/delivery-assets/provider-logo/lalamove.png',
+            'https://symplified.it/delivery-assets/provider-logo/pickupp.png',
+            'https://symplified.it/delivery-assets/provider-logo/tcs.png'
+        ]
+                
+        if ( this._router.url === '/' ) {
+            this.landingPage = true;
+        }
+        else this.landingPage = false;
+        
+
         this._router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
             distinctUntilChanged(),
         ).subscribe((response: NavigationEnd) => {
+            
             if (!response.url.includes("/store/")) {
                 this.store = null;
             }
+
+            if (response.url === '/') {
+                this.landingPage = true;
+                
+            } else this.landingPage = false;
+
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });
@@ -99,7 +131,12 @@ export class FooterComponent implements OnInit
 
     goToUrl(){
         const phonenumber = this.marketplaceInfo.phonenumber.replace(/[^0-9]/g, '');
-        this._document.location.href = "https://wa.me/" + phonenumber;
+        const message = encodeURI('Tell me more about joining Deliverin platform!')
+        this._document.location.href = "https://wa.me/" + phonenumber + '?text=' + message;
+    }
+
+    navigate(type: string) {
+        this._router.navigate(['/docs/legal/' + type]);
     }
     
 }

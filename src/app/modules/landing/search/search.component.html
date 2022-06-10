@@ -14,10 +14,32 @@
     <!-- Featured Stores -->
     <ng-container *ngIf="stores">
         <featured-stores class="w-full" [stores]="stores" [title]="'Stores'"></featured-stores>
+        <!-- Pagination -->
+        <ng-container *ngIf="storePagination">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="storePagination.length" 
+                    [initialPage]="storePagination.page + 1"
+                    [pageSize]="storePagination.size"
+                    (changePage)="onChangePage($event, 'store')"
+                    #storesPaginator></pagination>
+            </div>
+        </ng-container>
     </ng-container>
     <!-- Featured Products -->
     <ng-container *ngIf="products">
         <featured-products class="w-full" [products]="products" [title]="'Products'"></featured-products>
+        <!-- Pagination -->
+        <ng-container *ngIf="productPagination">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="productPagination.length" 
+                    [initialPage]="productPagination.page + 1"
+                    [pageSize]="productPagination.size"
+                    (changePage)="onChangePage($event, 'product')"
+                    #productsPaginator></pagination>
+            </div>
+        </ng-container>
     </ng-container>
     <!-- Ads Banner -->
     <ads-banner class="w-full" [banners]="ads"></ads-banner>

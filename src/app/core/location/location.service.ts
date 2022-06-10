@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { CategoryPagination, ChildCategory, LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetails, StoresDetails } from './location.types';
+import { CategoryPagination, ChildCategory, LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetailPagination, ProductDetails, StoresDetailPagination, StoresDetails } from './location.types';
 import { ProductPagination, StorePagination } from '../store/store.types';
 
 @Injectable({
@@ -14,7 +14,9 @@ import { ProductPagination, StorePagination } from '../store/store.types';
 export class LocationService
 {
     private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
+    private _storesDetailPagination: BehaviorSubject<StoresDetailPagination | null> = new BehaviorSubject(null);
     private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
+    private _productDetailPagination: BehaviorSubject<ProductDetailPagination | null> = new BehaviorSubject(null);
 
     // for featured location display
     private _featuredLocation: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
@@ -67,11 +69,26 @@ export class LocationService
     /**
      * Getter for parent categories
      */
+    get storesDetailPagination$(): Observable<StoresDetailPagination>
+    {
+    return this._storesDetailPagination.asObservable();
+    }
+
+    /**
+     * Getter for parent categories
+     */
     get productsDetails$(): Observable<ProductDetails[]>
     {
         return this._productsDetails.asObservable();
     }
 
+    /**
+     * Getter for parent categories
+     */
+    get productDetailPagination$(): Observable<ProductDetailPagination>
+    {
+    return this._productDetailPagination.asObservable();
+    }
     /**
      * Getter for parentCategory
      */
@@ -304,6 +321,10 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -380,6 +401,10 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -452,6 +477,9 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -494,6 +522,7 @@ export class LocationService
      */
     getStoresDetails(params: {
         storeName?      : string,
+        parentCategoryId?: string,
         page?           : number, 
         pageSize?       : number, 
         sortByCol?      : string, 
@@ -502,11 +531,12 @@ export class LocationService
         country?        : string, 
         stateId?        : string, 
         state?          : string, 
-        cityId?         : string, 
+        cityId?         : string | string[],
         city?           : string, 
         postcode?       : string
     } = {
         storeName       : null,
+        parentCategoryId: null,
         page            : 0, 
         pageSize        : 20, 
         sortByCol       : 'name', 
@@ -531,6 +561,9 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -545,7 +578,18 @@ export class LocationService
                                 
                     this._logging.debug("Response from LocationService (getStoresDetails)", response);
 
+                    let _pagination = {
+                        length: response["data"].totalElements,
+                        size: response["data"].size,
+                        page: response["data"].number,
+                        lastPage: response["data"].totalPages,
+                        startIndex: response["data"].pageable.offset,
+                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    }
+
                     this._storesDetails.next(response["data"].content);
+                    this._storesDetailPagination.next(_pagination);
+
                     return response["data"].content;
                 })
             );
@@ -558,6 +602,7 @@ export class LocationService
      */
     getProductsDetails(params: {
         name?           : string,
+        parentCategoryId?: string,
         storeName?      : string,
         page?           : number, 
         pageSize?       : number, 
@@ -567,12 +612,13 @@ export class LocationService
         country?        : string, 
         stateId?        : string, 
         state?          : string, 
-        cityId?         : string, 
+        cityId?         : string | string[],
         city?           : string, 
         postcode?       : string,
         status?         : string[]
     } = {
         name            : null,
+        parentCategoryId: null,
         storeName       : null,
         page            : 0, 
         pageSize        : 20, 
@@ -599,6 +645,9 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -613,6 +662,16 @@ export class LocationService
                                 
                     this._logging.debug("Response from LocationService (getProductsDetails)", response);
 
+                    let _pagination = {
+                        length: response["data"].totalElements,
+                        size: response["data"].size,
+                        page: response["data"].number,
+                        lastPage: response["data"].totalPages,
+                        startIndex: response["data"].pageable.offset,
+                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+                    }
+                    
+                    this._productDetailPagination.next(_pagination);
                     this._productsDetails.next(response["data"].content);
                     return response["data"].content;
                 })
@@ -661,6 +720,9 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }
@@ -741,6 +803,9 @@ export class LocationService
 
         // Delete empty value
         Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
             if (header.params[key] === null || header.params[key].length === 0) {
                 delete header.params[key];
             }

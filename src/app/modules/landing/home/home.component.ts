@@ -70,12 +70,12 @@ export class LandingHomeComponent implements OnInit
                     this.platform = platform;
 
                     // Get categories
-                    this._locationService.getParentCategories({pageSize: 8, regionCountryId: this.platform.country })
+                    this._locationService.getParentCategories({pageSize: 50, regionCountryId: this.platform.country })
                         .subscribe((category : ParentCategory[]) => {
                         });
 
                     // Get locations
-                        this._locationService.getFeaturedLocations({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                        this._locationService.getFeaturedLocations({pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                             .subscribe((location : LandingLocation[]) => {
                             });
 
@@ -168,8 +168,10 @@ export class LandingHomeComponent implements OnInit
             .subscribe((categories: ParentCategory[]) => {
                 if (categories) {
                     // to show only 8
-                    this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
-                    if (categories.length >= 8) this.categoriesViewAll = true;
+                    // this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
+                    // if (categories.length >= 8) this.categoriesViewAll = true;
+                    this.categories = categories;
+
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

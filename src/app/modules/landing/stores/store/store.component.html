@@ -4,7 +4,7 @@
         <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search> -->
         <search class="w-full" [storeId]="store.id" [store]="storeDetails"></search>
         <!-- Selected Store -->
-        <fuse-card class="flex flex-row h-28 sm:h-40 mt-4 md:mt-2 w-full border border-primary rounded-lg filter-article">
+        <fuse-card class="flex flex-row h-30 sm:h-40 mt-4 md:mt-2 w-full border border-primary rounded-lg filter-article">
             <div class="flex-0 w-30 sm:w-44 h-full">
                 <img
                     class="w-full h-full shadow object-cover"
@@ -20,7 +20,7 @@
                     <p class="flex flex-row text-black overflow-hidden text-ellipsis text-xs sm:text-sm md:text-base break-all line-clamp-2" [innerHTML]="store.storeDescription"></p>
                 </div>
                 
-                <div class="flex flex-col mt-2">
+                <div class="flex flex-col">
                     <!-- Contact  -->
                     <div class="flex flex-col sm:flex-row justify-between gap-x-2">
                         <div class="flex flex-row gap-x-1">
@@ -53,7 +53,7 @@
             <ng-container *ngIf="currentScreenSize.includes('md')">
                 <div class="flex flex-col lg:pr-6">
                     <!-- Search for large screen -->
-                    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
+                    <!-- <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
                         <mat-icon
                             class="icon-size-4 text-primary"
                             matPrefix
@@ -63,7 +63,7 @@
                             [formControl]="searchInputControl"
                             [autocomplete]="'off'"
                             [placeholder]="'Search products'">
-                    </mat-form-field>
+                    </mat-form-field> -->
     
                     <!-- Filter -->
                     <div class="flex flex-col mt-2 mb-4">

@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { ProductDetails, StoresDetails } from 'app/core/location/location.types';
+import { LocationArea, ProductDetailPagination, ProductDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -22,7 +22,7 @@ export class LandingProductsComponent implements OnInit
     @ViewChild("productsPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
    
-    pagination: StorePagination;
+    pagination: ProductDetailPagination;
     currentScreenSize: string[] = [];
     productViewOrientation: string = 'grid';
     searchInputControl: FormControl = new FormControl();
@@ -36,6 +36,7 @@ export class LandingProductsComponent implements OnInit
     categoryId: string;
     locationId: string;
     products: ProductDetails[];
+    adjacentLocationIds: string[] = [];
 
     /**
      * Constructor
@@ -69,9 +70,21 @@ export class LandingProductsComponent implements OnInit
                     this.categoryId = params.categoryId ? params.categoryId : null;
                     this.locationId = params.locationId ? params.locationId : null;
 
-                    // Get featured products
-                    this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', cityId: this.locationId, parentCategoryId: this.categoryId })
+                    // Get adjacent city first
+                    this._locationService.getLocationArea(this.locationId)
+                    .subscribe((response: LocationArea[]) => {
+                        this.adjacentLocationIds = [];
+                        this.adjacentLocationIds = response.map(item => {
+                            return item.storeCityId;
+                        });
+
+                        this.adjacentLocationIds.unshift(this.locationId);
+                
+                        // Get products
+                        this._locationService.getProductsDetails({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
                         .subscribe((products : ProductDetails[]) => {});
+                    });
+                    
                 });
 
             }
@@ -79,7 +92,7 @@ export class LandingProductsComponent implements OnInit
             this._changeDetectorRef.markForCheck();
 
         });
-        this._locationService.featuredProducts$
+        this._locationService.productsDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
                 if (products) {
@@ -87,6 +100,18 @@ export class LandingProductsComponent implements OnInit
                 }
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Get the product pagination
+        this._locationService.productDetailPagination$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((pagination: ProductDetailPagination) => {
+            
+            // Update the pagination
+            this.pagination = pagination;                   
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
@@ -100,7 +125,7 @@ export class LandingProductsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getFeaturedProducts({ pageSize: 25, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', cityId: this.locationId, parentCategoryId: this.categoryId })
+                return this._locationService.getProductsDetails({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
             }),
             map(() => {
                 // set loading to false
@@ -149,7 +174,7 @@ export class LandingProductsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId });
+                        return this._locationService.getProductsDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -170,7 +195,7 @@ export class LandingProductsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getFeaturedProducts({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.locationId })
+                this._locationService.getProductsDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds })
                     .subscribe(()=>{
                         // set loading to false
                         this.isLoading = false;

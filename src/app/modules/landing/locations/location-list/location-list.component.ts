@@ -69,7 +69,7 @@ export class LandingLocationsComponent implements OnInit
                     // This is when user directly open /location/location-list
                     if (this.locations.length < 1){
                         // Get all the available location
-                        this._locationService.getFeaturedLocations({pageSize: 10, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC'})
+                        this._locationService.getFeaturedLocations({pageSize: 50, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC'})
                             .subscribe((location : LandingLocation[]) => {                        
                             });
                     }

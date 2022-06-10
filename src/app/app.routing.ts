@@ -125,6 +125,16 @@ export const appRoutes: Route[] = [
             // {path: 'buyer', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
         ]
     },
+    // Documentation
+    {
+        path: 'docs',
+        children: [
+            // Changelog
+            // {path: 'changelog', loadChildren: () => import('app/modules/admin/docs/changelog/changelog.module').then(m => m.ChangelogModule)},
+            {path: 'legal', loadChildren: () => import('app/modules/admin/docs/legal/legal.module').then(m => m.LegalModule)}
+
+        ]
+    },
     {
         path: '**', redirectTo: ''
     }

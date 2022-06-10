@@ -36,11 +36,37 @@
         <!-- Content  -->
         <div class="flex flex-col bg-card w-full px-2 sm:px-4 h-full">
             <!-- Featured Categories -->
-            <featured-categories class="w-full" [categories]="categories" [showViewAll]="categoriesViewAll" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Discover your favorites'"></featured-categories>
+            <featured-categories class="w-full" [categories]="categories" [showViewAll]="false" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Categories'" [swiper]="true"></featured-categories>
             <!-- Featured Products -->
-            <featured-products class="w-full" [products]="products" [showViewAll]="productsViewAll" [redirectURL]="redirectUrl" [title]="'Try our featured products'"></featured-products>
+            <ng-container *ngIf="products && products.length">
+                <featured-products class="w-full" [products]="products" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Featured Products'"></featured-products>
+                <!-- Pagination -->
+                <ng-container *ngIf="featuredProductsPagination">
+                    <div class="flex w-full my-4 items-center justify-center">
+                        <pagination 
+                            [itemLength]="featuredProductsPagination.length" 
+                            [initialPage]="featuredProductsPagination.page + 1"
+                            [pageSize]="featuredProductsPagination.size"
+                            (changePage)="onChangePage($event, 'product')"
+                            #productsPaginator></pagination>
+                    </div>
+                </ng-container>
+            </ng-container>
             <!-- Featured Stores -->
-            <featured-stores class="w-full" [stores]="stores" [showViewAll]="storesViewAll" [redirectURL]="redirectUrl" [title]="'Check out our featured merchants'"></featured-stores>
+            <ng-container *ngIf="stores && stores.length">
+                <featured-stores class="w-full" [stores]="stores" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Featured Stores'"></featured-stores>
+                <!-- Pagination -->
+                <ng-container *ngIf="featuredStoresPagination">
+                    <div class="flex w-full my-4 items-center justify-center">
+                        <pagination 
+                            [itemLength]="featuredStoresPagination.length" 
+                            [initialPage]="featuredStoresPagination.page + 1"
+                            [pageSize]="featuredStoresPagination.size"
+                            (changePage)="onChangePage($event, 'store')"
+                            #storesPaginator></pagination>
+                    </div>
+                </ng-container>
+            </ng-container>
         </div>
     </div>
 </ng-container>

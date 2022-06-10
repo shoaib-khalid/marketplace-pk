@@ -57,7 +57,7 @@ SwiperCore.use([Pagination, Navigation, Autoplay]);
         }
 
         /* Pagination */
-        .swiper-pagination { 
+        :host ::ng-deep .swiper-pagination { 
             top: 88%;
             left: -30% !important;
             

@@ -1,12 +1,13 @@
-import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LocationService } from 'app/core/location/location.service';
 import { LandingLocation, LocationArea, ParentCategory, ProductDetails, StoreDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
 import { ProductPagination, StorePagination } from 'app/core/store/store.types';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
     selector     : 'location',
@@ -15,6 +16,9 @@ import { ProductPagination, StorePagination } from 'app/core/store/store.types';
 })
 export class LocationComponent implements OnInit
 {
+    @ViewChild("storesPaginator", {read: MatPaginator}) private _storesPaginator: MatPaginator;
+    @ViewChild("productsPaginator", {read: MatPaginator}) private _productsPaginator: MatPaginator;
+
 
     platform: Platform;
     
@@ -28,18 +32,22 @@ export class LocationComponent implements OnInit
     
     stores: StoresDetails[] = [];
     featuredStoresPagination: StorePagination;
-    
+    featuredStoresPageOfItems: Array<any>;
+
     products: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
+    featuredProductsPageOfItems: Array<any>;
     
     redirectUrl: { categoryId?: string, locationId?: string }
     storesViewAll: boolean = false;
     productsViewAll: boolean = false;
     categoriesViewAll: boolean = false;
 
-    maxStoresDisplay: number = 3;
-    maxProductsDisplay: number = 9;
-    maxCategoriesDisplay: number = 4;
+    maxStoresDisplay: number = 10;
+    maxProductsDisplay: number = 15;
+    maxCategoriesDisplay: number = 50;
+    
+    isLoading: boolean = false;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -94,11 +102,7 @@ export class LocationComponent implements OnInit
                         this.adjacentLocationIds = response.map(item => {
                             return item.storeCityId;
                         });
-
-                        if (this.adjacentLocationIds.length > 0) {
-                            this.adjacentLocationIds.unshift(this.locationId);
-                        }
-                
+                        this.adjacentLocationIds.unshift(this.locationId);
                         // Get Featured Stores
                         this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             .subscribe(()=>{});
@@ -138,10 +142,8 @@ export class LocationComponent implements OnInit
                             });
 
                             // put the original this.locationId in the adjacentLocationIds
-                            if (this.adjacentLocationIds.length > 0) {
-                                this.adjacentLocationIds.unshift(this.locationId);
-                            }
-        
+                            this.adjacentLocationIds.unshift(this.locationId);
+
                             // Get categories
                             this._locationService.getParentCategories({ pageSize: this.maxCategoriesDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds })
                                 .subscribe((category : ParentCategory[]) => {});
@@ -263,6 +265,85 @@ export class LocationComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+    }
+
+    /**
+    * After view init
+    */
+    ngAfterViewInit(): void
+    {
+        setTimeout(() => {
+            if (this._storesPaginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._storesPaginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+            if (this._productsPaginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._productsPaginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+        }, 0);
+    }
+  
+    onChangePage(pageOfItems: Array<any>, type: string) {
+        
+        // update current page of items
+        if (type === 'store') {
+            this.featuredStoresPageOfItems = pageOfItems;
+            if( this.featuredStoresPagination && this.featuredStoresPageOfItems['currentPage']) {
+                if (this.featuredStoresPageOfItems['currentPage'] - 1 !== this.featuredStoresPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
+        
+                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });
+                }
+            }        
+        }
+        if (type === 'product') {
+            // update current page of items
+            this.featuredProductsPageOfItems = pageOfItems;
+            if( this.featuredProductsPagination && this.featuredProductsPageOfItems['currentPage']) {
+                if (this.featuredProductsPageOfItems['currentPage'] - 1 !== this.featuredProductsPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
+        
+                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });
+                }
+            }
+        }
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 
     // -----------------------------------------------------------------------------------------------------

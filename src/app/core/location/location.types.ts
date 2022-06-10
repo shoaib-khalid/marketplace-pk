@@ -19,6 +19,16 @@ export interface StoresDetails
     regionCountryId : string;
 }
 
+export interface StoresDetailPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
+}
+
 export interface ParentCategory 
 {
     parentId            : string;
@@ -63,6 +73,15 @@ export interface ProductDetails
     status          : string;
     storeDetails    : StoreDetails;
     productInventories : ProductInventory[];
+}
+export interface ProductDetailPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
 }
 
 export interface ProductOnLocationPagination

@@ -15,6 +15,7 @@ export const landingRoutes: Route[] = [
             {path: 'location', loadChildren: () => import('app/modules/landing/locations/locations.module').then(m => m.LandingLocationsModule)},
             {path: 'store', loadChildren: () => import('app/modules/landing/stores/stores.module').then(m => m.LandingStoresModule)},
             {path: 'product', loadChildren: () => import('app/modules/landing/products/products.module').then(m => m.LandingProductsModule)},
+            // {path: 'legal', loadChildren: () => import('app/modules/admin/docs/legal/legal.module').then(m => m.LegalModule)}
         ]
     }
 ]; 

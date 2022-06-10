@@ -30,6 +30,8 @@ export class _SearchComponent implements OnInit, OnDestroy
     customer: User;
     custSearchResults: any[];
 
+    placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
+
     /**
      * Constructor
      */
@@ -56,6 +58,11 @@ export class _SearchComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+        if (this.store) {
+            this.placeholder = 'Search products'
+        }
+
         
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
