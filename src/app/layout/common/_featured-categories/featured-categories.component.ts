@@ -83,6 +83,7 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
     @Input() showViewAll: boolean = false;
     @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     @Input() swiper: boolean = true;
+    @Input() numberOfCols: number = 4;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

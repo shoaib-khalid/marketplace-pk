@@ -9,7 +9,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class LegalComponent implements OnInit
 {
-    docId: any;
+    docId: string;
+    
 
     /**
      * Constructor

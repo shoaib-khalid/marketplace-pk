@@ -33,14 +33,15 @@ export class LandingHomeComponent implements OnInit
     featuredStoresPagination: StorePagination;
     featuredStoresPageOfItems: Array<any>;
     storesViewAll : boolean = false;
+    featuredStorePageSize = 10;
 
     featuredProducts: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     productsViewAll : boolean = false;
+    featuredProductPageSize = 10;
 
     isLoading: boolean = false;
-
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
 
@@ -80,12 +81,12 @@ export class LandingHomeComponent implements OnInit
                             });
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedStores({pageSize: this.featuredStorePageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: 10, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }

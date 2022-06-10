@@ -3,7 +3,7 @@
     <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full sm:mt-4"></search> -->
     <search class="w-full sm:mt-4"></search>
     <!-- Featured Stores -->
-    <featured-stores class="w-full" [stores]="stores"></featured-stores>
+    <featured-stores class="w-full" [stores]="stores" [title]="'Stores'"></featured-stores>
     <!-- Pagination -->
     <ng-container *ngIf="pagination">
         <div class="flex w-full my-4 items-center justify-center">
