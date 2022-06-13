@@ -41,10 +41,12 @@
                 <span class="text-sm md:text-base text-gray-400 line-clamp-1">{{product.storeDetails.name}}</span>
             </div>
             <div class="flex flex-row items-end justify-between">
-                <ng-container *ngIf="product.productInventories[0].itemDiscount">
+                <ng-container *ngIf="product.productInventories[0] && product.productInventories[0].itemDiscount">
                     <span class="line-through text-sm font-semibold">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</span>
                 </ng-container>
-                <span class="text-lg font-semibold">{{product.productInventories[0].price | currency: platform.currency}}</span>
+                <ng-container *ngIf="product.productInventories[0]">
+                    <span class="text-lg font-semibold">{{product.productInventories[0].price | currency: platform.currency}}</span>
+                </ng-container>
             </div>
         </div>
     </fuse-card>

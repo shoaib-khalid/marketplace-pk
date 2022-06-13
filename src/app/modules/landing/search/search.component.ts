@@ -23,23 +23,24 @@ export class LandingSearchComponent implements OnInit
 
     platform    : Platform;
     locations   : LandingLocation[] = [];
-    stores      : StoresDetails[] = [];
-    products    : ProductDetails[] = [];
     categories  : ParentCategory[] = [];
-
+    
     searchValue: string;
-
+    
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
-
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    
+    stores      : StoresDetails[] = [];
     storePagination: StoresDetailPagination;
     storePageOfItems: Array<any>;
-
+    
+    products    : ProductDetails[] = [];
     productPagination: ProductDetailPagination;
     productPageOfItems: Array<any>;
-
+    
     isLoading: boolean;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -56,6 +57,9 @@ export class LandingSearchComponent implements OnInit
     }
 
     ngOnInit(): void {
+
+        this.storePagination = null;
+        this.productPagination = null;
 
         // Get platform
         this._platformsService.platform$
@@ -99,10 +103,10 @@ export class LandingSearchComponent implements OnInit
         this._locationService.storesDetailPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: StoresDetailPagination) => {
-                
-                // Update the pagination
-                this.storePagination = pagination;                   
-
+                if (pagination) {
+                    // Update the pagination
+                    this.storePagination = pagination;                   
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -122,10 +126,10 @@ export class LandingSearchComponent implements OnInit
         this._locationService.productDetailPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: ProductDetailPagination) => {
-
-                // Update the pagination
-                this.productPagination = pagination;                   
-
+                if (pagination) {
+                    // Update the pagination
+                    this.productPagination = pagination;                   
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

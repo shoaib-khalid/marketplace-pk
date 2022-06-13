@@ -7,6 +7,7 @@
     <ng-container *ngIf="pagination">
         <div class="flex w-full my-4 items-center justify-center">
             <pagination 
+                *ngIf="pagination.length > pagination.size"
                 [itemLength]="pagination.length" 
                 [initialPage]="pagination.page + 1"
                 [pageSize]="pagination.size"

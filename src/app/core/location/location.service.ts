@@ -13,27 +13,31 @@ import { ProductPagination, StorePagination } from '../store/store.types';
 })
 export class LocationService
 {
-    private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
-    private _storesDetailPagination: BehaviorSubject<StoresDetailPagination | null> = new BehaviorSubject(null);
-    private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
-    private _productDetailPagination: BehaviorSubject<ProductDetailPagination | null> = new BehaviorSubject(null);
 
-    // for featured location display
-    private _featuredLocation: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
-    private _featuredLocations: BehaviorSubject<LandingLocation[] | null> = new BehaviorSubject<LandingLocation[]>(null);
-    private _featuredLocationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
-
-    // for featured store display
+    // Featured Stores
     private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
     private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
     private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
 
-    // for featured product display
+    // Stores
+    private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
+    private _storesDetailPagination: BehaviorSubject<StoresDetailPagination | null> = new BehaviorSubject(null);
+
+    // Featured Products
     private _featuredProduct: BehaviorSubject<ProductDetails | null> = new BehaviorSubject(null);
     private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
     private _featuredProductPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
+
+    // Products
+    private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
+    private _productDetailPagination: BehaviorSubject<ProductDetailPagination | null> = new BehaviorSubject(null);
+
+    // Featured Location
+    private _featuredLocation: BehaviorSubject<LandingLocation | null> = new BehaviorSubject<LandingLocation>(null);
+    private _featuredLocations: BehaviorSubject<LandingLocation[] | null> = new BehaviorSubject<LandingLocation[]>(null);
+    private _featuredLocationPagination: BehaviorSubject<LocationPagination | null> = new BehaviorSubject(null);
     
-    // for featured category display
+    // Featured Category
     private _parentCategory: BehaviorSubject<ParentCategory | null> = new BehaviorSubject<ParentCategory>(null);
     private _parentCategories: BehaviorSubject<ParentCategory[] | null> = new BehaviorSubject<ParentCategory[]>(null);
     private _parentCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);

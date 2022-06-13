@@ -17,7 +17,7 @@
     <ng-container *ngIf="featuredStores && featuredStores.length">
         <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Stores'"></featured-stores>
         <!-- Pagination -->
-        <ng-container *ngIf="featuredStoresPagination.length > featuredStorePageSize">
+        <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
             <div class="flex w-full my-4 items-center justify-center">
                 <pagination 
                     [itemLength]="featuredStoresPagination.length" 
@@ -32,7 +32,7 @@
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
         <featured-products class="w-full" [products]="featuredProducts" [showViewAll]="false" [title]="'Featured Products'"></featured-products>
         <!-- Pagination -->
-        <ng-container *ngIf="featuredProductsPagination.length > featuredProductPageSize ">
+        <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductPageSize ">
             <div class="flex w-full my-4 items-center justify-center">
                 <pagination 
                     [itemLength]="featuredProductsPagination.length" 
