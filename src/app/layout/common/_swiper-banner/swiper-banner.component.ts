@@ -104,7 +104,7 @@ SwiperCore.use([Pagination, Navigation, Autoplay]);
 
     // styleUrls    : ['./category-carousel.component.scss'],
 })
-export class SwiperBannerComponent
+export class _SwiperBannerComponent
 {    
 
     @ViewChild(SwiperComponent) swiper: SwiperComponent;
