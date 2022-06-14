@@ -116,8 +116,6 @@ export class SwiperBannerComponent
     galleryImages: string[] = [];
     mobileGalleryImages: string[] = [];
     currentScreenSize: string[];
-    banner: { display: string; }[];
-
     
     /**
      * Constructor
@@ -146,24 +144,15 @@ export class SwiperBannerComponent
     ngOnInit(): void
     {
 
-        this.banner = [
-            // {display: "assets/images/example/order-now.png"},
-            // {display: "assets/images/example/special-offer.png"},
-            // {display: "assets/images/example/discount.png"},
-        ] 
+        this.galleryImages = [
+            'https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png',
+            'https://symplified.it/store-assets/20220614043143'
+        ];
         
-        if(this.banner.length > 0) {
-            this.galleryImages = [];
-            this.mobileGalleryImages = [];
-            this.banner.forEach(item => {
-                this.galleryImages.push(item.display);
-                this.mobileGalleryImages.push(item.display);
-            });
-        } 
-        else {
-            this.galleryImages.push('https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png')
-            this.mobileGalleryImages.push('https://symplified.it/store-assets/Landing-Page-Banner_304X224.png') 
-        }
+        this.mobileGalleryImages = [
+            'https://symplified.it/store-assets/Landing-Page-Banner_304X224.png',
+            'https://symplified.it/store-assets/20220614043216'
+        ];
  
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
