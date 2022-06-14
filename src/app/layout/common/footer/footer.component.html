@@ -153,9 +153,11 @@
                     </div>
                 </ng-container>
             </ng-template>
-            <div class="flex flex-wrap w-full justify-center pt-4">
-                <span class="text-sm font-medium text-secondary text-xs">SYMplified &copy; {{currentYear}} . Version-FNB01-001-{{version}}</span>
-            </div>
+            <ng-container *ngIf="platform">
+                <div class="flex flex-wrap w-full justify-center pt-4">
+                    <span class="text-sm font-medium text-secondary text-xs">{{platform.name}} &copy; {{currentYear}} . Version-FNB01-001-{{version}}</span>
+                </div>
+            </ng-container>
         </div>
     </div>
 </div>

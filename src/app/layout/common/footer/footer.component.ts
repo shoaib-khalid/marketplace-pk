@@ -5,6 +5,8 @@ import { StoresService } from 'app/core/store/store.service';
 import { Store } from 'app/core/store/store.types';
 import { NavigationEnd, Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 
 @Component({
     selector       : 'footer',
@@ -16,6 +18,7 @@ import { DOCUMENT } from '@angular/common';
 export class FooterComponent implements OnInit
 {
 
+    platform: Platform;
     store: Store;
     marketplaceInfo: { phonenumber: string; email: string; address: string };
     landingPage: boolean = true;
@@ -30,6 +33,7 @@ export class FooterComponent implements OnInit
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        private _platformService: PlatformService,
         private _storesService: StoresService,
         private _router: Router,
         private _changeDetectorRef: ChangeDetectorRef
@@ -58,6 +62,16 @@ export class FooterComponent implements OnInit
      */
     ngOnInit(): void
     {
+        this._platformService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         this.marketplaceInfo = {
             email: "hello@deliverin.my",
             phonenumber: "+60125033299",
@@ -77,7 +91,7 @@ export class FooterComponent implements OnInit
             'https://symplified.it/delivery-assets/provider-logo/jnt.png',
             'https://symplified.it/delivery-assets/provider-logo/lalamove.png',
             'https://symplified.it/delivery-assets/provider-logo/pickupp.png',
-            'https://symplified.it/delivery-assets/provider-logo/tcs.png'
+            // 'https://symplified.it/delivery-assets/provider-logo/tcs.png'
         ]
                 
         if ( this._router.url === '/' ) {

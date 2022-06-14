@@ -10,6 +10,8 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart } from 'app/core/cart/cart.types';
 import { JwtService } from 'app/core/jwt/jwt.service';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product, ProductPagination } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -47,6 +49,8 @@ import { StoreService } from './store.service';
 export class LandingStoreComponent implements OnInit
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    platform: Platform;
    
     storeDomain: string;
 
@@ -91,6 +95,7 @@ export class LandingStoreComponent implements OnInit
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        private _platformService: PlatformService,
         private _storesService: StoresService,
         private _productsService: ProductsService,
         private _storeService: StoreService,
@@ -113,6 +118,17 @@ export class LandingStoreComponent implements OnInit
     }
 
     ngOnInit(): void {
+
+        this._platformService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         this.storeDomain = this._route.snapshot.paramMap.get('store-slug');    
         
         this._storesService.store$
@@ -411,7 +427,7 @@ export class LandingStoreComponent implements OnInit
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
 

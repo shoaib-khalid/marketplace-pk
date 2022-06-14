@@ -8,6 +8,8 @@ import { CartService } from 'app/core/cart/cart.service';
 import { User } from 'app/core/user/user.types';
 import { Store } from 'app/core/store/store.types';
 import { DOCUMENT } from '@angular/common';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 
 
 
@@ -25,6 +27,7 @@ export class CartComponent implements OnInit, OnDestroy
     /* eslint-enable @typescript-eslint/naming-convention */
 
     @Input() showAvatar: boolean = true;
+    platform: Platform;
     cart: Cart;
     carts: Cart[] = [];
     totalCartItems: number = 0;
@@ -43,6 +46,7 @@ export class CartComponent implements OnInit, OnDestroy
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        private _platformService: PlatformService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
         private _cartService: CartService
@@ -59,6 +63,16 @@ export class CartComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+        this._platformService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         this._cartService.customerCarts$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -131,7 +145,7 @@ export class CartComponent implements OnInit, OnDestroy
         if (store.storeLogoUrl != null) {
             return store.storeLogoUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
     

@@ -354,13 +354,4 @@ export class _SearchComponent implements OnInit, OnDestroy
 
         
     }
-
-    displayStoreLogo(storeAssets: StoreAssets[]) {
-        let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
-        if (storeAssetsIndex > -1) {
-            return storeAssets[storeAssetsIndex].assetUrl;
-        } else {
-            return 'assets/branding/symplified/logo/symplified.png'
-        }
-    }
 }

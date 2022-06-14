@@ -8,6 +8,8 @@ import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gal
 import { take, of, switchMap, takeUntil, Subject } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { Platform } from 'app/core/platform/platform.types';
+import { PlatformService } from 'app/core/platform/platform.service';
 
 @Component({
     selector     : 'landing-product-details',
@@ -82,6 +84,7 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 })
 export class LandingProductDetailsComponent implements OnInit
 { 
+    platform: Platform;
     storeDomain: string;
 
     store: Store;
@@ -130,6 +133,7 @@ export class LandingProductDetailsComponent implements OnInit
     constructor(
         private _storesService: StoresService,
         private _productsService: ProductsService,
+        private _platformService: PlatformService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
         private _route: ActivatedRoute,
@@ -145,6 +149,16 @@ export class LandingProductDetailsComponent implements OnInit
     // -----------------------------------------------------------------------------------------------------
 
     ngOnInit() {
+
+        this._platformService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for change
+                this._changeDetectorRef.markForCheck();
+            });
 
         this.specialInstructionForm = this._formBuilder.group({
             specialInstructionValue     : ['']
@@ -690,7 +704,7 @@ export class LandingProductDetailsComponent implements OnInit
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
 

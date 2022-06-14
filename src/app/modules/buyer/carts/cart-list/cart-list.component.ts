@@ -221,7 +221,7 @@ export class CartListComponent implements OnInit, OnDestroy
         if (store.storeLogoUrl != null) {
             return store.storeLogoUrl;
         } else {
-            return 'assets/branding/symplified/logo/symplified.png'
+            return this.platform.logo;
         }
     }
     deleteCart(cartId: string) {
