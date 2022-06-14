@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -32,7 +32,8 @@ export class SharedBackgroundComponent implements OnInit
         private _authService: AuthService,
         private _formBuilder: FormBuilder,
         private _router: Router,
-        private _storesService:StoresService,
+        private _storesService: StoresService,
+        private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
 
     )
@@ -53,8 +54,11 @@ export class SharedBackgroundComponent implements OnInit
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => {
-                this.platform = platform;
-                
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
       
     }

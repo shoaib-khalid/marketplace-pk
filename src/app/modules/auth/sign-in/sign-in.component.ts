@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -67,6 +67,7 @@ export class AuthSignInComponent implements OnInit
         private _socialAuthService: SocialAuthService,
         private _platformsService: PlatformService,
         private _httpstatService: HttpStatService,
+        private _changeDetectorRef: ChangeDetectorRef,
         private _cartsService: CartService,
         private _appleLoginService: AppleLoginService
 
@@ -100,10 +101,12 @@ export class AuthSignInComponent implements OnInit
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => {
-                this.platform = platform;
-
-                this.countryCode = this.platform.country;
-
+                if (platform) {
+                    this.platform = platform;
+                    this.countryCode = this.platform.country;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
         });
 
         // We need to check first the location before we proceed to send the payload

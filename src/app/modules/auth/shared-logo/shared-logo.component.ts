@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -26,6 +26,7 @@ export class SharedLogoComponent implements OnInit
      * Constructor
      */
     constructor(
+        private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _router: Router,
     )
@@ -45,8 +46,11 @@ export class SharedLogoComponent implements OnInit
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform) => {
-                this.platform = platform;
-                
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
     }
 
