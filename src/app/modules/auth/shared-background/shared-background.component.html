@@ -1,5 +1,15 @@
 <!-- Background - @formatter:off -->
-<img class="absolute inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/image.png'" [alt]="">
+<ng-container *ngIf="pageType ==='signIn'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/signIn-page.png'" [alt]="">
+</ng-container>
+
+<ng-container *ngIf="pageType ==='signUp'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/signUp-page.png'" [alt]="">
+</ng-container>
+
+<ng-container *ngIf="pageType ==='forgotPassword'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/forgotPassword.png'" [alt]="">
+</ng-container>
 
 <!-- @formatter:on -->
 <!-- Content -->
