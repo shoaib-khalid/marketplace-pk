@@ -17,7 +17,7 @@ export const appRoutes: Route[] = [
         // canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'marketplace',
+            layout: 'fnb2',
             // roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -99,7 +99,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'marketplace',
+            layout: 'fnb2',
             roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -115,7 +115,7 @@ export const appRoutes: Route[] = [
     {
         path       : '',
         canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
+        canActivateChild: [AuthGuard], 
         component  : LayoutComponent,
         resolve    : {
             initialData: InitialDataResolver,

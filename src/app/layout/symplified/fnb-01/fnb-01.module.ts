@@ -16,14 +16,14 @@ import { ShortcutsModule } from 'app/layout/common/shortcuts/shortcuts.module';
 import { UserModule } from 'app/layout/common/user/user.module';
 import { CartModule } from 'app/layout/common/cart/cart.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { MarketplaceLayoutComponent } from 'app/layout/symplified/marketplace/marketplace.component';
 import { Error500Component } from 'app/shared/error-500/error-500.component';
 import { FooterModule } from 'app/layout/common/footer/footer.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
+import { Fnb01LayoutComponent } from './fnb-01.component';
 
 @NgModule({
     declarations: [
-        MarketplaceLayoutComponent,
+        Fnb01LayoutComponent,
         Error500Component
     ],
     imports     : [
@@ -48,9 +48,9 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
         SharedModule
     ],
     exports     : [
-        MarketplaceLayoutComponent
+        Fnb01LayoutComponent
     ]
 })
-export class MarketplaceLayoutModule
+export class Fnb01LayoutModule
 {
 }

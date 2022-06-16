@@ -1,0 +1,164 @@
+<!-- Loading bar -->
+<fuse-loading-bar></fuse-loading-bar>
+
+    <!-- Navigation -->
+    <ng-container *ngIf="isScreenSmall">
+        <fuse-vertical-navigation
+            class="dark bg-black print:hidden sticky-top-0"
+            [mode]="'over'"
+            [name]="'mainNavigation'"
+            [navigation]="navigation.default"
+            [opened]="user ? true : false">
+            <!-- Navigation header hook -->
+            <ng-container fuseVerticalNavigationContentHeader>
+                <div class="flex items-center w-full p-4 pl-6">
+                    <!-- Logo -->
+                    <ng-container *ngIf="platform">
+                        <div class="flex items-center justify-start">
+                            <img
+                                (click)="goToHome()"
+                                class="w-1/2 py-1 cursor-pointer"
+                                [src]="platform.logoDark">
+                        </div>
+                    </ng-container>
+                    <!-- Components -->
+                    <div class="flex items-center ml-auto">
+                        <user [showAvatar]="true"></user>
+                        <notifications></notifications>
+                    </div>
+                </div>
+                <!-- User -->
+                <ng-container *ngIf="user">
+                    <div class="flex flex-col items-center w-full p-4">
+                        <div class="relative w-24 h-24">
+                            <img
+                                class="w-full h-full rounded-full"
+                                *ngIf="user.avatar"
+                                [src]="user.avatar"
+                                alt="User avatar">
+                            <mat-icon
+                                class="icon-size-24"
+                                *ngIf="!user.avatar"
+                                [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                        </div>
+                    
+                        <div class="flex flex-col items-center justify-center w-full mt-6">
+                            <div class="w-full whitespace-nowrap text-ellipsis overflow-hidden text-center leading-normal font-medium">
+                                {{user.username}}
+                            </div>
+                            <div class="w-full mt-0.5 whitespace-nowrap text-ellipsis overflow-hidden text-center text-md leading-normal font-medium text-secondary">
+                                {{user.email}}
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>    
+            </ng-container>
+        </fuse-vertical-navigation>
+    </ng-container>
+
+<!-- Wrapper -->
+<div class="flex flex-col flex-auto w-full min-w-0 bg-card">
+
+    <!-- Header -->
+    <div class="md:relative flex flex-col flex-0 justify-center w-full h-auto overflow-hidden z-49 shadow dark:shadow-none print:hidden sticky top-0">
+        <!-- Top bar -->
+        <!-- <div class="relative dark flex flex-auto justify-center w-full px-4 md:px-8 lg:px-40 bg-black dark:bg-gray-900">
+            <div class="flex flex-row justify-between items-center w-full max-w-360 h-16 sm:h-20">
+
+                <ng-container *ngIf="isScreenSmall">
+                    <button
+                        mat-icon-button
+                        (click)="toggleNavigation('mainNavigation')">
+                        <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+                    </button>
+                </ng-container>
+
+                <fuse-horizontal-navigation
+                class="-mx-4"
+                [name]="'mainNavigation'"
+                [navigation]="navigation.horizontal"></fuse-horizontal-navigation>
+
+                <languages></languages>
+                
+            </div>
+        </div> -->
+        <!-- Bottom bar -->
+        <div class="flex flex-auto justify-center items-center lg:px-40 bg-card z-40 dark:bg-gray-700">
+            <div class="relative flex items-center justify-between w-full h-16">
+                <!-- Logo -->
+                <ng-container *ngIf="platform">
+                    <div class="flex items-center">
+                        <img
+                            (click)="goToHome()"
+                            class="w-36 cursor-pointer"
+                            [src]="platform.logo"
+                            alt="Logo image">
+                        <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
+                    </div>
+                </ng-container>
+                <search class="w-full hidden sm:block"></search>
+                <div class="flex items-center flex-row">
+
+                    <button class="sm:hidden" mat-icon-button (click)="open()">
+                        <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:search'"></mat-icon>
+                    </button>
+
+                    <notifications></notifications>
+
+                    <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span>
+
+                    <!-- cart -->
+                    <cart class="mr-0 sm:mr-2"></cart>
+
+                    <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span>
+
+                    <!-- Components -->
+                    <div class="flex w-full items-center">
+                        <!-- <search [appearance]="'bar'"></search> -->
+                        <user></user>
+                        <ng-container *ngIf="!isScreenSmall">
+                            <div class="ml-4 text-medium font-medium leading-5 truncate">
+                                {{displayUsername}}
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <!-- <search *ngIf="currentScreenSize.includes('md')" class="w-full"></search> -->
+        </div>
+        <div class="flex flex-auto w-full bg-primary z-30">
+            <div class="w-full flex flex-row justify-center items-center">
+                <span class="text-white"><&nbsp;</span>
+                <span class="text-white font-semibold">Up to 70% Off.</span>
+                <span class="text-white underline">&nbsp; Shop our latest sale styles</span>
+                <span class="text-white">&nbsp;></span>
+            </div>
+        </div>
+        <div class="sm:hidden w-full flex flex-auto items-center px-2 pb-2 z-20 bg-teal-300"
+            *ngIf="opened" 
+            @expandCollapse
+            >
+            <search class=" w-full"></search>
+            <button
+                class="flex items-center mt-2"
+                mat-icon-button
+                (click)="close()">
+                <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+        </div>
+        
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col flex-auto lg:px-40">
+        <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
+             Otherwise, layout changes won't be registered and the view won't be updated! -->
+        <router-outlet *ngIf="true"></router-outlet>
+    </div>
+
+    <!-- Footer -->
+    <footer [footerType]="'footer-02'" class="w-full"></footer>
+</div>
+
+<!-- Quick chat -->
+<!-- <quick-chat #quickChat="quickChat"></quick-chat> -->

@@ -1,144 +1,44 @@
-<div class="flex flex-col items-center w-full max-h-80 bg-black">
-    <div class="flex flex-col h-full items-center w-full max-w-280">
-        <div class="flex flex-col w-full items-center px-2 sm:px-5 mb-2 text-white">
-            <!-- <img
-                class="w-20 sm:w-30 sm:h-30 lg:h-40 lg:w-40 h-20  my-1.5 rounded-full"
-                [src]="displayStoreLogo(store.storeAssets)"
-                alt="Logo image"> -->
-            <div class="w-full border-t mt-4 sm:mt-12 border-gray-600"></div>
-            <ng-container *ngIf="store; else marketplaceFooter">
-                <div class="flex flex-col md:flex-row w-full justify-between">
-                    <!-- this is a hack [ngClass]="store.displayAddress ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'" -->
-                    <div class="flex flex-col sm:flex-row w-full md:justify-between"
-                        [ngClass]="store.displayAddress ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'">
-                        <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2">
-                            <span class="w-1/2 sm:w-auto md:min-w-20 text-gray-400 pr-1">Contact Us:</span>  
-                            <span class="w-1/2 flex sm:w-auto flex-auto text-primary-400 items-center justify-end sm:justify-start">
-                                <mat-icon 
-                                    class="icon-size-4 text-primary-400"
-                                    [svgIcon]="'heroicons_solid:phone'"></mat-icon>
-                                &nbsp;
-                                {{ store.phoneNumber}}
-                            </span>
-                        </div>
-                        <!-- this is a hack [ngClass]="store.displayAddress ? 'md:w-full' : 'md:w-1/2'"  -->
-                        <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2"
-                            [ngClass]="store.displayAddress ? 'md:w-full' : 'md:w-auto'">
-                            <span 
-                                class="w-1/4 sm:w-auto text-gray-400 pr-1"
-                                [ngClass]="store.displayAddress ? 'md:min-w-20' : 'md:min-w-[46px]'"
-                                >Email:</span>  
-                            <span class="w-3/4 md:w-full flex flex-auto text-primary-400 items-center justify-end sm:justify-start">
-                                <mat-icon 
-                                    class="icon-size-4 text-primary-400"
-                                    [svgIcon]="'mat_solid:email'"></mat-icon>
-                                &nbsp;
-                                {{ store.email}}
-                            </span>
-                        </div>
-                    </div>
-                    <div *ngIf="store.displayAddress" class="flex flex-row pt-2 text-md flex-wrap w-full md:w-1/2 justify-between sm:justify-start md:justify-end  items-start">
-                        <span class="min-w-20 text-gray-400">Location:</span>  
-                        <div class="flex flex-row max-w-2/3">
-                            <mat-icon 
-                                class="icon-size-5 text-primary-400"
-                                [svgIcon]="'mat_solid:location_on'"></mat-icon>
-                            &nbsp;
-                            <span class="flex text-primary-400 text-right md:text-left items-end content-end justify-end sm:justify-start">
-                                {{ store.displayAddress }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
-            <ng-template #marketplaceFooter>
-                <ng-container *ngIf="landingPage">
-                    <div class="flex flex-row justify-between w-full pt-2 gap-4 md:gap-2">
-                        <!-- Payment & delivery -->
-                        <div class="flex flex-col w-1/2 md:w-3/5 text-primary-400 gap-3">
-                            <!-- Payment methods  -->
-                            <div>
-                                <span>Payment Methods</span>
-                                <div class="flex flex-row flex-wrap gap-2 mt-2">
-                                    <ng-container *ngFor="let logo of paymentLogos">
-                                        <div class="flex items-center justify-center w-8 bg-white rounded p-1">
-                                            <img
-                                                class="w-full"
-                                                [src]="logo">
-                                        </div>
-                                    </ng-container>
-                                </div>
-                            </div>
-                            <!-- Delivery partners -->
-                            <div>
-                                <span>Delivery Partners</span>
-                                <div class="flex flex-row flex-wrap gap-2 mt-2">
-                                    <ng-container *ngFor="let logo of providerLogos">
-                                        <div class="flex items-center justify-center w-10 bg-white rounded p-1">
-                                            <img
-                                                class="w-full"
-                                                [src]="logo">
-                                        </div>
-                                    </ng-container>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Info  -->
-                        <div class="flex flex-col md:flex-row gap-2 w-1/2 md:w-2/5">
-                            <!-- Address  -->
-                            <div class="flex flex-col justify-between gap-y-2 text-primary-400 w-full md:w-3/5">
-                                <span>Address</span>
-                                <span class="font-light text-sm">{{ marketplaceInfo.address }}</span>
-                                <div class="flex flex-col sm:flex-row gap-1 md:gap-2 tracking-tight">
-                                    <span class="font-light text-sm">{{ marketplaceInfo.email }}</span>
-                                    <span class="hidden sm:block font-light text-sm">|</span>
-                                    <span (click)="goToUrl()" class="font-light text-sm cursor-pointer">{{ marketplaceInfo.phonenumber }}</span>
-                                </div>
-                            </div>
-                            <!-- <div class="border-l border-primary-400"></div> -->
-                            <!-- Legal -->
-                            <div class="flex flex-col justify-between gap-y-2 text-primary-400 w-full md:w-2/5">
-                                <span>Legal</span>
-                                <span (click)="navigate('privacy-policy')" class="font-light text-sm cursor-pointer">Privacy Policy</span>
-                                <span (click)="navigate('refund-policy')" class="font-light text-sm cursor-pointer">Refund Policy</span>
-                                <span (click)="navigate('terms-conditions')" class="font-light text-sm cursor-pointer">Terms & Conditions</span>
-                            </div>
-                        </div>
-                    </div>
-                </ng-container>
-                <ng-container *ngIf="!landingPage">
+<ng-container *ngIf="footerType ==='footer-01'">
+    <div class="flex flex-col items-center w-full max-h-80 bg-black">
+        <div class="flex flex-col h-full items-center w-full max-w-280">
+            <div class="flex flex-col w-full items-center px-2 sm:px-5 mb-2 text-white">
+                <!-- <img
+                    class="w-20 sm:w-30 sm:h-30 lg:h-40 lg:w-40 h-20  my-1.5 rounded-full"
+                    [src]="displayStoreLogo(store.storeAssets)"
+                    alt="Logo image"> -->
+                <div class="w-full border-t mt-4 sm:mt-12 border-gray-600"></div>
+                <ng-container *ngIf="store; else marketplaceFooter">
                     <div class="flex flex-col md:flex-row w-full justify-between">
+                        <!-- this is a hack [ngClass]="store.displayAddress ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'" -->
                         <div class="flex flex-col sm:flex-row w-full md:justify-between"
-                            [ngClass]="marketplaceInfo.address ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'">
-                            <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2 cursor-pointer"
-                                (click)="goToUrl()"
-                            >
+                            [ngClass]="store.displayAddress ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'">
+                            <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2">
                                 <span class="w-1/2 sm:w-auto md:min-w-20 text-gray-400 pr-1">Contact Us:</span>  
                                 <span class="w-1/2 flex sm:w-auto flex-auto text-primary-400 items-center justify-end sm:justify-start">
                                     <mat-icon 
                                         class="icon-size-4 text-primary-400"
                                         [svgIcon]="'heroicons_solid:phone'"></mat-icon>
                                     &nbsp;
-                                    {{ marketplaceInfo.phonenumber}}
+                                    {{ store.phoneNumber}}
                                 </span>
                             </div>
+                            <!-- this is a hack [ngClass]="store.displayAddress ? 'md:w-full' : 'md:w-1/2'"  -->
                             <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2"
-                                [ngClass]="marketplaceInfo.address ? 'md:w-full' : 'md:w-auto'">
+                                [ngClass]="store.displayAddress ? 'md:w-full' : 'md:w-auto'">
                                 <span 
                                     class="w-1/4 sm:w-auto text-gray-400 pr-1"
-                                    [ngClass]="marketplaceInfo.address ? 'md:min-w-20' : 'md:min-w-[46px]'"
+                                    [ngClass]="store.displayAddress ? 'md:min-w-20' : 'md:min-w-[46px]'"
                                     >Email:</span>  
                                 <span class="w-3/4 md:w-full flex flex-auto text-primary-400 items-center justify-end sm:justify-start">
                                     <mat-icon 
                                         class="icon-size-4 text-primary-400"
                                         [svgIcon]="'mat_solid:email'"></mat-icon>
                                     &nbsp;
-                                    {{ marketplaceInfo.email}}
+                                    {{ store.email}}
                                 </span>
                             </div>
                         </div>
-                        <div *ngIf="marketplaceInfo.address" class="flex flex-row pt-2 text-md flex-wrap w-full md:w-1/2 justify-between sm:justify-start md:justify-end items-start">
+                        <div *ngIf="store.displayAddress" class="flex flex-row pt-2 text-md flex-wrap w-full md:w-1/2 justify-between sm:justify-start md:justify-end  items-start">
                             <span class="min-w-20 text-gray-400">Location:</span>  
                             <div class="flex flex-row max-w-2/3">
                                 <mat-icon 
@@ -146,18 +46,202 @@
                                     [svgIcon]="'mat_solid:location_on'"></mat-icon>
                                 &nbsp;
                                 <span class="flex text-primary-400 text-right md:text-left items-end content-end justify-end sm:justify-start">
-                                    {{ marketplaceInfo.address }}
+                                    {{ store.displayAddress }}
                                 </span>
                             </div>
                         </div>
                     </div>
                 </ng-container>
-            </ng-template>
-            <ng-container *ngIf="platform">
-                <div class="flex flex-wrap w-full justify-center pt-4">
-                    <span class="text-sm font-medium text-secondary text-xs">{{platform.name}} &copy; {{currentYear}} . Version-FNB01-001-{{version}}</span>
-                </div>
-            </ng-container>
+                <ng-template #marketplaceFooter>
+                    <ng-container *ngIf="landingPage">
+                        <div class="flex flex-row justify-between w-full pt-2 gap-4 md:gap-2">
+                            <!-- Payment & delivery -->
+                            <div class="flex flex-col w-1/2 md:w-3/5 text-primary-400 gap-3">
+                                <!-- Payment methods  -->
+                                <div>
+                                    <span>Payment Methods</span>
+                                    <div class="flex flex-row flex-wrap gap-2 mt-2">
+                                        <ng-container *ngFor="let logo of paymentLogos">
+                                            <div class="flex items-center justify-center w-8 bg-white rounded p-1">
+                                                <img
+                                                    class="w-full"
+                                                    [src]="logo">
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <!-- Delivery partners -->
+                                <div>
+                                    <span>Delivery Partners</span>
+                                    <div class="flex flex-row flex-wrap gap-2 mt-2">
+                                        <ng-container *ngFor="let logo of providerLogos">
+                                            <div class="flex items-center justify-center w-10 bg-white rounded p-1">
+                                                <img
+                                                    class="w-full"
+                                                    [src]="logo">
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Info  -->
+                            <div class="flex flex-col md:flex-row gap-2 w-1/2 md:w-2/5">
+                                <!-- Address  -->
+                                <div class="flex flex-col justify-between gap-y-2 text-primary-400 w-full md:w-3/5">
+                                    <span>Address</span>
+                                    <span class="font-light text-sm">{{ marketplaceInfo.address }}</span>
+                                    <div class="flex flex-col sm:flex-row gap-1 md:gap-2 tracking-tight">
+                                        <span class="font-light text-sm">{{ marketplaceInfo.email }}</span>
+                                        <span class="hidden sm:block font-light text-sm">|</span>
+                                        <span (click)="goToUrl()" class="font-light text-sm cursor-pointer">{{ marketplaceInfo.phonenumber }}</span>
+                                    </div>
+                                </div>
+                                <!-- <div class="border-l border-primary-400"></div> -->
+                                <!-- Legal -->
+                                <div class="flex flex-col justify-between gap-y-2 text-primary-400 w-full md:w-2/5">
+                                    <span>Legal</span>
+                                    <span (click)="navigate('privacy-policy')" class="font-light text-sm cursor-pointer">Privacy Policy</span>
+                                    <span (click)="navigate('refund-policy')" class="font-light text-sm cursor-pointer">Refund Policy</span>
+                                    <span (click)="navigate('terms-conditions')" class="font-light text-sm cursor-pointer">Terms & Conditions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!landingPage">
+                        <div class="flex flex-col md:flex-row w-full justify-between">
+                            <div class="flex flex-col sm:flex-row w-full md:justify-between"
+                                [ngClass]="marketplaceInfo.address ? 'md:flex-col md:w-1/2' : 'md:flex-row md:w-full'">
+                                <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2 cursor-pointer"
+                                    (click)="goToUrl()"
+                                >
+                                    <span class="w-1/2 sm:w-auto md:min-w-20 text-gray-400 pr-1">Contact Us:</span>  
+                                    <span class="w-1/2 flex sm:w-auto flex-auto text-primary-400 items-center justify-end sm:justify-start">
+                                        <mat-icon 
+                                            class="icon-size-4 text-primary-400"
+                                            [svgIcon]="'heroicons_solid:phone'"></mat-icon>
+                                        &nbsp;
+                                        {{ marketplaceInfo.phonenumber}}
+                                    </span>
+                                </div>
+                                <div class="flex flex-row items-center justify-between w-full sm:w-1/2 text-md text-white pt-2"
+                                    [ngClass]="marketplaceInfo.address ? 'md:w-full' : 'md:w-auto'">
+                                    <span 
+                                        class="w-1/4 sm:w-auto text-gray-400 pr-1"
+                                        [ngClass]="marketplaceInfo.address ? 'md:min-w-20' : 'md:min-w-[46px]'"
+                                        >Email:</span>  
+                                    <span class="w-3/4 md:w-full flex flex-auto text-primary-400 items-center justify-end sm:justify-start">
+                                        <mat-icon 
+                                            class="icon-size-4 text-primary-400"
+                                            [svgIcon]="'mat_solid:email'"></mat-icon>
+                                        &nbsp;
+                                        {{ marketplaceInfo.email}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div *ngIf="marketplaceInfo.address" class="flex flex-row pt-2 text-md flex-wrap w-full md:w-1/2 justify-between sm:justify-start md:justify-end items-start">
+                                <span class="min-w-20 text-gray-400">Location:</span>  
+                                <div class="flex flex-row max-w-2/3">
+                                    <mat-icon 
+                                        class="icon-size-5 text-primary-400"
+                                        [svgIcon]="'mat_solid:location_on'"></mat-icon>
+                                    &nbsp;
+                                    <span class="flex text-primary-400 text-right md:text-left items-end content-end justify-end sm:justify-start">
+                                        {{ marketplaceInfo.address }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-template>
+                <ng-container *ngIf="platform">
+                    <div class="flex flex-wrap w-full justify-center pt-4">
+                        <span class="font-medium text-secondary text-xs">{{platform.name}} &copy; {{currentYear}} . Version-FNB01-001-{{version}}</span>
+                    </div>
+                </ng-container>
+            </div>
         </div>
     </div>
-</div>
+</ng-container>
+
+<ng-container *ngIf="footerType ==='footer-02'">
+    <div class="w-full max-h-100 px-10 py-4 bg-primary justify-center">
+        <div class="flex flex-col md:flex-row justify-between">
+            <div class="flex flex-col">
+                <div class="flex flex-wrap w-full sm:justify-start justify-center">
+                    <img
+                        class="w-36"
+                        [src]="platform.logoDark"
+                        alt="Logo image">
+                </div>
+                <div class="grid grid-cols-9 gap-0">
+                    <span class="col-span-3 text-white">About Us</span>
+                    <span class="col-span-3 text-white">Contact Us</span>
+                    <span class="col-span-3 text-white">Terms & Conditions</span>
+                    <span class="col-span-3 text-white">Support</span>
+                    <span class="col-span-3 text-white">Return Policy</span>
+                    <span class="col-span-3 text-white">Privacy Policy</span>
+                </div>
+            </div>
+            <div class="flex flex-col mt-4 md:mt-0">
+                <div class="flex justify-between">
+                    <span>FOLLOW US</span>
+                    <span>CHAT WITH US</span>
+                </div>
+                <!-- Address  -->
+                <div class="flex flex-col justify-between gap-y-2 text-white w-full md:w-3/5">
+                    <div class="flex flex-row">
+                        <mat-icon class="text-white" svgIcon="mat_solid:location_on"></mat-icon>
+                        <span class="text-white">{{ marketplaceInfo.address }}</span>
+                    </div>
+                    <div class="flex flex-row">
+                        <div class="flex flex-row">
+                            <mat-icon class="text-white" svgIcon="heroicons_solid:phone"></mat-icon>
+                            <span (click)="goToUrl()" class="cursor-pointer">{{ marketplaceInfo.phonenumber }}</span>
+                        </div>
+                        &nbsp; &nbsp;
+                        <div class="flex flex-row gap-1 md:gap-2 tracking-tight">
+                            <mat-icon class="text-white" svgIcon="heroicons_solid:mail"></mat-icon>
+                            <span class="text-white">{{ marketplaceInfo.email }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- Payment methods  -->
+                <div>
+                    <span class="text-white">PAYMENT METHODS</span>
+                    <div class="flex flex-row flex-wrap gap-2 mt-2">
+                        <ng-container *ngFor="let logo of paymentLogos">
+                            <div class="flex items-center justify-center w-8 bg-white rounded p-1">
+                                <img
+                                    class="w-full"
+                                    [src]="logo">
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Delivery partners -->
+                <div>
+                    <span class="text-white">DELIVERY PARTNERS</span>
+                    <div class="flex flex-row flex-wrap gap-2 mt-2">
+                        <ng-container *ngFor="let logo of providerLogos">
+                            <div class="flex items-center justify-center w-10 bg-white rounded p-1">
+                                <img
+                                    class="w-full"
+                                    [src]="logo">
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Border -->
+        <div class="border-0 border-t border-white mt-4"></div>
+        <ng-container *ngIf="platform">
+            <div class="flex flex-wrap w-full sm:justify-start justify-center pt-4">
+                <span class="font-medium text-white text-xs">{{platform.name}} &copy; {{currentYear}} . Version-FNB01-001-{{version}}</span>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>

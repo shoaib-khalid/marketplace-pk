@@ -20,6 +20,9 @@ export class FooterComponent implements OnInit
 
     platform: Platform;
     store: Store;
+
+    @Input() footerType: string = "footer-01";
+
     marketplaceInfo: { phonenumber: string; email: string; address: string };
     landingPage: boolean = true;
     paymentLogos: string[] = [];

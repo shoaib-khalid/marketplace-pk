@@ -12,11 +12,11 @@ import { User } from 'app/core/user/user.types';
 import { Error500Service } from 'app/core/error-500/error-500.service';
 
 @Component({
-    selector     : 'marketplace-layout',
-    templateUrl  : './marketplace.component.html',
+    selector     : 'fnb-01-layout',
+    templateUrl  : './fnb-01.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class MarketplaceLayoutComponent implements OnInit, OnDestroy
+export class Fnb01LayoutComponent implements OnInit, OnDestroy
 {
     navigation: Navigation;
     platform: Platform;
