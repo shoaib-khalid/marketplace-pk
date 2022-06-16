@@ -10,7 +10,8 @@
         "reportService"         : "https://api.symplified.biz/report-service/v1",
         "deliveryService"       : "https://api.symplified.biz/delivery-service/v1",
         "paymentService"        : "https://api.symplified.biz/payment-service/v1",
-        "locationService"       : "https://api.symplified.biz/location-service/v1" 
+        "locationService"       : "https://api.symplified.biz/location-service/v1",
+        "analyticService"       : "https://api.symplified.biz/analytic-service/v1" 
     },
     "storeFrontDomain"          : ".deliverin.my",
     "marketplaceDomain"         : "deliverin.my",

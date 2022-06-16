@@ -5,6 +5,12 @@ import { catchError, concatMap, delay, retry, retryWhen } from 'rxjs/operators';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Error500Service } from './error-500/error-500.service';
+import { DeviceDetectorService } from 'ngx-device-detector';
+import { AuthService } from './auth/auth.service';
+import { IpAddressService } from './ip-address/ip-address.service';
+import { Router } from '@angular/router';
+import { AnalyticService } from './analytic/analytic.service';
+import { CartService } from './cart/cart.service';
 
 export const retryCount = 3;
 export const retryDelay = 1000;
@@ -12,14 +18,36 @@ export const retryDelay = 1000;
 @Injectable()
 export class CoreInterceptor implements HttpInterceptor
 {
+    ipAddress  : string;
+    deviceInfo = null;
+    _event     : string;
+
     /**
      * Constructor
      */
     constructor(
         private _fuseConfirmationService: FuseConfirmationService,
-        private _error500Service: Error500Service
+        private _error500Service: Error500Service,
+        private _jwtService: JwtService,
+        private _deviceService: DeviceDetectorService,
+        private _ipAddressService: IpAddressService,
+        private _authService: AuthService,
+        private _analyticService: AnalyticService,
+        private _cartService: CartService,
+        private _router: Router,
     )
     {
+        // Get User IP Address
+        this._ipAddressService.ipAdressInfo$
+        .subscribe((response:any)=>{
+            if (response) {
+                this.ipAddress = response.ip_addr;                
+            }
+        });
+
+        this._router.events.forEach((event) => {
+            this._event = event["urlAfterRedirects"]
+        })
     }
 
     /**
@@ -78,6 +106,46 @@ export class CoreInterceptor implements HttpInterceptor
                                 },
                             }
                         });
+
+                        //--------------------------------------------
+                        //post customer activity if there is any error
+                        //-------------------------------------------- 
+
+                        // get storeId
+                        // var _storeId = this.store.id;
+
+                        // if customerId null means guest
+                        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
+                        //get device info (browser info, os info, device nodel infp)
+                        var device = this._deviceService.getDeviceInfo();
+                        let _deviceBrowser = device.browser + ' ' + device.browser_version
+                        let _deviceOs = device.os_version
+                        let _deviceModel = device.deviceType + ' ' + device.device
+                        
+                        //get ip address info
+                        var _IpService = this.ipAddress;
+
+                        //get session id by get cart id
+                        var _sessionId = this._cartService.cartId$ 
+
+                        const activityBody = 
+                        {
+                            browserType : _deviceBrowser,
+                            customerId  : _customerId? _customerId :null,
+                            deviceModel : _deviceModel,
+                            errorOccur  : "error " + error.error.error,
+                            errorType   : "error " + error.error.status,
+                            ip          : _IpService,
+                            os          : _deviceOs,
+                            pageVisited : this._event,
+                            sessionId   : _sessionId,
+                            storeId     : null
+                        }
+
+                        this._analyticService.postActivity(activityBody)
+                            .subscribe((response) => {
+                            });
                         
                     }
                     
