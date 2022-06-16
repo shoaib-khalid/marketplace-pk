@@ -24,17 +24,17 @@
     </button>
 </ng-container>
 <ng-template #notLoggedIn>
-    <div class="flex flex-row pl-2 items-center">
-        <div class="flex items-center pr-1">
-            <span (click)="customerLogin()" class="bg-primary rounded-sm px-1 hidden md:block cursor-pointer font-semibold text-white">Sign In</span>
+    <div class="flex flex-row ml-2 md:w-32 md:pl-2 md:pr-2 items-center md:bg-primary rounded-sm ">
+        <div class="flex items-center">
+            <span (click)="customerLogin()" class="hidden md:block cursor-pointer font-medium text-white">Sign In</span>
             <mat-icon
                 (click)="customerLogin()"
                 class="block md:hidden cursor-pointer"
                 [svgIcon]="'mat_solid:login'"></mat-icon>
         </div>
-        <span class="text-gray-300"> &nbsp; | &nbsp; </span>
-        <div class="flex items-center pl-1">
-            <span (click)="customerRegister()" class="bg-primary rounded-sm px-1 hidden md:block cursor-pointer font-semibold text-white">Sign Up</span>
+        <span class="text-gray-300">&nbsp;|&nbsp;</span>
+        <div class="flex items-center">
+            <span (click)="customerRegister()" class="hidden md:block cursor-pointer font-medium text-white">Sign Up</span>
             <mat-icon
                 (click)="customerRegister()"
                 class="block md:hidden cursor-pointer"

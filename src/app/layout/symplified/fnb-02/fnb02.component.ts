@@ -152,4 +152,5 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
         // const redirectURL = this.platform.name === "DeliverIn" ? "https://www.deliverin.my" : "https://www.easydukan.co";
         // this._document.location.href = redirectURL;
     }
+    
 }
