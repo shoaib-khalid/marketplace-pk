@@ -43,7 +43,7 @@ export class AuthSignUpComponent implements OnInit
     //to be display the text
     titleText: string ='Sign Up';
     descriptionText: string ='Please enter the following details to create your account';
-    buttonText: string = 'Sign Up Now'
+    buttonText: string = 'Sign Up'
 
 
     //validate Payload

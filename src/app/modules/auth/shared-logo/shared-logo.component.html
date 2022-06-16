@@ -1,12 +1,16 @@
-<ng-container *ngIf="platform">
+<!-- <ng-container *ngIf="platform">
     <div class="grid justify-items-center">
         <div class="w-2/3 cursor-pointer">
             <img (click)="goToHome()" [src]="platform.logo">
         </div>
     </div>
-</ng-container>
-
-<div *ngIf="titleText" class="grid justify-items-center mt-2 text-3xl font-bold tracking-tight leading-tight">{{titleText}}</div>
+</ng-container> -->
+<div class="flex flex-row items-center">
+    <div *ngIf="titleText" class="grid justify-items-center mt-2 text-3xl font-bold tracking-tight leading-tight">{{titleText}}</div>
+    <div class="cursor-pointer">
+        <img class="w-50 pt-1 pl-1" (click)="goToHome()" [src]="platform.logo">
+    </div>
+</div>
 <div *ngIf="descriptionText" class="flex items-center mt-4 font-medium text-gray-500 justify-center">
     <div>
         <p class="text-center">
