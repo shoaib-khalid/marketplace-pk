@@ -149,7 +149,9 @@ export class FooterComponent implements OnInit
     goToUrl(){
         const phonenumber = this.marketplaceInfo.phonenumber.replace(/[^0-9]/g, '');
         const message = encodeURI('Tell me more about joining Deliverin platform!')
-        this._document.location.href = "https://wa.me/" + phonenumber + '?text=' + message;
+        window.open("https://wa.me/" + phonenumber + '?text=' + message, "_blank");
+
+        // this._document.location.href = "https://wa.me/" + phonenumber + '?text=' + message;
     }
 
     navigate(type: string) {
@@ -157,7 +159,8 @@ export class FooterComponent implements OnInit
     }
 
     goToFacebook() {
-        this._document.location.href = "https://www.facebook.com/DeliverIn.My/"
+        window.open("https://www.facebook.com/DeliverIn.My/", "_blank");
+        // this._document.location.href = "https://www.facebook.com/DeliverIn.My/"
     }
 
     
