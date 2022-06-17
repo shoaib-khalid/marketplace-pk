@@ -39,7 +39,7 @@ export class AuthSignInComponent implements OnInit
     showAlert: boolean = false;
     
     //to be display the text
-    titleText:string ='Sign In to';
+    titleText:string ='Sign In';
     descriptionText:string ='Stay signed in with your account to make searching easier';
 
     //validate Payload

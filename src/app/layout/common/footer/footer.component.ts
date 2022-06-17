@@ -160,33 +160,42 @@ export class FooterComponent implements OnInit
         this._document.location.href = "https://www.facebook.com/DeliverIn.My/"
     }
 
-    scrollToTop(el) {
-        var to = 0;
-        var duration = 1000;
-        var start = el.scrollTop,
-            change = to - start,
-            currentTime = 0,
-            increment = 20;
     
-        var easeInOutQuad = function(t, b, c, d) {
-            t /= d / 2;
-            if (t < 1) 
-                return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        }
-    
-        var animateScroll = function() {        
-            currentTime += increment;
-            var val = easeInOutQuad(currentTime, start, change, duration);
-    
-            el.scrollTop = val;
-            if(currentTime < duration) {
-                setTimeout(animateScroll, increment);
-                el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start' });
-            }
-        }
-        animateScroll();    
+    scrollToTop(){
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
     }
+
+    // scrollToTop(el) {
+    //     var to = 0;
+    //     var duration = 1000;
+    //     var start = el.scrollTop,
+    //         change = to - start,
+    //         currentTime = 0,
+    //         increment = 20;
+    
+    //     var easeInOutQuad = function(t, b, c, d) {
+    //         t /= d / 2;
+    //         if (t < 1) 
+    //             return c / 2 * t * t + b;
+    //         t--;
+    //         return -c / 2 * (t * (t - 2) - 1) + b;
+    //     }
+    
+    //     var animateScroll = function() {        
+    //         currentTime += increment;
+    //         var val = easeInOutQuad(currentTime, start, change, duration);
+    
+    //         el.scrollTop = val;
+    //         if(currentTime < duration) {
+    //             setTimeout(animateScroll, increment);
+    //             el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start' });
+    //         }
+    //     }
+    //     animateScroll();    
+    // }
     
 }
