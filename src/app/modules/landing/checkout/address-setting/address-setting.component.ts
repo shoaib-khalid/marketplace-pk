@@ -13,7 +13,7 @@ import { StoresService } from 'app/core/store/store.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { EditAddressDialog } from '../../user-profile/delivery-address/edit-address/edit-address.component';
+// import { EditAddressDialog } from '../../user-profile/delivery-address/edit-address/edit-address.component';
 import { DomSanitizer} from '@angular/platform-browser';
 
 @Component({
@@ -162,49 +162,49 @@ export class AddressSettingComponent implements OnInit
         this.accountForm.enable();
     }
     addAddress() {
-        const dialogRef = this._dialog.open( 
-            EditAddressDialog, {
-                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-                disableClose: true,
-                data: {
-                    type: "create",
-                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
-                    user: this.accountForm.value
-                },
-            }
-        );    
-        dialogRef.afterClosed().subscribe(result=>{
-            if (result) {
-                //Customer Addresses
-                this._userService.createCustomerAddress(result)
-                    .subscribe(()=>{});
-            }
-        });
+        // const dialogRef = this._dialog.open( 
+        //     EditAddressDialog, {
+        //         width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+        //         height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+        //         maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+        //         maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+        //         disableClose: true,
+        //         data: {
+        //             type: "create",
+        //             customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
+        //             user: this.accountForm.value
+        //         },
+        //     }
+        // );    
+        // dialogRef.afterClosed().subscribe(result=>{
+        //     if (result) {
+        //         //Customer Addresses
+        //         this._userService.createCustomerAddress(result)
+        //             .subscribe(()=>{});
+        //     }
+        // });
     }
 
     editAddress(customerAddress: CustomerAddress){
-        const dialogRef = this._dialog.open(
-            EditAddressDialog, {
-                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-                disableClose: true,
-                data: {
-                    type: "edit",
-                    customerAddress: customerAddress
-                }
-            }
-        );
-        dialogRef.afterClosed().subscribe(result => {
-            if(result){
-                // Customer Addresses
-                this._userService.putCustomerAddressById(result).subscribe(()=>{});
-            } 
-        });        
+        // const dialogRef = this._dialog.open(
+        //     EditAddressDialog, {
+        //         width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+        //         height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+        //         maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+        //         maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+        //         disableClose: true,
+        //         data: {
+        //             type: "edit",
+        //             customerAddress: customerAddress
+        //         }
+        //     }
+        // );
+        // dialogRef.afterClosed().subscribe(result => {
+        //     if(result){
+        //         // Customer Addresses
+        //         this._userService.putCustomerAddressById(result).subscribe(()=>{});
+        //     } 
+        // });        
     }
 
     deleteAddress(customerAddressId) {

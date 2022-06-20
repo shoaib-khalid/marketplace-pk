@@ -45,21 +45,29 @@ export interface DeliveryProvider
 
 export interface CartDiscount
 {
-    cartSubTotal: number;
-    deliveryDiscount: number;
-    deliveryDiscountDescription: string;
-    deliveryDiscountMaxAmount: number;
-    discountCalculationType: string;
-    discountCalculationValue: number;
-    discountId?: string;
-    discountMaxAmount: number;
-    discountType: string;
-    subTotalDiscount: number;
-    subTotalDiscountDescription: string;
+    cartSubTotal                : number;
+    deliveryDiscount            : number;
+    deliveryDiscountDescription : string;
+    deliveryDiscountMaxAmount   : number;
+    discountCalculationType     : string;
+    discountCalculationValue    : number;
+    discountId?                 : string;
+    discountMaxAmount           : number;
+    discountType                : string;
+    subTotalDiscount            : number;
+    subTotalDiscountDescription : string;
     storeServiceChargePercentage: number;
-    storeServiceCharge: number;
-    deliveryCharges: number;
-    cartGrandTotal: number;
+    storeServiceCharge          : number;
+    deliveryCharges             : number;
+    cartGrandTotal              : number;
+    voucherDeliveryDiscount     : number;
+    voucherDiscountMaxAmount    : number;
+    voucherDiscountType         : string;
+    voucherSubTotalDiscount     : number;
+    voucherDeliveryDiscountDescription  : string;
+    voucherDiscountCalculationType      : string;
+    voucherDiscountCalculationValue     : number;
+    voucherSubTotalDiscountDescription  : string;
 }
 
 export interface Payment

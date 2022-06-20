@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { merchantRoutes } from 'app/modules/buyer/buyer.routing';
+import { customerRoutes } from 'app/modules/customer/customer.routing';
 
 @NgModule({
     imports     : [
-        RouterModule.forChild(merchantRoutes),
+        RouterModule.forChild(customerRoutes),
     ],
     bootstrap   : [
     ]

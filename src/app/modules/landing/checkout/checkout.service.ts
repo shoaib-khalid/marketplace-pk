@@ -147,6 +147,35 @@ export class CheckoutService
             );
     }
 
+    /**
+     * Get Discount
+     */
+     getDiscountOfCartGroup(id: string[], deliveryQuotationId: string = null, deliveryType: string): Observable<CartDiscount>
+     {
+         let orderService = this._apiServer.settings.apiServer.orderService;
+         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+         let accessToken = "accessToken";
+ 
+         const header = {  
+             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+             params: {
+                 deliveryQuotationId,
+                 deliveryType
+             }
+         };
+ 
+         if (deliveryQuotationId === null) { delete header.params.deliveryQuotationId; }
+ 
+         return this._httpClient.post<any>(orderService + '/carts/groupdiscount', id, header)
+             .pipe(
+                 map((response) => {
+                     this._logging.debug("Response from StoresService (getDiscountOfCart)",response);
+ 
+                     return response["data"];
+                 })
+             );
+     }
+
     getSubTotalDiscount(id: string): Observable<CartDiscount>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;

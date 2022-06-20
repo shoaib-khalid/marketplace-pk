@@ -45,7 +45,7 @@ imagePullSecrets:
 ingress:
   annotations: {}
   className: ""
-  enabled: true
+  enabled: false
   hosts:
   - host: dev-my.symplified.ai
     paths:

@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { CartListComponent } from './cart-list/cart-list.component';
+import { CartListComponent } from './carts.component';
 import { CartsResolver } from './carts.resolver';
 
 export const voucherRoutes: Route[] = [
