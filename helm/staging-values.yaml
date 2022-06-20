@@ -39,7 +39,7 @@ fullnameOverride: ""
 image:
   pullPolicy: Always
   repository: kalsym/marketplace
-  tag: 1.1.0
+  tag: 2.0.0
 imagePullSecrets:
 - name: kalsym-docker-hub
 ingress:
