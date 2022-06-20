@@ -138,7 +138,7 @@
                             [mode]="'indeterminate'"></mat-progress-spinner>
                     </button>
 
-                    <ng-container *ngIf="countryCode === 'MYS'">
+                    <ng-container *ngIf="countryCode === 'MYS' && !existedEmail">
                         <!-- Separator -->
                         <div class="flex items-center mt-8">
                             <div class="flex-auto mt-px border-t"></div>
@@ -171,15 +171,17 @@
                 </form>
             </div>
         </div>
-        <!-- Sign-up -->
-        <div class="flex flex-row mt-4 mb-4 sm:mt-8 sm:mb-4 w-full justify-center">
-            <div>Already have an account?</div>
-            <a
-                class="ml-1 text-primary-500 hover:underline"
-                [routerLink]="['/sign-in']"
-                >Sign in
-            </a>
-        </div>
+        <ng-container *ngIf="!existedEmail">
+            <!-- Sign-up -->
+            <div class="flex flex-row mt-4 mb-4 sm:mt-8 sm:mb-4 w-full justify-center">
+                <div>Already have an account?</div>
+                <a
+                    class="ml-1 text-primary-500 hover:underline"
+                    [routerLink]="['/sign-in']"
+                    >Sign in
+                </a>
+            </div>
+        </ng-container>
     </div>
     <!-- Shared background -->
     <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-primary dark:border-l">
