@@ -111,6 +111,7 @@ export class CartComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+            
     }
 
     /**

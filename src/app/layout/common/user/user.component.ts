@@ -157,6 +157,12 @@ export class UserComponent implements OnInit, OnDestroy
         this._router.navigate(['/orders']);
     }
 
+    vouchersRedirect(): void
+    {
+        this._router.navigate(['/vouchers']);
+    }
+
+
     customerLogin(){
         // // Set cookie for testing
         // this._cookieService.set('CustomerId','bd421a78-fc36-4691-a5e5-38278e0a4245');

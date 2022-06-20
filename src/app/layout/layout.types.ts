@@ -13,6 +13,6 @@ export type Layout =
     | 'futuristic'
     | 'thin'
     // SYMplified
-    | 'fnb'
-    | 'marketplace'
+    | 'fnb2'
+    | 'fnb1'
     ;
