@@ -20,64 +20,109 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { UserService } from 'app/core/user/user.service';
+import { fuseAnimations } from '@fuse/animations';
 
 @Component({
     selector     : 'buyer-checkout',
     templateUrl  : './checkout.component.html',
     styles       : [
+        /* language=SCSS */
         `
+            .cart-grid {
+                grid-template-columns: 24px auto 96px 96px 96px 30px;
+
+                @screen md {
+                    grid-template-columns: 24px auto 112px 112px 112px 30px;
+                }
+            }
+
+            .cart-title-grid {
+                grid-template-columns: 24px auto;
+
+                @screen sm {
+                    grid-template-columns: 24px auto;
+                }
+            }
+
+            .mat-tab-group {
+
+                /* No header */
+                &.fuse-mat-no-header {
+            
+                    .mat-tab-header {
+                        height: 0 !important;
+                        max-height: 0 !important;
+                        border: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                    }
+                }
+            
+                .mat-tab-header {
+                    border-bottom: flex !important;
+            
+                    .mat-tab-label-container {
+                        padding: 0 0px;
+            
+                        .mat-tab-list {
+            
+                            .mat-tab-labels {
+            
+                                .mat-tab-label {
+                                    min-width: 0 !important;
+                                    height: 40px !important;
+                                    padding: 0 20px !important;
+                                    @apply text-secondary;
+            
+                                    &.mat-tab-label-active {
+                                        @apply bg-primary-700 bg-opacity-0 dark:bg-primary-50 dark:bg-opacity-0 #{'!important'};
+                                        @apply text-primary #{'!important'};
+                                    }
+            
+                                    + .mat-tab-label {
+                                        margin-left: 0px;
+                                    }
+            
+                                    .mat-tab-label-content {
+                                        line-height: 20px;
+                                    }
+                                }
+                            }
+            
+                            .mat-ink-bar {
+                                display: flex !important;
+                            }
+                        }
+                    }
+                }
+            
+                .mat-tab-body-content {
+                    padding: 0px;
+                }
+            }
+
             /** Custom input number **/
             input[type='number']::-webkit-inner-spin-button,
             input[type='number']::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+              -webkit-appearance: none;
+              margin: 0;
             }
-        
+    
+            input[type='number'] {
+                -moz-appearance:textfield;
+            }
+          
             .custom-number-input input:focus {
-            outline: none !important;
+              outline: none !important;
             }
-        
+          
             .custom-number-input button:focus {
-            outline: none !important;
+              outline: none !important;
             }
-
-            ::ng-deep .mat-radio-button .mat-radio-ripple{
-                display: none;
-            }
-
-            .map {
-                width: 50vw;
-                height: 50vh;
-            }
-            #pac-input {
-                background-color: #fff;
-                font-family: Roboto;
-                font-size: 15px;
-                font-weight: 300;
-                padding: 0 11px 0 13px;
-                text-overflow: ellipsis;
-                width: 400px;
-                height: 40px;
-            }
-              
-            #pac-input:focus {
-                border-color: #4d90fe;
-                padding: 5px 5px 5px 5px;
-            }
-            
-            .pac-controls {
-                padding: 5px 11px;
-                display: inline-block;
-            }
-              
-            .pac-controls label {
-                font-family: Roboto;
-                font-size: 13px;
-                font-weight: 300;
-            }
-
         `
-    ]
+    ],
+    encapsulation: ViewEncapsulation.None,
+    animations     : fuseAnimations
 })
 export class BuyerCheckoutComponent implements OnInit
 {
@@ -87,6 +132,10 @@ export class BuyerCheckoutComponent implements OnInit
     @ViewChild('checkoutContainer') checkoutContainer: ElementRef;
     
     checkoutForm: FormGroup;
+
+    quantity: number = 1;
+    minQuantity: number = 1;
+    maxQuantity: number = 999;
 
     currentScreenSize: string[] = [];
 
@@ -282,5 +331,18 @@ export class BuyerCheckoutComponent implements OnInit
         this.discountAmountVoucherApplied = parseFloat(value);
         this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
                   
+    }
+
+    checkQuantity(operator: string = null) {
+        if (operator === 'decrement')
+            this.quantity > this.minQuantity ? this.quantity -- : this.quantity = this.minQuantity;
+        else if (operator === 'increment')
+            this.quantity < this.maxQuantity ? this.quantity ++ : this.quantity = this.maxQuantity;
+        else {
+            if (this.quantity < this.minQuantity) 
+                this.quantity = this.minQuantity;
+            else if (this.quantity > this.maxQuantity)
+                this.quantity = this.maxQuantity;
+        }
     }
 }

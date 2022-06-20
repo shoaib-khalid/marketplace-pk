@@ -38,6 +38,9 @@ export class CartsResolver implements Resolve<any>
     {
         let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
-        return this._cartsService.getCarts(0, 4, null, customerId);
+        return forkJoin([
+            // this._cartsService.getCarts(0, 4, null, customerId),
+            this._cartsService.getCartsWithDetails(0, 2, null, customerId)
+        ]);
     }
 }

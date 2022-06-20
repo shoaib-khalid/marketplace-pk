@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,17 +12,21 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SharedModule } from 'app/shared/shared.module';
 import { MatTabsModule } from '@angular/material/tabs'
 import { voucherRoutes } from './carts.routing';
+import { MatTableModule } from '@angular/material/table';
 import { FuseCardModule } from '@fuse/components/card';
-import { CartListComponent } from './cart-list/cart-list.component';
+import { CartListComponent } from './carts.component';
+import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 
 @NgModule({
     declarations: [
-        CartListComponent
+        CartListComponent,
+        ModalConfirmationDeleteItemComponent
     ],
     imports     : [
         RouterModule.forChild(voucherRoutes),
         MatButtonModule,
         MatIconModule,
+        MatTableModule,
         MatSelectModule,
         MatInputModule,
         MatCheckboxModule,

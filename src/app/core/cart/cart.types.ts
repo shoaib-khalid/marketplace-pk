@@ -10,6 +10,19 @@ export interface Cart
     store?: Store;
 }
 
+export interface CartWithDetails
+{
+    cartItems?              : CartItem[],
+    customerId?             : string;
+    deliveryQuotationId?    : string;
+    deliveryType?           : string;
+    id                      : string;
+    isOpen                  : boolean;
+    store                   : Store;
+    storeId                 : string;
+    storeVoucherCode        : string;
+}
+
 export interface CartPagination
 {
     length      : number;
