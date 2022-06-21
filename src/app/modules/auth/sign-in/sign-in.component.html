@@ -1,7 +1,7 @@
-<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 md:bg-card">
     <!-- Forms -->
     <div class="z-20 w-auto h-full md:w-1/2 flex flex-col items-center justify-center pt-4">
-        <div class="py-8 px-4 sm:p-12 md:p-16 rounded-2xl sm:shadow md:shadow-none bg-card">
+        <div class="py-8 px-4 sm:p-12 md:p-0 rounded-2xl sm:shadow md:shadow-none bg-card">
             <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
                 <!-- Logo , Title , Description-->
                 <app-shared-logo [titleText]="titleText" [descriptionText]="descriptionText"></app-shared-logo>
@@ -94,7 +94,7 @@
                         [color]="'primary'"
                         [disabled]="signInForm.disabled"
                         (click)="signIn()">
-                        <span *ngIf="!signInForm.disabled">
+                        <span class="text-white" *ngIf="!signInForm.disabled">
                             Sign in
                         </span>
                         <mat-progress-spinner
@@ -103,52 +103,54 @@
                             [mode]="'indeterminate'"></mat-progress-spinner>
                     </button>
 
-                    <ng-container *ngIf="countryCode === 'MYS'">
-                        <!-- Separator -->
-                        <div class="flex items-center mt-8">
-                            <div class="flex-auto mt-px border-t"></div>
-                            <div class="mx-2 text-secondary text-gray-400">Or continue with</div>
-                            <div class="flex-auto mt-px border-t"></div>
-                        </div>
-        
-                        <!-- Single sign-on buttons -->
-                        <div class="flex flex-row justify-center w-full items-center mt-4 space-x-4">
-                            <div class="flex justify-center">
-                                <div class="mr-4">
-                                    <button mat-fab type="button" color="" (click)="signInWithGoogle()">
-                                        <img src = "assets/social-media/google-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                    </button>
-                                </div>
-                                <div class="mr-4">
-                                    <button mat-fab type="button" color="" (click)="signInWithFB()">
-                                        <img src = "assets/social-media/facebook-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                    </button>
-                                </div>
-                                <div class="">
-                                    <button mat-fab type="button" color="" (click)="signInWithApple()">
-                                        <img src = "assets/social-media/apple-svgrepo.svg" style="width: 25px;height: 25px;" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </ng-container>
-    
+                    <!-- Sign-up -->
+                    <div class="flex flex-row mt-4 sm:mt-8 sm:mb-4 w-full justify-center">
+                        <div>Don't have an account?</div>
+                        <a
+                            class="ml-1 text-primary-500 hover:underline"
+                            [routerLink]="['/sign-up']"
+                            >Sign up
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
-        <!-- Sign-up -->
-        <div class="flex flex-row mt-4 mb-4 sm:mt-8 sm:mb-4 w-full justify-center">
-            <div>Don't have an account?</div>
-            <a
-                class="ml-1 text-primary-500 hover:underline"
-                [routerLink]="['/sign-up']"
-                >Sign up
-            </a>
-        </div>
+        <ng-container *ngIf="countryCode === 'MYS'">
+            <div class="w-full md:max-w-80">
+                <!-- Separator -->
+                <div class="flex w-full items-center mt-8">
+                    <div class="flex-auto border-gray-300 mt-px border-t"></div>
+                    <div class="mx-2 text-gray-400">Or continue with</div>
+                    <div class="flex-auto border-gray-300 mt-px border-t"></div>
+                </div>
+    
+                <!-- Single sign-on buttons -->
+                <div class="flex flex-row justify-center w-full items-center mt-4 space-x-4">
+                    <div class="flex justify-center">
+                        <div class="mr-4">
+                            <button mat-fab type="button" color="" (click)="signInWithGoogle()">
+                                <img src = "assets/social-media/google-svgrepo.svg" style="width: 25px;height: 25px;" />
+                            </button>
+                        </div>
+                        <div class="mr-4">
+                            <button mat-fab type="button" color="" (click)="signInWithFB()">
+                                <img src = "assets/social-media/facebook-svgrepo.svg" style="width: 25px;height: 25px;" />
+                            </button>
+                        </div>
+                        <div class="">
+                            <button mat-fab type="button" color="" (click)="signInWithApple()">
+                                <img src = "assets/social-media/apple-svgrepo.svg" style="width: 25px;height: 25px;" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </ng-container>
     </div>
     <!-- Shared background -->
     <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-primary dark:border-l">
-        <app-shared-background></app-shared-background>
+        <app-shared-background [pageType]="'signIn'"></app-shared-background>
     </div>
 
     <!-- Mobile background -->

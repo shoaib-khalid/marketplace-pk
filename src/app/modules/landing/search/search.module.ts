@@ -15,6 +15,7 @@ import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/fe
 import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 @NgModule({
     declarations: [
@@ -34,7 +35,8 @@ import { PaginationModule } from 'app/layout/common/pagination/pagination.module
         _AdsBannerModule,
         _SwiperBannerModule,
         MatPaginatorModule,
-        PaginationModule
+        PaginationModule,
+        ErrorBackgroundModule
     ]
 })
 export class LandingSearchModule

@@ -20,6 +20,9 @@ export class FooterComponent implements OnInit
 
     platform: Platform;
     store: Store;
+
+    @Input() footerType: string = "footer-01";
+
     marketplaceInfo: { phonenumber: string; email: string; address: string };
     landingPage: boolean = true;
     paymentLogos: string[] = [];
@@ -146,11 +149,56 @@ export class FooterComponent implements OnInit
     goToUrl(){
         const phonenumber = this.marketplaceInfo.phonenumber.replace(/[^0-9]/g, '');
         const message = encodeURI('Tell me more about joining Deliverin platform!')
-        this._document.location.href = "https://wa.me/" + phonenumber + '?text=' + message;
+        window.open("https://wa.me/" + phonenumber + '?text=' + message, "_blank");
+
+        // this._document.location.href = "https://wa.me/" + phonenumber + '?text=' + message;
     }
 
     navigate(type: string) {
         this._router.navigate(['/docs/legal/' + type]);
     }
+
+    goToFacebook() {
+        window.open("https://www.facebook.com/DeliverIn.My/", "_blank");
+        // this._document.location.href = "https://www.facebook.com/DeliverIn.My/"
+    }
+
+    
+    scrollToTop(){
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
+    }
+
+    // scrollToTop(el) {
+    //     var to = 0;
+    //     var duration = 1000;
+    //     var start = el.scrollTop,
+    //         change = to - start,
+    //         currentTime = 0,
+    //         increment = 20;
+    
+    //     var easeInOutQuad = function(t, b, c, d) {
+    //         t /= d / 2;
+    //         if (t < 1) 
+    //             return c / 2 * t * t + b;
+    //         t--;
+    //         return -c / 2 * (t * (t - 2) - 1) + b;
+    //     }
+    
+    //     var animateScroll = function() {        
+    //         currentTime += increment;
+    //         var val = easeInOutQuad(currentTime, start, change, duration);
+    
+    //         el.scrollTop = val;
+    //         if(currentTime < duration) {
+    //             setTimeout(animateScroll, increment);
+    //             el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start' });
+    //         }
+    //     }
+    //     animateScroll();    
+    // }
     
 }

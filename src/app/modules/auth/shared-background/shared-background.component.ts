@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -19,6 +19,8 @@ import { Subject } from 'rxjs';
 })
 export class SharedBackgroundComponent implements OnInit
 {
+    @Input() pageType: string ;
+
     image: any=[];
     countryCode:string='';
 

@@ -1,22 +1,16 @@
 <!-- Background - @formatter:off -->
-<!-- Rings -->
-<svg class="absolute inset-0 pointer-events-none"
-        viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-    <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-        <circle r="234" cx="196" cy="23"></circle>
-        <circle r="234" cx="790" cy="491"></circle>
-    </g>
-</svg>
-<!-- Dots -->
-<svg class="absolute -top-16 -right-16 text-gray-300"
-        viewBox="0 0 220 192" width="220" height="192" fill="none">
-    <defs>
-        <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-            <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
-        </pattern>
-    </defs>
-    <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
-</svg>
+<ng-container *ngIf="pageType ==='signIn'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/signIn-page.png'" [alt]="">
+</ng-container>
+
+<ng-container *ngIf="pageType ==='signUp'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/signUp-page.png'" [alt]="">
+</ng-container>
+
+<ng-container *ngIf="pageType ==='forgotPassword'">
+    <img class="absolute brightness-75 inset-0 w-full h-full pointer-events-none object-cover" [src]="'assets/branding/deliverin/forgotPassword.png'" [alt]="">
+</ng-container>
+
 <!-- @formatter:on -->
 <!-- Content -->
 <ng-container *ngIf="platform">
@@ -25,7 +19,7 @@
             <div>Welcome to</div>
             <div>{{platform.name}}</div>
         </div>
-        <div class="mt-6 text-lg tracking-tight leading-6 text-gray-100">
+        <div class="mt-6 text-lg font-medium tracking-tight leading-6 text-gray-100">
             Let's start your journey with us to explore more goodies around you!
         </div>
         <!-- <div class="flex items-center mt-8">

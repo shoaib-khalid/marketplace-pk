@@ -17,7 +17,7 @@ export const appRoutes: Route[] = [
         // canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'marketplace',
+            layout: 'fnb2',
             // roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -99,7 +99,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
-            layout: 'marketplace',
+            layout: 'fnb2',
             roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
@@ -107,7 +107,7 @@ export const appRoutes: Route[] = [
             platformSetup: PlatformSetupResolver
         },
         children   : [
-            { path: '', loadChildren: () => import('app/modules/buyer/buyer.module').then(m => m.BuyerModule) },
+            { path: '', loadChildren: () => import('app/modules/customer/customer.module').then(m => m.BuyerModule) },
         ]
     }, 
 
@@ -115,7 +115,7 @@ export const appRoutes: Route[] = [
     {
         path       : '',
         canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard],
+        canActivateChild: [AuthGuard], 
         component  : LayoutComponent,
         resolve    : {
             initialData: InitialDataResolver,

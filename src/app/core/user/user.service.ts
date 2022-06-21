@@ -195,7 +195,7 @@ export class UserService
      *Customer Address Controller
      ===========================================
      */
-    getCustomerAddress()
+    getCustomerAddresses()
     {
         let userService = this._apiServer.settings.apiServer.userService;
         let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
@@ -212,6 +212,36 @@ export class UserService
                 }
             )
         );
+    }
+
+    getCustomerAddress(id:string)
+    {
+        let userService = this._apiServer.settings.apiServer.userService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.get<CustomerAddress>(userService + '/customer/' + customerId + '/address', header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from UserService (getCustomerAddress)",response);
+
+                    let defaultAddressIndex = response["data"].content.findIndex(item => item.default === true);
+                    let customerDefaultAddress: CustomerAddress;
+                    if (response["data"].content && response["data"].content.length) {
+                        if (defaultAddressIndex > -1) {
+                            customerDefaultAddress = response["data"].content[defaultAddressIndex]
+                        } else {
+                            customerDefaultAddress = response["data"].content[0];
+                        }
+                    }
+                    this._customerAddress.next(customerDefaultAddress);
+                })
+            );
     }
 
     getCustomerAddressById(id:string)

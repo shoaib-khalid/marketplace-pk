@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, O
 import { Router } from '@angular/router';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { Subject, takeUntil } from 'rxjs';
-import { Cart, CustomerCart } from 'app/core/cart/cart.types';
+import { Cart, CartWithDetails, CustomerCart } from 'app/core/cart/cart.types';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { User } from 'app/core/user/user.types';
@@ -10,6 +10,8 @@ import { Store } from 'app/core/store/store.types';
 import { DOCUMENT } from '@angular/common';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { JwtService } from 'app/core/jwt/jwt.service';
+import { AuthService } from 'app/core/auth/auth.service';
 
 
 
@@ -27,9 +29,12 @@ export class CartComponent implements OnInit, OnDestroy
     /* eslint-enable @typescript-eslint/naming-convention */
 
     @Input() showAvatar: boolean = true;
+
+    customerId: string = '';
     platform: Platform;
+
     cart: Cart;
-    carts: Cart[] = [];
+    carts: CartWithDetails[] = [];
     totalCartItems: number = 0;
     user: User;
     seeMoreCarts: boolean = true;
@@ -49,7 +54,9 @@ export class CartComponent implements OnInit, OnDestroy
         private _platformService: PlatformService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
-        private _cartService: CartService
+        private _cartService: CartService,
+        private _jwtService: JwtService,
+        private _authService: AuthService
     )
     {
     }
@@ -63,6 +70,7 @@ export class CartComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
         this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -74,16 +82,54 @@ export class CartComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._cartService.customerCarts$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((carts: CustomerCart) => {
+        // this._cartService.customerCarts$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((carts: CustomerCart) => {                
                 
-                if (carts) {
+        //         if (carts) {
 
-                    this.carts = carts.cartList;
-                    this.totalCartItems = carts.totalItem;
+        //             this.carts = carts.cartList;
+        //             this.totalCartItems = carts.totalItem;
 
-                    this.totalCartList = carts.cartList.length;
+        //             this.totalCartList = carts.cartList.length;
+    
+        //             // remove duplicate stores
+        //             let resArr = [];
+        //             this.carts.filter(function(item){
+        //                 let i = resArr.findIndex(x => (x.storeId == item.storeId));
+    
+        //                 if (i <= -1){
+        //                     resArr.push(item);
+        //                 }
+        //                 return null;
+        //             });
+                    
+        //             // to show only 3
+        //             if (resArr.length >= 3) {
+        //                 this.totalCartList = resArr.length;
+        //                 const slicedArray = resArr.slice(0, 3);
+        //                 this.carts = slicedArray;
+        //             }
+    
+        //         }
+        //         else {
+        //             this.seeMoreCarts = false
+        //         }
+
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
+
+        this._cartService.cartsHeaderWithDetails$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((cartsWithDetails: CartWithDetails[]) => {                
+
+                if (cartsWithDetails) {
+
+                    this.carts = cartsWithDetails;
+                    // this.totalCartItems = carts.totalItem;
+
+                    this.totalCartList = cartsWithDetails.length;
     
                     // remove duplicate stores
                     let resArr = [];
@@ -110,7 +156,9 @@ export class CartComponent implements OnInit, OnDestroy
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
+                
             });
+             
     }
 
     /**

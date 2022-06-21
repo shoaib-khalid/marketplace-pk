@@ -1,0 +1,95 @@
+<!-- Loading bar -->
+<fuse-loading-bar></fuse-loading-bar>
+
+<!-- Wrapper -->
+<ng-container *ngIf="show500 === false; else error">
+    <div class="flex flex-col flex-auto w-full min-w-0 bg-card">
+    
+        <!-- Header -->
+        <div class="md:relative flex flex-col flex-0 justify-center w-full h-auto overflow-hidden z-49 shadow dark:shadow-none print:hidden sticky top-0">
+            <!-- Top Header bar -->
+            <div class="flex flex-auto justify-center items-center lg:px-40 bg-card z-40 dark:bg-gray-700">
+                <div class="relative flex items-center justify-between w-full h-16">
+                    <!-- Logo -->
+                    <ng-container *ngIf="platform">
+                        <div class="flex items-center">
+                            <img
+                                (click)="goToHome()"
+                                class="w-36 cursor-pointer"
+                                [src]="platform.logo"
+                                alt="Logo image">
+                            <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
+                        </div>
+                    </ng-container>
+                    <search class="w-full hidden sm:block"></search>
+                    <div class="flex items-center flex-row">
+    
+                        <button class="sm:hidden" mat-icon-button (click)="open()">
+                            <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:search'"></mat-icon>
+                        </button>
+    
+                        <notifications></notifications>
+    
+                        <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span>
+    
+                        <!-- cart -->
+                        <cart class="mr-0 sm:mr-2"></cart>
+    
+                        <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span>
+    
+                        <!-- Components -->
+                        <div class="flex w-full items-center">
+                            <!-- <search [appearance]="'bar'"></search> -->
+                            <user></user>
+                            <ng-container *ngIf="!isScreenSmall">
+                                <div class="ml-4 text-medium font-medium leading-5 truncate">
+                                    {{displayUsername}}
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
+                <!-- <search *ngIf="currentScreenSize.includes('md')" class="w-full"></search> -->
+            </div>
+            <div class="flex-auto w-full bg-primary z-30 hidden sm:block">
+                <div class="w-full flex flex-row justify-center items-center">
+                    <span class="text-white"><&nbsp;</span>
+                    <span class="text-white font-semibold">Up to 70% Off.</span>
+                    <span class="text-white underline">&nbsp; Shop our latest sale styles</span>
+                    <span class="text-white">&nbsp;></span>
+                </div>
+            </div>
+            <div class="sm:hidden w-full flex flex-auto items-center px-2 pb-2 z-20 bg-teal-300"
+                *ngIf="opened" 
+                @expandCollapse
+                >
+                <search class=" w-full"></search>
+                <button
+                    class="flex items-center mt-2"
+                    mat-icon-button
+                    (click)="close()">
+                    <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                </button>
+            </div>
+            
+        </div>
+    
+        <!-- Content -->
+        <div class="flex flex-col flex-auto lg:px-40">
+            <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
+                 Otherwise, layout changes won't be registered and the view won't be updated! -->
+            <router-outlet *ngIf="true"></router-outlet>
+        </div>
+    
+        <!-- Footer -->
+        <footer [footerType]="'footer-02'" class="w-full"></footer>
+        
+    </div>
+
+</ng-container>
+
+<!-- Error 500 -->
+<ng-template #error>
+    <error-500></error-500>
+</ng-template>
