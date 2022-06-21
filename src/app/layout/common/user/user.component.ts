@@ -174,7 +174,9 @@ export class UserComponent implements OnInit, OnDestroy
         // Sign out
         this._authService.signOut();
 
-        // this._cookieService.deleteAll('/catalogue');
+        // set user observable to null when logout 
+        this._userService.user = null;
+
 
         // // for localhost testing
         // this._cookieService.delete('CustomerId');

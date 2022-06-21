@@ -11,27 +11,29 @@
                 [src]="displayStoreLogo(store.storeAssets)"
                 [alt]="'Card cover image'">
             </div>
-            <div class="flex flex-col m-2 justify-center items-center w-full sm:px-6">
-                <div class="flex flex-row w-full justify-between pb-3">
-                    <div class="flex flex-row items-center">
+            <div class="flex flex-col md:flex-row justify-between m-2 w-full">
+                <div class="flex flex-col">
+                    <div class="flex flex-row gap-x-1">
                         <span class="text-xs sm:text-sm md:text-base">Products:</span>
-                        <span class="text-xs sm:text-sm md:text-base font-bold">80</span>
+                        <span class="text-xs sm:text-sm md:text-base font-medium">{{pagination?.length}}</span>
                     </div>
+                    <div class="flex flex-row gap-x-1">
+                        <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
+                        <span class="text-xs sm:text-sm md:text-base font-medium">{{store.phoneNumber}}</span>
+                    </div>
+                    <div class="flex flex-row gap-x-1">
+                        <span class="text-xs sm:text-sm md:text-base">Email:</span>
+                        <span class="text-xs sm:text-sm md:text-base font-medium">{{store.email}}</span>
+                    </div>                        
+                </div>
+                <div class="w-auto">
                     <div class="group cursor-pointer" (click)="chooseStore(store.domain)">
                         <div class="flex flex-row items-center border rounded-md border-primary py-1 px-2 group-hover:bg-primary">
                             <mat-icon class="icon-size-5 text-primary group-hover:text-white sm:icon-size-6" svgIcon="mat_outline:storefront"></mat-icon>
-                            <span class="text-sm sm:text-base font-semibold group-hover:text-white text-primary pl-2">View Store</span>
+                            <span class="text-sm sm:text-base font-semibold group-hover:text-white text-primary pl-2 tracking-tight">View Store</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-row w-full pb-3">
-                    <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
-                    <span class="text-xs sm:text-sm md:text-base font-bold">{{store.phoneNumber}}</span>
-                </div>
-                <div class="flex flex-row w-full">
-                    <span class="text-xs sm:text-sm md:text-base">Email:</span>
-                    <span class="text-xs sm:text-sm md:text-base font-bold">{{store.email}}</span>
-                </div>                        
             </div>
         </fuse-card>
         <!-- Products -->
@@ -47,7 +49,7 @@
                 <div class="flex flex-col w-full md:w-1/2">
                     <!-- Title -->
                     <div class="justify-start items-center mt-6 md:mt-0">
-                        <span class="text-3xl md:text-4xl font-semibold leading-none items-center">{{product.name}}</span>
+                        <span class="text-2xl md:text-3xl font-semibold leading-none items-center">{{product.name}}</span>
                         <!-- <span *ngIf="displayedProduct.discountAmount>0" class="mb-2 py-1 px-3 rounded text-sm font-semibold mx-2 items-center" [ngClass]="'text-primary-100 bg-red-600'">      
                             {{displayedProduct.discountAmount}}% Off
                         </span> -->
@@ -199,12 +201,12 @@
                             (click)="addToCart()"
                             mat-button>
                         <label 
-                            class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg cursor-pointer bg-primary"
+                            class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg cursor-pointer bg-primary group hover:bg-primary-600"
                             for="add-to-cart-button"
                             matRipple>
-                            <span class="text-sm font-semibold text-white">Add to Cart</span>
+                            <span class="text-sm font-semibold text-white group-hover:text-black">Add to Cart</span>
                             <mat-icon
-                                class="pl-1 text-white transform scale-75"
+                                class="pl-1 text-white transform scale-75 group-hover:text-black"
                                 [svgIcon]="'heroicons_solid:shopping-cart'"></mat-icon>
                         </label>
 
@@ -216,12 +218,12 @@
                             [routerLink]="['/checkout']"
                             mat-button>
                         <label 
-                            class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg bg-green-500 cursor-pointer"
+                            class="flex items-center justify-center w-5/12 sm:w-2/5 h-10 px-2 rounded-lg bg-green-500 cursor-pointer group hover:bg-green-600"
                             for="go-checkout-button"
                             matRipple>
-                            <span class="text-sm font-semibold text-white">Checkout</span>
+                            <span class="text-sm font-semibold text-white group-hover:text-black">Checkout</span>
                             <mat-icon
-                                class="pl-1 text-white transform scale-75"
+                                class="pl-1 text-white transform scale-75 group-hover:text-black"
                                 [svgIcon]="'heroicons_solid:shopping-bag'"></mat-icon>
                         </label>
                     </div>
@@ -236,6 +238,53 @@
                     [svgIcon]="'heroicons_outline:document-search'"></mat-icon>
                 <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">Product not found!</div>
             </div>
+        </ng-template>
+
+        <div class="mt-8 mb-4 border-t border-gray-300 items-center w-full"></div>
+
+        <!-- Popular products  -->
+        <span class="flex font-semibold text-xl w-full">Popular Products from {{store.name}}</span>
+        <ng-container *ngIf="products && products.length > 0">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 w-full mt-2 sm:mt-4">
+                <ng-container *ngFor="let product of products">
+                    <!-- need to do this because featuredProducts and productDetails have different response -->
+                    <ng-container *ngTemplateOutlet="productResult; context: {$implicit: product.productDetails ? product.productDetails : product}">
+                    </ng-container>
+                </ng-container>
+            </div>
+        </ng-container>
+
+        <!-- Contact result template -->
+        <ng-template
+            #productResult
+            let-product>
+            <fuse-card
+                (click)="redirectToProduct(product.seoUrl)"
+                class="flex flex-col rounded-lg border border-gray-300 h-[210px] md:h-[220px] cursor-pointer filter-article">
+                <div class="relative w-full">
+                    <ng-container *ngIf="!product.thumbnailUrl" >
+                        <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black opacity-40 rounded-t-lg">
+                            <span class="text-white text-center opacity-100">Product image not available</span>
+                        </div>
+                    </ng-container>
+                    <img
+                        class="object-cover w-full h-[8.5rem] rounded-t-lg shadow"
+                        [src]="product.thumbnailUrl ? product.thumbnailUrl : (product.storeCategory ? product.storeCategory.parentCategory.parentThumbnailUrl : platform.logo)">
+                </div>
+                <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
+                    <div class="flex flex-col">
+                        <span class="text-base md:text-lg font-semibold line-clamp-1">{{product.name}}</span>
+                    </div>
+                    <div class="flex flex-row items-end justify-between">
+                        <ng-container *ngIf="product.productInventories[0] && product.productInventories[0].itemDiscount">
+                            <span class="line-through text-sm font-semibold">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</span>
+                        </ng-container>
+                        <ng-container *ngIf="product.productInventories[0]">
+                            <span class="text-lg font-semibold">{{product.productInventories[0].price | currency: platform.currency}}</span>
+                        </ng-container>
+                    </div>
+                </div>
+            </fuse-card>
         </ng-template>
     </ng-container>
 </div>
