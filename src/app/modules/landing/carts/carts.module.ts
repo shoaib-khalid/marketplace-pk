@@ -6,6 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CurrencyPipe } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { MatMenuModule } from '@angular/material/menu';
@@ -37,6 +38,9 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
         SharedModule,
         MatTabsModule,
         FuseCardModule
+    ],
+    providers: [
+        CurrencyPipe
     ],
     bootstrap   : [
     ]

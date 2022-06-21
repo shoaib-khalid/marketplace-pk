@@ -225,12 +225,21 @@ export class UserService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
         };
 
-        return this._httpClient.get<any>(userService + '/customer/' + customerId + '/address', header)
+        return this._httpClient.get<CustomerAddress>(userService + '/customer/' + customerId + '/address', header)
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from UserService (getCustomerAddress)",response);
 
-                    this._customerAddresses.next(response["data"].content);
+                    let defaultAddressIndex = response["data"].content.findIndex(item => item.default === true);
+                    let customerDefaultAddress: CustomerAddress;
+                    if (response["data"].content && response["data"].content.length) {
+                        if (defaultAddressIndex > -1) {
+                            customerDefaultAddress = response["data"].content[defaultAddressIndex]
+                        } else {
+                            customerDefaultAddress = response["data"].content[0];
+                        }
+                    }
+                    this._customerAddress.next(customerDefaultAddress);
                 })
             );
     }

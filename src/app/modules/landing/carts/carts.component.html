@@ -56,7 +56,7 @@
                     <div class="hidden lg:grid cart-grid w-full sticky py-2 border-b border-gray-600">
                         <!-- Checkbox all carts -->
                         <div class="flex items-center justify-center w-full">
-                            <input type="checkbox" [(ngModel)]="selectedCart.selected" (click)="selectCart(carts,null,null,$event.target.checked)"/>
+                            <input type="checkbox" [(ngModel)]="selectedCart.selected" (click)="selectCart()"/>
                         </div>
                         <span class="font-semibold text-left ml-4">Product</span>
                         <span class="font-semibold text-center">Unit Price</span>
@@ -88,10 +88,25 @@
                                         </div>
                                         <!-- Image, Title, Variants -->
                                         <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
-                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
+                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
                                                 <span class="text-md sm:text-lg lg:text-xl font-semibold line-clamp-2">{{cartItem.productName}}</span>
-                                                <span class="text-xs lg:text-md text-secondary">Colour: Black, Size: L</span>
+                                                <div>
+                                                    <!-- Display variants -->
+                                                    <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
+                                                        <ng-container *ngFor="let variant of cartItem.productInventory.productInventoryItems">
+                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{variant.productVariantAvailable.productVariant.name}} : {{variant.productVariantAvailable.value}}</span>
+                                                            <span class="block last:hidden">,</span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <!-- Display Combo -->
+                                                    <ng-container *ngIf="cartItem.cartSubItem.length > 0">
+                                                        <ng-container  *ngFor="let combo of cartItem.cartSubItem">
+                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{combo.productName}}</span>
+                                                            <span class="block last:hidden">,</span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </div>
                                                 <!-- Quantity -->
                                                 <div class="block md:hidden flex flex-col justify-center items-center mt-0.5">
                                                     <div class="flex flex-row h-6 w-16 justify-center items-center rounded-lg relative border border-primary">
@@ -183,14 +198,14 @@
                                     </mat-form-field>
                                 </div>
                                 <!-- Shipping Fee & Total Items -->
-                                <div class="flex flex-row justify-between">
-                                    <div class="flex flex-col sm:flex-row justify-between sm:min-w-44">
+                                <div class="flex flex-row justify-between items-center">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center sm:min-w-44">
                                         <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                        <span class="text-xs sm:text-sm">RM 6.00</span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
                                     </div>
-                                    <div class="flex flex-col sm:flex-row justify-between sm:min-w-44">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center sm:min-w-44">
                                         <span class="text-sm sm:text-md">Total items({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
-                                        <span class="text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                     </div>
                                 </div>
                             </ng-container>
