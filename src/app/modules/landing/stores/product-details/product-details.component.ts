@@ -1,15 +1,16 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
+import { ProductPagination, Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
 import { take, of, switchMap, takeUntil, Subject } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector     : 'landing-product-details',
@@ -42,7 +43,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 
             @screen sm {
                 position: relative;
-                z-index: 40;
+                z-index: 50;
                 border-radius:15px !important;
             }
         }
@@ -79,6 +80,12 @@ import { PlatformService } from 'app/core/platform/platform.service';
             z-index: 40 !important;
         }
 
+        :host ::ng-deep .ngx-gallery-preview-img {
+            width: auto;
+            background-color: white;
+            border-radius:15px !important;
+        }
+
         `
     ]
 })
@@ -89,6 +96,7 @@ export class LandingProductDetailsComponent implements OnInit
 
     store: Store;
     product: Product;
+    products: Product[];
 
     quantity: number = 1;
     minQuantity: number = 1;
@@ -126,11 +134,13 @@ export class LandingProductDetailsComponent implements OnInit
     currentScreenSize: string[] = [];
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    pagination: ProductPagination;
 
     /**
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _storesService: StoresService,
         private _productsService: ProductsService,
         private _platformService: PlatformService,
@@ -331,6 +341,26 @@ export class LandingProductDetailsComponent implements OnInit
                         }];
                     }
                 });
+
+                // get all products
+                this._productsService.products$
+                    .subscribe((products: Product[]) => {
+                        // Shuffle the array
+                        this.products = this.shuffle(products);
+                        
+                    })
+
+                // Get the products pagination
+                this._productsService.pagination$
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((pagination: ProductPagination) => {
+                    
+                    // Update the pagination
+                    this.pagination = pagination;                
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
                                 
                 return of(true);
             })
@@ -392,6 +422,24 @@ export class LandingProductDetailsComponent implements OnInit
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+
+    shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+      
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+      
+          // Pick a remaining element.
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+      
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+      
+        return array;
+    }
 
     goToCatalogue() {
         history.back();
@@ -712,7 +760,11 @@ export class LandingProductDetailsComponent implements OnInit
         
         let slug = storeDomain.split(".")[0]
         
-        this._router.navigate(['/stores/' + slug]);
+        this._router.navigate(['/store/' + slug]);
         
+    }
+
+    redirectToProduct(url: string) {
+        this._document.location.href = url;
     }
 }
