@@ -263,8 +263,6 @@ export class BuyerCheckoutComponent implements OnInit
                                 this.selectedCart.carts[cartIdIndex].selected = true;
                             }
                         });
-
-                        console.log("allSelected", allSelected);
                         
                         if (allSelected.length && !allSelected.includes(false)) {
                             // set all selected cart to true since all items in cartItem is true
@@ -286,10 +284,7 @@ export class BuyerCheckoutComponent implements OnInit
                             }),
                             selected: false
                         }
-                    }
-
-                    console.log("this.selectedCart", this.selectedCart);
-                    
+                    }                    
 
                     // this.selectCart(null,null,true);
                 }
@@ -479,11 +474,9 @@ export class BuyerCheckoutComponent implements OnInit
     }
 
     selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {      
-        console.log("carts", carts);
           
         if (carts) {
             let cartsIds = carts.map(item => item.id);
-            console.log("cartsIds", cartsIds);
             
             this.selectedCart.carts.forEach(item => {
                 item.selected = checked;

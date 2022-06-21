@@ -84,10 +84,7 @@ export class CartComponent implements OnInit, OnDestroy
 
         // this._cartService.customerCarts$
         //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((carts: CustomerCart) => {
-
-        //         console.log("carts",carts);
-                
+        //     .subscribe((carts: CustomerCart) => {                
                 
         //         if (carts) {
 
@@ -125,10 +122,7 @@ export class CartComponent implements OnInit, OnDestroy
 
         this._cartService.cartsHeaderWithDetails$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((cartsWithDetails: CartWithDetails[]) => {
-
-                console.log("cartsWithDetailsHeader",cartsWithDetails);
-                
+            .subscribe((cartsWithDetails: CartWithDetails[]) => {                
 
                 if (cartsWithDetails) {
 

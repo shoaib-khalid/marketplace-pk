@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { CurrencyPipe, DOCUMENT } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,10 +14,11 @@ import { fuseAnimations } from '@fuse/animations';
 import { merge, pipe, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { CartDiscount } from '../checkout/checkout.types';
+import { CartDiscount, DeliveryProvider } from '../checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
+import { CheckoutService } from '../checkout/checkout.service';
 
 @Component({
     selector     : 'carts',
@@ -141,10 +142,10 @@ export class CartListComponent implements OnInit, OnDestroy
     cart: Cart;
     carts: CartWithDetails[];
     
-    selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean}[], selected: boolean };
+    selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean, minDeliveryCharges?: number, maxDeliveryCharges?: number}[], selected: boolean };
     
     customerId: string = '';
-    customerAddresses: CustomerAddress[] = [];
+    customerAddress: CustomerAddress;
 
     paymentDetails: CartDiscount = {
         cartSubTotal: 0,
@@ -180,9 +181,11 @@ export class CartListComponent implements OnInit, OnDestroy
         @Inject(DOCUMENT) private _document: Document,
         public _dialog: MatDialog,
         private _platformService: PlatformService,
+        private _checkoutService: CheckoutService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _changeDetectorRef: ChangeDetectorRef,
+        private _currencyPipe: CurrencyPipe,
         private _cartService: CartService,
         private _jwtService: JwtService,
         private _authService: AuthService,
@@ -216,7 +219,6 @@ export class CartListComponent implements OnInit, OnDestroy
         this._cartService.cartsWithDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((cartsWithDetails: CartWithDetails[]) => {
-                console.log("cartsWithDetails",cartsWithDetails);
 
                 if (cartsWithDetails) {
                     this.carts = cartsWithDetails;
@@ -254,19 +256,17 @@ export class CartListComponent implements OnInit, OnDestroy
                                     }),
                                     selected: false
                                 };
-
-                                console.log("sinii22", cart);
-                                
-
                                 this.selectedCart.carts.push(cart);
                             }
+
+                            // get delivery charges of every carts
+                            this.getDeliveryCharges(item.id,item.storeId);
+                            
 
                             if (cartIdIndex > -1 && allInCartSelected !== null && !allInCartSelected.allSelected.includes(false)) {
                                 this.selectedCart.carts[cartIdIndex].selected = true;
                             }
                         });
-
-                        console.log("allSelected", allSelected);
                         
                         if (allSelected.length && !allSelected.includes(false)) {
                             // set all selected cart to true since all items in cartItem is true
@@ -290,8 +290,20 @@ export class CartListComponent implements OnInit, OnDestroy
                         }
                     }
 
-                    console.log("this.selectedCart", this.selectedCart);
-                    
+                    this._userService.customerAddress$
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((customerAddress : CustomerAddress) => {
+                            if (customerAddress) {
+                                this.customerAddress = customerAddress;
+
+                                this.carts.forEach(item => {                        
+                                    // get delivery charges of every carts
+                                    this.getDeliveryCharges(item.id,item.storeId);
+                                });
+                            }
+                            // Mark for check 
+                            this._changeDetectorRef.markForCheck();
+                        });                    
 
                     // this.selectCart(null,null,true);
                 }
@@ -315,16 +327,7 @@ export class CartListComponent implements OnInit, OnDestroy
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
-
                 this.currentScreenSize = matchingAliases;
-            });
-
-        this._userService.customersAddresses$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((customerAddresses : CustomerAddress[]) => {
-
-                this.customerAddresses = customerAddresses;
-                
             });
     }
 
@@ -478,29 +481,27 @@ export class CartListComponent implements OnInit, OnDestroy
         }
     }
 
-    selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {      
-        console.log("carts", carts);
-          
-        if (carts) {
-            let cartsIds = carts.map(item => item.id);
-            console.log("cartsIds", cartsIds);
-            
-            this.selectedCart.carts.forEach(item => {
-                item.selected = checked;
-                if (cartsIds.includes(item.id)) {
-                    item.cartItem.forEach(element => {
-                        element.selected = checked;
-                    });
-                }
-            });
-        } else if (cart) {
-            let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
-            if (cartIndex > -1) {
-                this.selectedCart.carts[cartIndex].cartItem.forEach(item => {
-                    item.selected = checked;
+    selectCart() {
+        let cartItemIds: string[];
+        this.selectedCart.carts.forEach((item, iteration) => {
+            if (iteration === 0) {
+                cartItemIds = item.cartItem.map(element => {
+                    if (element.selected === true) {
+                        return element.id;
+                    }
                 });
+            } else {
+                cartItemIds.concat(item.cartItem.map(element => {
+                    if (element.selected === true) {
+                        return element.id;
+                    }
+                }));
             }
-        }
+        });
+
+        console.log("cartItemIds", cartItemIds);
+        
+
     }
 
     deleteCartItem(cartId: string, cartItem: CartItem){
@@ -520,5 +521,52 @@ export class CartListComponent implements OnInit, OnDestroy
             //     this.addressFormChanges();
             // }
         });
+    }
+
+    getDeliveryCharges(cartId: string, storeId: string)
+    {
+        // if customerId null means guest
+        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
+        const deliveryChargesBody = {
+            cartId: this._cartService.cartId$,
+            customerId: _customerId,
+            delivery: {
+                deliveryAddress     : this.customerAddress.address,
+                deliveryCity        : this.customerAddress.city,
+                deliveryState       : this.customerAddress.state,
+                deliveryPostcode    : this.customerAddress.postCode,
+                deliveryCountry     : this.customerAddress.country,
+                deliveryContactEmail: this.customerAddress.email,
+                deliveryContactName : this.customerAddress.name,
+                deliveryContactPhone: this.customerAddress.phoneNumber,
+                latitude            : null,
+                longitude           : null
+            },
+            deliveryProviderId      : null,
+            storeId: storeId
+        }
+
+        this._checkoutService.postToRetrieveDeliveryCharges(deliveryChargesBody)
+            .subscribe((deliveryProviderResponse: DeliveryProvider[])=>{
+                let cartIndex = this.selectedCart.carts.findIndex(item => item.id == cartId);
+                if (cartIndex > -1) {
+                    let minDeliveryCharges = Math.min(...deliveryProviderResponse.map(item => item.price));
+                    let maxDeliveryCharges = Math.max(...deliveryProviderResponse.map(item => item.price));
+                    
+                    this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
+                    this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+                }
+            });
+    }
+
+    getDeliveryChargesRange(index: number) : string 
+    {
+        
+        if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
+            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
+        } else {
+            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
+        }
     }
 }
