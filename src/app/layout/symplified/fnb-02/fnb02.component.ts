@@ -8,6 +8,7 @@ import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { fuseAnimations } from '@fuse/animations';
+import { Error500Service } from 'app/core/error-500/error-500.service';
 
 @Component({
     selector     : 'fnb02-layout',
@@ -25,6 +26,9 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
     navigation: Navigation;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    show500: boolean;
+
+
     /**
      * Constructor
      */
@@ -35,6 +39,7 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
         private _platformsService: PlatformService,
+        private _error500Service: Error500Service
 
     )
     {
@@ -82,6 +87,13 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
         .pipe(takeUntil(this._unsubscribeAll))
         .subscribe((platform: Platform) => {
             this.platform = platform;
+        });
+
+        // Subscribe to platform data
+        this._error500Service.show500$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((any) => {
+            this.show500 = any;
         });
     
     }

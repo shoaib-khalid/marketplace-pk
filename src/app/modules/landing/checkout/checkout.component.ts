@@ -3,24 +3,23 @@ import { FormBuilder, FormControl, FormGroup, NgForm, ValidationErrors, Validato
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { DOCUMENT } from '@angular/common'; 
 import { CartService } from 'app/core/cart/cart.service';
-import { CartItem } from 'app/core/cart/cart.types';
-import { StoresService } from 'app/core/store/store.service';
+import { Cart, CartItem, CartPagination, CartWithDetails } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
-import { of, Subject, Subscription, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
-import { takeWhile, scan, tap } from "rxjs/operators";
+import { of, Subject, merge, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
 import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged } from 'rxjs/operators';
-import { CheckoutService } from './checkout.service';
-import { CheckoutValidationService } from './checkout.validation.service';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address } from './checkout.types';
-import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Address, CartDiscount } from './checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
-import { CustomerAuthenticate } from 'app/core/auth/auth.types';
-import { UserService } from 'app/core/user/user.service';
 import { fuseAnimations } from '@fuse/animations';
+import { MatPaginator } from '@angular/material/paginator';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
+import { JwtService } from 'app/core/jwt/jwt.service';
+import { CustomerAddress } from 'app/core/user/user.types';
+import { UserService } from 'app/core/user/user.service';
+
 
 @Component({
     selector     : 'buyer-checkout',
@@ -127,109 +126,234 @@ import { fuseAnimations } from '@fuse/animations';
 export class BuyerCheckoutComponent implements OnInit
 {
 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
-    @ViewChild('checkoutNgForm') signInNgForm: NgForm;
-    @ViewChild('checkoutContainer') checkoutContainer: ElementRef;
-    
-    checkoutForm: FormGroup;
+    @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
+    platform: Platform;
+
+    // Quantity Selector
     quantity: number = 1;
     minQuantity: number = 1;
     maxQuantity: number = 999;
 
     currentScreenSize: string[] = [];
 
-    inputPromoCode:string ='';
-    discountAmountVoucherApplied: number = 0.00;
-    displaydiscountAmountVoucherApplied:any = 0.00;
-    customerAuthenticate: CustomerAuthenticate;
-    user: any;
-    customerAddresses: Address[] = [];
+    isLoading: boolean = false;
+    pageOfItems: Array<any>;
+    pagination: CartPagination;
+
+    cart: Cart;
+    carts: CartWithDetails[];
+    
+    selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean}[], selected: boolean };
+    
+    customerId: string = '';
+    customerAddresses: CustomerAddress[] = [];
+
+    paymentDetails: CartDiscount = {
+        cartSubTotal: 0,
+        subTotalDiscount: 0,
+        subTotalDiscountDescription: null,
+        discountCalculationType: null,
+        discountCalculationValue: 0,
+        discountMaxAmount: 0,
+        discountType: null,
+        storeServiceChargePercentage: 0,
+        storeServiceCharge: 0,
+        deliveryCharges: 0, // not exist in (cart discount api), fetched from getPrice delivery service
+        deliveryDiscount: 0,
+        deliveryDiscountDescription: null,
+        deliveryDiscountMaxAmount: 0,
+        cartGrandTotal: 0,
+        voucherDeliveryDiscount: 0,
+        voucherDeliveryDiscountDescription: null,
+        voucherDiscountCalculationType: null,
+        voucherDiscountCalculationValue: 0,
+        voucherDiscountMaxAmount: 0,
+        voucherDiscountType: null,
+        voucherSubTotalDiscount: 0,
+        voucherSubTotalDiscountDescription: null,
+    }
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
     constructor(
-        private _formBuilder: FormBuilder,
-
-        private _checkoutService: CheckoutService,
-        private _changeDetectorRef: ChangeDetectorRef,
+        @Inject(DOCUMENT) private _document: Document,
+        public _dialog: MatDialog,
+        private _platformService: PlatformService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _cartService: CartService,
+        private _jwtService: JwtService,
         private _authService: AuthService,
-        private _userService: UserService,
-
-        private _datePipe: DatePipe,
-        private _dialog: MatDialog,
-        private _router: Router,
-        @Inject(DOCUMENT) document: Document
+        private _userService: UserService
     )
     {
     }
 
-    ngOnInit() {
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
 
-        // Create the support form
-        this.checkoutForm = this._formBuilder.group({
-            // Main Store Section
-            id                  : ['undefined'],
-            fullName            : ['', Validators.required],
-            // firstName           : ['', Validators.required],
-            // lastName            : ['', Validators.required],
-            email               : ['', [Validators.required, CheckoutValidationService.emailValidator]],
-            phoneNumber         : ['', CheckoutValidationService.phonenumberValidator],
-            address             : ['', Validators.required],
-            storePickup         : [false],
-            postCode            : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), CheckoutValidationService.postcodeValidator]],
-            state               : ['', Validators.required],
-            city                : ['', Validators.required],
-            deliveryProviderId  : ['', CheckoutValidationService.deliveryProviderValidator],
-            country             : [''],
-            regionCountryStateId: [''],
-            specialInstruction  : [''],
-            saveMyInfo          : [true]
-        });
+    /**
+     * On init
+     */
+    ngOnInit(): void
+    {
 
-        this._authService.customerAuthenticate$
-        .subscribe((response: CustomerAuthenticate) => {
-            
-            this.customerAuthenticate = response;
+        this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
-        // Get customer Addresses
-        this._checkoutService.customerAddresses$
-        .subscribe((response: Address[]) => {
-            
-            this.customerAddresses = response
-            
-        });
-
-        this._userService.get(this.customerAuthenticate.session.ownerId)
-        .subscribe((response)=>{
-
-            this.user = response.data
- 
-        });
-
-        // ----------------------
-        // Fuse Media Watcher
-        // ----------------------
-
-        this._fuseMediaWatcherService.onMediaChange$
+        this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(({matchingAliases}) => {               
-
-                this.currentScreenSize = matchingAliases;                
-
+            .subscribe((platform) => {
+                if(platform) {
+                    this.platform = platform;
+                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
+        this._cartService.cartsWithDetails$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((cartsWithDetails: CartWithDetails[]) => {
+                if (cartsWithDetails) {
+                    this.carts = cartsWithDetails;
+                    
+                    let allSelected: boolean[] = [];
+                    let allInCartSelected: { id: string; allSelected: boolean[]} = null;
+                    if (this.selectedCart) {
+                        // set all selected cart to false for every changes
+                        this.selectedCart.selected = false;
+
+                        this.carts.forEach(item => {
+
+                            // check if the selectedCart cartId already exists
+                            let cartIdIndex = this.selectedCart.carts.findIndex(element => element.id === item.id);
+                            
+                            if (cartIdIndex > -1) {
+                                // set all seleted in cart to false first, later check for true again
+                                this.selectedCart.carts[cartIdIndex].selected = false;
+
+                                // get all selected boolean from cartItems
+                                allSelected = this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected);
+                                allInCartSelected = {
+                                    id: this.selectedCart.carts[cartIdIndex].id,
+                                    allSelected: this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected)
+                                }
+                                // this.selectedCart.carts[cartIdIndex] = {...this.selectedCart.carts[cartIdIndex], ...cart};
+                            } else {
+                                let cart = {
+                                    id: item.id, 
+                                    cartItem: item.cartItems.map(element => {
+                                        return {
+                                            id: element.id,
+                                            selected: false
+                                        }
+                                    }),
+                                    selected: false
+                                };
+
+                                this.selectedCart.carts.push(cart);
+                            }
+
+                            if (cartIdIndex > -1 && allInCartSelected !== null && !allInCartSelected.allSelected.includes(false)) {
+                                this.selectedCart.carts[cartIdIndex].selected = true;
+                            }
+                        });
+
+                        console.log("allSelected", allSelected);
+                        
+                        if (allSelected.length && !allSelected.includes(false)) {
+                            // set all selected cart to true since all items in cartItem is true
+                            this.selectedCart.selected = true;                            
+                        }
+                    } else {
+                        this.selectedCart = {
+                            carts:  this.carts.map(item => {
+                                return {
+                                    id: item.id,
+                                    cartItem: item.cartItems.map(element => {
+                                        return {
+                                            id: element.id,
+                                            selected: false
+                                        }
+                                    }),
+                                    selected: false
+                                }
+                            }),
+                            selected: false
+                        }
+                    }
+
+                    console.log("this.selectedCart", this.selectedCart);
+                    
+
+                    // this.selectCart(null,null,true);
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get the cart pagination
+        this._cartService.cartsWithDetailsPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: CartPagination) => {
+                if (pagination) {
+                    // Update the pagination
+                    this.pagination = pagination;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            }); 
+
+        
+
+        // Subscribe to media changes
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {
+
+                this.currentScreenSize = matchingAliases;
+            });
+
+        this._userService.customersAddresses$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((customerAddresses : CustomerAddress[]) => {
+
+            this.customerAddresses = customerAddresses;
+            
+        });
     }
-    
+
+    /**
+    * After view init
+    */
+    ngAfterViewInit(): void
+    {
+        setTimeout(() => {
+            if (this._paginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._paginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._cartService.getCartsWithDetails(0, 4, null, this.customerId);
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+        }, 0);
+
+    }
+
     /**
      * On destroy
      */
@@ -238,111 +362,163 @@ export class BuyerCheckoutComponent implements OnInit
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+      
     }
-    
+
     // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
+    // @ Public method
     // -----------------------------------------------------------------------------------------------------
 
-    displayError(message: string) {
-        const confirmation = this._fuseConfirmationService.open({
-            "title": "Error",
-            "message": message,
-            "icon": {
-            "show": true,
-            "name": "heroicons_outline:exclamation",
-            "color": "warn"
-            },
-            "actions": {
-            "confirm": {
-                "show": true,
-                "label": "OK",
-                "color": "warn"
-            },
-            "cancel": {
-                "show": false,
-                "label": "Cancel"
+    onChangePage(pageOfItems: Array<any>) {
+        
+        // update current page of items
+        this.pageOfItems = pageOfItems;
+        
+        if(this.pagination && this.pageOfItems['currentPage']){
+
+            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+                // set loading to true
+                this.isLoading = true;
+                this._cartService.getCartsWithDetails(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], null, this.customerId)
+                    .subscribe((response)=>{
+                            
+                        // set loading to false
+                        this.isLoading = false;
+                    });
+                    
             }
-            },
-            "dismissible": true
-        });
+        }
 
-        return confirmation;
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
-
-    redeemPromoCode(){
-
-        // dummy data promo code available
-        let voucherCodes =[
-            'FREESHIPPING',
-            'RAYADEALS'
-        ]
-
-        //IF VOUCHER EXIST
-        if(voucherCodes.includes(this.inputPromoCode)){
-            const confirmation = this._fuseConfirmationService.open({
-                title  : '', 
-                message: 'Voucher code applied',
-                icon       : {
-                    show : false,
-                },
-                actions: {
-                    confirm: {
-                        label: 'OK',
-                        color: 'primary'
-                    },
-                    cancel : {
-                        show : false,
-                    }
-                }
-            });
-            //to show the dusocunted price when voucher applied
-            this.discountAmountVoucherApplied = 10.50;
-            this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
-           
-        } 
-        else{
-            const confirmation = this._fuseConfirmationService.open({
-                title  : '',
-                message: 'Invalid code, please try again',
-                icon       : {
-                    show : false,
-                },
-                actions: {
-                    confirm: {
-                        label: 'OK',
-                        color: 'primary'
-                    },
-                    cancel : {
-                        show : false,
-                    }
-                }
-            });
+    displayStoreLogo(store: Store) {
+        // let storeAssetsIndex = storeAssets.findIndex(item => item.assetType === 'LogoUrl');
+        if (store.storeLogoUrl != null) {
+            return store.storeLogoUrl;
+        } else {
+            return this.platform.logo;
         }
     }
 
-    selectOnVoucher(value:string){
+    deleteCart(cartId: string) {
 
-        //to show the disocunted price when voucher applied
-        this.discountAmountVoucherApplied = parseFloat(value);
-        this.displaydiscountAmountVoucherApplied = this.discountAmountVoucherApplied.toFixed(2) 
-                  
+        const confirmation = this._fuseConfirmationService.open({
+                title  : 'Delete Cart',
+                message: 'Are you sure you want to delete this cart?',
+                icon:{
+                    name:"mat_outline:delete_forever",
+                    color:"primary"
+                },
+                actions: {
+                    confirm: {
+                        label: 'Delete',
+                        color: 'warn'
+                    }
+                }
+            });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+    
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {
+
+                this._cartService.deleteCart(cartId)
+                    .subscribe(response => {
+
+                        this._cartService.getCartsByCustomerId(this.customerId)
+                            .subscribe()
+                    })
+            }
+        });    
+        
     }
 
-    checkQuantity(operator: string = null) {
+    checkQuantity(cartId: string, cartItem: CartItem, quantity: number = null, operator: string = null) {
+        quantity = quantity ? quantity : cartItem.quantity;
         if (operator === 'decrement')
-            this.quantity > this.minQuantity ? this.quantity -- : this.quantity = this.minQuantity;
+            quantity > this.minQuantity ? quantity -- : quantity = this.minQuantity;
         else if (operator === 'increment')
-            this.quantity < this.maxQuantity ? this.quantity ++ : this.quantity = this.maxQuantity;
+            quantity < this.maxQuantity ? quantity ++ : quantity = this.maxQuantity;
         else {
-            if (this.quantity < this.minQuantity) 
-                this.quantity = this.minQuantity;
-            else if (this.quantity > this.maxQuantity)
-                this.quantity = this.maxQuantity;
+            if (quantity < this.minQuantity) 
+                quantity = this.minQuantity;
+            else if (quantity > this.maxQuantity)
+                quantity = this.maxQuantity;
         }
+
+        let cartIndex = this.carts.findIndex(item => item.id === cartId);
+        let cartItemIndex = this.carts[cartIndex].cartItems.findIndex(item => item.id === cartItem.id);
+        
+        const cartItemBody = {
+            cartId: cartItem.cartId,
+            id: cartItem.id,
+            itemCode: cartItem.itemCode,
+            productId: cartItem.productId,
+            quantity: quantity
+        }
+
+        if (!((cartItem.quantity === quantity) && (quantity === this.minQuantity || quantity === this.maxQuantity))) {
+            this._cartService.putCartItem(cartId, cartItemBody, cartItem.id)
+                .subscribe((response)=>{
+                    this.carts[cartIndex].cartItems[cartItemIndex].quantity = quantity;
+                });
+        }
+    }
+
+    getCartItemsTotal(cartItems: CartItem[]) : number {
+        let cartItemsTotal: number;
+        if (cartItems.length && cartItems.length > 0) {
+            return cartItems.reduce((partialSum, item) => partialSum + item.price, 0);
+        } else {
+            return cartItemsTotal;
+        }
+    }
+
+    selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {      
+        console.log("carts", carts);
+          
+        if (carts) {
+            let cartsIds = carts.map(item => item.id);
+            console.log("cartsIds", cartsIds);
+            
+            this.selectedCart.carts.forEach(item => {
+                item.selected = checked;
+                if (cartsIds.includes(item.id)) {
+                    item.cartItem.forEach(element => {
+                        element.selected = checked;
+                    });
+                }
+            });
+        } else if (cart) {
+            let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
+            if (cartIndex > -1) {
+                this.selectedCart.carts[cartIndex].cartItem.forEach(item => {
+                    item.selected = checked;
+                });
+            }
+        }
+    }
+
+    deleteCartItem(cartId: string, cartItem: CartItem){
+
+        //To make custom pop up, and we pass the details in paramter data
+        let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
+        dialogRef.afterClosed().subscribe((result) => {
+            
+            // // if cart has items, calculate the charges
+            // if (this.cartItems.length > 0) {
+                
+            //     this.calculateCharges()                
+            // }
+            // // if cart is empty, reset the values
+            // else {
+            //     // change button to Calculate Charges
+            //     this.addressFormChanges();
+            // }
+        });
     }
 }

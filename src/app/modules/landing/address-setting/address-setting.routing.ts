@@ -1,22 +1,21 @@
 import { Route } from '@angular/router';
 import { CustomerAddressResolver } from '../landing.resolvers';
-import { CartListComponent } from './carts.component';
-import { CartsResolver } from './carts.resolver';
+import { AddressSettingsComponent } from './address-setting.component';
 
-export const voucherRoutes: Route[] = [
+
+export const addressSettingsRoutes: Route[] = [
     {
         path     : '',
         children   : [
             {
                 path: '',
                 resolve  : {
-                    cartsResolver: CartsResolver,
                     address: CustomerAddressResolver
                 },
                 data: {
-                    headerTitle: 'My Carts'
+                    headerTitle: 'My Address'
                 },
-                component: CartListComponent,
+                component: AddressSettingsComponent,
             }
         ],
     }

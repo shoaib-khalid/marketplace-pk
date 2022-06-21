@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
-import { UserService } from 'app/core/user/user.service';
+import { Injectable } from "@angular/core";
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { UserService } from "app/core/user/user.service";
+import { Observable } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
-export class UserProfileResolver implements Resolve<any>
+export class CustomerAddressResolver implements Resolve<any>
 {
     /**
      * Constructor

@@ -22,6 +22,9 @@ export class CartService
     private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
     private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
 
+    private _cartsHeaderWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
+    private _cartsHeaderWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
+
     private _customerCarts: ReplaySubject<CustomerCart> = new ReplaySubject<CustomerCart>(1);
     private _cartPagination: BehaviorSubject<CartPagination | null> = new BehaviorSubject(null);
 
@@ -74,12 +77,25 @@ export class CartService
         return this._cartsWithDetails.asObservable();
     }
 
+    get cartsHeaderWithDetails$(): Observable<CartWithDetails[]>
+    {
+        return this._cartsHeaderWithDetails.asObservable();
+    }
+
     /**
     * Getter for cart pagination
     */
     get cartsWithDetailsPagination$(): Observable<CartPagination>
     {
         return this._cartsWithDetailsPagination.asObservable();
+    }
+
+    /**
+    * Getter for cart pagination
+    */
+    get cartsHeaderWithDetailsPagination$(): Observable<CartPagination>
+    {
+        return this._cartsHeaderWithDetailsPagination.asObservable();
     }
 
     /**
@@ -194,7 +210,50 @@ export class CartService
                 page        : '' + page,
                 pageSize    : '' + size,
                 storeId     : '' + storeId,
-                customerId  : '' + customerId
+                customerId  : '' + customerId,
+                includeEmptyCart: false
+            }
+        };
+
+        if (storeId === null) delete header.params.storeId;
+
+        return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
+            tap((response) => {
+
+                this._logging.debug("Response from CartService (getCartsHeaderWithDetails)",response);
+
+                let _pagination = {
+                    length: response.data.totalElements,
+                    size: response.data.size,
+                    page: response.data.number,
+                    lastPage: response.data.totalPages,
+                    startIndex: response.data.pageable.offset,
+                    endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                }
+                this._cartsWithDetailsPagination.next(_pagination);
+                this._cartsWithDetails.next(response.data.content);
+            })
+        );
+    }
+
+    /**
+     * Get the current logged in cart data
+     */
+    getCartsHeaderWithDetails(page: number = 0, size: number = 10, storeId: string = null, customerId: string = null):
+    Observable<{ pagination: CartPagination; carts: Cart[] }>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                page        : '' + page,
+                pageSize    : '' + size,
+                storeId     : '' + storeId,
+                customerId  : '' + customerId,
+                includeEmptyCart: false
             }
         };
 
@@ -213,8 +272,8 @@ export class CartService
                     startIndex: response.data.pageable.offset,
                     endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
                 }
-                this._cartsWithDetailsPagination.next(_pagination);
-                this._cartsWithDetails.next(response.data.content);
+                this._cartsHeaderWithDetailsPagination.next(_pagination);
+                this._cartsHeaderWithDetails.next(response.data.content);
             })
         );
     }

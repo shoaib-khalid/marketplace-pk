@@ -16,6 +16,8 @@ import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { CartDiscount } from '../checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
+import { UserService } from 'app/core/user/user.service';
+import { CustomerAddress } from 'app/core/user/user.types';
 
 @Component({
     selector     : 'carts',
@@ -142,6 +144,7 @@ export class CartListComponent implements OnInit, OnDestroy
     selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean}[], selected: boolean };
     
     customerId: string = '';
+    customerAddresses: CustomerAddress[] = [];
 
     paymentDetails: CartDiscount = {
         cartSubTotal: 0,
@@ -182,7 +185,8 @@ export class CartListComponent implements OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _cartService: CartService,
         private _jwtService: JwtService,
-        private _authService: AuthService
+        private _authService: AuthService,
+        private _userService: UserService
     )
     {
     }
@@ -212,6 +216,8 @@ export class CartListComponent implements OnInit, OnDestroy
         this._cartService.cartsWithDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((cartsWithDetails: CartWithDetails[]) => {
+                console.log("cartsWithDetails",cartsWithDetails);
+
                 if (cartsWithDetails) {
                     this.carts = cartsWithDetails;
                     
@@ -248,6 +254,9 @@ export class CartListComponent implements OnInit, OnDestroy
                                     }),
                                     selected: false
                                 };
+
+                                console.log("sinii22", cart);
+                                
 
                                 this.selectedCart.carts.push(cart);
                             }
@@ -302,14 +311,20 @@ export class CartListComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             }); 
 
-        
-
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
 
                 this.currentScreenSize = matchingAliases;
+            });
+
+        this._userService.customersAddresses$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((customerAddresses : CustomerAddress[]) => {
+
+                this.customerAddresses = customerAddresses;
+                
             });
     }
 

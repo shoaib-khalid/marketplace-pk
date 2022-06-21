@@ -9,21 +9,42 @@
                 <!-- Header -->
                 <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                     <mat-icon 
-                        class="icon-size-4" 
-                        [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
-                    <span class="ml-2">Delivery Address</span>
+                        class="icon-size-5 text-primary" 
+                        [svgIcon]="'mat_solid:location_on'"></mat-icon>
+                    <span class="ml-2 font-bold">Delivery Address</span>
                 </div>
-                <!-- Enter Address -->
-                <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
-                <!-- Button -->
-                <button 
-                    class="w-30 bg-primary rounded-lg flex flex-row items-center justify-center p-1 mt-4"
-                >
-                    <mat-icon 
-                        class="icon-size-4" 
-                        [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-                    <span class="ml-1">Add</span>
-                </button>
+                <ng-container *ngIf="customerAddresses && customerAddresses.length; else noAddress">
+                    <ng-container *ngFor="let address of customerAddresses">
+                        <ng-container *ngIf="address.isDefault">
+                            <div class="flex flex-col m-2">
+                                <span class="font-medium pb-1">{{address.name}}</span>
+                                <span class="font-medium pb-1">{{address.phoneNumber}}</span>
+                                <span class="font-medium">{{address.address}}, {{address.postCode}}, {{address.city}}, {{address.state}}</span>
+                            </div>
+                            <div class="flex w-full justify-center items-center">
+                                <button
+                                    [routerLink]="'/address'"
+                                    class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
+                                    <span class="text-white">Change</span>
+                                </button>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-template #noAddress>
+                    <!-- Enter Address -->
+                    <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                    <!-- Button -->
+                    <button 
+                        [routerLink]="'/address'"
+                        class="w-30 bg-primary rounded-lg flex flex-row items-center justify-center p-1 mt-4"
+                    >
+                        <mat-icon 
+                            class="icon-size-5 text-white" 
+                            [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                        <span class="ml-1 text-white">Add</span>
+                    </button>
+                </ng-template>
             </div>
 
             <!-- Carts Details -->
@@ -63,11 +84,11 @@
                                     <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
                                         <!-- Checkbox each item -->
                                         <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
-                                            <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j + pagination.startIndex].selected" type="checkbox">
+                                            <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox">
                                         </div>
                                         <!-- Image, Title, Variants -->
                                         <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
-                                            <img class="w-14 sm:w-18 w-14 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : displayStoreLogo(cart.store)">
+                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
                                                 <span class="text-md sm:text-lg lg:text-xl font-semibold line-clamp-2">{{cartItem.productName}}</span>
                                                 <span class="text-xs lg:text-md text-secondary">Colour: Black, Size: L</span>
@@ -238,35 +259,14 @@
 
             <!-- Cart Summary -->
             <div class="flex flex-col w-full md:w-140 md:ml-6 md:mt-8">
-                <!-- Delivery Address (md) -->
-                <div class="hidden md:block flex flex-col justify-center items-center border rounded-lg p-2">
-                    <!-- Header -->
-                    <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
-                        <mat-icon 
-                            class="icon-size-4" 
-                            [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
-                        <span class="ml-2">Delivery Address</span>
-                    </div>
-                    <!-- Enter Address -->
-                    <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
-                    <!-- Button -->
-                    <button 
-                        class="w-30 bg-primary rounded-lg flex flex-row items-center justify-center p-1 mt-4"
-                    >
-                        <mat-icon 
-                            class="icon-size-4" 
-                            [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-                        <span class="ml-1">Add</span>
-                    </button>
-                </div>
                 <!-- Cart Summary -->
-                <div class="flex flex-col border rounded-lg p-2 mt-4">
+                <div class="flex flex-col border rounded-lg p-2 mb-4">
                     <!-- Header -->
                     <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                         <mat-icon 
-                            class="icon-size-4" 
+                            class="icon-size-5 text-primary" 
                             [svgIcon]="'mat_solid:add_shopping_cart'"></mat-icon>
-                        <span class="ml-2">Cart Summary</span>
+                        <span class="ml-2 font-bold">Cart Summary</span>
                     </div>
                     <!-- Summary -->
                     <!-- Sub Total -->
@@ -341,7 +341,7 @@
                             autocomplete="disabled"
                             [required]="true"
                             maxlength="5">
-                            <button class="bg-primary py-2 px-4 rounded">
+                            <button class="bg-primary py-2 px-4 rounded text-white">
                                 Apply
                             </button>
                     </mat-form-field>
@@ -358,9 +358,51 @@
                     </div>
 
                     <!-- Checkout -->
-                    <button class="bg-primary py-2 px-4 rounded w-full mt-2">
+                    <button class="bg-primary py-2 px-4 rounded w-full mt-2 text-white">
                         Checkout Now
                     </button>
+                </div>
+                <!-- Delivery Address (md) -->
+                <div class="hidden md:block flex flex-col justify-center items-center border rounded-lg p-2">
+                    <!-- Header -->
+                    <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
+                        <mat-icon 
+                            class="icon-size-5 text-primary" 
+                            [svgIcon]="'mat_solid:location_on'"></mat-icon>
+                        <span class="ml-2 font-bold">Delivery Address</span>
+                    </div>
+                    <ng-container *ngIf="customerAddresses && customerAddresses.length; else noAddress">
+                        <ng-container *ngFor="let address of customerAddresses">
+                            <ng-container *ngIf="address.isDefault">
+                                <div class="flex flex-col m-2">
+                                    <span class="font-medium pb-1">{{address.name}}</span>
+                                    <span class="font-medium pb-1">{{address.phoneNumber}}</span>
+                                    <span class="font-medium">{{address.address}}, {{address.postCode}}, {{address.city}}, {{address.state}}</span>
+                                </div>
+                                <div class="flex w-full justify-center items-center">
+                                    <button
+                                        [routerLink]="'/address'"
+                                        class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
+                                        <span class="text-white">Change</span>
+                                    </button>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <ng-template #noAddress>
+                        <!-- Enter Address -->
+                        <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                        <!-- Button -->
+                        <button 
+                            [routerLink]="'/address'"
+                            class="w-30 bg-primary rounded-lg flex flex-row items-center justify-center p-1 mt-4"
+                        >
+                            <mat-icon 
+                                class="icon-size-5 text-white" 
+                                [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                            <span class="ml-1 text-white">Add</span>
+                        </button>
+                    </ng-template>
                 </div>
             </div>
         </ng-container>    

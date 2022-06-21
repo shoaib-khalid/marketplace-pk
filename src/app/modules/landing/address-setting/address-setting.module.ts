@@ -13,25 +13,22 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
-import { BuyerCheckoutComponent } from './checkout.component';
-import { BuyerCheckoutRoutes } from './checkout.routing';
 
-
-import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs'
 import { MatTableModule } from '@angular/material/table';
 import { FuseCardModule } from '@fuse/components/card';
+import { AddressSettingsComponent } from './address-setting.component';
+import { addressSettingsRoutes } from './address-setting.routing'
 
 @NgModule({
     declarations: [
-        BuyerCheckoutComponent,
-        ModalConfirmationDeleteItemComponent,
+        AddressSettingsComponent,
     ],
     imports     : [
-        RouterModule.forChild(BuyerCheckoutRoutes),
+        RouterModule.forChild(addressSettingsRoutes),
         MatButtonModule,
         MatPaginatorModule,
         PaginationModule,
@@ -55,6 +52,6 @@ import { FuseCardModule } from '@fuse/components/card';
         DatePipe
     ]
 })
-export class BuyerCheckoutModule
+export class AddressSettingsModule
 {
 }

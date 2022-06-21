@@ -37,7 +37,7 @@ import { DomSanitizer} from '@angular/platform-browser';
 })
 
 
-export class AddressSettingComponent implements OnInit
+export class AddressSettingsComponent implements OnInit
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
