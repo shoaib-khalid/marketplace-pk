@@ -481,7 +481,48 @@ export class CartListComponent implements OnInit, OnDestroy
         }
     }
 
-    selectCart() {
+    selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {
+        if (carts) {
+            // select all carts
+            let cartsIds = carts.map(item => item.id);
+            this.selectedCart.carts.forEach(item => {
+                item.selected = checked;
+                if (cartsIds.includes(item.id)) {
+                    item.cartItem.forEach(element => {
+                        element.selected = checked;
+                    });
+                }
+            });
+        } else if (cart && cartItem === null) {
+            // select all cartItems in a cart 
+            let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
+            if (cartIndex > -1) {
+                this.selectedCart.carts[cartIndex].cartItem.forEach(item => {
+                    item.selected = checked;
+                });
+            }
+            // check for select all cartItems in a cart
+            this.carts.forEach(item => {
+                if (this.selectedCart.carts.map(element => element.id).includes(item.id)){
+                    this.selectedCart.selected = this.selectedCart.carts.every(element => element.selected);
+                }
+            });
+        } else if (cart && cartItem) {
+            // select single cart items
+            let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
+            if (cartIndex > -1) {
+                this.selectedCart.carts[cartIndex].selected = this.selectedCart.carts[cartIndex].cartItem.every(item => item.selected);
+            }
+            // check for select all cartItems in a cart
+            this.carts.forEach(item => {
+                if (this.selectedCart.carts.map(element => element.id).includes(item.id)){
+                    this.selectedCart.selected = this.selectedCart.carts.every(element => element.selected);
+                }
+            });
+        } else {
+            console.warn("Action not configured");
+        }
+
         let cartItemIds: string[];
         this.selectedCart.carts.forEach((item, iteration) => {
             if (iteration === 0) {
@@ -500,9 +541,9 @@ export class CartListComponent implements OnInit, OnDestroy
         });
 
         console.log("cartItemIds", cartItemIds);
-        
-
     }
+
+
 
     deleteCartItem(cartId: string, cartItem: CartItem){
 
