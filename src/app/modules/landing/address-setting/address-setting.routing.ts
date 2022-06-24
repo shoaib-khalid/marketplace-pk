@@ -1,7 +1,5 @@
 import { Route } from '@angular/router';
-import { CustomerAddressResolver } from '../landing.resolvers';
 import { AddressSettingsComponent } from './address-setting.component';
-
 
 export const addressSettingsRoutes: Route[] = [
     {
@@ -9,9 +7,6 @@ export const addressSettingsRoutes: Route[] = [
         children   : [
             {
                 path: '',
-                // resolve  : {
-                //     address: CustomerAddressResolver
-                // },
                 data: {
                     headerTitle: 'My Address'
                 },
@@ -19,5 +14,4 @@ export const addressSettingsRoutes: Route[] = [
             }
         ],
     }
-
 ]; 
