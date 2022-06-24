@@ -28,18 +28,18 @@ import { UserService } from 'app/core/user/user.service';
         /* language=SCSS */
         `
             .cart-grid {
-                grid-template-columns: 24px auto 96px 96px 96px 30px;
+                grid-template-columns: 0px auto 96px 96px 96px 0px;
 
                 @screen md {
-                    grid-template-columns: 24px auto 112px 112px 112px 30px;
+                    grid-template-columns: 0px auto 112px 112px 112px 0px;
                 }
             }
 
             .cart-title-grid {
-                grid-template-columns: 24px auto;
+                grid-template-columns: 0px auto;
 
                 @screen sm {
-                    grid-template-columns: 24px auto;
+                    grid-template-columns: 0px auto;
                 }
             }
 

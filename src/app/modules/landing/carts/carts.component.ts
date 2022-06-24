@@ -155,7 +155,9 @@ export class CartListComponent implements OnInit, OnDestroy
             description: {
                 isOpen: boolean,
                 value?: string
-            }
+            },
+            deliveryQuotationId: string,
+            deliveryType: string
         }[], 
         selected: boolean 
     };
@@ -273,7 +275,9 @@ export class CartListComponent implements OnInit, OnDestroy
                                     selected: false,
                                     description: {
                                         isOpen: false
-                                    }
+                                    },
+                                    deliveryQuotationId: null,
+                                    deliveryType: null
                                 };
                                 this.selectedCart.carts.push(cart);
                             }
@@ -305,7 +309,9 @@ export class CartListComponent implements OnInit, OnDestroy
                                     selected: false,
                                     description: {
                                         isOpen: false
-                                    }
+                                    },
+                                    deliveryQuotationId: null,
+                                    deliveryType: null
                                 }
                             }),
                             selected: false
@@ -571,7 +577,9 @@ export class CartListComponent implements OnInit, OnDestroy
                         return element.id
                     }
                 // to remove if selected = false (undefined array of cart item)
-                }).filter(x => x)
+                }).filter(x => x),
+                deliveryQuotationId : item.deliveryQuotationId,
+                deliveryType : item.deliveryType
             }
         // to remove if selected = false (undefined array of selectedItemId)
         }).filter(n => {
@@ -585,7 +593,8 @@ export class CartListComponent implements OnInit, OnDestroy
         this._cartService.getDiscountOfCartGroup(cartListBody)
         .subscribe((response) => {            
             this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
-            this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal
+            this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
+            this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
         });
 
         // console.log("cartItemIds", cartItemIds);
@@ -645,7 +654,13 @@ export class CartListComponent implements OnInit, OnDestroy
                     
                     this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
                     this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
-                }
+
+                    // find index at response to find the minimum price charges
+                    let minDeliveryChargesIndex = deliveryProviderResponse.findIndex(item => item.price === minDeliveryCharges);
+
+                    this.selectedCart.carts[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
+                    this.selectedCart.carts[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
+                }                
             });
     }
 

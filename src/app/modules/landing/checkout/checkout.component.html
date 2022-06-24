@@ -55,10 +55,11 @@
                     <!-- Header -->
                     <div class="hidden lg:grid cart-grid w-full sticky py-2 border-b border-gray-600">
                         <!-- Checkbox all carts -->
-                        <div class="flex items-center justify-center w-full">
+                        <!-- <div class="flex items-center justify-center w-full">
                             <input type="checkbox" [(ngModel)]="selectedCart.selected" (click)="selectCart(carts,null,null,$event.target.checked)"/>
-                        </div>
-                        <span class="font-semibold text-left ml-4">Product</span>
+                        </div> -->
+                        <span></span>
+                        <span class="font-semibold text-left">Product</span>
                         <span class="font-semibold text-center">Unit Price</span>
                         <span class="font-semibold text-center">Quantity</span>
                         <span class="font-semibold text-center">Total Price</span>
@@ -69,10 +70,11 @@
                             <!-- Cart Header -->
                             <div class="cart-title-grid grid w-full sticky pb-2 border-b">
                                 <!-- Checkbox all in cart -->
-                                <div class="flex items-start justify-center mt-2 w-full">
+                                <!-- <div class="flex items-start justify-center mt-2 w-full">
                                     <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (click)="selectCart(null,cart,null,$event.target.checked)">
-                                </div>
-                                <div class="flex flex-col justify-start ml-2 md:ml-4">
+                                </div> -->
+                                <span></span>
+                                <div class="flex flex-col justify-start">
                                     <span class="text-md sm:text-2xl font-semibold">{{cart.store.name}}</span>
                                     <span class="text-sm sm:text-md text-secondary">Cart ID: {{cart.id}}</span>
                                     <span class="text-sm sm:text-md text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
@@ -83,12 +85,13 @@
                                 <ng-container *ngFor="let cartItem of cart.cartItems; let j = index">
                                     <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
                                         <!-- Checkbox each item -->
-                                        <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
+                                        <!-- <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
                                             <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j + pagination.startIndex].selected" type="checkbox">
-                                        </div>
+                                        </div> -->
+                                        <span></span>
                                         <!-- Image, Title, Variants -->
-                                        <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
-                                            <img class="w-14 sm:w-18 w-14 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : displayStoreLogo(cart.store)">
+                                        <div class="flex flex-row grow items-center justify-start">
+                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
                                                 <span class="text-md sm:text-lg lg:text-xl font-semibold line-clamp-2">{{cartItem.productName}}</span>
                                                 <span class="text-xs lg:text-md text-secondary">Colour: Black, Size: L</span>
@@ -137,23 +140,13 @@
                                             <span class="text-xs text-red-500 mt-1">2 items left</span>
                                         </div>
                                         <!-- Total Price -->
-                                        <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md min-w-20 max-w-20 truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                        <span class="hidden sm:flex justify-center items-center font-semibold text-right text-sm md:text-md truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                         <!-- Remove Item -->
-                                        <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer"
-                                            (click)="deleteCartItem(cart.id, cartItem)">
-                                            <mat-icon 
-                                                class="icon-size-4" 
-                                                [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                                        </span>
+                                        <span></span>
                                         <!-- Total Price , Unit Price , Remove button for sm-->
                                         <div class="flex flex-col items-end justify-between">
                                             <!-- Remove Item -->
-                                            <span class="flex sm:hidden justify-center items-center text-center px-1 cursor-pointer"
-                                                (click)="deleteCartItem(cart.id,cartItem)">
-                                                <mat-icon 
-                                                    class="icon-size-4" 
-                                                    [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                                            </span>
+                                            <span></span>
                                             <div class="flex flex-col justify-end items-end">
                                                 <!-- Unit Price -->
                                                 <div class="flex sm:hidden flex-col justify-center items-end text-center px-1">

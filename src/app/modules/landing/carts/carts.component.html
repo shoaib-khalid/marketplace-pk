@@ -165,18 +165,18 @@
                                         <!-- Total Price -->
                                         <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md min-w-20 max-w-20 truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                         <!-- Remove Item -->
-                                        <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer"
-                                            (click)="deleteCartItem(cart.id, cartItem)">
+                                        <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer">
                                             <mat-icon 
+                                            (click)="deleteCartItem(cart.id, cartItem)"
                                                 class="icon-size-4" 
                                                 [svgIcon]="'heroicons_solid:trash'"></mat-icon>
                                         </span>
                                         <!-- Total Price , Unit Price , Remove button for sm-->
                                         <div class="flex flex-col items-end justify-between">
                                             <!-- Remove Item -->
-                                            <span class="flex sm:hidden justify-center items-center text-center px-1 cursor-pointer"
-                                                (click)="deleteCartItem(cart.id,cartItem)">
-                                                <mat-icon 
+                                            <span class="flex sm:hidden justify-center items-center text-center px-1 cursor-pointer">
+                                                <mat-icon
+                                                    (click)="deleteCartItem(cart.id,cartItem)" 
                                                     class="icon-size-4" 
                                                     [svgIcon]="'heroicons_solid:trash'"></mat-icon>
                                             </span>
@@ -355,11 +355,11 @@
                     </div>
                     <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Store Voucher</span>
-                        <span class="text-md font-semibold">RM 5.00</span>
+                        <span class="text-md font-semibold">RM 0.00</span>
                     </div>
                     <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
-                        <span class="text-md font-semibold">RM 5.00</span>
+                        <span class="text-md font-semibold">RM 0.00</span>
                     </div>
 
                     <!-- Separator -->
