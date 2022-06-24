@@ -13,21 +13,6 @@
     <featured-locations class="w-full" [locations]="locations" [showViewAll]="false" [title]="'Locations'"></featured-locations>
     <!-- Categories -->
     <featured-categories class="w-full" [categories]="categories" [showViewAll]="false" [title]="'Categories'"></featured-categories>
-    <!-- Featured Stores -->
-    <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Stores'"></featured-stores>
-        <!-- Pagination -->
-        <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
-            <div class="flex w-full my-4 items-center justify-center">
-                <pagination 
-                    [itemLength]="featuredStoresPagination.length" 
-                    [initialPage]="featuredStoresPagination.page + 1"
-                    [pageSize]="featuredStoresPagination.size"
-                    (changePage)="onChangePage($event, 'store')"
-                    #storesPaginator></pagination>
-            </div>
-        </ng-container>
-    </ng-container>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
         <featured-products class="w-full" [products]="featuredProducts" [showViewAll]="false" [title]="'Featured Products'"></featured-products>
@@ -40,6 +25,21 @@
                     [pageSize]="featuredProductsPagination.size"
                     (changePage)="onChangePage($event, 'product')"
                     #productsPaginator></pagination>
+            </div>
+        </ng-container>
+    </ng-container>
+    <!-- Featured Stores -->
+    <ng-container *ngIf="featuredStores && featuredStores.length">
+        <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Stores'"></featured-stores>
+        <!-- Pagination -->
+        <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="featuredStoresPagination.length" 
+                    [initialPage]="featuredStoresPagination.page + 1"
+                    [pageSize]="featuredStoresPagination.size"
+                    (changePage)="onChangePage($event, 'store')"
+                    #storesPaginator></pagination>
             </div>
         </ng-container>
     </ng-container>
