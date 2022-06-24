@@ -29,8 +29,8 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { EditAccountComponent } from './account/account.component';
 import { EditSecurityComponent } from './security/security.component';
 import { EditDeliveryAddressComponent } from './delivery-address/delivery-address.component';
-import { EditAddressDialog } from './delivery-address/edit-address/edit-address.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { _CustomerAddressesModule } from 'app/layout/common/_customer-addresses/customer-addresses.module';
 
 @NgModule({
     declarations: [
@@ -38,7 +38,6 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
         EditAccountComponent,
         EditSecurityComponent,
         EditDeliveryAddressComponent,
-        EditAddressDialog
     ],
     imports     : [
         RouterModule.forChild(userProfileRoutes),
@@ -62,7 +61,8 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
         FuseCardModule,
         FuseAlertModule,
         MatDialogModule,
-        NgxMatSelectSearchModule
+        NgxMatSelectSearchModule,
+        _CustomerAddressesModule
     ],
     providers: [
         // GraphHelper
