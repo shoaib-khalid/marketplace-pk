@@ -109,7 +109,7 @@ export class CartsResolver implements Resolve<any>
 
         return forkJoin([
             // this._cartsService.getCarts(0, 4, null, customerId),
-            this._cartsService.getCartsWithDetails(0, 2, null, customerId)
+            this._cartsService.getCartsWithDetails({ page: 0, pageSize: 2, customerId: customerId, includeEmptyCart: false})
         ]);
     }
 }

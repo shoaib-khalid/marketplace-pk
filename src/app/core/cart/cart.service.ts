@@ -8,6 +8,7 @@ import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from '../auth/auth.service';
 import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
+import { JwtService } from '../jwt/jwt.service';
 
 @Injectable({
     providedIn: 'root'
@@ -36,6 +37,7 @@ export class CartService
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _authService: AuthService,
+        private _jwtService: JwtService,
         private _router: Router,
         private _logging: LogService
     )
@@ -117,16 +119,16 @@ export class CartService
     /**
      * Setter for cartId
      */
-    set cartId(value: string) {
-        localStorage.setItem('cartId', value);
+    set cartIds(value: string) {
+        localStorage.setItem('cartIds', value);
     }
 
     /**
      * Getter for cartId
      */
-    get cartId$(): string
+    get cartIds$(): string
     {
-        return localStorage.getItem('cartId') ?? '';
+        return localStorage.getItem('cartIds') ?? '';
     }
 
     /**
@@ -148,6 +150,20 @@ export class CartService
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+
+    cartResolver(): Observable<any>
+    {
+        return of(true).pipe(
+            map(()=>{
+                let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
+                let cartIds: { id: string, storeId: string, cartItems: { id: string }}[] = this.cartIds$ ? JSON.parse(this.cartIds$) : [];
+
+                if ((cartIds && cartIds.length) || customerId){
+                    this.getCartsWithDetails({ id: cartIds.map(item => item.id), page: 0, pageSize: 5, customerId: customerId, includeEmptyCart: false}).subscribe();
+                }
+            })
+        );
+    }
 
     // -------------
     // Cart
@@ -197,7 +213,21 @@ export class CartService
     /**
      * Get the current logged in cart data
      */
-    getCartsWithDetails(page: number = 0, size: number = 10, storeId: string = null, customerId: string = null):
+    getCartsWithDetails(params: { 
+        page                : number,
+        pageSize            : number,
+        id?                 : string[],
+        storeId?            : string,
+        customerId?         : string,
+        includeEmptyCart?   : boolean
+    } = {
+        id                  : [],
+        page                : 0, 
+        pageSize            : 10, 
+        storeId             : null, 
+        customerId          : null,
+        includeEmptyCart    : false
+    }):
     Observable<{ pagination: CartPagination; carts: Cart[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
@@ -206,16 +236,21 @@ export class CartService
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page        : '' + page,
-                pageSize    : '' + size,
-                storeId     : '' + storeId,
-                customerId  : '' + customerId,
-                includeEmptyCart: false
-            }
+            params: params
         };
 
-        if (storeId === null) delete header.params.storeId;
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+                delete header.params[key];
+            }
+        });
+
+        console.log("header.params", header.params);
+        
 
         return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
             tap((response) => {
@@ -336,9 +371,6 @@ export class CartService
                 ),
                 switchMap(async (response: any) => {
                     this._logging.debug("Response from StoresService (createCart)",response);
-
-                    // set cart id
-                    this.cartId = response["data"].id;
 
                     // set cart
                     this._cart.next(response);

@@ -128,7 +128,7 @@ export class AppComponent
             var _IpActivity = this.ipAddress;
             
             //get session id by get cart id
-            var _sessionId = this._cartService.cartId$ 
+            var _sessionId = null // this._cartService.cartId$ 
 
             const activityBody = 
             {

@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { FuseCardModule } from '@fuse/components/card';
 import { CartListComponent } from './carts.component';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 @NgModule({
     declarations: [
@@ -37,6 +38,7 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
         PaginationModule,
         SharedModule,
         MatTabsModule,
+        ErrorBackgroundModule,
         FuseCardModule
     ],
     providers: [

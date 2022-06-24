@@ -329,7 +329,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -409,7 +409,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -484,7 +484,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });        
@@ -568,7 +568,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -652,7 +652,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -727,7 +727,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -810,7 +810,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || header.params[key].length === 0) {
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });

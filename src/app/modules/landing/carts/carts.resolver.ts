@@ -15,9 +15,7 @@ export class CartsResolver implements Resolve<any>
      * Constructor
      */
     constructor(
-        private _cartsService: CartService,
-        private _jwtService: JwtService,
-        private _authService: AuthService
+        private _cartsService: CartService
 
     )
     {
@@ -36,11 +34,8 @@ export class CartsResolver implements Resolve<any>
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
-        let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
-
         return forkJoin([
-            // this._cartsService.getCarts(0, 4, null, customerId),
-            this._cartsService.getCartsWithDetails(0, 5, null, customerId)
+            this._cartsService.cartResolver()
         ]);
     }
 }

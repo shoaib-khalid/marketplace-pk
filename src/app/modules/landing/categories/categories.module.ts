@@ -14,6 +14,7 @@ import { _FeaturedLocationsModule } from 'app/layout/common/_featured-locations/
 import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/featured-products.module';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.module';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 @NgModule({
     declarations: [
@@ -32,6 +33,7 @@ import { _AdsBannerModule } from 'app/layout/common/_ads-banner/ads-banner.modul
         _FeaturedProductsModule,
         _AdsBannerModule,
         PaginationModule,
+        ErrorBackgroundModule,
         FuseCardModule
     ]
 })

@@ -374,7 +374,7 @@ export class CartListComponent implements OnInit, OnDestroy
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._cartService.getCartsWithDetails(0, 4, null, this.customerId);
+                        return this._cartService.getCartsWithDetails({page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -410,7 +410,7 @@ export class CartListComponent implements OnInit, OnDestroy
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._cartService.getCartsWithDetails(this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], null, this.customerId)
+                this._cartService.getCartsWithDetails({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], customerId: this.customerId, includeEmptyCart: false})
                     .subscribe((response)=>{
                             
                         // set loading to false
@@ -627,7 +627,7 @@ export class CartListComponent implements OnInit, OnDestroy
         let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
         const deliveryChargesBody = {
-            cartId: this._cartService.cartId$,
+            cartId: cartId,
             customerId: _customerId,
             delivery: {
                 deliveryAddress     : this.customerAddress.address,

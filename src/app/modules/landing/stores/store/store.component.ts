@@ -219,9 +219,11 @@ export class LandingStoreComponent implements OnInit
                     // check if cart id exists
                     // -----------------------
 
-                    if (this._cartService.cartId$) {
+                    if (false
+                        // this._cartService.cartId$
+                        ) {
                         
-                        this.cartId = this._cartService.cartId$;
+                        // this.cartId = this._cartService.cartId$;
                         // if(this.cartId && this.cartId !== '') {                            
                         //     this.getCartItems(this.cartId);
                         // }

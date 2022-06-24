@@ -4,6 +4,7 @@ import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { InitialDataResolver, PlatformSetupResolver } from 'app/app.resolvers';
 import { UserRole } from 'app/core/user/user.roles';
+import { CartsResolver } from './modules/landing/carts/carts.resolver';
 
 // @formatter:off
 /* eslint-disable max-len */
@@ -22,7 +23,8 @@ export const appRoutes: Route[] = [
         },
         resolve    : {
             initialData: InitialDataResolver,
-            platformSetup: PlatformSetupResolver
+            platformSetup: PlatformSetupResolver,
+            carts: CartsResolver
         },
         children   : [
             { path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule) },

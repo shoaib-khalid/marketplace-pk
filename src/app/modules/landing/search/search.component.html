@@ -1,11 +1,11 @@
-<div class="flex flex-col items-center bg-card w-full p-2 sm:p-4 sm:pt-0 h-full">
+<div class="flex flex-col items-center bg-card w-full h-full">
     <!-- Search Bar -->
     <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full sm:mt-4"></search> -->
     <!-- <search class="w-full sm:mt-4"></search> -->
     <!-- No Results -->
     <ng-container *ngIf="stores.length === 0 && products.length === 0">
-        <div class="flex flex-auto flex-col items-center justify-center h-56 md:h-140 border-gray-300 dark:bg-transparent">
-            <error-background class="absolute z-0 md:max-w-160 md:w-full opacity-50"></error-background>
+        <div class="relative flex flex-col items-center justify-center w-full h-56 md:h-96 border-gray-300 dark:bg-transparent">
+            <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
             <mat-icon
                 class="icon-size-20 z-10"
                 [svgIcon]="'heroicons_outline:document-search'"></mat-icon>
