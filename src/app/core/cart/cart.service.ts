@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
-import { Cart, CartItem, CartPagination, CartWithDetails, CustomerCart } from 'app/core/cart/cart.types';
+import { Cart, CartItem, CartPagination, CartWithDetails, CustomerCart, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { AppConfig } from 'app/config/service.config';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from '../auth/auth.service';
@@ -540,21 +540,29 @@ export class CartService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
         };
 
-        return this.cartItems$.pipe(
+        console.log("this.cartsWithDetails$", this.cartsWithDetails$);
+        
+
+        return this.cartsWithDetails$.pipe(
             take(1),
-            switchMap(cartItems => this._httpClient.delete<any>(orderService + '/carts/' + cartId + '/items/' + itemId, header)
+            switchMap(cartsWithDetails => this._httpClient.delete<any>(orderService + '/carts/' + cartId + '/items/' + itemId, header)
             .pipe(
                 map((response) => {
-                    this._logging.debug("Response from StoresService (deleteCartItem)",response);
+                    this._logging.debug("Response from CartService (deleteCartItem)",response);
 
-                    let index = cartItems.findIndex(item => item.id === itemId);
+                    let index = cartsWithDetails.findIndex(item => item.id === itemId);
 
                     if (index > -1) {
                         // Delete the cartItems
-                        cartItems.splice(index, 1);
+                        cartsWithDetails.splice(index, 1);
 
                         // Update the products
-                        this._cartItems.next(cartItems);
+                        this._cartsWithDetails.next(cartsWithDetails);
+
+                        console.log("_cartsWithDetails",this._cartsWithDetails);
+                        console.log("cartsWithDetails", cartsWithDetails);
+                        
+                        
                     }
 
                     return response["data"];
@@ -645,6 +653,31 @@ export class CartService
         {
             this._router.navigateByUrl('/signed-in-redirect');
         }
+    }
+
+    //-----------------------
+    //      Cart Group
+    //-----------------------
+
+    getDiscountOfCartGroup(CartListBody: any): Observable<DiscountOfCartGroup> 
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.post<any>(orderService + '/carts' + '/groupdiscount', CartListBody, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from StoresService (getDiscountOfCartGroup)",response);
+
+                    // Return the new notification from observable
+                    return response['data'];
+                })
+        );
     }
 
 }

@@ -9,9 +9,9 @@ export const addressSettingsRoutes: Route[] = [
         children   : [
             {
                 path: '',
-                resolve  : {
-                    address: CustomerAddressResolver
-                },
+                // resolve  : {
+                //     address: CustomerAddressResolver
+                // },
                 data: {
                     headerTitle: 'My Address'
                 },

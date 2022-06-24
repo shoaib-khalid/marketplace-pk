@@ -82,6 +82,6 @@ export class CustomerAddressResolver implements Resolve<any>
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
         // Fork join multiple API endpoint calls to wait all of them to finish
-        return this._userService.getCustomerAddress(this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid);
+        return this._userService.getCustomerAddresses();
     }
 }

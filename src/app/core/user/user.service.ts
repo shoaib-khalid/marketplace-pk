@@ -207,14 +207,63 @@ export class UserService
         return this._httpClient.get<any>(userService + "/customer/" + customerId +'/address', header)
             .pipe(
                 tap((address: CustomerAddress) => {
-                    this._logging.debug("Response from UserService (getCustomerAddress)",address);
+                    this._logging.debug("Response from UserService (getCustomerAddresses)",address);
                     this._customerAddresses.next(address["data"].content);
+
+                    let defaultAddressIndex = address["data"].content.findIndex(item => item.isDefault === true);
+                    
+                    if (defaultAddressIndex > -1) {
+                        this._customerAddress.next(address["data"].content[defaultAddressIndex]);
+                    } else {
+                        this._customerAddress.next(address["data"].content[0]);
+                    }
                 }
             )
         );
     }
 
-    getCustomerAddress(id:string)
+    getSelectedCustomerAddress(id: string): Observable<CustomerAddress>
+    {
+        return this._customerAddresses.pipe(
+            take(1),
+            map((addresses) => {
+
+                // Find the store
+                const address = addresses.find(item => item.id === id) || null;
+
+                this._logging.debug("Response from StoresService (getSelectedCustomerAddress)",address);
+
+                // Update the store
+                this._customerAddress.next(address);
+
+                // Return the store
+                return address;
+            }),
+            switchMap((address) => {
+
+                if ( !address )
+                {
+                    return throwError('Could not found store with id of ' + id + '!');
+                }
+
+                return of(address);
+            })
+        );
+    }
+
+    // getSelectedCustomerAddress()
+    // {
+    //     return this.customerAddress$
+    //         .pipe(
+    //             map((address: CustomerAddress) => {
+    //                 this._logging.debug("Response from UserService (getCustomerAddress)",address);
+    //                 this._customerAddresses.next(address["data"].content);
+    //             }
+    //         )
+    //     );
+    // }
+
+    getCustomerAddressByCustomerId()
     {
         let userService = this._apiServer.settings.apiServer.userService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
@@ -244,7 +293,7 @@ export class UserService
             );
     }
 
-    getCustomerAddressById(id:string)
+    getCustomerAddressById(addressId: string)
     {
         let userService = this._apiServer.settings.apiServer.userService;
         let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
@@ -253,7 +302,7 @@ export class UserService
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
         };
 
-        return this._httpClient.get<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address'+ id, header)
+        return this._httpClient.get<HttpResponse<CustomerAddress>>(userService + "/customer/" + customerId +'/address'+ addressId, header)
             .pipe(
                 tap((address:HttpResponse<CustomerAddress>) => {
                     this._logging.debug("Response from UserService (getCustomerAddressById)",address);

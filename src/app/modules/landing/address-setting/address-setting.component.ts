@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,24 +15,25 @@ import { CustomerAddress } from 'app/core/user/user.types';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 // import { EditAddressDialog } from '../../user-profile/delivery-address/edit-address/edit-address.component';
 import { DomSanitizer} from '@angular/platform-browser';
+import { EditAddressDialog } from './edit-address/edit-address.component';
 
 @Component({
     selector     : 'address-setting',
     templateUrl  : './address-setting.component.html',
     encapsulation: ViewEncapsulation.None,
-    styles        : [
-        `
-        .mat-dialog-container {
-            padding: 10px !important;
-            border-radius: 0 !important;
+    // styles        : [
+    //     `
+    //     .mat-dialog-container {
+    //         padding: 10px !important;
+    //         border-radius: 2 !important;
 
-            @screen sm {
-                padding: 24px !important;
-                border-radius: 16px !important;
-            }
-        }
-        `
-    ]
+    //         @screen sm {
+    //             padding: 24px !important;
+    //             border-radius: 16px !important;
+    //         }
+    //     }
+    //     `
+    // ]
 
 })
 
@@ -41,13 +42,18 @@ export class AddressSettingsComponent implements OnInit
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    customersAddresses$: Observable<CustomerAddress[]>;
+    customersAddresses: CustomerAddress[];
+    customerAddress: CustomerAddress = null;
+
+    selectedAddress: CustomerAddress = null;
+    
     accountForm: FormGroup;
 
     alert: any;
     currentScreenSize: string[] = [];
 
     url:any;
+
 
     /**
      * Constructor
@@ -61,7 +67,8 @@ export class AddressSettingsComponent implements OnInit
         private _userService: UserService,
         private _jwtService: JwtService,
         private _authService: AuthService,
-        private _domSanitizer: DomSanitizer
+        private _domSanitizer: DomSanitizer,
+        private _location: Location
     )
     {
     }
@@ -81,11 +88,28 @@ export class AddressSettingsComponent implements OnInit
         // Customer Details
         this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
             .subscribe((response)=>{
-                
                 this.accountForm.patchValue(response);
             })
 
-        this.customersAddresses$ = this._userService.customersAddresses$;
+        this._userService.customersAddresses$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((addresses: CustomerAddress[]) => {
+                if(addresses){
+                    this.customersAddresses = addresses;
+                } 
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+            this._userService.customerAddress$
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((address: CustomerAddress) => {
+                    if (address) {
+                        this.selectedAddress = address;
+                    }    
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
 
         // ----------------------
         // Fuse Media Watcher
@@ -100,6 +124,16 @@ export class AddressSettingsComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -162,49 +196,49 @@ export class AddressSettingsComponent implements OnInit
         this.accountForm.enable();
     }
     addAddress() {
-        // const dialogRef = this._dialog.open( 
-        //     EditAddressDialog, {
-        //         width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-        //         height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-        //         maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-        //         maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-        //         disableClose: true,
-        //         data: {
-        //             type: "create",
-        //             customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
-        //             user: this.accountForm.value
-        //         },
-        //     }
-        // );    
-        // dialogRef.afterClosed().subscribe(result=>{
-        //     if (result) {
-        //         //Customer Addresses
-        //         this._userService.createCustomerAddress(result)
-        //             .subscribe(()=>{});
-        //     }
-        // });
+        const dialogRef = this._dialog.open( 
+            EditAddressDialog, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data: {
+                    type: "create",
+                    customerId: this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid,
+                    user: this.accountForm.value
+                },
+            }
+        );    
+        dialogRef.afterClosed().subscribe(result=>{
+            if (result) {
+                //Customer Addresses
+                this._userService.createCustomerAddress(result)
+                    .subscribe(()=>{});
+            }
+        });
     }
 
     editAddress(customerAddress: CustomerAddress){
-        // const dialogRef = this._dialog.open(
-        //     EditAddressDialog, {
-        //         width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-        //         height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-        //         maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-        //         maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
-        //         disableClose: true,
-        //         data: {
-        //             type: "edit",
-        //             customerAddress: customerAddress
-        //         }
-        //     }
-        // );
-        // dialogRef.afterClosed().subscribe(result => {
-        //     if(result){
-        //         // Customer Addresses
-        //         this._userService.putCustomerAddressById(result).subscribe(()=>{});
-        //     } 
-        // });        
+        const dialogRef = this._dialog.open(
+            EditAddressDialog, {
+                width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                disableClose: true,
+                data: {
+                    type: "edit",
+                    customerAddress: customerAddress
+                }
+            }
+        );
+        dialogRef.afterClosed().subscribe(result => {
+            if(result){
+                // Customer Addresses
+                this._userService.putCustomerAddressById(result).subscribe(()=>{});
+            } 
+        });        
     }
 
     deleteAddress(customerAddressId) {
@@ -235,5 +269,17 @@ export class AddressSettingsComponent implements OnInit
         this._userService.setDefaultCustomerAddressById(customerbody)
             .subscribe(()=>{});
     }
+
+    selectAddress(addressId) {
+
+        this._userService.getSelectedCustomerAddress(addressId)
+        .subscribe(response=>{
+            this.customerAddress = response
+        })
+    }
+
+    backClicked() {
+        this._location.back();
+      }
     
 }

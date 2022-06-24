@@ -22,10 +22,13 @@ import { MatTableModule } from '@angular/material/table';
 import { FuseCardModule } from '@fuse/components/card';
 import { AddressSettingsComponent } from './address-setting.component';
 import { addressSettingsRoutes } from './address-setting.routing'
+import { EditAddressDialog } from './edit-address/edit-address.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
     declarations: [
         AddressSettingsComponent,
+        EditAddressDialog
     ],
     imports     : [
         RouterModule.forChild(addressSettingsRoutes),
@@ -47,6 +50,7 @@ import { addressSettingsRoutes } from './address-setting.routing'
         FuseCardModule,
         MatExpansionModule,
         SharedModule,
+        NgxMatSelectSearchModule
     ],
     providers   : [
         DatePipe

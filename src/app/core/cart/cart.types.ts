@@ -97,3 +97,56 @@ export interface Product
     isPackage: boolean;
     status: string;
 }
+
+export interface DiscountOfCartGroup 
+{
+    platformVoucherDeliveryDiscount             : number;
+    platformVoucherDeliveryDiscountDescription  : string;
+    platformVoucherDiscountCalculationType      : string;
+    platformVoucherDiscountCalculationValue     : number;
+    platformVoucherDiscountMaxAmount            : number;
+    platformVoucherDiscountType                 : string;
+    platformVoucherSubTotalDiscount             : number;
+    platformVoucherSubTotalDiscountDescription  : string;
+    storeDiscountList                           : StoreDiscountList;
+    sumCartDeliveryCharge                       : number;
+    sumCartGrandTotal                           : number;
+    sumCartSubTotal                             : number;
+    sumDeliveryDiscount                         : number;
+    sumSubTotalDiscount                         : number;
+}
+
+export interface StoreDiscountList
+{
+    cartDeliveryCharge                      : number;
+    cartGrandTotal                          : number;
+    cartSubTotal                            : number;
+    deliveryDiscount                        : number;
+    deliveryDiscountDescription             : string;
+    deliveryDiscountMaxAmount               : number;
+    discountCalculationType                 : string;
+    discountCalculationValue                : number;
+    discountId                              : string;
+    discountMaxAmount                       : number;
+    discountType                            : string;
+    storeServiceCharge                      : number;
+    storeServiceChargePercentage            : number;
+    storeVoucherDeliveryDiscount            : number;
+    storeVoucherDeliveryDiscountDescription : string;
+    storeVoucherDiscountCalculationType     : string;
+    storeVoucherDiscountCalculationValue    : number;
+    storeVoucherDiscountMaxAmount           : number;
+    storeVoucherDiscountType                : string;
+    storeVoucherSubTotalDiscount            : number;
+    storeVoucherSubTotalDiscountDescription : string;
+    subTotalDiscount                        : number;
+    subTotalDiscountDescription             : string;
+    voucherDeliveryDiscount                 : number;
+    voucherDeliveryDiscountDescription      : string;
+    voucherDiscountCalculationType          : string;
+    voucherDiscountCalculationValue         : number;
+    voucherDiscountMaxAmount                : number;
+    voucherDiscountType                     : string;
+    voucherSubTotalDiscount                 : number;
+    voucherSubTotalDiscountDescription      : string;
+}

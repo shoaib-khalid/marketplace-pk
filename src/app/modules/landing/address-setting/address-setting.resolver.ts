@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
 @Injectable({
     providedIn: 'root'
 })
-export class CustomerAddressResolver implements Resolve<any>
+export class CustomerAddressesResolver implements Resolve<any>
 {
     /**
      * Constructor

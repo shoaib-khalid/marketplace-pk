@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 import { BuyerCheckoutComponent } from './checkout.component';
-import { AddressResolver, CartsResolver, CustomerAddressResolver } from './checkout.resolver';
+import { AddressResolver, CartsResolver } from './checkout.resolver';
 
 export const BuyerCheckoutRoutes: Route[] = [
     {
@@ -12,7 +12,7 @@ export const BuyerCheckoutRoutes: Route[] = [
                     headerTitle: 'Checkout'
                 },
                 resolve  : {
-                    address: CustomerAddressResolver,
+                    // address: CustomerAddressResolver,
                     cartsResolver: CartsResolver,
                 },
                 component: BuyerCheckoutComponent

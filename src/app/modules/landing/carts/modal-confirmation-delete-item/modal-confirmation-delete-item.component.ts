@@ -8,30 +8,29 @@ import { CartService } from 'app/core/cart/cart.service';
 })
 export class ModalConfirmationDeleteItemComponent implements OnInit {
 
-  cartId :string ='';
-  itemId : string = '';
+	cartId :string ='';
+	itemId : string = '';
 
-  constructor(
-    private dialogRef: MatDialogRef<ModalConfirmationDeleteItemComponent>,
-    private _cartService: CartService,
-    @Inject(MAT_DIALOG_DATA) private data: any
-  ) { }
+	constructor(
+		private dialogRef: MatDialogRef<ModalConfirmationDeleteItemComponent>,
+		private _cartService: CartService,
+		@Inject(MAT_DIALOG_DATA) private data: any
+	) 
+	{
+	}
 
-  ngOnInit(): void {
-    this.cartId = this.data['cartId'];
-    this.itemId = this.data['itemId'];
+	ngOnInit(): void {
+		this.cartId = this.data['cartId'];
+		this.itemId = this.data['itemId'];
 
-  }
+	}
 
-  cancelButton() {
-    this.dialogRef.close();
-  }
+	cancelButton() {
+		this.dialogRef.close();
+	}
 
-  deleteButton() {    
-    this._cartService.deleteCartItem(this.cartId, this.itemId)
-        .subscribe((response)=>{
-          this.dialogRef.close();
-        });
-  }
+	deleteButton() {    
+		this._cartService.deleteCartItem(this.cartId, this.itemId).subscribe(()=>{ this.dialogRef.close(); });
+	}
 
 }

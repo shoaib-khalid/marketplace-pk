@@ -11,7 +11,7 @@ export const voucherRoutes: Route[] = [
                 path: '',
                 resolve  : {
                     cartsResolver: CartsResolver,
-                    address: CustomerAddressResolver
+                    // address: CustomerAddressResolver
                 },
                 data: {
                     headerTitle: 'My Carts'

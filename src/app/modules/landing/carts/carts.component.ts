@@ -6,7 +6,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartWithDetails, CartPagination, CartItem } from 'app/core/cart/cart.types';
-import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
+import { ModalConfirmationDeleteItemComponent } from 'app/modules/landing/carts/modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Store } from 'app/core/store/store.types';
@@ -142,7 +142,23 @@ export class CartListComponent implements OnInit, OnDestroy
     cart: Cart;
     carts: CartWithDetails[];
     
-    selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean, minDeliveryCharges?: number, maxDeliveryCharges?: number}[], selected: boolean };
+    selectedCart: { 
+        carts: { 
+            id: string, 
+            cartItem: { 
+                id: string, 
+                selected: boolean
+            }[], 
+            selected: boolean, 
+            minDeliveryCharges?: number, 
+            maxDeliveryCharges?: number,
+            description: {
+                isOpen: boolean,
+                value?: string
+            }
+        }[], 
+        selected: boolean 
+    };
     
     customerId: string = '';
     customerAddress: CustomerAddress;
@@ -221,7 +237,7 @@ export class CartListComponent implements OnInit, OnDestroy
             .subscribe((cartsWithDetails: CartWithDetails[]) => {
 
                 if (cartsWithDetails) {
-                    this.carts = cartsWithDetails;
+                    this.carts = cartsWithDetails;                     
                     
                     let allSelected: boolean[] = [];
                     let allInCartSelected: { id: string; allSelected: boolean[]} = null;
@@ -254,7 +270,10 @@ export class CartListComponent implements OnInit, OnDestroy
                                             selected: false
                                         }
                                     }),
-                                    selected: false
+                                    selected: false,
+                                    description: {
+                                        isOpen: false
+                                    }
                                 };
                                 this.selectedCart.carts.push(cart);
                             }
@@ -283,7 +302,10 @@ export class CartListComponent implements OnInit, OnDestroy
                                             selected: false
                                         }
                                     }),
-                                    selected: false
+                                    selected: false,
+                                    description: {
+                                        isOpen: false
+                                    }
                                 }
                             }),
                             selected: false
@@ -293,7 +315,7 @@ export class CartListComponent implements OnInit, OnDestroy
                     this._userService.customerAddress$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((customerAddress : CustomerAddress) => {
-                            if (customerAddress) {
+                            if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
 
                                 this.carts.forEach(item => {                        
@@ -540,16 +562,42 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         });
 
-        console.log("cartItemIds", cartItemIds);
+        // to list out the array of slectedCart
+        let cartListBody = this.selectedCart.carts.map(item => {
+            return {
+                cartId: item.id,
+                selectedItemId: item.cartItem.map(element => {
+                    if (element.selected === true) {
+                        return element.id
+                    }
+                // to remove if selected = false (undefined array of cart item)
+                }).filter(x => x)
+            }
+        // to remove if selected = false (undefined array of selectedItemId)
+        }).filter(n => {
+            if (n.selectedItemId && n.selectedItemId.length > 0) {
+                return n;
+            }
+        });
+
+        // console.log('cartListBody',cartListBody);
+
+        this._cartService.getDiscountOfCartGroup(cartListBody)
+        .subscribe((response) => {            
+            this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
+            this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal
+        });
+
+        // console.log("cartItemIds", cartItemIds);
+        // console.log("selected", this.selectedCart);
+
     }
 
-
-
-    deleteCartItem(cartId: string, cartItem: CartItem){
+    deleteCartItem(cartId: string, cartItem: CartWithDetails){
 
         //To make custom pop up, and we pass the details in paramter data
         let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
-        dialogRef.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe((result) => {            
             
             // // if cart has items, calculate the charges
             // if (this.cartItems.length > 0) {
@@ -609,5 +657,28 @@ export class CartListComponent implements OnInit, OnDestroy
         } else {
             return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
         }
+    }
+
+    /**
+     * Open the search
+     * Used in 'bar'
+     */
+    open(id: string): void
+    {
+        let index = this.selectedCart.carts.findIndex(item => item.id === id);
+
+        if(index > -1){
+            this.selectedCart.carts[index].description.isOpen = true;
+        }
+    }
+
+    close(id: string): void
+    {
+        let index = this.selectedCart.carts.findIndex(item => item.id === id);
+
+        if(index > -1){
+            this.selectedCart.carts[index].description.isOpen = false;
+        }
+
     }
 }
