@@ -161,6 +161,7 @@ export class CartListComponent implements OnInit, OnDestroy
         }[], 
         selected: boolean 
     };
+    totalSelectedCartItem: number = 0;
     
     customerId: string = '';
     customerAddress: CustomerAddress;
@@ -568,7 +569,7 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         });
 
-        // to list out the array of slectedCart
+        // to list out the array of selectedCart
         let cartListBody = this.selectedCart.carts.map(item => {
             return {
                 cartId: item.id,
@@ -588,7 +589,9 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         });
 
-        // console.log('cartListBody',cartListBody);
+        // Get totalSelectedCartItem to be displayed
+        // .reduce will sum up all number in the array of number created by .map
+        this.totalSelectedCartItem = cartListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
 
         this._cartService.getDiscountOfCartGroup(cartListBody)
         .subscribe((response) => {            
@@ -596,9 +599,6 @@ export class CartListComponent implements OnInit, OnDestroy
             this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
             this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
         });
-
-        // console.log("cartItemIds", cartItemIds);
-        // console.log("selected", this.selectedCart);
 
     }
 

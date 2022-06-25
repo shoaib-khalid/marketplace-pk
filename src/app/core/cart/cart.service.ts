@@ -247,10 +247,7 @@ export class CartService
             if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
                 delete header.params[key];
             }
-        });
-
-        console.log("header.params", header.params);
-        
+        });        
 
         return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
             tap((response) => {
@@ -570,10 +567,7 @@ export class CartService
 
         const header = {  
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
-        };
-
-        console.log("this.cartsWithDetails$", this.cartsWithDetails$);
-        
+        };        
 
         return this.cartsWithDetails$.pipe(
             take(1),
@@ -590,11 +584,6 @@ export class CartService
 
                         // Update the products
                         this._cartsWithDetails.next(cartsWithDetails);
-
-                        console.log("_cartsWithDetails",this._cartsWithDetails);
-                        console.log("cartsWithDetails", cartsWithDetails);
-                        
-                        
                     }
 
                     return response["data"];

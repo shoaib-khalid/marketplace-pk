@@ -303,7 +303,7 @@
                     <!-- Summary -->
                     <!-- Sub Total -->
                     <div class="flex flex-row justify-between mt-2">
-                        <span class="text-md text-secondary">Sub Total(2 items)</span>
+                        <span class="text-md text-secondary">Sub Total <small *ngIf="totalSelectedCartItem > 0">({{totalSelectedCartItem}} items)</small></span>
                         <span class="text-md font-semibold">{{paymentDetails.cartSubTotal | currency: platform.currency}}</span>
                     </div>
                     <!-- Order Discount -->
