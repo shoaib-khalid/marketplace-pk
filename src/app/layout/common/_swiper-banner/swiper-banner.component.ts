@@ -118,8 +118,6 @@ export class _SwiperBannerComponent
     galleryImages: Banner[] = [];
     mobileGalleryImages: Banner[] = [];
     currentScreenSize: string[];
-    adsDesktop: Banner[];
-    adsMobile: Banner[];
     
     /**
      * Constructor
@@ -156,20 +154,42 @@ export class _SwiperBannerComponent
             if (banner) {
                 this.galleryImages = banner;
             }
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
-    // Get banners
-    this._adsService.bannersMobile$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((banner: Banner[]) => {
-            if (banner) {
-                this.mobileGalleryImages = banner;
+            // set default banner here
+            else {
+                this.galleryImages = [
+                    {
+                        id: 1,
+                        bannerUrl: 'https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png',
+                        regionCountryId: '',
+                        type: 'DESKTOP'
+                    }
+                ]
             }
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });
+
+        // Get banners
+        this._adsService.bannersMobile$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((banner: Banner[]) => {
+                if (banner) {
+                    this.mobileGalleryImages = banner;
+                }
+                // set default banner here
+                else {
+                    this.mobileGalleryImages = [
+                        {
+                            id: 1,
+                            bannerUrl: 'https://symplified.it/store-assets/Landing-Page-Banner_304X224.png',
+                            regionCountryId: '',
+                            type: 'MOBILE'
+                        }
+                    ]
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
  
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
