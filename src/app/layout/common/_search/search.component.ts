@@ -275,6 +275,20 @@ export class _SearchComponent implements OnInit, OnDestroy
         
     }
 
+    deleteSelectedResult(id: any) {
+        let index = this.autoCompleteList.findIndex(item => item.id === id)
+
+        if(index > -1){
+            this.autoCompleteList.splice(index, 1)
+        }
+
+        this._searchService.deleteCustomerSearch(id).subscribe(response => {})
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+
+    }
+
     blurInput() {
         // Remove focus
         setTimeout(() => this.searchElement.nativeElement.blur());
@@ -315,6 +329,9 @@ export class _SearchComponent implements OnInit, OnDestroy
                     map((searches) => {
                         this.resultSets = searches;
                         this.autoCompleteList = searches;
+
+                        console.log("this.autoCompleteList", this.autoCompleteList);
+                        
                         
                         // Mark for check
                         this._changeDetectorRef.markForCheck();

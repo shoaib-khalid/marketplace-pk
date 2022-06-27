@@ -201,6 +201,45 @@ export class SearchService
         );
     }
 
+    deleteCustomerSearch (id: string): Observable<any>
+    {
+        let userService = this._apiServer.settings.apiServer.userService;
+        let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid; 
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+        };
+        
+        return this.customerSearch$.pipe(
+            take(1),
+            switchMap(search => this._httpClient.delete<any>(userService + '/customer/' + customerId + '/search/' + id, header).pipe(
+                map((response) => {
+
+                    this._logging.debug("Response from StoresService (deleteCustomerSearchById)",response);
+
+                    // Find the index of the deleted product
+                    const index = search.findIndex(item => item.id === id);
+
+                    // Delete the product
+                    search.splice(index, 1);
+
+                    // Update the products
+                    this._customerSearch.next(search);
+                    
+                    let isDeleted:boolean = false;
+                    if (response["status"] === 200) {
+                        isDeleted = true;
+                    }
+
+                    // Return the deleted status
+                    return isDeleted;
+                })
+            ))
+        );
+
+    }
+
     post(storeBody: any): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
