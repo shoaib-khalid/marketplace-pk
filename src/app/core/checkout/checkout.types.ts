@@ -7,6 +7,15 @@ export interface DeliveryCharges
     storeId: string;
 }
 
+export interface CheckoutItems
+{
+    cartId              : string;
+    selectedItemId      : string[];
+    deliveryQuotationId : string;
+    deliveryType        : string;
+    storeVoucherCode?   : string;
+}
+
 export interface DeliveryDetails
 {
     deliveryAddress: string;

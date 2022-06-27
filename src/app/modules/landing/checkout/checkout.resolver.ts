@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CartService } from 'app/core/cart/cart.service';
+import { CheckoutService } from 'app/core/checkout/checkout.service';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { ProductsService } from 'app/core/product/product.service';
 import { UserService } from 'app/core/user/user.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { CheckoutService } from './checkout.service';
 
 
 @Injectable({
@@ -109,7 +109,7 @@ export class CartsResolver implements Resolve<any>
 
         return forkJoin([
             // this._cartsService.getCarts(0, 4, null, customerId),
-            this._cartsService.getCartsWithDetails({ page: 0, pageSize: 2, customerId: customerId, includeEmptyCart: false})
+            // this._cartsService.getCartsWithDetails({ page: 0, pageSize: 2, customerId: customerId, includeEmptyCart: false})
         ]);
     }
 }

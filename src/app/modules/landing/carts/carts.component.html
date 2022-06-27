@@ -172,9 +172,9 @@
                                                 [svgIcon]="'heroicons_solid:trash'"></mat-icon>
                                         </span>
                                         <!-- Total Price , Unit Price , Remove button for sm-->
-                                        <div class="flex flex-col items-end justify-between">
+                                        <div class="flex flex-col sm:hidden items-end justify-between">
                                             <!-- Remove Item -->
-                                            <span class="flex sm:hidden justify-center items-center text-center px-1 cursor-pointer">
+                                            <span class="flex justify-center items-center text-center px-1 cursor-pointer">
                                                 <mat-icon
                                                     (click)="deleteCartItem(cart.id,cartItem)" 
                                                     class="icon-size-4" 
@@ -182,12 +182,12 @@
                                             </span>
                                             <div class="flex flex-col w-26 justify-end items-end">
                                                 <!-- Unit Price -->
-                                                <div class="flex sm:hidden flex-col justify-center items-end text-center px-1">
+                                                <div class="flex flex-col justify-center items-end text-center px-1">
                                                     <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                     <span class="text-sm md:text-xs">{{cartItem.quantity}} x {{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                 </div>
                                                 <!-- Total Price -->
-                                                <span class="flex sm:hidden justify-center items-center font-semibold text-center text-sm md:text-md px-1">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                <span class="flex justify-center items-center font-semibold text-center text-sm md:text-md px-1">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -390,7 +390,7 @@
                     </div>
 
                     <!-- Checkout -->
-                    <button class="bg-primary py-2 px-4 rounded w-full mt-2 text-white">
+                    <button [routerLink]="['/checkout']" class="bg-primary py-2 px-4 rounded w-full mt-2 text-white">
                         Checkout Now
                     </button>
                 </div>

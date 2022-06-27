@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -46,8 +46,7 @@ export class LandingDataResolver implements Resolve<any>
         // Fork join multiple API endpoint calls to wait all of them to finish
         return forkJoin([
             this._adsService.set(),
-            this._cartsService.getCartsHeaderWithDetails(0, 99, null, customerId)
-
+            this._cartsService.cartResolver(true) // cartResolver(true) means we resolving the cart notification header
         ]);
     }
 }

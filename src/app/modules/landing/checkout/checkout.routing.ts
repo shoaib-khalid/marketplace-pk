@@ -13,7 +13,7 @@ export const BuyerCheckoutRoutes: Route[] = [
                 },
                 resolve  : {
                     // address: CustomerAddressResolver,
-                    cartsResolver: CartsResolver,
+                    // cartsResolver: CartsResolver,
                 },
                 component: BuyerCheckoutComponent
             },
