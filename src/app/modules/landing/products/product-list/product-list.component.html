@@ -12,6 +12,7 @@
                 [initialPage]="pagination.page + 1"
                 [pageSize]="pagination.size"
                 (changePage)="onChangePage($event)"
+                (click)="scrollToTop()"
                 #productsPaginator></pagination>
         </div>
     </ng-container>
