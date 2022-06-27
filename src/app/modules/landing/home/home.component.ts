@@ -44,7 +44,6 @@ export class LandingHomeComponent implements OnInit
     isLoading: boolean = false;
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
-
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**

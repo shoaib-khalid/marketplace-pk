@@ -8,6 +8,8 @@ import { Subject } from 'rxjs';
 // import Swiper core and required modules
 import SwiperCore, { Pagination, Navigation, Autoplay } from "swiper";
 import { SwiperComponent } from 'swiper/angular';
+import { AdsService } from 'app/core/ads/ads.service';
+import { Banner } from 'app/core/ads/ads.types';
 
 SwiperCore.use([Pagination, Navigation, Autoplay]);
 
@@ -113,9 +115,11 @@ export class _SwiperBannerComponent
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    galleryImages: string[] = [];
-    mobileGalleryImages: string[] = [];
+    galleryImages: Banner[] = [];
+    mobileGalleryImages: Banner[] = [];
     currentScreenSize: string[];
+    adsDesktop: Banner[];
+    adsMobile: Banner[];
     
     /**
      * Constructor
@@ -125,6 +129,7 @@ export class _SwiperBannerComponent
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
+        private _adsService: AdsService
     )
     {
         
@@ -144,15 +149,27 @@ export class _SwiperBannerComponent
     ngOnInit(): void
     {
 
-        this.galleryImages = [
-            'https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png',
-            'https://symplified.it/store-assets/20220614043143'
-        ];
-        
-        this.mobileGalleryImages = [
-            'https://symplified.it/store-assets/Landing-Page-Banner_304X224.png',
-            'https://symplified.it/store-assets/20220614043216'
-        ];
+        // Get banners
+        this._adsService.bannersDesktop$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((banner: Banner[]) => {
+            if (banner) {
+                this.galleryImages = banner;
+            }
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
+    // Get banners
+    this._adsService.bannersMobile$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((banner: Banner[]) => {
+            if (banner) {
+                this.mobileGalleryImages = banner;
+            }
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
  
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))

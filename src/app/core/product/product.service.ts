@@ -98,19 +98,19 @@ export class ProductsService
      * Getter for access token
      */
  
-     get accessToken(): string
-     {
-         return localStorage.getItem('accessToken') ?? '';
-     }
+    get accessToken(): string
+    {
+        return localStorage.getItem('accessToken') ?? '';
+    }
 
     /**
      * Getter for storeId
      */
  
-     get storeId$(): string
-     {
-         return localStorage.getItem('storeId') ?? '';
-     }
+    get storeId$(): string
+    {
+        return localStorage.getItem('storeId') ?? '';
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
@@ -391,7 +391,7 @@ export class ProductsService
      *
      * @param product
      */
-     addProductAssets(productId: string, formData: FormData, productAssets: ProductAssets, assetIndex: number = null): Observable<ProductAssets>{
+    addProductAssets(productId: string, formData: FormData, productAssets: ProductAssets, assetIndex: number = null): Observable<ProductAssets>{
 
         let productService = this._apiServer.settings.apiServer.productService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
@@ -1336,5 +1336,4 @@ export class ProductsService
             ))
         );
     }
-
 }

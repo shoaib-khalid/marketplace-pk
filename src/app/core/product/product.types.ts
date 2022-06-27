@@ -113,15 +113,15 @@ thumbnailUrl: string;
  * 
  */
 
- export interface ProductCategoryPagination
- {
-     length: number;
-     size: number;
-     page: number;
-     lastPage: number;
-     startIndex: number;
-     endIndex: number;
- }
+export interface ProductCategoryPagination
+{
+    length: number;
+    size: number;
+    page: number;
+    lastPage: number;
+    startIndex: number;
+    endIndex: number;
+}
 
 /**
  * 
@@ -145,21 +145,21 @@ export interface ProductAssets
  * 
  */
 
- export interface ProductPackageOption
- {
-     id?: string;
-     packageId: string;
-     title: string;
-     totalAllow: number;
-     productPackageOptionDetail: ProductPackageOptionDetail[];
- }
- 
- export interface ProductPackageOptionDetail 
- {
-     id?: string;
-     productId?: string;
-     product?: Product;
-     productPackageOptionId?: string;
-     
- }
+export interface ProductPackageOption
+{
+    id?: string;
+    packageId: string;
+    title: string;
+    totalAllow: number;
+    productPackageOptionDetail: ProductPackageOptionDetail[];
+}
+
+export interface ProductPackageOptionDetail 
+{
+    id?: string;
+    productId?: string;
+    product?: Product;
+    productPackageOptionId?: string;
+    
+}
  

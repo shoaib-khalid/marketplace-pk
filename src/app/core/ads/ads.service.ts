@@ -6,7 +6,7 @@ import { AppConfig } from 'app/config/service.config';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
-import { Ad } from './ads.types';
+import { Ad, Banner } from './ads.types';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +15,10 @@ export class AdsService
 {
     private _ad: ReplaySubject<Ad> = new ReplaySubject<Ad>(1);
     private _ads: ReplaySubject<Ad[]> = new ReplaySubject<Ad[]>(1);
+
+    private _banner: BehaviorSubject<Banner | null> = new BehaviorSubject(null);
+    private _bannersDesktop: BehaviorSubject<Banner[] | null> = new BehaviorSubject(null);
+    private _bannersMobile: BehaviorSubject<Banner[] | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -48,6 +52,30 @@ export class AdsService
     {
         return this._ad.asObservable();
     }
+
+    /**
+     * Getter for banner
+     */
+    get banner$(): Observable<Banner>
+    {
+        return this._banner.asObservable();
+    }
+    
+    /**
+     * Getter for mobile banners
+     */
+    get bannersMobile$(): Observable<Banner[]>
+    {
+        return this._bannersMobile.asObservable();
+    }
+
+    /**
+     * Getter for desktop banners
+     */
+     get bannersDesktop$(): Observable<Banner[]>
+     {
+         return this._bannersDesktop.asObservable();
+     }
 
     /**
      * Setter & getter for ads
@@ -86,6 +114,37 @@ export class AdsService
                 this._ads.next([ads]);
 
                 return [ads];
+            })
+        );
+    }
+
+    getBanner(regionCountryId: string = "" ): Observable<Banner[]>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = "accessToken";
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                regionCountryId: regionCountryId,
+            }
+        };
+
+        if (regionCountryId === "") {
+            delete header.params.regionCountryId;
+        }
+
+        return this._httpClient.get<Banner[]>(productService + '/banner-config', header).pipe(
+            tap((response) => {
+                this._logging.debug("Response from AdsService (getBanner)", response);
+                const data = response['data'];
+
+                let desktop = data.filter(element => element.type === 'DESKTOP')
+                let mobile = data.filter(element => element.type === 'MOBILE')
+
+                this._bannersDesktop.next(desktop);
+                this._bannersMobile.next(mobile);
+
             })
         );
     }

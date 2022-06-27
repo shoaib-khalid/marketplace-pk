@@ -11,7 +11,7 @@ import { PlatformLocation } from '@angular/common';
 import { Platform } from './platform.types';
 import { AuthService } from '../auth/auth.service';
 import { StoresService } from 'app/core/store/store.service';
-import { LocationService } from '../location/location.service';
+import { AdsService } from '../ads/ads.service';
 
 @Injectable({
     providedIn: 'root'
@@ -41,6 +41,7 @@ export class PlatformService
         private _apiServer: AppConfig,
         private _jwt: JwtService,
         private _logging: LogService,
+        private _adsService: AdsService
     )
     {
     }
@@ -163,6 +164,9 @@ export class PlatformService
                             // Return the store
                             return newPlatform;
                         });
+
+                    // Get banner
+                    this._adsService.getBanner(response["data"][0].platformCountry).subscribe();
                 })
             );
     }
