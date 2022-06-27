@@ -26,6 +26,7 @@
             [itemLength]="pagination.length" 
             [initialPage]="pagination.page + 1"
             [pageSize]="pagination.size"
+            (click)="scrollToTop()"
             (changePage)="onChangePage($event)"></pagination>
     </div>
 

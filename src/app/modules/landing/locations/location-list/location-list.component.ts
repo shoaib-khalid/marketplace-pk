@@ -172,4 +172,12 @@ export class LandingLocationsComponent implements OnInit
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
+
+    scrollToTop(){        
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
+    }
 }

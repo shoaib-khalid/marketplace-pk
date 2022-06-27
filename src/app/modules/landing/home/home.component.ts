@@ -10,6 +10,7 @@ import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
     selector     : 'landing-home',
@@ -39,7 +40,7 @@ export class LandingHomeComponent implements OnInit
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     productsViewAll : boolean = false;
-    featuredProductPageSize = 10;
+    featuredProductPageSize = 30;
 
     isLoading: boolean = false;
     currentScreenSize: string[] = [];
@@ -55,7 +56,8 @@ export class LandingHomeComponent implements OnInit
         private _locationService: LocationService,
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _apiServer: AppConfig
+        private _apiServer: AppConfig,
+        private _scroller: ViewportScroller
     )
     {
     }
@@ -322,5 +324,9 @@ export class LandingHomeComponent implements OnInit
             }
         }
         animateScroll();    
+    }
+
+    scroll(id) {
+        this._scroller.scrollToAnchor(id)
     }
 }

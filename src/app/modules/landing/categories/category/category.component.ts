@@ -41,7 +41,7 @@ export class CategoryComponent implements OnInit
     productsPagination: ProductPagination;
 
     maxStoresDisplay: number = 3;
-    maxProductsDisplay: number = 10;
+    maxProductsDisplay: number = 30;
     maxLocationsDisplay: number = 50;
     
     redirectUrl: { categoryId?: string, locationId?: string }
