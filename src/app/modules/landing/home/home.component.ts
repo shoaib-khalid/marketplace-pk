@@ -39,7 +39,7 @@ export class LandingHomeComponent implements OnInit
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     productsViewAll : boolean = false;
-    featuredProductPageSize = 10;
+    featuredProductPageSize = 30;
 
     isLoading: boolean = false;
     currentScreenSize: string[] = [];

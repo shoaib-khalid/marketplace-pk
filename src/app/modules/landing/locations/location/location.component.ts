@@ -54,7 +54,7 @@ export class LocationComponent implements OnInit
     categoriesViewAll: boolean = false;
 
     maxStoresDisplay: number = 5;
-    maxProductsDisplay: number = 15;
+    maxProductsDisplay: number = 30;
     maxCategoriesDisplay: number = 50;
     
     isLoading: boolean = false;

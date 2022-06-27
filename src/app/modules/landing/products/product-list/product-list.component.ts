@@ -81,7 +81,7 @@ export class LandingProductsComponent implements OnInit
                         this.adjacentLocationIds.unshift(this.locationId);
                 
                         // Get products
-                        this._locationService.getProductsDetails({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
+                        this._locationService.getProductsDetails({ pageSize: 50, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
                         .subscribe((products : ProductDetails[]) => {});
                     });
                     
@@ -125,7 +125,7 @@ export class LandingProductsComponent implements OnInit
                 // set loading to true
                 this.isLoading = true;
                 
-                return this._locationService.getProductsDetails({ pageSize: 25, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
+                return this._locationService.getProductsDetails({ pageSize: 50, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId })
             }),
             map(() => {
                 // set loading to false
