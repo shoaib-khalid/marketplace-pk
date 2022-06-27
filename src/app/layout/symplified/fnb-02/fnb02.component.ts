@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
@@ -9,6 +9,11 @@ import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { fuseAnimations } from '@fuse/animations';
 import { Error500Service } from 'app/core/error-500/error-500.service';
+import { DOCUMENT, PlatformLocation } from '@angular/common';
+import { FloatingBannerService } from 'app/core/floating-banner/floating-banner.service';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
+import { AppConfig } from 'app/config/service.config';
 
 @Component({
     selector     : 'fnb02-layout',
@@ -21,26 +26,32 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
 {
     opened: boolean = false;
     platform: Platform;
-
+    user: User;
+    
     isScreenSmall: boolean;
     navigation: Navigation;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-
+    
     show500: boolean;
-
-
+    floatingMessageData = {};
+    
     /**
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _activatedRoute: ActivatedRoute,
+        private _apiServer: AppConfig,
         private _router: Router,
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
         private _platformsService: PlatformService,
-        private _error500Service: Error500Service
-
+        private _error500Service: Error500Service,
+        private _userService: UserService,
+        private _platformLocation: PlatformLocation,
+        private _floatingBannerService: FloatingBannerService,
+        
     )
     {
     }
@@ -95,6 +106,25 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
         .subscribe((any) => {
             this.show500 = any;
         });
+
+        // Subscribe to the user service
+        this._userService.user$
+        .pipe((takeUntil(this._unsubscribeAll)))
+        .subscribe((user: User) => {
+            this.user = user;
+        });
+
+        // Set promo banner
+        if (!this.user) {
+            let fullUrl = (this._platformLocation as any).location.origin;
+            let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
+            let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
+                    '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
+                    // + '&guestCartId=' + this._cartService.cartId$ + '&storeId=' + this._storesService.storeId$;
+
+            this._floatingBannerService.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl)
+            this._floatingBannerService.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl)
+                    }
     
     }
 

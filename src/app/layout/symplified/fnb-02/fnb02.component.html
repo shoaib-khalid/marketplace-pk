@@ -3,6 +3,9 @@
 
 <!-- Wrapper -->
 <ng-container *ngIf="show500 === false; else error">
+
+    <floating-message-big></floating-message-big>
+        <floating-message-small></floating-message-small>
     <div class="flex flex-col flex-auto w-full min-w-0 bg-card">
     
         <!-- Header -->
@@ -69,7 +72,7 @@
                     class="flex items-center mt-2"
                     mat-icon-button
                     (click)="close()">
-                    <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:x'"></mat-icon>
                 </button>
             </div>
             

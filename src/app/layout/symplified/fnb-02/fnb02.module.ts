@@ -20,6 +20,7 @@ import { Fnb2LayoutComponent } from 'app/layout/symplified/fnb-02/fnb02.componen
 import { CartModule } from 'app/layout/common/cart/cart.module';
 import { FooterModule } from 'app/layout/common/footer/footer.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
+import { FloatingMessageModule } from 'app/layout/common/_floating-message/floating-message.module';
 
 @NgModule({
     declarations: [
@@ -45,7 +46,8 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
         SharedModule,
         CartModule,
         FooterModule,
-        _SearchModule
+        _SearchModule,
+        FloatingMessageModule
     ],
     exports     : [
         Fnb2LayoutComponent
