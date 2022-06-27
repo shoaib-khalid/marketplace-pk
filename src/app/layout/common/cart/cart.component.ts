@@ -144,7 +144,7 @@ export class CartComponent implements OnInit, OnDestroy
                     
                     // to show only 3
                     if (resArr.length >= 3) {
-                        this.totalCartList = resArr.length;
+                        // this.totalCartList = resArr.length;
                         const slicedArray = resArr.slice(0, 3);
                         this.carts = slicedArray;
                     }

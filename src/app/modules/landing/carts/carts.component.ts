@@ -14,11 +14,11 @@ import { fuseAnimations } from '@fuse/animations';
 import { merge, pipe, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { CartDiscount, DeliveryProvider } from '../checkout/checkout.types';
+import { CartDiscount, DeliveryProvider } from '../../../core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
-import { CheckoutService } from '../checkout/checkout.service';
+import { CheckoutService } from 'app/core/checkout/checkout.service';
 
 @Component({
     selector     : 'carts',
@@ -594,11 +594,13 @@ export class CartListComponent implements OnInit, OnDestroy
         this.totalSelectedCartItem = cartListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
 
         this._cartService.getDiscountOfCartGroup(cartListBody)
-        .subscribe((response) => {            
-            this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
-            this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
-            this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
-        });
+            .subscribe((response) => {
+                this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
+                this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
+                this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
+            });            
+
+        this._checkoutService.resolveCheckout(cartListBody).subscribe();
 
     }
 

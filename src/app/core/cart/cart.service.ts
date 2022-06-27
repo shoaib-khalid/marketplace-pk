@@ -151,15 +151,19 @@ export class CartService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    cartResolver(): Observable<any>
+    cartResolver(resolveCartHeader: boolean = false): Observable<any>
     {
         return of(true).pipe(
             map(()=>{
+                
                 let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
                 let cartIds: { id: string, storeId: string, cartItems: { id: string }}[] = this.cartIds$ ? JSON.parse(this.cartIds$) : [];
 
+                // if resolveCartHeader true, we'll query 99 (max) paginated pageSize
+                // for cart notification header, normal default cartItem is 5
+                let pageSize: number = resolveCartHeader ? 99 : 5;
                 if ((cartIds && cartIds.length) || customerId){
-                    this.getCartsWithDetails({ id: cartIds.map(item => item.id), page: 0, pageSize: 5, customerId: customerId, includeEmptyCart: false}).subscribe();
+                    this.getCartsWithDetails({ cartId: cartIds.map(item => item.id), page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
                 }
             })
         );
@@ -214,20 +218,20 @@ export class CartService
      * Get the current logged in cart data
      */
     getCartsWithDetails(params: { 
-        page                : number,
-        pageSize            : number,
-        id?                 : string[],
-        storeId?            : string,
-        customerId?         : string,
-        includeEmptyCart?   : boolean
+        page                    : number,
+        pageSize                : number,
+        cartId?                 : string[],
+        storeId?                : string,
+        customerId?             : string,
+        includeEmptyCart?       : boolean
     } = {
-        id                  : [],
-        page                : 0, 
-        pageSize            : 10, 
-        storeId             : null, 
-        customerId          : null,
-        includeEmptyCart    : false
-    }):
+        cartId                  : [],
+        page                    : 0, 
+        pageSize                : 10, 
+        storeId                 : null, 
+        customerId              : null,
+        includeEmptyCart        : false,
+    }, isNotificationCounter: boolean = false):
     Observable<{ pagination: CartPagination; carts: Cart[] }>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
@@ -252,7 +256,7 @@ export class CartService
         return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
             tap((response) => {
 
-                this._logging.debug("Response from CartService (getCartsHeaderWithDetails)",response);
+                this._logging.debug("Response from CartService (getCartsHeaderWithDetails) " + (isNotificationCounter ? "Cart Header Notification" : "Cart Items") ,response);
 
                 let _pagination = {
                     length: response.data.totalElements,
@@ -262,54 +266,17 @@ export class CartService
                     startIndex: response.data.pageable.offset,
                     endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
                 }
-                this._cartsWithDetailsPagination.next(_pagination);
-                this._cartsWithDetails.next(response.data.content);
-            })
-        );
-    }
-
-    /**
-     * Get the current logged in cart data
-     */
-    getCartsHeaderWithDetails(page: number = 0, size: number = 10, storeId: string = null, customerId: string = null):
-    Observable<{ pagination: CartPagination; carts: Cart[] }>
-    {
-        let orderService = this._apiServer.settings.apiServer.orderService;
-        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-        let accessToken = "accessToken";
-
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                page        : '' + page,
-                pageSize    : '' + size,
-                storeId     : '' + storeId,
-                customerId  : '' + customerId,
-                includeEmptyCart: false
-            }
-        };
-
-        if (storeId === null) delete header.params.storeId;
-
-        return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
-            tap((response) => {
-
-                this._logging.debug("Response from CartService (getCartsWithDetails)",response);
-
-                let _pagination = {
-                    length: response.data.totalElements,
-                    size: response.data.size,
-                    page: response.data.number,
-                    lastPage: response.data.totalPages,
-                    startIndex: response.data.pageable.offset,
-                    endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                if (isNotificationCounter) {
+                    this._cartsHeaderWithDetailsPagination.next(_pagination);
+                    this._cartsHeaderWithDetails.next(response.data.content);
+                } else {
+                    this._cartsWithDetailsPagination.next(_pagination);
+                    this._cartsWithDetails.next(response.data.content);
                 }
-                this._cartsHeaderWithDetailsPagination.next(_pagination);
-                this._cartsHeaderWithDetails.next(response.data.content);
             })
         );
     }
-
+    
     /**
      * (Used by app.resolver)
      * 

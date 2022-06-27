@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { StoresService } from 'app/core/store/store.service';
 import { Customer } from 'app/core/user/user.types';
-import { Address, CartDiscount, DeliveryCharges, DeliveryProvider } from './checkout.types';
+import { Address, CartDiscount, CheckoutItems, DeliveryCharges, DeliveryProvider } from './checkout.types';
 import { AuthService } from 'app/core/auth/auth.service';
+import { Cart, CartPagination, CartWithDetails } from 'app/core/cart/cart.types';
+import { CartService } from 'app/core/cart/cart.service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +20,10 @@ export class CheckoutService
     private _address: ReplaySubject<Address> = new ReplaySubject<Address>(1);
     private _addresses: ReplaySubject<Address[]> = new ReplaySubject<Address[]>(1);
 
+    private _cartWithDetails: ReplaySubject<CartWithDetails> = new ReplaySubject<CartWithDetails>(1);
+    private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
+    private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
+
     /**
      * Constructor
      */
@@ -25,6 +31,7 @@ export class CheckoutService
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _storeService: StoresService,
+        private _cartService: CartService,
         private _jwt: JwtService,
         private _logging: LogService,
         private _authService: AuthService,
@@ -64,9 +71,149 @@ export class CheckoutService
         return this._addresses.asObservable();
     }
 
+    get cartWithDetails$(): Observable<CartWithDetails>
+    {
+        return this._cartWithDetails.asObservable();
+    }
+
+    get cartsWithDetails$(): Observable<CartWithDetails[]>
+    {
+        return this._cartsWithDetails.asObservable();
+    }
+
+    /**
+    * Getter for cart pagination
+    */
+    get cartsWithDetailsPagination$(): Observable<CartPagination>
+    {
+        return this._cartsWithDetailsPagination.asObservable();
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+
+    resolveCheckout(checkoutItems: CheckoutItems[]): Observable<any>
+    {
+        return of(true).pipe(
+            map(()=>{
+                this.getCartsWithDetails({cartIdList: checkoutItems.map(item => item.cartId), page:0 ,pageSize: 5, includeEmptyCart: false}, checkoutItems).subscribe();
+            })
+        );
+    }
+    /**
+     * Get the current logged in cart data
+     */
+    getCartsWithDetails(params: { 
+        page                    : number,
+        pageSize                : number,
+        cartIdList?             : string[],
+        storeId?                : string,
+        customerId?             : string,
+        includeEmptyCart?       : boolean
+    } = {
+        cartIdList              : [],
+        page                    : 0, 
+        pageSize                : 10, 
+        storeId                 : null, 
+        customerId              : null,
+        includeEmptyCart        : false,
+    }, checkoutItems: CheckoutItems[] = null):
+    Observable<{ pagination: CartPagination; carts: Cart[] }>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: params
+        };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+                delete header.params[key];
+            }
+        });        
+
+        return this._httpClient.get<any>(orderService +'/carts/details', header).
+            pipe(
+                tap((response) => {
+
+                    this._logging.debug("Response from CheckoutService (getCartsDetails)",response);
+
+                    let _pagination = {
+                        length: response.data.totalElements,
+                        size: response.data.size,
+                        page: response.data.number,
+                        lastPage: response.data.totalPages,
+                        startIndex: response.data.pageable.offset,
+                        endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                    }
+
+                    this._cartsWithDetailsPagination.next(_pagination);
+
+                    // Filter out cartItems that were not included in selectedItems
+                    let _checkoutItems: CartWithDetails[] = response.data.content;
+                    _checkoutItems.forEach(item => {
+                        let index = checkoutItems.findIndex(element => element.cartId === item.id);
+                        let toMaintainCartItems = item.cartItems;
+                        if (index > -1) {
+                            const toMaintain = new Set(checkoutItems[index].selectedItemId);
+                            toMaintainCartItems = item.cartItems.filter(element => toMaintain.has(element.id));
+                        }
+                        item.cartItems = toMaintainCartItems;
+                    });
+                    this._cartsWithDetails.next(_checkoutItems);
+                })
+            );
+    }
+
+    /**
+     * Delete cart
+     * 
+     * @param cartId 
+     * @param itemId 
+     * @returns 
+     */
+    deleteCart(cartId: string): Observable<Cart>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return of(null);
+        
+        // this.carts$.pipe(
+        //     take(1),
+        //     switchMap(carts => this._httpClient.delete<any>(orderService + '/carts/' + cartId, header)
+        //     .pipe(
+        //         map((response) => {
+        //             this._logging.debug("Response from CartService (deleteCart)", response);
+
+        //             let index = carts.findIndex(item => item.id === cartId);
+
+        //             if (index > -1) {
+        //                 // Delete the cartItems
+        //                 carts.splice(index, 1);
+
+        //                 // Update the products
+        //                 this._carts.next(carts);
+        //             }
+
+        //             return response["data"];
+        //         })
+        //     ))
+        // );
+    }
 
     /**
      * Get the Customer Info

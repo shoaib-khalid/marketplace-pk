@@ -6,9 +6,9 @@ import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartItem, CartPagination, CartWithDetails } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
 import { of, Subject, merge, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
-import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged } from 'rxjs/operators';
+import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address, CartDiscount } from './checkout.types';
+import { Address, CartDiscount } from '../../../core/checkout/checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -19,6 +19,8 @@ import { Platform } from 'app/core/platform/platform.types';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { CustomerAddress } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { CheckoutService } from 'app/core/checkout/checkout.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -187,8 +189,10 @@ export class BuyerCheckoutComponent implements OnInit
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _cartService: CartService,
+        private _checkoutService: CheckoutService,
         private _jwtService: JwtService,
         private _authService: AuthService,
+        private _router: Router,
         private _userService: UserService
     )
     {
@@ -216,10 +220,15 @@ export class BuyerCheckoutComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._cartService.cartsWithDetails$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((cartsWithDetails: CartWithDetails[]) => {
-                if (cartsWithDetails) {
+        this._checkoutService.cartsWithDetails$
+            .pipe(
+                startWith(false),
+                debounceTime(1), // wait 1 milisecond
+                takeUntil(this._unsubscribeAll),
+            )
+            .subscribe((cartsWithDetails: CartWithDetails[] | boolean) => {    
+                            
+                if (typeof(cartsWithDetails) !== "boolean" && cartsWithDetails) {
                     this.carts = cartsWithDetails;
                     
                     let allSelected: boolean[] = [];
@@ -287,13 +296,16 @@ export class BuyerCheckoutComponent implements OnInit
                     }                    
 
                     // this.selectCart(null,null,true);
-                }
+                } else {
+                    this._router.navigate(['carts'])
+                }                
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         // Get the cart pagination
-        this._cartService.cartsWithDetailsPagination$
+        this._checkoutService.cartsWithDetailsPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: CartPagination) => {
                 if (pagination) {
@@ -338,7 +350,7 @@ export class BuyerCheckoutComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._cartService.getCartsWithDetails({page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false});
+                        return this._checkoutService.getCartsWithDetails({page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -374,7 +386,7 @@ export class BuyerCheckoutComponent implements OnInit
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._cartService.getCartsWithDetails({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], customerId: this.customerId, includeEmptyCart: false})
+                this._checkoutService.getCartsWithDetails({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], customerId: this.customerId, includeEmptyCart: false})
                     .subscribe((response)=>{
                             
                         // set loading to false
