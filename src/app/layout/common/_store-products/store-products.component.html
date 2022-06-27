@@ -8,7 +8,7 @@
                     <!-- Product -->
                     <div class="flex flex-col h-120 w-full lg:max-w-65 shadow border group hover:border-2 rounded-lg overflow-hidden cursor-pointer"
                         [ngClass]="isProductOutOfStock(product) ? 'bg-card hover:border-primary' : 'bg-gray-200 hover:border-gray-600'"
-                        (click)="redirectToProduct(product.seoUrl)">
+                        (click)="redirectToProduct(product.seoName)">
                         <!-- Product Header -->
                         <div class="relative flex flex-col p-2 h-60 bg-white bg-no-repeat bg-cover bg-center" 
                             [style]="product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + displayStoreLogo(store.storeAssets) + '\');' + 'background-size: cover;'"

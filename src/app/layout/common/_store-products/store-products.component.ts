@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { DOCUMENT } from '@angular/common';
@@ -20,6 +20,8 @@ export class _StoreProductsComponent implements OnInit, OnDestroy
     @Input() products: any;
     @Input() store: any;
     @Input() productViewOrientation: string = "grid"; 
+    @Input() catalogueSlug: any;
+    @Input() storeSlug: any;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -28,7 +30,9 @@ export class _StoreProductsComponent implements OnInit, OnDestroy
     constructor(
         @Inject(DOCUMENT) private _document: Document,
         private _platformService: PlatformService,
-        private _router: Router
+        private _router: Router,
+        private _route: ActivatedRoute,
+
     )
     {
     }
@@ -84,7 +88,8 @@ export class _StoreProductsComponent implements OnInit, OnDestroy
     }
 
     redirectToProduct(url: string) {
-        this._document.location.href = url;
+        // this._document.location.href = url;
+        this._router.navigate(['store/' + this.storeSlug + '/' + this.catalogueSlug + '/' + url]);
     }
 
     displayStoreLogo(storeAssets: StoreAssets[]) {
