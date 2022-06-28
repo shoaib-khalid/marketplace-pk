@@ -14,7 +14,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { merge, pipe, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { CartDiscount, DeliveryProvider } from '../../../core/checkout/checkout.types';
+import { CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
