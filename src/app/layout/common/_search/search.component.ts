@@ -72,7 +72,8 @@ export class _SearchComponent implements OnInit, OnDestroy
 
         this._searchService.get()
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((response)=> {    
+            .subscribe((response)=> {   
+                                
                 this.resultSets = response;                
                 this.autoCompleteList = response;  
                 
@@ -83,7 +84,9 @@ export class _SearchComponent implements OnInit, OnDestroy
         // Subscribe to search control reactive form
         this.searchControl.valueChanges.subscribe(userInput => {
             this.autoCompleteSetList(userInput);
-          })
+        })
+
+        this.searchControl.valueChanges.subscribe
     }
 
     /**
@@ -275,14 +278,63 @@ export class _SearchComponent implements OnInit, OnDestroy
         
     }
 
-    deleteSelectedResult(id: any) {
-        let index = this.autoCompleteList.findIndex(item => item.id === id)
+    deleteGuestSelectedResult(value) {
 
-        if(index > -1){
-            this.autoCompleteList.splice(index, 1)
+        // let searchIndex = this.autoCompleteList.findIndex(item => item.searchText === value)
+        
+        // if(searchIndex > -1){
+        //     this.autoCompleteList.splice(searchIndex, 1);
+
+        //     // Mark for check
+        //     this._changeDetectorRef.markForCheck();
+        // }
+
+        let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$); 
+
+        let index = localDataSearch.findIndex(x => x.searchText === value);
+        
+        if(index > -1) {
+            localDataSearch.splice(index, 1);
+
+            this._searchService.localSearch = localDataSearch;
+            this.resultSets = localDataSearch; 
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
         }
+    
 
-        this._searchService.deleteCustomerSearch(id).subscribe(response => {})
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+            
+    }
+
+
+    deleteSelectedResult(id: any) {
+        if(this.customer ) {
+            let index = this.autoCompleteList.findIndex(item => item.id === id)
+    
+            if(index > -1){
+                this.autoCompleteList.splice(index, 1)
+            }
+    
+            this._searchService.deleteCustomerSearch(id).subscribe(response => {
+    
+                if(response) {
+                    this._searchService.get()
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((response)=> {   
+                                            
+                        // this.resultSets = response;                
+                        this.autoCompleteList = response;  
+                        
+                        // Mark for check
+                        this._changeDetectorRef.markForCheck();
+                    });
+    
+                }
+            });
+        }
 
         // Mark for check
         this._changeDetectorRef.markForCheck();

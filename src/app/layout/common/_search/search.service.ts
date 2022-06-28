@@ -237,8 +237,37 @@ export class SearchService
                 })
             ))
         );
-
     }
+
+    // deleteGuestSearch (searchText: any): Observable<any>
+    // {        
+    //     return of(JSON.parse(this.localSearch$)).pipe(
+    //         take(1),
+    //         switchMap(search => this._httpClient.delete<any>(searchText).pipe(
+    //             map((response) => {
+
+    //                 this._logging.debug("Response from StoresService (deleteGuestSearch)",response);
+
+    //                 // Find the index of the deleted product
+    //                 const index = search.findIndex(item => item.searchText === searchText);
+
+    //                 // Delete the product
+    //                 search.splice(index, 1);
+
+    //                 // Update the products
+    //                 JSON.parse(this.localSearch$).getItem('@customerSearch').next(search);
+                    
+    //                 let isDeleted:boolean = false;
+    //                 if (response["status"] === 200) {
+    //                     isDeleted = true;
+    //                 }
+
+    //                 // Return the deleted status
+    //                 return isDeleted;
+    //             })
+    //         ))
+    //     );
+    // }
 
     post(storeBody: any): Observable<any>
     {
