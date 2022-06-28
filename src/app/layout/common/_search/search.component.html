@@ -54,7 +54,7 @@
 <ng-template
     #historyResult
     let-result>
-    <div class="flex flex-row">
+    <div class="flex flex-row items-center">
 
         <div class="flex items-center justify-between w-full"
             (click)="selectResult(result); blurInput()">
@@ -74,12 +74,19 @@
                 </div>
             </div>
         </div>
-        <div>
-            <button mat-icon-button (click)="deleteSelectedResult(result.id)">
+        <ng-container *ngIf="customer">
+            <button mat-icon-button (click)="deleteSelectedResult(result.id);blurInput()">
                 <mat-icon
                     class="m-0 icon-size-5 text-primary dark:text-primary-400"
                     [svgIcon]="'feather:x-circle'"></mat-icon>
             </button>
-        </div>
+        </ng-container>
+        <ng-container *ngIf="!customer">
+            <button mat-icon-button (click)="deleteGuestSelectedResult(result.searchText);blurInput()">
+                <mat-icon
+                    class="m-0 icon-size-5 text-primary dark:text-primary-400"
+                    [svgIcon]="'feather:x-circle'"></mat-icon>
+            </button>
+        </ng-container>
     </div>
 </ng-template>
