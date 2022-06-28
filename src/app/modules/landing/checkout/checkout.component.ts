@@ -8,7 +8,7 @@ import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
 import { of, Subject, merge, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
 import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address, CartDiscount, DeliveryProvider } from '../../../core/checkout/checkout.types';
+import { Address, CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
