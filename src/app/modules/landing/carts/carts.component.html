@@ -5,7 +5,7 @@
         <!-- Carts -->
         <ng-container *ngIf="carts && carts.length; else noCarts">
             <!-- Delivery Address (xs) -->
-            <div class="block md:hidden flex flex-col justify-center items-center border rounded-lg p-2 mb-2">
+            <div class="block md:hidden w-full flex flex-col justify-center items-start border rounded-lg p-2 mb-2">
                 <!-- Header -->
                 <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                     <mat-icon 
@@ -14,19 +14,19 @@
                     <span class="ml-2 font-bold">Delivery Address</span>
                 </div>
                 <ng-container *ngIf="customerAddress; else noAddress">
-                            <div class="flex flex-col m-2">
-                                <span class="font-medium pb-1">{{customerAddress.name}}</span>
-                                <span class="font-medium pb-1">{{customerAddress.phoneNumber}}</span>
-                                <span class="font-medium">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
-                            </div>
-                            <div class="flex w-full justify-center items-center">
-                                <button
-                                    [routerLink]="['/address']"
-                                    [queryParams]="{origin: 'carts'}"
-                                    class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
-                                    <span class="text-white">Change</span>
-                                </button>
-                            </div>
+                    <div class="flex flex-col m-2">
+                        <span class="font-medium pb-1">{{customerAddress.name}}</span>
+                        <span class="font-medium pb-1">{{customerAddress.phoneNumber}}</span>
+                        <span class="font-medium">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                    </div>
+                    <div class="flex w-full justify-center items-center">
+                        <button
+                            [routerLink]="['/address']"
+                            [queryParams]="{origin: 'carts'}"
+                            class="my-2 w-full font-semibold p-1 rounded-md bg-primary"                            >
+                            <span class="text-white">Change</span>
+                        </button>
+                    </div>
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->

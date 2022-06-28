@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CartService } from 'app/core/cart/cart.service';
-import { Cart, CartWithDetails, CartPagination, CartItem } from 'app/core/cart/cart.types';
+import { Cart, CartWithDetails, CartPagination, CartItem, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { ModalConfirmationDeleteItemComponent } from 'app/modules/landing/carts/modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { Platform } from 'app/core/platform/platform.types';
@@ -332,7 +332,7 @@ export class CartListComponent implements OnInit, OnDestroy
                             }
                             // Mark for check 
                             this._changeDetectorRef.markForCheck();
-                        });                    
+                        });
 
                     // this.selectCart(null,null,true);
                 }
@@ -351,6 +351,18 @@ export class CartListComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             }); 
+
+        this._cartService.cartSummary$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: DiscountOfCartGroup)=>{
+                if(response) {
+                    this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
+                    this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
+                    this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck()
+            });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -593,13 +605,10 @@ export class CartListComponent implements OnInit, OnDestroy
         // .reduce will sum up all number in the array of number created by .map
         this.totalSelectedCartItem = cartListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
 
-        this._cartService.getDiscountOfCartGroup(cartListBody)
-            .subscribe((response) => {
-                this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
-                this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
-                this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
-            });            
+        // Call for cart summary
+        this._cartService.getDiscountOfCartGroup(cartListBody).subscribe();
 
+        // Resolved checkout
         this._checkoutService.resolveCheckout(cartListBody).subscribe();
 
     }
@@ -668,7 +677,6 @@ export class CartListComponent implements OnInit, OnDestroy
 
     getDeliveryChargesRange(index: number) : string 
     {
-        
         if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
             return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
         } else {
