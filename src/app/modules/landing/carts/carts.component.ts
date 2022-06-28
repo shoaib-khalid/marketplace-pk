@@ -11,7 +11,7 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Store } from 'app/core/store/store.types';
 import { fuseAnimations } from '@fuse/animations';
-import { merge, pipe, Subject } from 'rxjs';
+import { forkJoin, merge, pipe, Subject, combineLatest } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
@@ -136,6 +136,7 @@ export class CartListComponent implements OnInit, OnDestroy
     currentScreenSize: string[] = [];
 
     isLoading: boolean = false;
+    isPristine: boolean = true;
     pageOfItems: Array<any>;
     pagination: CartPagination;
 
@@ -352,6 +353,7 @@ export class CartListComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             }); 
 
+        // Get cartSummary data
         this._cartService.cartSummary$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: DiscountOfCartGroup)=>{
@@ -361,8 +363,23 @@ export class CartListComponent implements OnInit, OnDestroy
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
                 }
                 // Mark for check
-                this._changeDetectorRef.markForCheck()
+                this._changeDetectorRef.markForCheck();
             });
+
+        // once selectCart() is triggered, it will set isLoading to true
+        // this function will wait for both cartsWithDetails$ & cartSummary$ result first
+        // then is isLoading to false
+        combineLatest([
+            this._cartService.cartsWithDetails$,
+            this._cartService.cartSummary$
+        ]).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([result1, result2 ] : [CartWithDetails[], DiscountOfCartGroup])=>{
+            if (result1 && result2) {
+                this.isLoading = false;
+            }            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -523,6 +540,10 @@ export class CartListComponent implements OnInit, OnDestroy
     }
 
     selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {
+
+        // set isLoading to true
+        this.isLoading = true;
+
         if (carts) {
             // select all carts
             let cartsIds = carts.map(item => item.id);
@@ -604,6 +625,8 @@ export class CartListComponent implements OnInit, OnDestroy
         // Get totalSelectedCartItem to be displayed
         // .reduce will sum up all number in the array of number created by .map
         this.totalSelectedCartItem = cartListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
+
+        this.isPristine = (this.totalSelectedCartItem < 1) ? true : false;
 
         // Call for cart summary
         this._cartService.getDiscountOfCartGroup(cartListBody).subscribe();

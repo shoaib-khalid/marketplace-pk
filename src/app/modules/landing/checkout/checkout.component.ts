@@ -5,7 +5,7 @@ import { CurrencyPipe, DOCUMENT } from '@angular/common';
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartItem, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
-import { of, Subject, merge, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
+import { of, Subject, merge, timer, interval as observableInterval, combineLatest } from 'rxjs';
 import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Address, CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
@@ -146,25 +146,13 @@ export class BuyerCheckoutComponent implements OnInit
     cart: Cart;
     carts: CartWithDetails[];
     
-    selectedCart: { 
-        carts: { 
-            id: string, 
-            cartItem: { 
-                id: string, 
-                selected: boolean
-            }[], 
-            selected: boolean, 
-            minDeliveryCharges?: number, 
-            maxDeliveryCharges?: number,
-            description: {
-                isOpen: boolean,
-                value?: string
-            },
-            deliveryQuotationId: string,
-            deliveryType: string
-        }[], 
-        selected: boolean 
-    };
+    deliveryCharges: {
+        cartId: string,
+        minDeliveryCharges: number,
+        maxDeliveryCharges: number,
+        deliveryQuotationId: string,
+        deliveryType: string
+    }[];
     totalSelectedCartItem: number = 0;
         
     customerId: string = '';
@@ -249,85 +237,47 @@ export class BuyerCheckoutComponent implements OnInit
             .subscribe((cartsWithDetails: CartWithDetails[] | boolean) => {    
                             
                 if (typeof(cartsWithDetails) !== "boolean" && cartsWithDetails) {
-                    this.carts = cartsWithDetails;                     
-                    
-                    let allSelected: boolean[] = [];
-                    let allInCartSelected: { id: string; allSelected: boolean[]} = null;
-                    if (this.selectedCart) {
-                        // set all selected cart to false for every changes
-                        this.selectedCart.selected = false;
+                    this.carts = cartsWithDetails;
 
+                    // Set default deliveryCharges
+                    if (this.deliveryCharges) {
                         this.carts.forEach(item => {
-
-                            // check if the selectedCart cartId already exists
-                            let cartIdIndex = this.selectedCart.carts.findIndex(element => element.id === item.id);
-                            
-                            if (cartIdIndex > -1) {
-                                // set all seleted in cart to false first, later check for true again
-                                this.selectedCart.carts[cartIdIndex].selected = false;
-
-                                // get all selected boolean from cartItems
-                                allSelected = this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected);
-                                allInCartSelected = {
-                                    id: this.selectedCart.carts[cartIdIndex].id,
-                                    allSelected: this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected)
-                                }
-                                // this.selectedCart.carts[cartIdIndex] = {...this.selectedCart.carts[cartIdIndex], ...cart};
-                            } else {
-                                let cart = {
-                                    id: item.id, 
-                                    cartItem: item.cartItems.map(element => {
-                                        return {
-                                            id: element.id,
-                                            selected: false
-                                        }
-                                    }),
-                                    selected: false,
-                                    description: {
-                                        isOpen: false
-                                    },
+                            // check for duplicate delivery charges
+                            let index = this.deliveryCharges.findIndex(element => element.cartId === item.id);
+                            if (index < 0) {
+                                this.deliveryCharges.push({
+                                    cartId: item.id,
+                                    minDeliveryCharges: 0,
+                                    maxDeliveryCharges: 0,
                                     deliveryQuotationId: null,
                                     deliveryType: null
-                                };
-                                this.selectedCart.carts.push(cart);
-                            }
-
-                            // get delivery charges of every carts
-                            this.getDeliveryCharges(item.id,item.storeId);
-                            
-
-                            if (cartIdIndex > -1 && allInCartSelected !== null && !allInCartSelected.allSelected.includes(false)) {
-                                this.selectedCart.carts[cartIdIndex].selected = true;
+                                });
                             }
                         });
-                        
-                        if (allSelected.length && !allSelected.includes(false)) {
-                            // set all selected cart to true since all items in cartItem is true
-                            this.selectedCart.selected = true;                            
-                        }
                     } else {
-                        this.selectedCart = {
-                            carts:  this.carts.map(item => {
-                                return {
-                                    id: item.id,
-                                    cartItem: item.cartItems.map(element => {
-                                        return {
-                                            id: element.id,
-                                            selected: false
-                                        }
-                                    }),
-                                    selected: false,
-                                    description: {
-                                        isOpen: false
-                                    },
-                                    deliveryQuotationId: null,
-                                    deliveryType: null
-                                }
-                            }),
-                            selected: false
-                        }
-                    }
+                        this.deliveryCharges = this.carts.map(item => {
+                            return {
+                                cartId: item.id,
+                                minDeliveryCharges: 0,
+                                maxDeliveryCharges: 0,
+                                deliveryQuotationId: null,
+                                deliveryType: null
+                            };
+                        });
+                    }                    
 
+                    // CartsWithDetailsTotalItems
+                    this._checkoutService.cartsWithDetailsTotalItems$
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((cartsWithDetailsTotalItems: number)=>{
+                            if (cartsWithDetailsTotalItems) {
+                                this.totalSelectedCartItem = cartsWithDetailsTotalItems;
+                            }
+                            // Mark for check 
+                            this._changeDetectorRef.markForCheck();
+                        });
+
+                    // Customer Address
                     this._userService.customerAddress$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((customerAddress : CustomerAddress) => {
@@ -374,6 +324,21 @@ export class BuyerCheckoutComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck()
             });
+
+        // once selectCart() is triggered, it will set isLoading to true
+        // this function will wait for both cartsWithDetails$ & cartSummary$ result first
+        // then is isLoading to false
+        combineLatest([
+            this._cartService.cartsWithDetails$,
+            this._cartService.cartSummary$
+        ]).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([result1, result2 ] : [CartWithDetails[], DiscountOfCartGroup])=>{
+            if (result1 && result2) {
+                this.isLoading = false;
+            }            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -485,29 +450,34 @@ export class BuyerCheckoutComponent implements OnInit
 
         this._checkoutService.postToRetrieveDeliveryCharges(deliveryChargesBody)
             .subscribe((deliveryProviderResponse: DeliveryProvider[])=>{
-                let cartIndex = this.selectedCart.carts.findIndex(item => item.id == cartId);
+                let cartIndex = this.deliveryCharges ? this.deliveryCharges.findIndex(item => item.cartId == cartId) : -1;
                 if (cartIndex > -1) {
                     let minDeliveryCharges = Math.min(...deliveryProviderResponse.map(item => item.price));
                     let maxDeliveryCharges = Math.max(...deliveryProviderResponse.map(item => item.price));
                     
-                    this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
-                    this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+                    this.deliveryCharges[cartIndex].minDeliveryCharges = minDeliveryCharges;
+                    this.deliveryCharges[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
 
                     // find index at response to find the minimum price charges
                     let minDeliveryChargesIndex = deliveryProviderResponse.findIndex(item => item.price === minDeliveryCharges);
 
-                    this.selectedCart.carts[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
-                    this.selectedCart.carts[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
+                    this.deliveryCharges[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
+                    this.deliveryCharges[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
                 }                
             });
     }
 
     getDeliveryChargesRange(index: number) : string 
     {
-        if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
-            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
+        
+        if (this.deliveryCharges && this.deliveryCharges[index]) {
+            if (this.deliveryCharges[index].minDeliveryCharges === this.deliveryCharges[index].maxDeliveryCharges) {
+                return this._currencyPipe.transform(this.deliveryCharges[index].minDeliveryCharges, this.platform.currency);
+            } else {
+                return this._currencyPipe.transform(this.deliveryCharges[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.deliveryCharges[index].maxDeliveryCharges, this.platform.currency);
+            }
         } else {
-            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
+            return "Price not available";
         }
     }
 
@@ -583,29 +553,6 @@ export class BuyerCheckoutComponent implements OnInit
             return cartItems.reduce((partialSum, item) => partialSum + item.price, 0);
         } else {
             return cartItemsTotal;
-        }
-    }
-
-    selectCart(carts: CartWithDetails[], cart: CartWithDetails, cartItem: CartItem, checked: boolean) {      
-          
-        if (carts) {
-            let cartsIds = carts.map(item => item.id);
-            
-            this.selectedCart.carts.forEach(item => {
-                item.selected = checked;
-                if (cartsIds.includes(item.id)) {
-                    item.cartItem.forEach(element => {
-                        element.selected = checked;
-                    });
-                }
-            });
-        } else if (cart) {
-            let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
-            if (cartIndex > -1) {
-                this.selectedCart.carts[cartIndex].cartItem.forEach(item => {
-                    item.selected = checked;
-                });
-            }
         }
     }
 
