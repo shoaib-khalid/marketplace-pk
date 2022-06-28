@@ -385,9 +385,9 @@ export class LandingProductDetailsComponent implements OnInit
                 "previewCloseOnEsc": true,
                 // "thumbnailsRemainingCount": true
             },
-            // max-width 767 Mobile configuration
+            // max-width 767 Mobile configuration (medium view)
             {
-                breakpoint: 767,
+                breakpoint: 959,
                 thumbnailsColumns: 0,
                 thumbnails : false,
                 thumbnailsArrows  : true,

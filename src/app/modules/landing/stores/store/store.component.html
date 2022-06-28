@@ -4,7 +4,7 @@
         <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search> -->
         <!-- <search class="w-full" [storeId]="store.id" [store]="storeDetails"></search> -->
         <!-- Selected Store -->
-        <fuse-card class="flex flex-row h-30 sm:h-40 mt-4 md:mt-2 w-full border border-primary rounded-lg filter-article">
+        <fuse-card class="flex flex-row h-30 sm:h-40 w-full border border-primary rounded-lg filter-article">
             <div class="flex-0 w-30 sm:w-44 h-full">
                 <img
                     class="w-full h-full shadow object-cover"
@@ -22,7 +22,11 @@
                 
                 <div class="flex flex-col">
                     <!-- Contact  -->
-                    <div class="flex flex-col sm:flex-row justify-between gap-x-2">
+                    <div class="flex flex-row gap-x-1">
+                        <span class="text-xs sm:text-sm md:text-base">Address:</span>
+                        <span class="text-xs sm:text-sm md:text-base font-medium">{{store.address}}</span>
+                    </div>                        
+                    <div class="flex flex-row justify-between gap-x-2">
                         <div class="flex flex-row gap-x-1">
                             <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
                             <span class="text-xs sm:text-sm md:text-base font-medium">{{store.phoneNumber}}</span>
@@ -32,17 +36,12 @@
                             <span class="text-xs sm:text-sm md:text-base font-medium">{{pagination?.length}}</span>
                         </div>
                     </div>
-                    <div class="flex flex-row gap-x-1">
-                        <span class="text-xs sm:text-sm md:text-base">Email:</span>
-                        <span class="text-xs sm:text-sm md:text-base font-medium">{{store.email}}</span>
-                    </div>                        
                 </div>
             </div>
         </fuse-card>
 
         <!-- Store product list -->
         
-
         <div class="flex flex-col md:flex-row justify-between w-full mt-2 sm:pt-2">
             <ng-container *ngIf="!currentScreenSize.includes('md')">
                 <store-categories-top class="w-full" [categories]="storeCategories" [category]="storeCategory" [store]="store"
