@@ -29,6 +29,8 @@ export class CartService
     private _customerCarts: ReplaySubject<CustomerCart> = new ReplaySubject<CustomerCart>(1);
     private _cartPagination: BehaviorSubject<CartPagination | null> = new BehaviorSubject(null);
 
+    private _cartSummary: ReplaySubject<DiscountOfCartGroup> = new ReplaySubject<DiscountOfCartGroup>(1);
+
     /**
      * Constructor
      */
@@ -145,6 +147,20 @@ export class CartService
     get cartPagination$(): Observable<CartPagination>
     {
         return this._cartPagination.asObservable();
+    }
+
+    /**
+     * Cart Summary
+     */
+
+    get cartSummary$(): Observable<DiscountOfCartGroup>
+    {
+        return this._cartSummary.asObservable();
+    }
+
+    set cartSummary(value: DiscountOfCartGroup)
+    {
+        this._cartSummary.next(value);
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -661,6 +677,8 @@ export class CartService
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from StoresService (getDiscountOfCartGroup)",response);
+
+                    this._cartSummary.next(response['data']);
 
                     // Return the new notification from observable
                     return response['data'];

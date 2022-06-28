@@ -1,11 +1,10 @@
 <!-- Voucher List -->
-<div class="relative flex flex-col items-center bg-card w-full h-full py-5 px-3 sm:px-5">
-    <!-- Container -->
+<div class="relative flex flex-col items-center bg-card w-full h-full">
     <div class="flex flex-col md:flex-row w-full">
         <!-- Carts -->
         <ng-container *ngIf="carts && carts.length; else noCarts">
             <!-- Delivery Address (xs) -->
-            <div class="block md:hidden flex flex-col justify-center items-center border rounded-lg p-2 mb-2">
+            <div class="block md:hidden w-full flex flex-col justify-center items-start border rounded-lg p-2 mb-2">
                 <!-- Header -->
                 <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                     <mat-icon 
@@ -13,23 +12,20 @@
                         [svgIcon]="'mat_solid:location_on'"></mat-icon>
                     <span class="ml-2 font-bold">Delivery Address</span>
                 </div>
-                <ng-container *ngIf="customerAddresses && customerAddresses.length; else noAddress">
-                    <ng-container *ngFor="let address of customerAddresses">
-                        <ng-container *ngIf="address.isDefault">
-                            <div class="flex flex-col m-2">
-                                <span class="font-medium pb-1">{{address.name}}</span>
-                                <span class="font-medium pb-1">{{address.phoneNumber}}</span>
-                                <span class="font-medium">{{address.address}}, {{address.postCode}}, {{address.city}}, {{address.state}}</span>
-                            </div>
-                            <div class="flex w-full justify-center items-center">
-                                <button
-                                    [routerLink]="'/address'"
-                                    class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
-                                    <span class="text-white">Change</span>
-                                </button>
-                            </div>
-                        </ng-container>
-                    </ng-container>
+                <ng-container *ngIf="customerAddress; else noAddress">
+                    <div class="flex flex-col m-2">
+                        <span class="font-medium pb-1">{{customerAddress.name}}</span>
+                        <span class="font-medium pb-1">{{customerAddress.phoneNumber}}</span>
+                        <span class="font-medium">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                    </div>
+                    <div class="flex w-full justify-center items-center">
+                        <button
+                            [routerLink]="['/address']"
+                            [queryParams]="{origin: 'carts'}"
+                            class="my-2 w-full font-semibold p-1 rounded-md bg-primary"                            >
+                            <span class="text-white">Change</span>
+                        </button>
+                    </div>
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->
@@ -46,14 +42,14 @@
                     </button>
                 </ng-template>
             </div>
-
+            
             <!-- Carts Details -->
             <div class="flex flex-col w-full items-center">
                 <div class="grid w-full">
                     <!-- Title -->
-                    <span class="text-lg sm:text-3xl font-semibold">Your Cart</span>
+                    <span class="text-lg sm:text-3xl font-semibold">Checkout</span>
                     <!-- Header -->
-                    <div class="hidden lg:grid cart-grid w-full sticky py-2 border-b border-gray-600">
+                    <div class="hidden lg:grid checkout-grid w-full sticky py-2 border-b border-gray-600">
                         <!-- Checkbox all carts -->
                         <!-- <div class="flex items-center justify-center w-full">
                             <input type="checkbox" [(ngModel)]="selectedCart.selected" (click)="selectCart(carts,null,null,$event.target.checked)"/>
@@ -68,7 +64,7 @@
                     <ng-container *ngFor="let cart of carts; let i = index">
                         <div class="w-full border lg:border-0 lg:border-b lg:last:border-b-0 lg:border-gray-600 rounded-lg lg:rounded-none px-2 lg:px-0 py-4 mb-4 last:mb-0">
                             <!-- Cart Header -->
-                            <div class="cart-title-grid grid w-full sticky pb-2 border-b">
+                            <div class="checkout-title-grid grid w-full sticky pb-2 border-b">
                                 <!-- Checkbox all in cart -->
                                 <!-- <div class="flex items-start justify-center mt-2 w-full">
                                     <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (click)="selectCart(null,cart,null,$event.target.checked)">
@@ -83,36 +79,31 @@
                             <!-- Cart Items -->
                             <ng-container *ngIf="cart.cartItems && cart.cartItems.length; else noCartItem">
                                 <ng-container *ngFor="let cartItem of cart.cartItems; let j = index">
-                                    <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
+                                    <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'checkout-grid grid' : 'flex flex-row justify-between'">
                                         <!-- Checkbox each item -->
                                         <!-- <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
                                             <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j + pagination.startIndex].selected" type="checkbox">
                                         </div> -->
                                         <span></span>
                                         <!-- Image, Title, Variants -->
-                                        <div class="flex flex-row grow items-center justify-start">
-                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : displayStoreLogo(cart.store)">
+                                        <div class="flex flex-row grow items-center justify-start">                                            <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
                                                 <span class="text-md sm:text-lg lg:text-xl font-semibold line-clamp-2">{{cartItem.productName}}</span>
-                                                <span class="text-xs lg:text-md text-secondary">Colour: Black, Size: L</span>
-                                                <!-- Quantity -->
-                                                <div class="block md:hidden flex flex-col justify-center items-center mt-0.5">
-                                                    <div class="flex flex-row h-6 w-16 justify-center items-center rounded-lg relative border border-primary">
-                                                        <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="text-black hover:bg-primary h-full w-20 rounded-l-lg cursor-pointer outline-none">
-                                                            <span class="flex justify-center text-sm">−</span>
-                                                        </button>
-                                                            <input 
-                                                                matInput
-                                                                (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
-                                                                type="number" 
-                                                                class="pt-[0.1rem] outline-none focus:outline-none text-center w-full font-semibold text-xs text-black focus:text-black md:text-basecursor-default flex items-center outline-none" 
-                                                                name="custom-input-number-small" 
-                                                                [value]="cartItem.quantity"/>
-                                                        <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="text-black hover:bg-primary h-full w-20 rounded-r-lg cursor-pointer">
-                                                            <span class="flex justify-center text-sm">+</span>
-                                                        </button>
-                                                    </div>
-                                                    <span class="text-xs text-red-500 sm:mt-0.5">2 items left</span>
+                                                <div>
+                                                    <!-- Display variants -->
+                                                    <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
+                                                        <ng-container *ngFor="let variant of cartItem.productInventory.productInventoryItems">
+                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{variant.productVariantAvailable.productVariant.name}} : {{variant.productVariantAvailable.value}}</span>
+                                                            <span class="block last:hidden">,</span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <!-- Display Combo -->
+                                                    <ng-container *ngIf="cartItem.cartSubItem.length > 0">
+                                                        <ng-container  *ngFor="let combo of cartItem.cartSubItem">
+                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{combo.productName}}</span>
+                                                            <span class="block last:hidden">,</span>
+                                                        </ng-container>
+                                                    </ng-container>
                                                 </div>
                                             </div>
                                         </div>
@@ -122,22 +113,8 @@
                                             <span class="font-semibold text-sm md:text-md">{{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                         </div>
                                         <!-- Quantity -->
-                                        <div class="hidden md:flex flex-col justify-center items-center mx-2">
-                                            <div class="flex flex-row h-6 w-16 justify-center items-center rounded-lg relative border border-primary">
-                                                <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-l-lg cursor-pointer outline-none">
-                                                    <span class="flex justify-center">−</span>
-                                                </button>
-                                                    <input
-                                                        (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
-                                                        type="number" 
-                                                        class="pt-[0.1rem] outline-none focus:outline-none text-center w-full font-semibold text-md text-black focus:text-black md:text-basecursor-default flex items-center outline-none" 
-                                                        name="custom-input-number" 
-                                                        [value]="cartItem.quantity"/>
-                                                <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-r-lg cursor-pointer">
-                                                    <span class="flex justify-center">+</span>
-                                                </button>
-                                            </div>
-                                            <span class="text-xs text-red-500 mt-1">2 items left</span>
+                                        <div class="flex flex-col justify-center items-center mx-2">
+                                            <span>{{cartItem.quantity}}</span>
                                         </div>
                                         <!-- Total Price -->
                                         <span class="hidden sm:flex justify-center items-center font-semibold text-right text-sm md:text-md truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
@@ -176,14 +153,14 @@
                                     </mat-form-field>
                                 </div>
                                 <!-- Shipping Fee & Total Items -->
-                                <div class="flex flex-row justify-between">
-                                    <div class="flex flex-col sm:flex-row justify-between sm:min-w-44">
+                                <div class="flex flex-row justify-between items-center">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center sm:min-w-44">
                                         <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                        <span class="text-xs sm:text-sm">RM 6.00</span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
                                     </div>
-                                    <div class="flex flex-col sm:flex-row justify-between sm:min-w-44">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center sm:min-w-44">
                                         <span class="text-sm sm:text-md">Total items({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
-                                        <span class="text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                     </div>
                                 </div>
                             </ng-container>
@@ -364,23 +341,24 @@
                             [svgIcon]="'mat_solid:location_on'"></mat-icon>
                         <span class="ml-2 font-bold">Delivery Address</span>
                     </div>
-                    <ng-container *ngIf="customerAddresses && customerAddresses.length; else noAddress">
-                        <ng-container *ngFor="let address of customerAddresses">
-                            <ng-container *ngIf="address.isDefault">
+                    <ng-container *ngIf="customerAddress; else noAddress">
+                        <!-- <ng-container *ngFor="let address of customerAddresses"> -->
+                            <!-- <ng-container *ngIf="customerAddress.isDefault"> -->
                                 <div class="flex flex-col m-2">
-                                    <span class="font-medium pb-1">{{address.name}}</span>
-                                    <span class="font-medium pb-1">{{address.phoneNumber}}</span>
-                                    <span class="font-medium">{{address.address}}, {{address.postCode}}, {{address.city}}, {{address.state}}</span>
+                                    <span class="font-medium pb-1">{{customerAddress.name}}</span>
+                                    <span class="font-medium pb-1">{{customerAddress.phoneNumber}}</span>
+                                    <span class="font-medium">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
                                 </div>
                                 <div class="flex w-full justify-center items-center">
                                     <button
                                         [routerLink]="'/address'"
+                                        [queryParams]="{origin: 'carts'}"
                                         class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
                                         <span class="text-white">Change</span>
                                     </button>
                                 </div>
-                            </ng-container>
-                        </ng-container>
+                            <!-- </ng-container> -->
+                        <!-- </ng-container> -->
                     </ng-container>
                     <ng-template #noAddress>
                         <!-- Enter Address -->

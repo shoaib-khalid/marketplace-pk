@@ -101,6 +101,7 @@ export class CheckoutService
             })
         );
     }
+
     /**
      * Get the current logged in cart data
      */

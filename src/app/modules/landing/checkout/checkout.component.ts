@@ -1,14 +1,14 @@
 import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, NgForm, ValidationErrors, Validators } from '@angular/forms';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { DOCUMENT } from '@angular/common'; 
+import { CurrencyPipe, DOCUMENT } from '@angular/common'; 
 import { CartService } from 'app/core/cart/cart.service';
-import { Cart, CartItem, CartPagination, CartWithDetails } from 'app/core/cart/cart.types';
+import { Cart, CartItem, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
 import { of, Subject, merge, timer, interval as observableInterval, BehaviorSubject } from 'rxjs';
 import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address, CartDiscount } from '../../../core/checkout/checkout.types';
+import { Address, CartDiscount, DeliveryProvider } from '../../../core/checkout/checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -29,7 +29,7 @@ import { Router } from '@angular/router';
     styles       : [
         /* language=SCSS */
         `
-            .cart-grid {
+            .checkout-grid {
                 grid-template-columns: 0px auto 96px 96px 96px 0px;
 
                 @screen md {
@@ -37,10 +37,10 @@ import { Router } from '@angular/router';
                 }
             }
 
-            .cart-title-grid {
+            .checkout-title-grid {
                 grid-template-columns: 0px auto;
 
-                @screen sm {
+                @screen lg {
                     grid-template-columns: 0px auto;
                 }
             }
@@ -146,10 +146,29 @@ export class BuyerCheckoutComponent implements OnInit
     cart: Cart;
     carts: CartWithDetails[];
     
-    selectedCart: { carts: { id: string, cartItem: { id: string, selected: boolean}[], selected: boolean}[], selected: boolean };
-    
+    selectedCart: { 
+        carts: { 
+            id: string, 
+            cartItem: { 
+                id: string, 
+                selected: boolean
+            }[], 
+            selected: boolean, 
+            minDeliveryCharges?: number, 
+            maxDeliveryCharges?: number,
+            description: {
+                isOpen: boolean,
+                value?: string
+            },
+            deliveryQuotationId: string,
+            deliveryType: string
+        }[], 
+        selected: boolean 
+    };
+    totalSelectedCartItem: number = 0;
+        
     customerId: string = '';
-    customerAddresses: CustomerAddress[] = [];
+    customerAddress: CustomerAddress;
 
     paymentDetails: CartDiscount = {
         cartSubTotal: 0,
@@ -188,6 +207,7 @@ export class BuyerCheckoutComponent implements OnInit
         private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _changeDetectorRef: ChangeDetectorRef,
+        private _currencyPipe: CurrencyPipe,
         private _cartService: CartService,
         private _checkoutService: CheckoutService,
         private _jwtService: JwtService,
@@ -229,7 +249,7 @@ export class BuyerCheckoutComponent implements OnInit
             .subscribe((cartsWithDetails: CartWithDetails[] | boolean) => {    
                             
                 if (typeof(cartsWithDetails) !== "boolean" && cartsWithDetails) {
-                    this.carts = cartsWithDetails;
+                    this.carts = cartsWithDetails;                     
                     
                     let allSelected: boolean[] = [];
                     let allInCartSelected: { id: string; allSelected: boolean[]} = null;
@@ -262,11 +282,19 @@ export class BuyerCheckoutComponent implements OnInit
                                             selected: false
                                         }
                                     }),
-                                    selected: false
+                                    selected: false,
+                                    description: {
+                                        isOpen: false
+                                    },
+                                    deliveryQuotationId: null,
+                                    deliveryType: null
                                 };
-
                                 this.selectedCart.carts.push(cart);
                             }
+
+                            // get delivery charges of every carts
+                            this.getDeliveryCharges(item.id,item.storeId);
+                            
 
                             if (cartIdIndex > -1 && allInCartSelected !== null && !allInCartSelected.allSelected.includes(false)) {
                                 this.selectedCart.carts[cartIdIndex].selected = true;
@@ -288,14 +316,32 @@ export class BuyerCheckoutComponent implements OnInit
                                             selected: false
                                         }
                                     }),
-                                    selected: false
+                                    selected: false,
+                                    description: {
+                                        isOpen: false
+                                    },
+                                    deliveryQuotationId: null,
+                                    deliveryType: null
                                 }
                             }),
                             selected: false
                         }
-                    }                    
+                    }
 
-                    // this.selectCart(null,null,true);
+                    this._userService.customerAddress$
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((customerAddress : CustomerAddress) => {
+                            if (customerAddress) {                                
+                                this.customerAddress = customerAddress;
+
+                                this.carts.forEach(item => {                        
+                                    // get delivery charges of every carts
+                                    this.getDeliveryCharges(item.id,item.storeId);
+                                });
+                            }
+                            // Mark for check 
+                            this._changeDetectorRef.markForCheck();
+                        });
                 } else {
                     this._router.navigate(['carts'])
                 }                
@@ -316,7 +362,18 @@ export class BuyerCheckoutComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             }); 
 
-        
+        // Get cart summary
+        this._cartService.cartSummary$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: DiscountOfCartGroup)=>{
+                if(response) {
+                    this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
+                    this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
+                    this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck()
+            });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -325,14 +382,6 @@ export class BuyerCheckoutComponent implements OnInit
 
                 this.currentScreenSize = matchingAliases;
             });
-
-        this._userService.customersAddresses$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((customerAddresses : CustomerAddress[]) => {
-
-            this.customerAddresses = customerAddresses;
-            
-        });
     }
 
     /**
@@ -407,6 +456,58 @@ export class BuyerCheckoutComponent implements OnInit
             return store.storeLogoUrl;
         } else {
             return this.platform.logo;
+        }
+    }
+
+    getDeliveryCharges(cartId: string, storeId: string)
+    {
+        // if customerId null means guest
+        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
+        const deliveryChargesBody = {
+            cartId: cartId,
+            customerId: _customerId,
+            delivery: {
+                deliveryAddress     : this.customerAddress.address,
+                deliveryCity        : this.customerAddress.city,
+                deliveryState       : this.customerAddress.state,
+                deliveryPostcode    : this.customerAddress.postCode,
+                deliveryCountry     : this.customerAddress.country,
+                deliveryContactEmail: this.customerAddress.email,
+                deliveryContactName : this.customerAddress.name,
+                deliveryContactPhone: this.customerAddress.phoneNumber,
+                latitude            : null,
+                longitude           : null
+            },
+            deliveryProviderId      : null,
+            storeId: storeId
+        }
+
+        this._checkoutService.postToRetrieveDeliveryCharges(deliveryChargesBody)
+            .subscribe((deliveryProviderResponse: DeliveryProvider[])=>{
+                let cartIndex = this.selectedCart.carts.findIndex(item => item.id == cartId);
+                if (cartIndex > -1) {
+                    let minDeliveryCharges = Math.min(...deliveryProviderResponse.map(item => item.price));
+                    let maxDeliveryCharges = Math.max(...deliveryProviderResponse.map(item => item.price));
+                    
+                    this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
+                    this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+
+                    // find index at response to find the minimum price charges
+                    let minDeliveryChargesIndex = deliveryProviderResponse.findIndex(item => item.price === minDeliveryCharges);
+
+                    this.selectedCart.carts[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
+                    this.selectedCart.carts[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
+                }                
+            });
+    }
+
+    getDeliveryChargesRange(index: number) : string 
+    {
+        if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
+            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
+        } else {
+            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
         }
     }
 

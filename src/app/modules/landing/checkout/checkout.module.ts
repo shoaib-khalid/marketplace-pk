@@ -12,11 +12,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { BuyerCheckoutComponent } from './checkout.component';
 import { BuyerCheckoutRoutes } from './checkout.routing';
-
-
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
@@ -52,7 +50,8 @@ import { FuseCardModule } from '@fuse/components/card';
         SharedModule,
     ],
     providers   : [
-        DatePipe
+        DatePipe,
+        CurrencyPipe
     ]
 })
 export class BuyerCheckoutModule
