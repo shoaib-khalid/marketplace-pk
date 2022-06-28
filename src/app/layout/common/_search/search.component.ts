@@ -85,8 +85,6 @@ export class _SearchComponent implements OnInit, OnDestroy
         this.searchControl.valueChanges.subscribe(userInput => {
             this.autoCompleteSetList(userInput);
         })
-
-        this.searchControl.valueChanges.subscribe
     }
 
     /**
@@ -278,16 +276,7 @@ export class _SearchComponent implements OnInit, OnDestroy
         
     }
 
-    deleteGuestSelectedResult(value) {
-
-        // let searchIndex = this.autoCompleteList.findIndex(item => item.searchText === value)
-        
-        // if(searchIndex > -1){
-        //     this.autoCompleteList.splice(searchIndex, 1);
-
-        //     // Mark for check
-        //     this._changeDetectorRef.markForCheck();
-        // }
+    deleteGuestSelectedResult(value: string) {
 
         let localDataSearch: any[] = JSON.parse(this._searchService.localSearch$); 
 
@@ -297,13 +286,18 @@ export class _SearchComponent implements OnInit, OnDestroy
             localDataSearch.splice(index, 1);
 
             this._searchService.localSearch = localDataSearch;
-            this.resultSets = localDataSearch; 
+
+            this.resultSets = localDataSearch;
+
+            // Subscribe to search control reactive form
+            this.searchControl.valueChanges.subscribe(userInput => {
+                this.autoCompleteSetList(userInput);
+            })
 
             // Mark for check
             this._changeDetectorRef.markForCheck();
         }
     
-
         // Mark for check
         this._changeDetectorRef.markForCheck();
             
@@ -312,12 +306,6 @@ export class _SearchComponent implements OnInit, OnDestroy
 
     deleteSelectedResult(id: any) {
         if(this.customer ) {
-            let index = this.autoCompleteList.findIndex(item => item.id === id)
-    
-            if(index > -1){
-                this.autoCompleteList.splice(index, 1)
-            }
-    
             this._searchService.deleteCustomerSearch(id).subscribe(response => {
     
                 if(response) {

@@ -75,14 +75,14 @@
             </div>
         </div>
         <ng-container *ngIf="customer">
-            <button mat-icon-button (click)="deleteSelectedResult(result.id)">
+            <button mat-icon-button (click)="deleteSelectedResult(result.id);blurInput()">
                 <mat-icon
                     class="m-0 icon-size-5 text-primary dark:text-primary-400"
                     [svgIcon]="'feather:x-circle'"></mat-icon>
             </button>
         </ng-container>
         <ng-container *ngIf="!customer">
-            <button mat-icon-button (click)="deleteGuestSelectedResult(result.searchText)">
+            <button mat-icon-button (click)="deleteGuestSelectedResult(result.searchText);blurInput()">
                 <mat-icon
                     class="m-0 icon-size-5 text-primary dark:text-primary-400"
                     [svgIcon]="'feather:x-circle'"></mat-icon>
