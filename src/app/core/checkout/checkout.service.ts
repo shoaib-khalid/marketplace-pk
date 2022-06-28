@@ -22,6 +22,7 @@ export class CheckoutService
 
     private _cartWithDetails: ReplaySubject<CartWithDetails> = new ReplaySubject<CartWithDetails>(1);
     private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
+    private _cartsWithDetailsTotalItems: ReplaySubject<number> = new ReplaySubject<number>(1);
     private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
 
     /**
@@ -31,7 +32,6 @@ export class CheckoutService
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _storeService: StoresService,
-        private _cartService: CartService,
         private _jwt: JwtService,
         private _logging: LogService,
         private _authService: AuthService,
@@ -79,6 +79,11 @@ export class CheckoutService
     get cartsWithDetails$(): Observable<CartWithDetails[]>
     {
         return this._cartsWithDetails.asObservable();
+    }
+
+    get cartsWithDetailsTotalItems$(): Observable<number>
+    {
+        return this._cartsWithDetailsTotalItems.asObservable();
     }
 
     /**
@@ -161,7 +166,7 @@ export class CheckoutService
                     // Filter out cartItems that were not included in selectedItems
                     let _checkoutItems: CartWithDetails[] = response.data.content;
                     _checkoutItems.forEach(item => {
-                        let index = checkoutItems.findIndex(element => element.cartId === item.id);
+                        let index = checkoutItems ? checkoutItems.findIndex(element => element.cartId === item.id) : -1;
                         let toMaintainCartItems = item.cartItems;
                         if (index > -1) {
                             const toMaintain = new Set(checkoutItems[index].selectedItemId);
@@ -170,6 +175,12 @@ export class CheckoutService
                         item.cartItems = toMaintainCartItems;
                     });
                     this._cartsWithDetails.next(_checkoutItems);
+
+                    let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
+                    let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
+
+                    // cartsWithDetailsTotalItems 
+                    this._cartsWithDetailsTotalItems.next(cartsWithDetailsTotalItems);
                 })
             );
     }
