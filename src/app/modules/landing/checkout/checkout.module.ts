@@ -22,6 +22,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs'
 import { MatTableModule } from '@angular/material/table';
 import { FuseCardModule } from '@fuse/components/card';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 @NgModule({
     declarations: [
@@ -47,6 +48,7 @@ import { FuseCardModule } from '@fuse/components/card';
         MatRadioModule,
         FuseCardModule,
         MatExpansionModule,
+        ErrorBackgroundModule,
         SharedModule,
     ],
     providers   : [
