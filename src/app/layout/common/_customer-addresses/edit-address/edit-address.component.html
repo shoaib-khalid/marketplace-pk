@@ -22,7 +22,7 @@
                 </div>
                 <!-- Name -->
                 <div class="w-full flex flex-col sm:flex-row sm:mb-0 pt-8 sm:pt-6">
-                    <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
+                    <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
                         <mat-label>Name</mat-label>
                         <input
                             [formControlName]="'name'"
@@ -32,6 +32,15 @@
                                 Full name is required
                             </mat-error>
                     </mat-form-field>
+                    <ng-container *ngIf="!user">
+                        <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
+                            <mat-label>Email</mat-label>
+                            <input
+                                [formControlName]="'email'"
+                                placeholder="Enter your email"
+                                matInput>
+                        </mat-form-field>
+                    </ng-container>
                 </div>
     
                 <!-- Phone Number, State -->
@@ -71,13 +80,8 @@
                             State is required
                         </mat-error>
                     </mat-form-field>
-                    <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pl-1" floatLabel="always">
-                        <mat-label>Email</mat-label>
-                        <input
-                            [formControlName]="'email'"
-                            placeholder="Enter your email"
-                            matInput>
-                    </mat-form-field> -->
+                    
+                    
                 </div>
  
                 <!-- City, Postcode -->
@@ -114,8 +118,8 @@
                             <!-- <div *ngFor="let city of storeStateCities">
                                 <mat-option class="m-t" [value]="city.city">{{city.city}}</mat-option>
                             </div> -->
-                            <mat-option class="m-t" *ngFor="let city of storeStateCities$ | async" [value]="city.city">
-                                {{city.city}}
+                            <mat-option class="m-t" *ngFor="let city of storeStateCities$ | async" [value]="city.name">
+                                {{city.name}}
                             </mat-option>
                         </mat-select>
                         <mat-error *ngIf="addressForm.get('city').hasError('required')">
@@ -216,7 +220,7 @@
                     <span>&nbsp;&nbsp;</span>
                     <button
                         mat-flat-button
-                        [disabled]="isLoading || addressForm.pristine || addressForm.invalid"
+                        [disabled]="addressForm.invalid"
                         type="button"
                         (click)="updateAddress()"
                         [color]="'primary'">Save

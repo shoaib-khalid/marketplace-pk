@@ -30,7 +30,7 @@
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->
-                    <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                    <span class="mt-2 text-center">Enter House No. or Apartment No.</span>
                     <!-- Button -->
                     <button 
                         [routerLink]="'/address'"
@@ -351,6 +351,7 @@
 
                     <!-- Checkout -->
                     <button 
+                        (click)="initializeCheckoutList()"
                         [disabled]="isLoading || isPristine"
                         [routerLink]="['/checkout']" 
                         class="py-2 px-4 rounded w-full mt-2 text-white"
@@ -390,7 +391,7 @@
                     </ng-container>
                     <ng-template #noAddress>
                         <!-- Enter Address -->
-                        <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                        <span class="mt-2 text-center">Enter House No. or Apartment No.</span>
                         <!-- Button -->
                         <button 
                             [routerLink]="'/address'"

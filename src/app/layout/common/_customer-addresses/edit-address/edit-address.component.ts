@@ -9,6 +9,8 @@ import { Observable, ReplaySubject, BehaviorSubject, Subject, takeUntil, take } 
 import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
 import { UserProfileValidationService } from 'app/modules/customer/user-profile/user-profile.validation.service';
+import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/user/user.types';
 // import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 @Component({
@@ -118,6 +120,8 @@ export class EditAddressDialog implements OnInit {
     currentLat:any=0;
     currentLong:any=0;
 
+    user: User
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<EditAddressDialog>,
@@ -125,6 +129,7 @@ export class EditAddressDialog implements OnInit {
         private _platformsService: PlatformService,
         private _storesService: StoresService,
         private _changeDetectorRef: ChangeDetectorRef,
+        private _userService: UserService
 
     ) { }
 
@@ -133,7 +138,7 @@ export class EditAddressDialog implements OnInit {
         // Create the form
         this.addressForm = this._formBuilder.group({
             id          : [''],
-            customerId  : ['', Validators.required],
+            customerId  : [''],
             name        : ['', Validators.required],
             email       : [''],
             address     : ['', Validators.required],
@@ -144,6 +149,17 @@ export class EditAddressDialog implements OnInit {
             state       : ['Selangor', Validators.required],
             isDefault   : ['']
         });
+
+        this._userService.user$
+        .pipe(takeUntil(this._onDestroy))
+            .subscribe((result) => {
+                    
+                this.user = result;
+                console.log('user', result);
+                    
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
         
         this.setInitialValue();
 
