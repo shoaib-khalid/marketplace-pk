@@ -21,6 +21,8 @@ export interface CartWithDetails
     store                   : Store;
     storeId                 : string;
     storeVoucherCode        : string;
+    deliveryProviderId      : string;
+    orderNote?              : string;
 }
 
 export interface CartPagination
@@ -149,4 +151,25 @@ export interface StoreDiscountList
     voucherDiscountType                     : string;
     voucherSubTotalDiscount                 : number;
     voucherSubTotalDiscountDescription      : string;
+}
+
+export interface SelectedCart 
+{
+    carts: { 
+        id: string, 
+        cartItem: { 
+            id: string, 
+            selected: boolean
+        }[], 
+        selected: boolean, 
+        minDeliveryCharges?: number, 
+        maxDeliveryCharges?: number,
+        description: {
+            isOpen: boolean,
+            value?: string
+        },
+        deliveryQuotationId: string,
+        deliveryType: string
+    }[], 
+    selected: boolean 
 }

@@ -22,7 +22,7 @@ export class CheckoutService
 
     private _cartWithDetails: ReplaySubject<CartWithDetails> = new ReplaySubject<CartWithDetails>(1);
     private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
-    private _cartsWithDetailsTotalItems: ReplaySubject<number> = new ReplaySubject<number>(1);
+    private _checkoutItems: ReplaySubject<CheckoutItems[]> = new ReplaySubject<CheckoutItems[]>(1);
     private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
 
     /**
@@ -81,9 +81,9 @@ export class CheckoutService
         return this._cartsWithDetails.asObservable();
     }
 
-    get cartsWithDetailsTotalItems$(): Observable<number>
+    get checkoutItems$(): Observable<CheckoutItems[]>
     {
-        return this._cartsWithDetailsTotalItems.asObservable();
+        return this._checkoutItems.asObservable();
     }
 
     /**
@@ -171,16 +171,14 @@ export class CheckoutService
                         if (index > -1) {
                             const toMaintain = new Set(checkoutItems[index].selectedItemId);
                             toMaintainCartItems = item.cartItems.filter(element => toMaintain.has(element.id));
+                            item.orderNote = checkoutItems[index].orderNotes;
                         }
                         item.cartItems = toMaintainCartItems;
                     });
                     this._cartsWithDetails.next(_checkoutItems);
 
-                    let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
-                    let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
-
-                    // cartsWithDetailsTotalItems 
-                    this._cartsWithDetailsTotalItems.next(cartsWithDetailsTotalItems);
+                    // checkoutListBody 
+                    this._checkoutItems.next(checkoutItems);
                 })
             );
     }
@@ -373,6 +371,32 @@ export class CheckoutService
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from StoresService (postPlaceOrder)",response);
+
+                    return response["data"];
+                })
+            );
+    }
+
+    postPlaceGroupOrder( orderBodies, saveInfo: boolean, platformVoucherCode: string = null) : Observable<any>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                saveCustomerInformation: saveInfo,
+                platformVoucherCode: platformVoucherCode
+            }
+        };
+
+        if (platformVoucherCode === null) { delete header.params.platformVoucherCode; }
+
+        return this._httpClient.post<any>(orderService + '/orders/placeGroupOrder', orderBodies, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from StoresService (postPlaceGroupOrder)",response);
 
                     return response["data"];
                 })

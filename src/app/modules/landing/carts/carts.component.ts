@@ -14,7 +14,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { forkJoin, merge, pipe, Subject, combineLatest } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
+import { CartDiscount, CheckoutItems, DeliveryProvider } from 'app/core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
@@ -158,7 +158,8 @@ export class CartListComponent implements OnInit, OnDestroy
                 value?: string
             },
             deliveryQuotationId: string,
-            deliveryType: string
+            deliveryType: string,
+            deliveryProviderId: string
         }[], 
         selected: boolean 
     };
@@ -241,8 +242,8 @@ export class CartListComponent implements OnInit, OnDestroy
             .subscribe((cartsWithDetails: CartWithDetails[]) => {
 
                 if (cartsWithDetails) {
-                    this.carts = cartsWithDetails;                     
-                    
+                    this.carts = cartsWithDetails;   
+                                                          
                     let allSelected: boolean[] = [];
                     let allInCartSelected: { id: string; allSelected: boolean[]} = null;
                     if (this.selectedCart) {
@@ -276,10 +277,12 @@ export class CartListComponent implements OnInit, OnDestroy
                                     }),
                                     selected: false,
                                     description: {
+                                        value: '',
                                         isOpen: false
                                     },
                                     deliveryQuotationId: null,
-                                    deliveryType: null
+                                    deliveryType: null,
+                                    deliveryProviderId: null
                                 };
                                 this.selectedCart.carts.push(cart);
                             }
@@ -310,10 +313,12 @@ export class CartListComponent implements OnInit, OnDestroy
                                     }),
                                     selected: false,
                                     description: {
+                                        value: '',
                                         isOpen: false
                                     },
                                     deliveryQuotationId: null,
-                                    deliveryType: null
+                                    deliveryType: null,
+                                    deliveryProviderId: null
                                 }
                             }),
                             selected: false
@@ -603,7 +608,7 @@ export class CartListComponent implements OnInit, OnDestroy
         });
 
         // to list out the array of selectedCart
-        let cartListBody = this.selectedCart.carts.map(item => {
+        let checkoutListBody: CheckoutItems[] = this.selectedCart.carts.map(item => {
             return {
                 cartId: item.id,
                 selectedItemId: item.cartItem.map(element => {
@@ -613,7 +618,9 @@ export class CartListComponent implements OnInit, OnDestroy
                 // to remove if selected = false (undefined array of cart item)
                 }).filter(x => x),
                 deliveryQuotationId : item.deliveryQuotationId,
-                deliveryType : item.deliveryType
+                deliveryType : item.deliveryType,
+                deliveryProviderId : item.deliveryProviderId,
+                orderNotes : item.description.value
             }
         // to remove if selected = false (undefined array of selectedItemId)
         }).filter(n => {
@@ -624,15 +631,15 @@ export class CartListComponent implements OnInit, OnDestroy
 
         // Get totalSelectedCartItem to be displayed
         // .reduce will sum up all number in the array of number created by .map
-        this.totalSelectedCartItem = cartListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
+        this.totalSelectedCartItem = checkoutListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
 
         this.isPristine = (this.totalSelectedCartItem < 1) ? true : false;
 
         // Call for cart summary
-        this._cartService.getDiscountOfCartGroup(cartListBody).subscribe();
+        this._cartService.getDiscountOfCartGroup(checkoutListBody).subscribe();
 
         // Resolved checkout
-        this._checkoutService.resolveCheckout(cartListBody).subscribe();
+        this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
 
     }
 
@@ -694,6 +701,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
                     this.selectedCart.carts[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
                     this.selectedCart.carts[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
+                    this.selectedCart.carts[cartIndex].deliveryProviderId = deliveryProviderResponse[minDeliveryChargesIndex].providerId;
                 }                
             });
     }

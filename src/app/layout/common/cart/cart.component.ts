@@ -82,44 +82,6 @@ export class CartComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
-        // this._cartService.customerCarts$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((carts: CustomerCart) => {                
-                
-        //         if (carts) {
-
-        //             this.carts = carts.cartList;
-        //             this.totalCartItems = carts.totalItem;
-
-        //             this.totalCartList = carts.cartList.length;
-    
-        //             // remove duplicate stores
-        //             let resArr = [];
-        //             this.carts.filter(function(item){
-        //                 let i = resArr.findIndex(x => (x.storeId == item.storeId));
-    
-        //                 if (i <= -1){
-        //                     resArr.push(item);
-        //                 }
-        //                 return null;
-        //             });
-                    
-        //             // to show only 3
-        //             if (resArr.length >= 3) {
-        //                 this.totalCartList = resArr.length;
-        //                 const slicedArray = resArr.slice(0, 3);
-        //                 this.carts = slicedArray;
-        //             }
-    
-        //         }
-        //         else {
-        //             this.seeMoreCarts = false
-        //         }
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
-
         this._cartService.cartsHeaderWithDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((cartsWithDetails: CartWithDetails[]) => {                
