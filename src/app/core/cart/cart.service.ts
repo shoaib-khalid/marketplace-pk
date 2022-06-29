@@ -118,8 +118,12 @@ export class CartService
                 // if resolveCartHeader true, we'll query 99 (max) paginated pageSize
                 // for cart notification header, normal default cartItem is 5
                 let pageSize: number = resolveCartHeader ? 99 : 5;
-                if ((cartIds && cartIds.length) || customerId){
-                    this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
+                if (customerId){
+                    this.getCartsWithDetails({ page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
+                }
+                else if (cartIds && cartIds.length) {
+                    this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, includeEmptyCart: false}, resolveCartHeader).subscribe();
+
                 }
             })
         );

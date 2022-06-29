@@ -428,11 +428,11 @@ export class BuyerCheckoutComponent implements OnInit
                         id: element,
                     }
                 }),
-                customerId: this.customerId, 
+                customerId: this.customerId,
                 customerNotes: checkout.orderNotes,
                 voucherCode: '',
                 orderPaymentDetails: {
-                    accountName: this.user.name,
+                    accountName: this.user ? this.user.name : this.customerAddress.name,
                     deliveryQuotationReferenceId: checkout.deliveryQuotationId ? checkout.deliveryQuotationId : null
                 },
                 orderShipmentDetails: {
@@ -453,7 +453,7 @@ export class BuyerCheckoutComponent implements OnInit
             orderBodies.push(orderBody)
         })
         
-        return
+        // return
 
         this._checkoutService.postPlaceGroupOrder(orderBodies, false)
             .subscribe((response) => {
@@ -466,8 +466,8 @@ export class BuyerCheckoutComponent implements OnInit
 
                 const paymentBody = {
                     // callbackUrl: "https://bon-appetit.symplified.ai/thankyou",
-                    customerId: this.user.id,
-                    customerName: this.user.name,
+                    customerId: this.user ? this.user.id : null,
+                    customerName: this.user ? this.user.name : this.customerAddress.name,
                     productCode: "parcel", // 
                     // storeName: this.store.name,
                     systemTransactionId: transactionId,

@@ -11,8 +11,8 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Store } from 'app/core/store/store.types';
 import { fuseAnimations } from '@fuse/animations';
-import { forkJoin, merge, pipe, Subject, combineLatest } from 'rxjs';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { forkJoin, merge, pipe, Subject, combineLatest, fromEvent } from 'rxjs';
+import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { CartDiscount, CheckoutItems, DeliveryProvider } from 'app/core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -531,6 +531,7 @@ export class CartListComponent implements OnInit, OnDestroy
             this._cartService.putCartItem(cartId, cartItemBody, cartItem.id)
                 .subscribe((response)=>{
                     this.carts[cartIndex].cartItems[cartItemIndex].quantity = quantity;
+                    this.initializeCheckoutList()
                 });
         }
     }
@@ -607,39 +608,7 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         });
 
-        // to list out the array of selectedCart
-        let checkoutListBody: CheckoutItems[] = this.selectedCart.carts.map(item => {
-            return {
-                cartId: item.id,
-                selectedItemId: item.cartItem.map(element => {
-                    if (element.selected === true) {
-                        return element.id
-                    }
-                // to remove if selected = false (undefined array of cart item)
-                }).filter(x => x),
-                deliveryQuotationId : item.deliveryQuotationId,
-                deliveryType : item.deliveryType,
-                deliveryProviderId : item.deliveryProviderId,
-                orderNotes : item.description.value
-            }
-        // to remove if selected = false (undefined array of selectedItemId)
-        }).filter(n => {
-            if (n.selectedItemId && n.selectedItemId.length > 0) {
-                return n;
-            }
-        });
-
-        // Get totalSelectedCartItem to be displayed
-        // .reduce will sum up all number in the array of number created by .map
-        this.totalSelectedCartItem = checkoutListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
-
-        this.isPristine = (this.totalSelectedCartItem < 1) ? true : false;
-
-        // Call for cart summary
-        this._cartService.getDiscountOfCartGroup(checkoutListBody).subscribe();
-
-        // Resolved checkout
-        this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
+        this.initializeCheckoutList();
 
     }
 
@@ -666,6 +635,8 @@ export class CartListComponent implements OnInit, OnDestroy
     {
         // if customerId null means guest
         let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
+        if (!this.customerAddress) return;        
 
         const deliveryChargesBody = {
             cartId: cartId,
@@ -737,4 +708,42 @@ export class CartListComponent implements OnInit, OnDestroy
         }
 
     }
+
+    initializeCheckoutList() {
+        // to list out the array of selectedCart
+        let checkoutListBody: CheckoutItems[] = this.selectedCart.carts.map(item => {
+            return {
+                cartId: item.id,
+                selectedItemId: item.cartItem.map(element => {
+                    if (element.selected === true) {
+                        return element.id
+                    }
+                // to remove if selected = false (undefined array of cart item)
+                }).filter(x => x),
+                deliveryQuotationId : item.deliveryQuotationId,
+                deliveryType : item.deliveryType,
+                deliveryProviderId : item.deliveryProviderId,
+                orderNotes : item.description.value
+            }
+        // to remove if selected = false (undefined array of selectedItemId)
+        }).filter(n => {
+            if (n.selectedItemId && n.selectedItemId.length > 0) {
+                return n;
+            }
+        });
+
+        // Get totalSelectedCartItem to be displayed
+        // .reduce will sum up all number in the array of number created by .map
+        this.totalSelectedCartItem = checkoutListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
+
+        this.isPristine = (this.totalSelectedCartItem < 1) ? true : false;
+
+        // Call for cart summary
+        this._cartService.getDiscountOfCartGroup(checkoutListBody).subscribe();
+
+        // Resolved checkout
+        this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
+    }
+
+ 
 }
