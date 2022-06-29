@@ -355,7 +355,7 @@ export class LandingProductDetailsComponent implements OnInit
                 this._productsService.products$
                     .subscribe((products: Product[]) => {
                         // Shuffle the array
-                        this.products = this.shuffle(products);
+                        this.products = this.shuffle(products);                        
                         
                     })
 
@@ -871,7 +871,11 @@ export class LandingProductDetailsComponent implements OnInit
         
     }
 
-    redirectToProduct(url: string) {
-        this._document.location.href = url;
+    redirectToProduct(seoName: string) {
+        // let domainName = storeDomain.split(".")[0]
+        
+        // this._document.location.href = url;
+        this._router.navigate(['store/' + this.storeDomain + '/' + 'all-products/' + seoName]);
+
     }
 }

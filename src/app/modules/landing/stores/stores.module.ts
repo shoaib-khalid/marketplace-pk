@@ -20,6 +20,7 @@ import { LandingStoresComponent } from './store-list/store-list.component';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
 import { _StoreProductsModule } from 'app/layout/common/_store-products/store-products.module';
 import { _StoreCategoriesModule } from 'app/layout/common/_store-categories/store-categories.module';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 @NgModule({
     declarations: [
@@ -44,7 +45,8 @@ import { _StoreCategoriesModule } from 'app/layout/common/_store-categories/stor
         _FeaturedStoresModule,
         FontAwesomeModule,
         _StoreProductsModule,
-        _StoreCategoriesModule
+        _StoreCategoriesModule,
+        ErrorBackgroundModule
     ],
     exports     : [
         FontAwesomeModule,

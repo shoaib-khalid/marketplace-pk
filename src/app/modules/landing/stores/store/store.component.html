@@ -19,20 +19,26 @@
                     <!-- Store Description -->
                     <p class="flex flex-row text-black overflow-hidden text-ellipsis text-xs sm:text-sm md:text-base break-all line-clamp-2" [innerHTML]="store.storeDescription"></p>
                 </div>
+
+                <div class="w-full border-t border-primary-200"></div>
                 
                 <div class="flex flex-col">
-                    <!-- Contact  -->
-                    <div class="line-clamp-2 break-all text-ellipsis flex flex-row gap-x-1">
-                        <span class="text-xs sm:text-sm md:text-base">Address:</span>
-                        <span class="text-xs sm:text-sm md:text-base font-medium">{{store.address}}</span>
-                    </div>                        
+                    <!-- Address  -->
+                    <div class="w-full flex flex-row gap-x-0">
+                        <mat-icon class="block sm:hidden icon-size-3 text-primary pt-0.5" [svgIcon]="'mat_solid:location_on'"></mat-icon>
+                        <span class="hidden sm:block text-xs sm:text-sm md:text-base">Address:</span>
+                        <span class="text-xs sm:text-sm md:text-base line-clamp-2 font-medium">{{store.address}}</span>
+                    </div>
+                    <!-- Contact & Product -->
                     <div class="flex flex-row justify-between gap-x-2">
                         <div class="flex flex-row gap-x-1">
-                            <span class="text-xs sm:text-sm md:text-base">Contact Us:</span>
+                            <mat-icon class="block sm:hidden icon-size-3 text-primary" [svgIcon]="'mat_solid:phone'"></mat-icon>
+                            <span class="hidden sm:block text-xs sm:text-sm md:text-base">Contact Us:</span>
                             <span class="text-xs sm:text-sm md:text-base font-medium">{{store.phoneNumber}}</span>
                         </div>
                         <div class="flex flex-row gap-x-1">
-                            <span class="text-xs sm:text-sm md:text-base">Products:</span>
+                            <mat-icon class="block sm:hidden icon-size-3 text-primary" [svgIcon]="'mat_solid:shopping_bag'"></mat-icon>
+                            <span class="hidden sm:block text-xs sm:text-sm md:text-base">Products:</span>
                             <span class="text-xs sm:text-sm md:text-base font-medium">{{pagination?.length}}</span>
                         </div>
                     </div>
