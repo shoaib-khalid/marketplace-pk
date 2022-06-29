@@ -20,7 +20,7 @@ import { _FeaturedProductsModule } from 'app/layout/common/_featured-products/fe
 
 @NgModule({
     declarations: [
-        LandingProductsComponent
+        LandingProductsComponent,
     ],
     imports     : [
         RouterModule.forChild(landingProductsRoutes),
