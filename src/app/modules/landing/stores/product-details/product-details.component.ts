@@ -11,6 +11,11 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { DOCUMENT } from '@angular/common';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { CartService } from 'app/core/cart/cart.service';
+import { JwtService } from 'app/core/jwt/jwt.service';
+import { AuthService } from 'app/core/auth/auth.service';
+import { Cart, CartItem, CustomerCart } from 'app/core/cart/cart.types';
 
 @Component({
     selector     : 'landing-product-details',
@@ -144,9 +149,13 @@ export class LandingProductDetailsComponent implements OnInit
         private _storesService: StoresService,
         private _productsService: ProductsService,
         private _platformService: PlatformService,
+        private _cartService: CartService,
+        private _fuseConfirmationService: FuseConfirmationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _authService: AuthService,
+        private _jwtService: JwtService,
         private _router: Router,
-        private _route: ActivatedRoute,
+        private _activatedRoute: ActivatedRoute,
         private _formBuilder: FormBuilder,
         private _changeDetectorRef: ChangeDetectorRef
 
@@ -174,7 +183,7 @@ export class LandingProductDetailsComponent implements OnInit
             specialInstructionValue     : ['']
         });
 
-        this.storeDomain = this._route.snapshot.paramMap.get('store-slug');             
+        this.storeDomain = this._activatedRoute.snapshot.paramMap.get('store-slug');             
 
         this._storesService.store$
         .pipe(
@@ -446,172 +455,270 @@ export class LandingProductDetailsComponent implements OnInit
         // this._router.navigate(['/catalogue/'+this.categorySlug]);
     }
 
-    // addToCart() {
+    addToCart() {
 
-    //     // Do nothing if special instruction is empty
+        // Do nothing if special instruction is empty
 
-    //     if (this.product.isNoteOptional === false && !this.specialInstructionForm.get('specialInstructionValue').value) {
+        if (this.product.isNoteOptional === false && !this.specialInstructionForm.get('specialInstructionValue').value) {
 
-    //         // this is to make the form shows 'required' error
-    //         this.specialInstructionForm.get('specialInstructionValue').markAsTouched();
+            // this is to make the form shows 'required' error
+            this.specialInstructionForm.get('specialInstructionValue').markAsTouched();
 
-    //         // Mark for check
-    //         this._changeDetectorRef.markForCheck();
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
 
-    //         return;
-    //     }
+            return;
+        }
 
-    //     // Pre-check the product inventory
-    //     if (!this.selectedProductInventory) {
-    //         const confirmation = this._fuseConfirmationService.open({
-    //             "title": "Product Out of Stock",
-    //             "message": "Sorry, the product is currently out of stock",
-    //             "icon": {
-    //               "show": true,
-    //               "name": "heroicons_outline:exclamation",
-    //               "color": "warn"
-    //             },
-    //             "actions": {
-    //               "confirm": {
-    //                 "show": true,
-    //                 "label": "Ok",
-    //                 "color": "warn"
-    //               },
-    //               "cancel": {
-    //                 "show": false,
-    //                 "label": "Cancel"
-    //               }
-    //             },
-    //             "dismissible": true
-    //           });
+        // Pre-check the product inventory
+        if (!this.selectedProductInventory) {
+            const confirmation = this._fuseConfirmationService.open({
+                "title": "Product Out of Stock",
+                "message": "Sorry, the product is currently out of stock",
+                "icon": {
+                  "show": true,
+                  "name": "heroicons_outline:exclamation",
+                  "color": "warn"
+                },
+                "actions": {
+                  "confirm": {
+                    "show": true,
+                    "label": "Ok",
+                    "color": "warn"
+                  },
+                  "cancel": {
+                    "show": false,
+                    "label": "Cancel"
+                  }
+                },
+                "dismissible": true
+              });
 
-    //         return false;
-    //     }
+            return false;
+        }
 
-    //     // Precheck for combo
-    //     if (this.product.isPackage) {
-    //         let BreakException = {};
-    //         try {
-    //             this.combos.forEach(item => {
-    //                 if (item.totalAllow !== this.selectedCombo[item.id].length) {
-    //                     const confirmation = this._fuseConfirmationService.open({
-    //                         "title": "Incomplete Product Combo selection",
-    //                         "message": 'You need to select ' + item.totalAllow + ' item of <b>"' + item.title + '"</b>',
-    //                         "icon": {
-    //                           "show": true,
-    //                           "name": "heroicons_outline:exclamation",
-    //                           "color": "warn"
-    //                         },
-    //                         "actions": {
-    //                           "confirm": {
-    //                             "show": true,
-    //                             "label": "Ok",
-    //                             "color": "warn"
-    //                           },
-    //                           "cancel": {
-    //                             "show": false,
-    //                             "label": "Cancel"
-    //                           }
-    //                         },
-    //                         "dismissible": true
-    //                       });
-    //                       throw BreakException;
-    //                 }                 
-    //             });
-    //         } catch (error) {
-    //             // console.error(error);
-    //             return;
-    //         }
-    //     }
+        // Precheck for combo
+        if (this.product.isPackage) {
+            let BreakException = {};
+            try {
+                this.combos.forEach(item => {
+                    if (item.totalAllow !== this.selectedCombo[item.id].length) {
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Incomplete Product Combo selection",
+                            "message": 'You need to select ' + item.totalAllow + ' item of <b>"' + item.title + '"</b>',
+                            "icon": {
+                              "show": true,
+                              "name": "heroicons_outline:exclamation",
+                              "color": "warn"
+                            },
+                            "actions": {
+                              "confirm": {
+                                "show": true,
+                                "label": "Ok",
+                                "color": "warn"
+                              },
+                              "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                              }
+                            },
+                            "dismissible": true
+                          });
+                          throw BreakException;
+                    }                 
+                });
+            } catch (error) {
+                // console.error(error);
+                return;
+            }
+        }
 
-    //     const cartItemBody = {
-    //         cartId: this._cartService.cartId$,
-    //         itemCode: this.selectedProductInventory.itemCode,
-    //         price: this.selectedProductInventory.price, // need to recheck & revisit
-    //         productId: this.selectedProductInventory.productId,
-    //         productPrice: this.selectedProductInventory.price, // need to recheck & revisit
-    //         quantity: this.quantity,
-    //         SKU: this.selectedProductInventory.sku,
-    //         specialInstruction: this.specialInstructionForm.get('specialInstructionValue').value
-    //     };
 
-    //     // additinal step for product combo
-    //     if(this.product.isPackage){
-    //         cartItemBody["cartSubItem"] = [];
-    //         // loop all combos from backend
-    //         this.combos.forEach(item => {
-    //             // compare it with current selected combo by user
-    //             if (this.selectedCombo[item.id]) {
-    //                 // loop the selected current combo
-    //                 this.selectedCombo[item.id].forEach(element => {
-    //                     // get productPakageOptionDetail from this.combo[].productPackageOptionDetail where it's subitem.productId == element (id in this.currentcombo array)
-    //                     let productPakageOptionDetail = item.productPackageOptionDetail.find(subitem => subitem.productId === element);
-    //                     if (productPakageOptionDetail){
-    //                         // push to cart
-    //                         cartItemBody["cartSubItem"].push(
-    //                             {
-    //                                 SKU: productPakageOptionDetail.productInventory[0].sku,
-    //                                 productName: productPakageOptionDetail.product.name,
-    //                                 productId: element,
-    //                                 itemCode: productPakageOptionDetail.productInventory[0].itemCode,
-    //                                 quantity: 1, // this is set to one because this is not main product quantity, this is item for selected prouct in this combo
-    //                                 productPrice: 0, // this is set to zero because we don't charge differently for product combo item
-    //                                 specialInstruction: this.specialInstructionForm.get('specialInstructionValue').value // we actually don't need this because this already included in main product, we'll at this later
-    //                             }
-    //                         );
-    //                     }
-    //                 });
-    //             }
-    //         });            
-    //     }
+        // -----------------
+        // Provisioning
+        // -----------------
+        
+        let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
-    //     this._cartService.postCartItem(this._cartService.cartId$, cartItemBody)
-    //         .subscribe(()=>{
-    //             const confirmation = this._fuseConfirmationService.open({
-    //                 "title": "Great!",
-    //                 "message": "Item successfully added to cart",
-    //                 "icon": {
-    //                   "show": true,
-    //                   "name": "heroicons_outline:check",
-    //                   "color": "success"
-    //                 },
-    //                 "actions": {
-    //                   "confirm": {
-    //                     "show": true,
-    //                     "label": "OK",
-    //                     "color": "primary"
-    //                   },
-    //                   "cancel": {
-    //                     "show": false,
-    //                     "label": "Cancel"
-    //                   }
-    //                 },
-    //                 "dismissible": true
-    //               });
-    //         }, (error) => {
-    //             const confirmation = this._fuseConfirmationService.open({
-    //                 "title": "Out of Stock!",
-    //                 "message": "Sorry, this item is currently out of stock",
-    //                 "icon": {
-    //                   "show": true,
-    //                   "name": "heroicons_outline:exclamation",
-    //                   "color": "warn"
-    //                 },
-    //                 "actions": {
-    //                   "confirm": {
-    //                     "show": true,
-    //                     "label": "OK",
-    //                     "color": "warn"
-    //                   },
-    //                   "cancel": {
-    //                     "show": false,
-    //                     "label": "Cancel"
-    //                   }
-    //                 },
-    //                 "dismissible": true
-    //               });
-    //         });
-    // }
+        if (customerId){
+            // Get cartId from that customer
+            this._cartService.getCartsByCustomerId(customerId)
+                .subscribe((customerCart: CustomerCart) => {
+                    let cartIndex = customerCart.cartList.findIndex(item => item.storeId === this.store.id);
+                    if (cartIndex > -1) { // Cart of store belong to the customer found
+                        this.postCartItem(customerCart.cartList[cartIndex].id);
+                    } else { // No cart found for that customer
+                        const cart = {
+                            customerId  : customerId, 
+                            storeId     : this.store.id,
+                        }
+                        // Create it first
+                        this._cartService.createCart(cart)
+                            .subscribe((cart: Cart)=>{
+                                // Post it to cart
+                                this.postCartItem(cart.id);
+                            })
+                    }
+                });
+        } else {
+            let cartIds: { id: string, storeId: string, cartItems: CartItem[]}[] = this._cartService.cartIds$ ? JSON.parse(this._cartService.cartIds$) : [];
+            if (cartIds && cartIds.length) {
+                let cartIndex = cartIds.findIndex(item => item.storeId === this.store.id);
+                if (cartIndex > -1) { // update cartItems if cartId exists
+                    if (cartIds[cartIndex].cartItems.length > 9) {
+                        console.error("Guest only allowed 10 cartItems only");
+                    } else {
+                        this.postCartItem(cartIds[cartIndex].id).then((response: CartItem)=>{
+                            cartIds[cartIndex].cartItems.push(response);
+                            this._cartService.cartIds = JSON.stringify(cartIds);
+                        });
+                    }
+                } else { // New cart to be pushed
+                    if (cartIds.length > 4) { // Too many in local storage
+                        console.error("Guest only allowed 5 carts only");
+                    } else {
+                        const cart = {
+                            customerId  : null, 
+                            storeId     : this.store.id,
+                        }
+                        // Create it first
+                        this._cartService.createCart(cart)
+                            .subscribe((cart: Cart)=>{
+                                // Post it to cart
+                                this.postCartItem(cart.id).then((response: CartItem)=>{
+                                    // Push new cart id
+                                    cartIds.push({
+                                        id: response.cartId,
+                                        cartItems: [response],
+                                        storeId: this.store.id
+                                    });
+
+                                    this._cartService.cartIds = JSON.stringify(cartIds);
+                                });
+                            })
+                    }
+                }
+            } else {
+                const cart = {
+                    customerId  : null, 
+                    storeId     : this.store.id,
+                }
+
+                // Create it first
+                this._cartService.createCart(cart)
+                    .subscribe((cart: Cart)=>{
+                        // Post it to cart
+                        this.postCartItem(cart.id).then((response: CartItem)=>{
+                            cartIds = [{
+                                id: response.cartId,
+                                cartItems: [response],
+                                storeId: this.store.id
+                            }];
+
+                            this._cartService.cartIds = JSON.stringify(cartIds);
+                        });
+                    });
+            }
+        }
+    }
+    
+    /**
+     * @param cartId 
+     * @returns 
+     */
+    private postCartItem(cartId: string) : Promise<any>
+    {
+        const cartItemBody = {
+            cartId: cartId,
+            itemCode: this.selectedProductInventory.itemCode,
+            price: this.selectedProductInventory.price, // need to recheck & revisit
+            productId: this.selectedProductInventory.productId,
+            productPrice: this.selectedProductInventory.price, // need to recheck & revisit
+            quantity: this.quantity,
+            SKU: this.selectedProductInventory.sku,
+            specialInstruction: this.specialInstructionForm.get('specialInstructionValue').value
+        };
+
+        // additinal step for product combo
+        if(this.product.isPackage){
+            cartItemBody["cartSubItem"] = [];
+            // loop all combos from backend
+            this.combos.forEach(item => {
+                // compare it with current selected combo by user
+                if (this.selectedCombo[item.id]) {
+                    // loop the selected current combo
+                    this.selectedCombo[item.id].forEach(element => {
+                        // get productPakageOptionDetail from this.combo[].productPackageOptionDetail where it's subitem.productId == element (id in this.currentcombo array)
+                        let productPakageOptionDetail = item.productPackageOptionDetail.find(subitem => subitem.productId === element);
+                        if (productPakageOptionDetail){
+                            // push to cart
+                            cartItemBody["cartSubItem"].push(
+                                {
+                                    SKU: productPakageOptionDetail.productInventory[0].sku,
+                                    productName: productPakageOptionDetail.product.name,
+                                    productId: element,
+                                    itemCode: productPakageOptionDetail.productInventory[0].itemCode,
+                                    quantity: 1, // this is set to one because this is not main product quantity, this is item for selected prouct in this combo
+                                    productPrice: 0, // this is set to zero because we don't charge differently for product combo item
+                                    specialInstruction: this.specialInstructionForm.get('specialInstructionValue').value // we actually don't need this because this already included in main product, we'll at this later
+                                }
+                            );
+                        }
+                    });
+                }
+            });            
+        }
+
+        return new Promise(resolve => { this._cartService.postCartItem(cartId, cartItemBody)
+            .subscribe((response)=>{
+                const confirmation = this._fuseConfirmationService.open({
+                    "title": "Great!",
+                    "message": "Item successfully added to cart",
+                    "icon": {
+                      "show": true,
+                      "name": "heroicons_outline:check",
+                      "color": "success"
+                    },
+                    "actions": {
+                      "confirm": {
+                        "show": true,
+                        "label": "OK",
+                        "color": "primary"
+                      },
+                      "cancel": {
+                        "show": false,
+                        "label": "Cancel"
+                      }
+                    },
+                    "dismissible": true
+                  });
+                resolve(response);
+            }, (error) => {
+                const confirmation = this._fuseConfirmationService.open({
+                    "title": "Out of Stock!",
+                    "message": "Sorry, this item is currently out of stock",
+                    "icon": {
+                      "show": true,
+                      "name": "heroicons_outline:exclamation",
+                      "color": "warn"
+                    },
+                    "actions": {
+                      "confirm": {
+                        "show": true,
+                        "label": "OK",
+                        "color": "warn"
+                      },
+                      "cancel": {
+                        "show": false,
+                        "label": "Cancel"
+                      }
+                    },
+                    "dismissible": true
+                  });
+            });
+        });
+    }
+
 
     onChangeVariant(id, type, productID){     
 

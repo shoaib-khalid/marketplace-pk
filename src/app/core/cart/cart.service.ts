@@ -15,19 +15,12 @@ import { JwtService } from '../jwt/jwt.service';
 })
 export class CartService
 {
-    private _cart: ReplaySubject<Cart> = new ReplaySubject<Cart>(1);
-    private _carts: ReplaySubject<Cart[]> = new ReplaySubject<Cart[]>(1);
-    private _cartItems: ReplaySubject<CartItem[]> = new ReplaySubject<CartItem[]>(1);
-
     private _cartWithDetails: ReplaySubject<CartWithDetails> = new ReplaySubject<CartWithDetails>(1);
     private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
     private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
 
     private _cartsHeaderWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
     private _cartsHeaderWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
-
-    private _customerCarts: ReplaySubject<CustomerCart> = new ReplaySubject<CustomerCart>(1);
-    private _cartPagination: BehaviorSubject<CartPagination | null> = new BehaviorSubject(null);
 
     private _cartSummary: ReplaySubject<DiscountOfCartGroup> = new ReplaySubject<DiscountOfCartGroup>(1);
 
@@ -49,27 +42,6 @@ export class CartService
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Setter & getter for cart
-     *
-     * @param value
-     */
-    set cart(value: Cart)
-    {
-        // Store the value
-        this._cart.next(value);
-    }
-
-    get cart$(): Observable<Cart>
-    {
-        return this._cart.asObservable();
-    }
-
-    get carts$(): Observable<Cart[]>
-    {
-        return this._carts.asObservable();
-    }
 
     get cartWithDetails$(): Observable<CartWithDetails>
     {
@@ -103,22 +75,6 @@ export class CartService
     }
 
     /**
-     * Setter & getter for cartItem
-     *
-     * @param value
-     */
-    set cartItems(value: CartItem[])
-    {
-        // Store the value
-        this._cartItems.next(value);
-    }
-
-    get cartItems$(): Observable<CartItem[]>
-    {
-        return this._cartItems.asObservable();
-    }
-
-    /**
      * Setter for cartId
      */
     set cartIds(value: string) {
@@ -131,22 +87,6 @@ export class CartService
     get cartIds$(): string
     {
         return localStorage.getItem('cartIds') ?? '';
-    }
-
-    /**
-     * Getter for customerCarts
-     */
-    get customerCarts$(): Observable<CustomerCart>
-    {
-        return this._customerCarts.asObservable();
-    }
-
-    /**
-    * Getter for cart pagination
-    */
-    get cartPagination$(): Observable<CartPagination>
-    {
-        return this._cartPagination.asObservable();
     }
 
     /**
@@ -173,13 +113,13 @@ export class CartService
             map(()=>{
                 
                 let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
-                let cartIds: { id: string, storeId: string, cartItems: { id: string }}[] = this.cartIds$ ? JSON.parse(this.cartIds$) : [];
+                let cartIds: { id: string, storeId: string, cartItems: CartItem[]}[] = this.cartIds$ ? JSON.parse(this.cartIds$) : [];
 
                 // if resolveCartHeader true, we'll query 99 (max) paginated pageSize
                 // for cart notification header, normal default cartItem is 5
                 let pageSize: number = resolveCartHeader ? 99 : 5;
                 if ((cartIds && cartIds.length) || customerId){
-                    this.getCartsWithDetails({ cartId: cartIds.map(item => item.id), page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
+                    this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
                 }
             })
         );
@@ -213,19 +153,6 @@ export class CartService
 
         return this._httpClient.get<any>(orderService +'/carts', header).pipe(
             tap((response) => {
-
-                this._logging.debug("Response from CartService (getCarts)",response);
-
-                let _pagination = {
-                    length: response.data.totalElements,
-                    size: response.data.size,
-                    page: response.data.number,
-                    lastPage: response.data.totalPages,
-                    startIndex: response.data.pageable.offset,
-                    endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
-                }
-                this._cartPagination.next(_pagination);
-                this._carts.next(response.data.content);
             })
         );
     }
@@ -236,12 +163,12 @@ export class CartService
     getCartsWithDetails(params: { 
         page                    : number,
         pageSize                : number,
-        cartId?                 : string[],
+        cartIdList?             : string[],
         storeId?                : string,
         customerId?             : string,
         includeEmptyCart?       : boolean
     } = {
-        cartId                  : [],
+        cartIdList              : [],
         page                    : 0, 
         pageSize                : 10, 
         storeId                 : null, 
@@ -317,12 +244,7 @@ export class CartService
                     of(false)
                 ),
                 switchMap(async (response: any) => {
-                                
                     this._logging.debug("Response from CartService (getCartsByCustomerId)", response);
-                
-                    // set customer cart
-                    this._customerCarts.next(response["data"]);
-
                     return response["data"];
                 })
             );
@@ -352,9 +274,6 @@ export class CartService
                 switchMap(async (response: any) => {
                     this._logging.debug("Response from StoresService (createCart)",response);
 
-                    // set cart
-                    this._cart.next(response);
-
                     return response["data"];
                 })
             );
@@ -368,8 +287,8 @@ export class CartService
     updateCart(cart: Cart): Observable<any>
     {
         return this._httpClient.patch<Cart>('api/common/cart', {cart}).pipe(
-            map((response) => {
-                this._cart.next(response);
+            tap((response) => {
+
             })
         );
     }
@@ -391,27 +310,13 @@ export class CartService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
         };
 
-        return this.carts$.pipe(
-            take(1),
-            switchMap(carts => this._httpClient.delete<any>(orderService + '/carts/' + cartId, header)
+        return this._httpClient.delete<any>(orderService + '/carts/' + cartId, header)
             .pipe(
-                map((response) => {
+                tap((response) => {
                     this._logging.debug("Response from CartService (deleteCart)", response);
 
-                    let index = carts.findIndex(item => item.id === cartId);
-
-                    if (index > -1) {
-                        // Delete the cartItems
-                        carts.splice(index, 1);
-
-                        // Update the products
-                        this._carts.next(carts);
-                    }
-
-                    return response["data"];
                 })
-            ))
-        );
+            );
     }
 
     mergeCart(customerCartId : string, guestCartId : string):  Observable<Cart>
@@ -460,19 +365,15 @@ export class CartService
 
         return this._httpClient.get<any>(orderService + '/carts/' + id + '/items', header)
             .pipe(
-                map((response) => {
+                tap((response) => {
                     this._logging.debug("Response from StoresService (getCartItems)",response);
 
-                    // set cart id
-                    this._cartItems.next(response["data"].content);
-
-                    return response["data"].content;
                 })
             );
     }
 
     postCartItem(cartId: string, cartItem: CartItem):  Observable<CartItem>
-    {
+    {        
         let orderService = this._apiServer.settings.apiServer.orderService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
         let accessToken = "accessToken";
@@ -481,28 +382,14 @@ export class CartService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
         };
 
-        return this.cartItems$.pipe(
-            take(1),
-            switchMap(cartItems => this._httpClient.post<any>(orderService + '/carts/' + cartId + '/items', cartItem, header)
+        return this._httpClient.post<any>(orderService + '/carts/' + cartId + '/items', cartItem, header)
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from StoresService (postCartItem)",response);
 
-                    let index = cartItems.findIndex(item => item.id === response["data"].id);
-
-                    if (index > -1) {
-                        // update if existing cart item id exists
-                        cartItems[index] = { ...cartItems[index], ...response["data"]};
-                        this._cartItems.next(cartItems);
-                    } else {
-                        // add new if cart item not exist yet in cart
-                        this._cartItems.next([response["data"], ...cartItems]);
-                    }
-
                     return response["data"];
                 })
-            ))
-        );
+            );
     }
 
     putCartItem(cartId: string, cartItem: CartItem, itemId: string):  Observable<CartItem>
