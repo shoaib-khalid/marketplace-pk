@@ -1,14 +1,14 @@
 import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, NgForm, ValidationErrors, Validators } from '@angular/forms';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { CurrencyPipe, DOCUMENT } from '@angular/common'; 
+import { CurrencyPipe, DatePipe, DOCUMENT, PlatformLocation } from '@angular/common'; 
 import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartItem, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
 import { of, Subject, merge, timer, interval as observableInterval, combineLatest } from 'rxjs';
 import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Address, CartDiscount, DeliveryProvider } from 'app/core/checkout/checkout.types';
+import { Address, CartDiscount, CheckoutItems, DeliveryProvider, GroupOrder } from 'app/core/checkout/checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -17,10 +17,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { JwtService } from 'app/core/jwt/jwt.service';
-import { CustomerAddress } from 'app/core/user/user.types';
+import { CustomerAddress, User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
 import { CheckoutService } from 'app/core/checkout/checkout.service';
 import { Router } from '@angular/router';
+import { AnalyticService } from 'app/core/analytic/analytic.service';
+import { AppConfig } from 'app/config/service.config';
 
 
 @Component({
@@ -154,6 +156,7 @@ export class BuyerCheckoutComponent implements OnInit
         deliveryType: string
     }[];
     totalSelectedCartItem: number = 0;
+    checkoutItems: CheckoutItems[] = [];
         
     customerId: string = '';
     customerAddress: CustomerAddress;
@@ -184,6 +187,9 @@ export class BuyerCheckoutComponent implements OnInit
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    user: User;
+    order: GroupOrder;
+    payment: any;
 
     /**
      * Constructor
@@ -201,7 +207,12 @@ export class BuyerCheckoutComponent implements OnInit
         private _jwtService: JwtService,
         private _authService: AuthService,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _datePipe: DatePipe,
+        private _analyticService: AnalyticService,
+        private _apiServer: AppConfig,
+        private _platformLocation: PlatformLocation,
+
     )
     {
     }
@@ -267,10 +278,13 @@ export class BuyerCheckoutComponent implements OnInit
                     }                    
 
                     // CartsWithDetailsTotalItems
-                    this._checkoutService.cartsWithDetailsTotalItems$
+                    this._checkoutService.checkoutItems$
                         .pipe(takeUntil(this._unsubscribeAll))
-                        .subscribe((cartsWithDetailsTotalItems: number)=>{
-                            if (cartsWithDetailsTotalItems) {
+                        .subscribe((checkoutItems: CheckoutItems[])=>{
+                            if (checkoutItems) {
+                                this.checkoutItems = checkoutItems;
+                                let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
+                                let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
                                 this.totalSelectedCartItem = cartsWithDetailsTotalItems;
                             }
                             // Mark for check 
@@ -347,6 +361,15 @@ export class BuyerCheckoutComponent implements OnInit
 
                 this.currentScreenSize = matchingAliases;
             });
+
+        // Subscribe to user changes
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) => {
+                this.user = user;
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     /**
@@ -389,6 +412,192 @@ export class BuyerCheckoutComponent implements OnInit
     // -----------------------------------------------------------------------------------------------------
     // @ Public method
     // -----------------------------------------------------------------------------------------------------
+
+    onlinePay(){
+
+        // Set Loading to true
+        // this.isLoading = true;
+        
+        let orderBodies = [];
+        this.checkoutItems.forEach(checkout => {
+
+            const orderBody = {
+                cartId: checkout.cartId,
+                cartItems: checkout.selectedItemId.map(element => {
+                    return {
+                        id: element,
+                    }
+                }),
+                customerId: this.customerId, 
+                customerNotes: checkout.orderNotes,
+                voucherCode: '',
+                orderPaymentDetails: {
+                    accountName: this.user.name,
+                    deliveryQuotationReferenceId: checkout.deliveryQuotationId ? checkout.deliveryQuotationId : null
+                },
+                orderShipmentDetails: {
+                    address:  this.customerAddress.address,
+                    city: this.customerAddress.city,
+                    country: this.customerAddress.country,
+                    email: this.customerAddress.email,
+                    phoneNumber: this.customerAddress.phoneNumber,
+                    receiverName: this.customerAddress.name,
+                    state: this.customerAddress.state,
+                    storePickup: false,
+                    zipcode: this.customerAddress.postCode,
+                    deliveryProviderId: null, // deliveryProviderId not needed if it's a store pickup
+                    deliveryType: checkout.deliveryType ? checkout.deliveryType : null
+                }
+
+            };
+            orderBodies.push(orderBody)
+        })
+        
+        return
+
+        this._checkoutService.postPlaceGroupOrder(orderBodies, false)
+            .subscribe((response) => {
+
+                this.order = response;
+
+                let dateTime = new Date();
+                let transactionId = this._datePipe.transform(dateTime, "yyyyMMddhhmmss");
+                let dateTimeNow = this._datePipe.transform(dateTime, "yyyy-MM-dd hh:mm:ss"); //2022-05-18 09:51:36
+
+                const paymentBody = {
+                    // callbackUrl: "https://bon-appetit.symplified.ai/thankyou",
+                    customerId: this.user.id,
+                    customerName: this.user.name,
+                    productCode: "parcel", // 
+                    // storeName: this.store.name,
+                    systemTransactionId: transactionId,
+                    transactionId: this.order.id,
+                }
+
+                // return
+
+                this._checkoutService.postMakePayment(paymentBody)
+                    .subscribe((response) => {
+
+                        this.payment = response;
+
+                        if (this.payment.isSuccess === true) {
+                            if (this.payment.providerId == "1") {
+                                window.location.href = this.payment.paymentLink;
+                            } else if (this.payment.providerId == "2") {                                                               
+                                this.postForm( "post-to-senangpay", this.payment.paymentLink, 
+                                {
+                                    "detail" : this.payment.sysTransactionId, 
+                                    "amount": this.paymentDetails.cartGrandTotal.toFixed(2), 
+                                    "order_id": this.order.id, 
+                                    "name": this.order.shipmentName, 
+                                    "email": this.order.shipmentEmail, 
+                                    "phone": this.order.shipmentPhoneNumber, 
+                                    "hash": this.payment.hash 
+                                },
+                                    'post', true );
+
+                            } else if (this.payment.providerId == "3") {      
+                                let fullUrl = (this._platformLocation as any).location.origin;   
+
+                                this.postForm("post-to-fastpay", this.payment.paymentLink, 
+                                    { 
+                                        "CURRENCY_CODE" : "PKR", 
+                                        "MERCHANT_ID"   : "13464", 
+                                        "MERCHANT_NAME" : "EasyDukan Pvt Ltd", 
+                                        "TOKEN"         : this.payment.token, 
+                                        "SUCCESS_URL"   : this._apiServer.settings.apiServer.paymentService + 
+                                                            "/payments/payment-redirect?name=" + this.order.shipmentName + 
+                                                            "&email="           + this.order.shipmentEmail + 
+                                                            "&phone="           + this.order.shipmentPhoneNumber + 
+                                                            "&amount="          + this.paymentDetails.cartGrandTotal.toFixed(2) +
+                                                            "&hash="            + this.payment.hash +
+                                                            "&status_id=1"      +
+                                                            "&order_id="        + this.order.id+
+                                                            "&transaction_id="  + transactionId+
+                                                            "&msg=Payment_was_successful&payment_channel=fastpay", 
+                                        "FAILURE_URL"   : this._apiServer.settings.apiServer.paymentService + 
+                                                            "/payments/payment-redirect?name=" + this.order.shipmentName + 
+                                                            "&email="           + this.order.shipmentEmail + 
+                                                            "&phone="           + this.order.shipmentPhoneNumber + 
+                                                            "&amount="          + this.paymentDetails.cartGrandTotal.toFixed(2)+ 
+                                                            "&hash="            + this.payment.hash +
+                                                            "&status_id=0"      +
+                                                            "&order_id="        + this.order.id +
+                                                            "&transaction_id="  + transactionId +
+                                                            "&msg=Payment_was_failed&payment_channel=fastpay", 
+                                        "CHECKOUT_URL"  : fullUrl + "/checkout", 
+                                        "CUSTOMER_EMAIL_ADDRESS"    : this.order.shipmentEmail, 
+                                        "CUSTOMER_MOBILE_NO"        : this.order.shipmentPhoneNumber, 
+                                        "TXNAMT"        : this.paymentDetails.cartGrandTotal.toFixed(2), 
+                                        "BASKET_ID"     : this.payment.sysTransactionId, 
+                                        "ORDER_DATE"    : dateTimeNow, 
+                                        "SIGNATURE"     : "SOME-RANDOM-STRING", 
+                                        "VERSION"       : "MERCHANT-CART-0.1", 
+                                        "TXNDESC"       : "Item purchased from EasyDukan", 
+                                        "PROCCODE"      : "00", 
+                                        "TRAN_TYPE"     : "ECOMM_PURCHASE", 
+                                        "STORE_ID"      : "", 
+                                    } , 'post', false);
+                            } else {
+                                this.displayError("Provider id not configured");
+                                console.error("Provider id not configured");
+                            }
+                        }
+                        // Set Loading to false
+                        this.isLoading = false;
+                    }, (error) => {
+                        // Set Loading to false
+                        this.isLoading = false;
+                    });
+            }, (error) => {
+                // Set Loading to false
+                this.isLoading = false;
+            });
+        
+    }
+
+    postForm(id, path, params, method, encode: boolean) {
+        method = method || 'post';
+    
+        let form = document.createElement('form');
+        form.setAttribute('method', method);
+        form.setAttribute('action', path);
+        form.setAttribute('id', id);
+    
+        for (let key in params) {
+            if (params.hasOwnProperty(key)) {
+                let hiddenField = document.createElement('input');
+                hiddenField.setAttribute('type', 'hidden');
+                hiddenField.setAttribute('name', key);
+                hiddenField.setAttribute('value', encode ? encodeURI(params[key]) : params[key]);
+    
+                form.appendChild(hiddenField);
+            }
+        }
+    
+        document.body.appendChild(form);        
+        form.submit();
+
+        // //get ip address info
+        // var _IpService = this.ipAddress;
+
+        // var _sessionId = this._cartService.cartId$ 
+        
+        // this._analyticService.postActivity({
+        //     "browserType" : null,
+        //     "customerId"  : this.ownerId?this.ownerId:null,
+        //     "deviceModel" : null,
+        //     "errorOccur"  : null,
+        //     "errorType"   : null,
+        //     "ip"          : _IpService,
+        //     "os"          : null,
+        //     "pageVisited" : path,
+        //     "sessionId"   : _sessionId,
+        //     "storeId"     : null
+        // }).subscribe((response) => {
+        // }); 
+    }
 
     onChangePage(pageOfItems: Array<any>) {
         
@@ -574,4 +783,31 @@ export class BuyerCheckoutComponent implements OnInit
             // }
         });
     }
+
+    displayError(message: string) {
+        const confirmation = this._fuseConfirmationService.open({
+            "title": "Error",
+            "message": message,
+            "icon": {
+            "show": true,
+            "name": "heroicons_outline:exclamation",
+            "color": "warn"
+            },
+            "actions": {
+            "confirm": {
+                "show": true,
+                "label": "OK",
+                "color": "warn"
+            },
+            "cancel": {
+                "show": false,
+                "label": "Cancel"
+            }
+            },
+            "dismissible": true
+        });
+
+        return confirmation;
+    }
+
 }

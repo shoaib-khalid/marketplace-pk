@@ -70,9 +70,9 @@
                                     <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
                                 </div>
                                 <div class="flex flex-col justify-start ml-2 md:ml-4">
-                                    <span class="text-md sm:text-2xl font-semibold">{{cart.store.name}}</span>
-                                    <span class="text-sm sm:text-md text-secondary">Cart ID: {{cart.id}}</span>
-                                    <span class="text-sm sm:text-md text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
+                                    <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
+                                    <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span>
+                                    <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
                                 </div>
                             </div>
                             <!-- Cart Items -->
@@ -87,19 +87,19 @@
                                         <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
                                             <img class="w-14 sm:w-18 sm:h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
-                                                <span class="text-md sm:text-lg lg:text-xl font-semibold line-clamp-2">{{cartItem.productName}}</span>
+                                                <span class="text-md sm:text-md font-semibold line-clamp-2">{{cartItem.productName}}</span>
                                                 <div>
                                                     <!-- Display variants -->
                                                     <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
                                                         <ng-container *ngFor="let variant of cartItem.productInventory.productInventoryItems">
-                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{variant.productVariantAvailable.productVariant.name}} : {{variant.productVariantAvailable.value}}</span>
+                                                            <span class="leading-tight text-xs lg:text-sm text-secondary">{{variant.productVariantAvailable.productVariant.name}} : {{variant.productVariantAvailable.value}}</span>
                                                             <span class="block last:hidden">,</span>
                                                         </ng-container>
                                                     </ng-container>
                                                     <!-- Display Combo -->
                                                     <ng-container *ngIf="cartItem.cartSubItem.length > 0">
                                                         <ng-container  *ngFor="let combo of cartItem.cartSubItem">
-                                                            <span class="leading-tight text-xs lg:text-md text-secondary">{{combo.productName}}</span>
+                                                            <span class="leading-tight text-xs lg:text-sm text-secondary">{{combo.productName}}</span>
                                                             <span class="block last:hidden">,</span>
                                                         </ng-container>
                                                     </ng-container>
@@ -241,7 +241,7 @@
                 </div>
                 <!-- Pagination -->
                 <pagination 
-                    *ngIf="pagination"
+                    *ngIf="pagination.length > pagination.size"
                     class="mt-4"
                     [itemLength]="pagination.length" 
                     [initialPage]="pagination.page + 1"
@@ -313,14 +313,14 @@
                         <span class="text-md text-secondary">Shipping Fee Discount</span>
                         <span class="text-md font-semibold">{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
                     </div>
-                    <div class="flex flex-row justify-between mt-2">
+                    <!-- <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Store Voucher</span>
                         <span class="text-md font-semibold">RM 0.00</span>
                     </div>
                     <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
                         <span class="text-md font-semibold">RM 0.00</span>
-                    </div>
+                    </div> -->
 
                     <!-- Separator -->
                     <div class="border-b w-full my-1"></div>

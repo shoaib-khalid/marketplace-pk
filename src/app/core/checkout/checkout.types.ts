@@ -1,3 +1,5 @@
+import { CartItem } from "../cart/cart.types";
+
 export interface DeliveryCharges
 {
     cartId: string;
@@ -14,7 +16,10 @@ export interface CheckoutItems
     deliveryQuotationId : string;
     deliveryType        : string;
     storeVoucherCode?   : string;
+    deliveryProviderId  : string;
+    orderNotes?        : string;
 }
+
 
 export interface DeliveryDetails
 {
@@ -156,14 +161,32 @@ export interface Order
 
 export interface Address
 {
-    address     : string,
-    city        : string,
-    country     : string,
-    customerId  : string,
-    email       : string,
-    id          : string,
-    name        : string,
-    phoneNumber : string,
-    postCode    : string,
-    state       : string
+    address     : string;
+    city        : string;
+    country     : string;
+    customerId  : string;
+    email       : string;
+    id          : string;
+    name        : string;
+    phoneNumber : string;
+    postCode    : string;
+    state       : string;
+}
+
+export interface GroupOrder
+{
+    appliedDiscount: number;
+    customer: string;
+    customerId: string;
+    deliveryCharges: number;
+    deliveryDiscount: number;
+    id: string;
+    orderList: []
+    // platformVoucherDiscount: null
+    platformVoucherId: string;
+    shipmentEmail: string;
+    shipmentName: string;
+    shipmentPhoneNumber: string;
+    subTotal: number;
+    total: number;
 }
