@@ -20,6 +20,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
     @Input() title: string = "Product";
     @Input() showViewAll: boolean = false;
     @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -50,7 +51,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform)=>{
                 this.platform = platform;
-            })   
+            })           
     }
 
     /**
@@ -83,8 +84,12 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
         this._router.navigate(['/store/' + slug]);
     }
 
-    redirectToProduct(url: string) {
-        this._document.location.href = url;
+    redirectToProduct(storeDomain: string, seoName: string) {
+        let domainName = storeDomain.split(".")[0]
+        
+        // this._document.location.href = url;
+        this._router.navigate(['store/' + domainName + '/' + 'all-products/' + seoName]);
+
     }
 
     displayStoreLogo(storeAssets: StoreAssets[]) {
