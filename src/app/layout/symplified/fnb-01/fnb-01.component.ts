@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
@@ -9,7 +9,7 @@ import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
-import { Error500Service } from 'app/core/error-500/error-500.service';
+import { DisplayErrorService } from 'app/core/display-error/display-error.service';
 
 @Component({
     selector     : 'fnb-01-layout',
@@ -21,10 +21,15 @@ export class Fnb01LayoutComponent implements OnInit, OnDestroy
     navigation: Navigation;
     platform: Platform;
     user: User;
+
+    displayError: {
+        type: string,
+        title: string;
+        message: string;
+    } = null;
     
     isScreenSmall: boolean;
     currentScreenSize: string[] = [];
-    show500: boolean;
 
     headerTitle: string;
     displayUsername: string = '';
@@ -35,14 +40,15 @@ export class Fnb01LayoutComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
+        private _changeDetectorRef: ChangeDetectorRef,
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _userService: UserService,
+        private _displayErrorService: DisplayErrorService,
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
         private _platformsService: PlatformService,
-        private _error500Service: Error500Service
     )
     {
         this.headerTitle = this.getHeaderTitle(this._activatedRoute.root); 
@@ -75,19 +81,19 @@ export class Fnb01LayoutComponent implements OnInit, OnDestroy
         this._userService.user$
             .pipe((takeUntil(this._unsubscribeAll)))
             .subscribe((user: User) => {
-                this.user = user;
                 if (user) {
+                    this.user = user;
                     this.displayUsername = this.textTruncate(user.username, 12)
                 }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
-
                 this.currentScreenSize = matchingAliases;
-
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
@@ -96,15 +102,24 @@ export class Fnb01LayoutComponent implements OnInit, OnDestroy
         this._platformsService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform) => {
-                this.platform = platform;
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
-        // Subscribe to platform data
-        this._error500Service.show500$
+        // Subscribe to show error
+        this._displayErrorService.errorMessage$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((any) => {
-                this.show500 = any;
+            .subscribe((response) => {
+                if (response) {
+                    this.displayError = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
+
     }
 
     /**

@@ -1,13 +1,17 @@
 <!-- Loading bar -->
 <fuse-loading-bar></fuse-loading-bar>
 
-<!-- Wrapper -->
-<ng-container *ngIf="show500 === false; else error">
+<ng-container *ngIf="displayError; else displayMarketplace">
+    <display-error></display-error>
+</ng-container>
 
+<ng-template #displayMarketplace>
+    <!-- Floating Message Big -->
     <floating-message-big></floating-message-big>
-        <floating-message-small></floating-message-small>
+    <!-- Floating Message Small -->
+    <floating-message-small></floating-message-small>
+    <!-- Wrapper -->
     <div class="flex flex-col flex-auto w-full min-w-0 bg-card">
-    
         <!-- Header -->
         <div class="md:relative flex flex-col flex-0 justify-center w-full h-auto overflow-hidden z-49 shadow dark:shadow-none print:hidden sticky top-0">
             <!-- Top Header bar -->
@@ -89,10 +93,4 @@
         <footer [footerType]="'footer-02'" class="w-full"></footer>
         
     </div>
-
-</ng-container>
-
-<!-- Error 500 -->
-<ng-template #error>
-    <error-500></error-500>
 </ng-template>

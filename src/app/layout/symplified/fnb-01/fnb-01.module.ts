@@ -16,15 +16,14 @@ import { ShortcutsModule } from 'app/layout/common/shortcuts/shortcuts.module';
 import { UserModule } from 'app/layout/common/user/user.module';
 import { CartModule } from 'app/layout/common/cart/cart.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { Error500Component } from 'app/shared/error-500/error-500.component';
 import { FooterModule } from 'app/layout/common/footer/footer.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { Fnb01LayoutComponent } from './fnb-01.component';
+import { DisplayErrorModule } from 'app/layout/common/_display-error/display-error.module';
 
 @NgModule({
     declarations: [
-        Fnb01LayoutComponent,
-        Error500Component
+        Fnb01LayoutComponent
     ],
     imports     : [
         HttpClientModule,
@@ -45,6 +44,7 @@ import { Fnb01LayoutComponent } from './fnb-01.component';
         FooterModule,
         CartModule,
         _SearchModule,
+        DisplayErrorModule,
         SharedModule
     ],
     exports     : [

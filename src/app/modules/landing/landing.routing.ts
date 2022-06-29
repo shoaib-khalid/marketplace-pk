@@ -1,13 +1,12 @@
 import { Route } from '@angular/router';
-import { CustomerAddressResolver, LandingDataResolver } from './landing.resolvers';
+import { LandingDataResolver } from './landing.resolvers';
 
 export const landingRoutes: Route[] = [
     // Landing routes
     {
         path       : '',
         resolve: {
-            landingDataResolver: LandingDataResolver,
-            customerAddressResolver: CustomerAddressResolver
+            landingDataResolver: LandingDataResolver
         },
         children   : [
             {path: '', pathMatch : 'full', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},

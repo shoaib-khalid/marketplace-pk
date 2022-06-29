@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
@@ -8,12 +8,12 @@ import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { fuseAnimations } from '@fuse/animations';
-import { Error500Service } from 'app/core/error-500/error-500.service';
 import { DOCUMENT, PlatformLocation } from '@angular/common';
 import { FloatingBannerService } from 'app/core/floating-banner/floating-banner.service';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
+import { DisplayErrorService } from 'app/core/display-error/display-error.service';
 
 @Component({
     selector     : 'fnb02-layout',
@@ -27,12 +27,17 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
     opened: boolean = false;
     platform: Platform;
     user: User;
+
+    displayError: {
+        type: string,
+        title: string;
+        message: string;
+    } = null;
     
     isScreenSmall: boolean;
     navigation: Navigation;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     
-    show500: boolean;
     floatingMessageData = {};
     
     /**
@@ -41,13 +46,14 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
     constructor(
         @Inject(DOCUMENT) private _document: Document,
         private _activatedRoute: ActivatedRoute,
+        private _changeDetectorRef: ChangeDetectorRef,
         private _apiServer: AppConfig,
         private _router: Router,
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
         private _platformsService: PlatformService,
-        private _error500Service: Error500Service,
+        private _displayErrorService: DisplayErrorService,
         private _userService: UserService,
         private _platformLocation: PlatformLocation,
         private _floatingBannerService: FloatingBannerService,
@@ -95,24 +101,25 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
 
         // Subscribe to platform data
         this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => {
-            this.platform = platform;
-        });
-
-        // Subscribe to platform data
-        this._error500Service.show500$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((any) => {
-            this.show500 = any;
-        });
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Subscribe to the user service
         this._userService.user$
-        .pipe((takeUntil(this._unsubscribeAll)))
-        .subscribe((user: User) => {
-            this.user = user;
-        });
+            .pipe((takeUntil(this._unsubscribeAll)))
+            .subscribe((user: User) => {
+                if(user) {
+                    this.user = user;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Set promo banner
         if (!this.user) {
@@ -121,10 +128,20 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
             let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
                     '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
                     // + '&guestCartId=' + this._cartService.cartId$ + '&storeId=' + this._storesService.storeId$;
-
             this._floatingBannerService.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl)
             this._floatingBannerService.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl)
-                    }
+        }
+
+        // Subscribe to show error
+        this._displayErrorService.errorMessage$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response) => {
+                if (response) {
+                    this.displayError = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     
     }
 

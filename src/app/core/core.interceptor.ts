@@ -4,13 +4,13 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, concatMap, delay, retry, retryWhen } from 'rxjs/operators';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { Error500Service } from './error-500/error-500.service';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import { AuthService } from './auth/auth.service';
 import { IpAddressService } from './ip-address/ip-address.service';
 import { Router } from '@angular/router';
 import { AnalyticService } from './analytic/analytic.service';
 import { CartService } from './cart/cart.service';
+import { DisplayErrorService } from './display-error/display-error.service';
 
 export const retryCount = 3;
 export const retryDelay = 1000;
@@ -27,7 +27,7 @@ export class CoreInterceptor implements HttpInterceptor
      */
     constructor(
         private _fuseConfirmationService: FuseConfirmationService,
-        private _error500Service: Error500Service,
+        private _displayErrorService: DisplayErrorService,
         private _jwtService: JwtService,
         private _deviceService: DeviceDetectorService,
         private _ipAddressService: IpAddressService,
@@ -69,20 +69,19 @@ export class CoreInterceptor implements HttpInterceptor
                   concatMap((error, count) => {
 
                     // set show error 500 page to false
-                    this._error500Service.hide();
+                    this._displayErrorService.hide();
 
                     const substring =  String(error.status)[0]
                     
                     // retry 'retryCount' amount of times
                     if (count < retryCount && error instanceof HttpErrorResponse && (substring === '5' || error.status === 0)) {
-                        
                         return of(error);
                     }
 
                     // when already retried 'retryCount' amount of times
                     else if (count === retryCount) {
                         // set show error 500 page to true
-                        this._error500Service.show();
+                        this._displayErrorService.show({title: "Internal Server Error", code: error.status , message: error.message, type: '5xx'});
                     }
                     // Ignore intercept for login () clients/authenticate                
                     else if ( error instanceof HttpErrorResponse && !(error.status === 401 && newReq.url.indexOf("customers/authenticate") > -1)  && !(error.status === 409) && !(error.status === 417) && !(error.status === 404) && !(error.status === 403))

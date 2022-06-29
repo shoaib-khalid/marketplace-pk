@@ -6,17 +6,13 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { AuthService } from 'app/core/auth/auth.service';
-import { CartService } from 'app/core/cart/cart.service';
-import { Cart } from 'app/core/cart/cart.types';
-import { JwtService } from 'app/core/jwt/jwt.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product, ProductPagination } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
-import { Subject, take, switchMap, of, Observable } from 'rxjs';
+import { Subject, switchMap, Observable } from 'rxjs';
 import { takeUntil, debounceTime, map } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
@@ -96,14 +92,11 @@ export class LandingStoreComponent implements OnInit
     constructor(
         @Inject(DOCUMENT) private _document: Document,
         private _platformService: PlatformService,
+        private _storeService: StoreService,
         private _storesService: StoresService,
         private _productsService: ProductsService,
-        private _storeService: StoreService,
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
-        private _jwtService: JwtService,
-        private _authService: AuthService,
-        private _cartService: CartService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _matIconRegistry: MatIconRegistry,
@@ -132,147 +125,107 @@ export class LandingStoreComponent implements OnInit
         this.storeDomain = this._route.snapshot.paramMap.get('store-slug');    
         
         this._storesService.store$
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            take(1),
-            switchMap((response) => {
-                // set loading to true
-                this.isLoading = true;
-                this.store = response
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: Store) => {
+                if (response) {
+                    // set loading to true
+                    this.isLoading = true;
+                    this.store = response;
 
-                let storeLogo = this.displayStoreLogo(this.store.storeAssets);
-                // To be sent to _search component
-                this.storeDetails = {
-                    image : storeLogo,
-                    domain: this.storeDomain
-                }
-                // check if store id exists
-                if (this.store.id && this.store.id !== null) {
-
-                    // -----------------------
-                    // Get Store Category
-                    // -----------------------
-
-                    this._storesService.storeCategories$
-                        .pipe(takeUntil(this._unsubscribeAll))
-                        .subscribe((response)=>{
-                            
-                            this.storeCategories = response
-
-                            // If keyword from search exist, set catalogueSlug to null so that checkbox won't be checked
-                            if (!this.catalogueSlug && this._activatedRoute.snapshot.queryParamMap.get('keyword')){
-                                this.catalogueSlug = null;
-                            }
-                            // Else, set the catalogueSlug
-                            else if (!this.catalogueSlug) {
-                                this.catalogueSlug = this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
-                            }
-                            
-                            let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
-                            this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
-                         
-                            // we'll get the previous url, any url split by / that have length more than 3 will considered product page
-                            // after user click back from product page , we'll maintain it's previous pagination 
-                            if (this._storeService.getPreviousUrl() && this._storeService.getPreviousUrl().split("/").length > 3) {                            
-                                this.oldPaginationIndex = this.pagination ? this.pagination.page : 0;
-                            }
-
-                            // Get searches from url parameter 
-                            this._activatedRoute.queryParams.subscribe(params => {
-                                this.searchValue = params['keyword'];
-                                
-                                // If keyword exist
-                                if (this.searchValue) {
-                                    
-                                    // Get searched product
-                                    this._productsService.getProducts(0, 12, "name", "asc", this.searchValue, 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
-                                        .pipe(takeUntil(this._unsubscribeAll))
-                                        .subscribe(()=>{
-                                            // set loading to false
-                                            this.isLoading = false;
-        
-                                            // Mark for check
-                                            this._changeDetectorRef.markForCheck();
-                                        });
-
-                                }
-                                // Else, get all products
-                                else {
-                                    this._productsService.getProducts(this.oldPaginationIndex, 12, "name", "asc", "", 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
-                                        .pipe(takeUntil(this._unsubscribeAll))
-                                        .subscribe(()=>{
-                                            // set loading to false
-                                            this.isLoading = false;
-        
-                                            // Mark for check
-                                            this._changeDetectorRef.markForCheck();
-                                        });
-
-                                }
-                            });
-
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
-                        });
-
-                    // -----------------------
-                    // check if cart id exists
-                    // -----------------------
-
-                    if (false
-                        // this._cartService.cartId$
-                        ) {
-                        
-                        // this.cartId = this._cartService.cartId$;
-                        // if(this.cartId && this.cartId !== '') {                            
-                        //     this.getCartItems(this.cartId);
-                        // }
-                        
-                    } else {
-
-                        let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
-
-                        const createCartBody = {
-                            customerId: customerId, 
-                            storeId: this._storesService.storeId$,
-                        }
-                        this._cartService.createCart(createCartBody)
-                        .subscribe((cart: Cart)=>{
-                                // set cart id
-                                this.cartId = cart.id;
-
-                                // if(this.cartId && this.cartId !== '') {
-                                //     this.getCartItems(this.cartId);
-                                // }
-                            });
+                    this._storesService.storeId = this.store.id;
+    
+                    let storeLogo = this.displayStoreLogo(this.store.storeAssets);
+                    // To be sent to _search component
+                    this.storeDetails = {
+                        image : storeLogo,
+                        domain: this.storeDomain
                     }
-
-                    // -----------------------
-                    // Get Store Snooze
-                    // -----------------------
-                    
-                    // this._storesService.getStoreSnooze()
-                    //     .pipe(takeUntil(this._unsubscribeAll))
-                    //     .subscribe(() => {
-                             
-                    //     });
-
-                // } else if (this.url.subDomainName === "symplified" && state.url.indexOf("/payment-redirect") > -1) {
-                    // redirecting
-                } else {
-                    // this._router.navigate(['']);
-                    // alert("no store id");
-                    console.error("No store found");
-                }
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();   
-                             
-                return of(true);
-            })
-        ).subscribe(() => {
+                    // check if store id exists
+                    if (this.store.id && this.store.id !== null) {
+    
+                        // -----------------------
+                        // Get Store Category
+                        // -----------------------
+    
+                        this._storesService.storeCategories$
+                            .pipe(takeUntil(this._unsubscribeAll))
+                            .subscribe((storeCategories: StoreCategory[])=>{
+                                if (storeCategories) {
+                                    this.storeCategories = storeCategories
+        
+                                    // If keyword from search exist, set catalogueSlug to null so that checkbox won't be checked
+                                    if (!this.catalogueSlug && this._activatedRoute.snapshot.queryParamMap.get('keyword')){
+                                        this.catalogueSlug = null;
+                                    }
+                                    // Else, set the catalogueSlug
+                                    else if (!this.catalogueSlug) {
+                                        this.catalogueSlug = this._activatedRoute.snapshot.paramMap.get('catalogue-slug');
+                                    }
+                                    
+                                    let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
+                                    this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
+                                }
+                            
+                                // we'll get the previous url, any url split by / that have length more than 3 will considered product page
+                                // after user click back from product page , we'll maintain it's previous pagination 
+                                if (this._storeService.getPreviousUrl() && this._storeService.getPreviousUrl().split("/").length > 3) {                            
+                                    this.oldPaginationIndex = this.pagination ? this.pagination.page : 0;
+                                }
+    
+                                // Get searches from url parameter 
+                                this._activatedRoute.queryParams.subscribe(params => {
+                                    this.searchValue = params['keyword'];
+                                    // If keyword exist
+                                    if (this.searchValue) {
+                                        // Get searched product
+                                        this._productsService.getProducts(0, 12, "name", "asc", this.searchValue, 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
+                                            .pipe(takeUntil(this._unsubscribeAll))
+                                            .subscribe(()=>{
+                                                // set loading to false
+                                                this.isLoading = false;
             
-        });
+                                                // Mark for check
+                                                this._changeDetectorRef.markForCheck();
+                                            });
+    
+                                    }
+                                    // Else, get all products
+                                    else {
+                                        this._productsService.getProducts(this.oldPaginationIndex, 12, "name", "asc", "", 'ACTIVE,OUTOFSTOCK', this.storeCategory ? this.storeCategory.id : '')
+                                            .pipe(takeUntil(this._unsubscribeAll))
+                                            .subscribe(()=>{
+                                                // set loading to false
+                                                this.isLoading = false;
+            
+                                                // Mark for check
+                                                this._changeDetectorRef.markForCheck();
+                                            });
+    
+                                    }
+                                });
+    
+                                // Mark for check
+                                this._changeDetectorRef.markForCheck();
+                            });
+    
+                        // -----------------------
+                        // Get Store Snooze
+                        // -----------------------
+                        
+                        // this._storesService.getStoreSnooze()
+                        //     .pipe(takeUntil(this._unsubscribeAll))
+                        //     .subscribe(() => {
+                        //     });
+
+                    } else {
+                        // this._router.navigate(['']);
+                        // alert("no store id");
+                        console.error("No store found");
+                    }
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();                            
+            });
 
         // Get the products
         this.products$ = this._productsService.products$;        

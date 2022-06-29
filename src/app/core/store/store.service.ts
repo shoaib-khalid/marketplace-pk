@@ -4,11 +4,12 @@ import { BehaviorSubject, Observable, of, ReplaySubject, Subject, throwError } f
 import { switchMap, take, map, tap, catchError, filter } from 'rxjs/operators';
 import { Store, StoreRegionCountry, StoreTiming, StorePagination, StoreAssets, CreateStore, StoreDeliveryDetails, StoreSelfDeliveryStateCharges, StoreDeliveryProvider, StoreCategory, StoreDiscount, StoreSnooze, City } from 'app/core/store/store.types';
 import { AppConfig } from 'app/config/service.config';
-import { JwtService } from 'app/core/jwt/jwt.service';
 import { takeUntil } from 'rxjs/operators';
 import { LogService } from 'app/core/logging/log.service';
 import { FormControl } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
+import { DisplayErrorService } from '../display-error/display-error.service';
+import { ProductsService } from '../product/product.service';
 
 @Injectable({
     providedIn: 'root'
@@ -49,7 +50,8 @@ export class StoresService
         private _httpClient: HttpClient,
         private _apiServer: AppConfig,
         private _authService: AuthService,
-        private _jwt: JwtService,
+        private _productsService: ProductsService,
+        private _displayErrorService: DisplayErrorService,
         private _logging: LogService
     )
     {
@@ -58,6 +60,24 @@ export class StoresService
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
+
+    resolveStore(storeDomain: string): Observable<any>
+    {
+        return of(true).pipe(
+            map(()=>{
+                this.getStoreByDomainName(storeDomain)
+                    .subscribe((response: Store)=>{
+                        if (response) {
+                            this.storeId = response.id;
+                            this.getStoreCategories(response.id).subscribe();
+                            this._productsService.getProducts(0, 8, "name", "asc", '', 'ACTIVE,OUTOFSTOCK', '').subscribe();
+                        } else {
+                            this._displayErrorService.show({title: "Store Not Found", type: '4xx', message: "The store you are looking for might have been removed, had its name changed or is temporarily unavailable.", code: "404"});
+                        }
+                    })
+            })
+        )
+    }
 
     // ----------------------
     //         Store
