@@ -9,12 +9,21 @@ import { Store, StoreAssets } from 'app/core/store/store.types';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { CustomerSearch } from './search.types';
+import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 
 @Component({
     selector     : 'search',
     templateUrl  : './search.component.html',
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations,
+    styles       : [
+        `
+            .mat-form-field.mat-form-field-appearance-fill.fuse-mat-emphasized-affix .mat-form-field-wrapper .mat-form-field-flex .mat-form-field-prefix, .mat-form-field.mat-form-field-appearance-fill.fuse-mat-emphasized-affix .mat-form-field-wrapper .mat-form-field-flex .mat-form-field-suffix {
+                background-color: var(--fuse-primary) !important;
+                border-color: var(--fuse-primary) !important;
+            }
+        `
+    ]
 
 })
 export class _SearchComponent implements OnInit, OnDestroy
@@ -33,6 +42,8 @@ export class _SearchComponent implements OnInit, OnDestroy
 
     placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
 
+    currentScreenSize: string[] = [];
+
     /**
      * Constructor
      */
@@ -40,7 +51,8 @@ export class _SearchComponent implements OnInit, OnDestroy
         private _searchService: SearchService,
         private _router: Router,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService: UserService
+        private _userService: UserService,
+        private _fuseMediaWatcherService: FuseMediaWatcherService,
 
     )
     {
@@ -78,6 +90,20 @@ export class _SearchComponent implements OnInit, OnDestroy
                 this.resultSets = response;                
                 this.autoCompleteList = response;  
                 
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // ----------------------
+        // Fuse Media Watcher
+        // ----------------------
+
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {               
+
+                this.currentScreenSize = matchingAliases;                
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

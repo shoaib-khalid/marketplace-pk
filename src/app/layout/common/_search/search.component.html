@@ -1,5 +1,5 @@
 <div class="flex flex-col w-full mt-2 sm:mt-0">
-    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full" #autocompleteField>
+    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-emphasized-affix w-full" #autocompleteField>
         <mat-icon class="text-primary" svgIcon="heroicons_outline:search"></mat-icon>
         <input
             #searchInput
@@ -12,6 +12,10 @@
             [matAutocomplete]="matAutocomplete"
             (keypress)="onKeypress($event)"
             (keydown.enter)="goToSearch($event.target.value)">
+        <div *ngIf="currentScreenSize.includes('sm')" class="text-white font-semibold" matSuffix>
+            <button (click)="goToSearch($event.target.value);">Search</button>
+        </div>
+        <!-- </ng-container> -->
         <!-- <div class="w-15 py-1">
             <input
                 id="add-voucher-button"

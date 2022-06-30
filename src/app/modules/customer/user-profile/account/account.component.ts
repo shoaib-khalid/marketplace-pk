@@ -52,9 +52,10 @@ export class EditAccountComponent implements OnInit
     {
         // Create the form
         this.accountForm = this._formBuilder.group({
-            name    : ['', Validators.required],
-            username: [{value:'', disabled:true}, Validators.required],
-            email   : [{value:'', disabled:true}, [Validators.required, Validators.email]],
+            name        : ['', Validators.required],
+            username    : [{value:'', disabled:true}, Validators.required],
+            email       : [{value:'', disabled:true}, [Validators.required, Validators.email]],
+            phoneNumber : ['', Validators.required]
        
         });
     
