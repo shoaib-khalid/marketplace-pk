@@ -17,8 +17,18 @@ export const landingRoutes: Route[] = [
             {path: 'product', loadChildren: () => import('app/modules/landing/products/products.module').then(m => m.LandingProductsModule)},
             {path: 'checkout', loadChildren: () => import('app/modules/landing/checkout/checkout.module').then(m => m.BuyerCheckoutModule)},
             {path: 'carts', loadChildren: () => import('app/modules/landing/carts/carts.module').then(m => m.CartsModule)},
-            {path: 'address', loadChildren: () => import('app/modules/landing/address-setting/address-setting.module').then(m => m.AddressSettingsModule)}
+            {path: 'address', loadChildren: () => import('app/modules/landing/address-setting/address-setting.module').then(m => m.AddressSettingsModule)},
+            {path: 'thankyou', data: { breadcrumb: 'Thankyou' }, loadChildren: () => import('app/modules/landing/thankyou/thankyou.module').then(m => m.LandingThankyouModule)},
             // {path: 'legal', loadChildren: () => import('app/modules/admin/docs/legal/legal.module').then(m => m.LegalModule)}
         ]
-    }
+    },
+    // Store Front Redirect
+    {
+        path: 'payment-redirect',
+        data: { 
+            layout: 'empty', 
+            breadcrumb: 'Payment Redirect' 
+        }, 
+        loadChildren: () => import('app/modules/landing/payment-redirect/payment-redirect.module').then(m => m.LandingPaymentRedirectModule)
+    },
 ]; 
