@@ -1,7 +1,7 @@
 <ng-container *ngIf="!swiper">
     <ng-container *ngIf="categories && categories.length">
         <div class="flex flex-col w-full mt-2 sm:mt-4">
-            <div class="flex flex-row w-full items-center justify-between">
+            <div class="flex flex-row w-full items-center justify-between py-4">
                 <span class="font-semibold text-xl">{{title}}</span>
                 <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
             </div>

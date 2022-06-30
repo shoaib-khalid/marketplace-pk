@@ -9,8 +9,8 @@
                 {{ error ? error.message : "The store you are looking for might have been removed, had its name changed or is temporarily unavailable." }}
             </div>
             <a
-                class="flex flex-row items-center mt-12 font-medium bg-primary-500 py-2 px-4 rounded"
-                href="https://www.symplified.biz">
+                class="flex flex-row items-center mt-12 font-medium bg-primary-500 py-2 px-4 rounded cursor-pointer"
+                onclick="history.back()">
                 <mat-icon
                     class="icon-size-5 text-black"
                     [svgIcon]="'heroicons_outline:chevron-left'"></mat-icon>

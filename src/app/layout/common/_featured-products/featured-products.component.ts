@@ -6,6 +6,7 @@ import { Platform } from 'app/core/platform/platform.types';
 import { DOCUMENT } from '@angular/common';
 import { StoreAssets } from 'app/core/store/store.types';
 import { ProductDetails } from 'app/core/location/location.types';
+import { StoresService } from 'app/core/store/store.service';
 
 @Component({
     selector     : 'featured-products',
@@ -29,7 +30,8 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
     constructor(
         @Inject(DOCUMENT) private _document: Document,
         private _platformService: PlatformService,
-        private _router: Router
+        private _router: Router,
+        private _storesService: StoresService
     )
     {
     }
@@ -84,8 +86,11 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
         this._router.navigate(['/store/' + slug]);
     }
 
-    redirectToProduct(storeDomain: string, seoName: string) {
-        let domainName = storeDomain.split(".")[0]
+    redirectToProduct(storeId: string, storeDomain: string, seoName: string) {
+        let domainName = storeDomain.split(".")[0];
+
+        // resolve store 
+        this._storesService.storeId = storeId;
         
         // this._document.location.href = url;
         this._router.navigate(['store/' + domainName + '/' + 'all-products/' + seoName]);

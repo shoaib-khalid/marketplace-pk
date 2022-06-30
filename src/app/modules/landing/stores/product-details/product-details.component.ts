@@ -186,195 +186,201 @@ export class LandingProductDetailsComponent implements OnInit
         this.storeDomain = this._activatedRoute.snapshot.paramMap.get('store-slug');             
 
         this._storesService.store$
-        .pipe(
-            take(1),
-            switchMap((store : Store) => {
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((store: Store) => {
+                if(store) {
+                    this.store = store;
+                    
+                    // get product
+                    this._productsService.product$
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((product: Product) => {
+                            if(product){
+        
+                                this.product = product;                
+            
+                                // ----------------------------------
+                                // Get category info by category id
+                                // ----------------------------------
+            
+                                if (this.product && this.product.productInventories.length > 0) {
+                                    
+                                    // this._storesService.getStoreCategoriesById(response.categoryId)
+                                    //     .subscribe((response: StoreCategory) => {
+                                    //         this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
+                                    //     });
+                                    
+                                    //Check condition if the product inventory got itemDiscount or not
+                                    const checkItemDiscount = this.product.productInventories.filter((x:any)=>x.itemDiscount);
+                                    
+                                    if(checkItemDiscount.length > 0){
+                                        //get most discount amount 
+                                        this.selectedProductInventory = this.product.productInventories.reduce((r, e) => (<any>r).itemDiscount.discountAmount > (<any>e).itemDiscount.discountAmount ? r : e);
+                                    }
+                                    else {
+                                        //get the cheapest price
+                                        this.selectedProductInventory = this.product.productInventories.reduce((r, e) => r.price < e.price ? r : e);
+                                    }
+                                    
+                                    // set initial selectedProductInventoryItems to the cheapest item
+                                    this.selectedProductInventoryItems = this.selectedProductInventory.productInventoryItems;
+            
+                                    if (this.selectedProductInventoryItems) {
+                                        this.displayedProduct.price = this.selectedProductInventory.price;
+                                        this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
+                                        this.displayedProduct.sku = this.selectedProductInventory.sku;
+                                        this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
+                                        this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
+                                    } 
+                                    else {
+                                        this.displayedProduct.price = this.selectedProductInventory.price;
+                                        this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
+                                        this.displayedProduct.sku = this.selectedProductInventory.sku;
+                                        this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
+                                        this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
+                                    }
+            
+                                    // ------------------
+                                    // Product Assets
+                                    // ------------------
+            
+                                    this.productAssets = this.product.productAssets;
 
-                this.store = store;
-                
-                // get product
-                this._productsService.product$
-                .subscribe((product: Product) => {
-                    this.product = product;                
-
-                    // ----------------------------------
-                    // Get category info by category id
-                    // ----------------------------------
-
-                    if (this.product && this.product.productInventories.length > 0) {
-                        
-                        // this._storesService.getStoreCategoriesById(response.categoryId)
-                        //     .subscribe((response: StoreCategory) => {
-                        //         this.categorySlug = response.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '');
-                        //     });
-                        
-                        //Check condition if the product inventory got itemDiscount or not
-                        const checkItemDiscount = this.product.productInventories.filter((x:any)=>x.itemDiscount);
-                        
-                        if(checkItemDiscount.length > 0){
-                            //get most discount amount 
-                            this.selectedProductInventory = this.product.productInventories.reduce((r, e) => (<any>r).itemDiscount.discountAmount > (<any>e).itemDiscount.discountAmount ? r : e);
-                        }
-                        else {
-                            //get the cheapest price
-                            this.selectedProductInventory = this.product.productInventories.reduce((r, e) => r.price < e.price ? r : e);
-                        }
-                        
-                        // set initial selectedProductInventoryItems to the cheapest item
-                        this.selectedProductInventoryItems = this.selectedProductInventory.productInventoryItems;
-
-                        if (this.selectedProductInventoryItems) {
-                            this.displayedProduct.price = this.selectedProductInventory.price;
-                            this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
-                            this.displayedProduct.sku = this.selectedProductInventory.sku;
-                            this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
-                            this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
-                        } 
-                        else {
-                            this.displayedProduct.price = this.selectedProductInventory.price;
-                            this.displayedProduct.itemCode = this.selectedProductInventory.itemCode;
-                            this.displayedProduct.sku = this.selectedProductInventory.sku;
-                            this.displayedProduct.discountAmount = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountAmount : null;
-                            this.displayedProduct.discountedPrice = this.selectedProductInventory.itemDiscount ? this.selectedProductInventory.itemDiscount.discountedPrice : null;
-                        }
-
-                        // ------------------
-                        // Product Assets
-                        // ------------------
-
-                        this.productAssets = this.product.productAssets;
-
-                        // first this will push all images expect the one that are currently display
-                        product.productAssets.forEach( object => {
-                            let _imageObject = {
-                                small   : '' + object.url,
-                                medium  : '' + object.url,
-                                big     : '' + object.url
-                            }
+                                    //reset
+                                    this.imageCollection = [];
+            
+                                    // first this will push all images expect the one that are currently display
+                                    product.productAssets.forEach( object => {
+                                        let _imageObject = {
+                                            small   : '' + object.url,
+                                            medium  : '' + object.url,
+                                            big     : '' + object.url
+                                        }
+                                        
+                                        if(object.itemCode != this.displayedProduct.itemCode){
+                                            this.imageCollection.push(_imageObject)
+                                        } 
+                                    });
+            
+                                    // loop second one to push the one that are currently display in first array
+                                    product.productAssets.forEach( object => {
+                                        let _imageObject = {
+                                            small   : '' + object.url,
+                                            medium  : '' + object.url,
+                                            big     : '' + object.url
+                                        }
+                                        
+                                        if(object.itemCode == this.displayedProduct.itemCode){
+                                            this.imageCollection.unshift(_imageObject)
+                                        }
+                                    });
                             
-                            if(object.itemCode != this.displayedProduct.itemCode){
-                                this.imageCollection.push(_imageObject)
-                            } 
-                        });
-
-                        // loop second one to push the one that are currently display in first array
-                        product.productAssets.forEach( object => {
-                            let _imageObject = {
-                                small   : '' + object.url,
-                                medium  : '' + object.url,
-                                big     : '' + object.url
-                            }
-                            
-                            if(object.itemCode == this.displayedProduct.itemCode){
-                                this.imageCollection.unshift(_imageObject)
-                            }
-                        });
-                
-                        // set to galerry images
-                        this.galleryImages = this.imageCollection                    
-                        
-                        if (this.galleryImages.length < 1) {
-                            this.store.storeAssets.forEach(item => {                            
-                                if(item.assetType === "LogoUrl") {
+                                    // set to galerry images
+                                    this.galleryImages = this.imageCollection                    
+                                    
+                                    if (this.galleryImages.length < 1) {
+                                        this.store.storeAssets.forEach(item => {                            
+                                            if(item.assetType === "LogoUrl") {
+                                                this.galleryImages = [{
+                                                    small   : '' + item.assetUrl,
+                                                    medium  : '' + item.assetUrl,
+                                                    big     : '' + item.assetUrl
+                                                }];
+                                            }
+                                        });
+                                    }
+            
+                                    // -----------------------
+                                    // Product Variants
+                                    // -----------------------
+            
+                                    // set currentVariant
+                                    this.selectedProductInventoryItems.forEach(item => {
+                                        this.selectedVariants.push(item.productVariantAvailableId)
+                                    });
+            
+                                    // logic here is to extract current selected variant and to reconstruct new object with its string identifier 
+                                    // basically it create new array of object from this.product.productVariants to => this.requestParamVariant
+                                    let _productVariants = this.product.productVariants
+                                    _productVariants.map(variantBase => {
+                                        let _productVariantsAvailable = variantBase.productVariantsAvailable;
+                                        _productVariantsAvailable.forEach(element => {
+                                            this.selectedVariants.map(currentVariant => {
+                                                if(currentVariant.indexOf(element.id) > -1){
+                                                    let _data = {
+                                                        basename: variantBase.name,
+                                                        variantID: element.id,
+                                                    }
+                                                    this.selectedVariant.push(_data)
+                                                }
+                                            })
+            
+                                        })
+                                    });
+            
+                                    // -----------------------
+                                    // Product Combo
+                                    // -----------------------
+            
+                                    // get product package if exists
+                                    if (this.product.isPackage) {
+                                        this._productsService.getProductPackageOptions(this.product.id)
+                                        .subscribe((response)=>{
+            
+                                            this.combos = response["data"];
+                                            
+                                            this.combos.forEach(element => {
+                                                this.selectedCombo[element.id] = [];
+                                            });
+            
+                                        });
+                                    }
+            
+                                    // -----------------------
+                                    // Create meta description for product
+                                    // -----------------------
+            
+                                    if (this.product.description) {
+                                        const meta = document.createElement('meta');
+                                        meta.name = 'description';
+                                        meta.content = this.product.description;
+                                        document.head.appendChild(meta);
+                                    }
+                                } else {
+                                    // this means there is no data in product inventory, loading the default image
                                     this.galleryImages = [{
-                                        small   : '' + item.assetUrl,
-                                        medium  : '' + item.assetUrl,
-                                        big     : '' + item.assetUrl
+                                        small   : '' + this.store.storeAsset.logoUrl,
+                                        medium  : '' + this.store.storeAsset.logoUrl,
+                                        big     : '' + this.store.storeAsset.logoUrl
                                     }];
                                 }
-                            });
-                        }
-
-                        // -----------------------
-                        // Product Variants
-                        // -----------------------
-
-                        // set currentVariant
-                        this.selectedProductInventoryItems.forEach(item => {
-                            this.selectedVariants.push(item.productVariantAvailableId)
+                            }
+                            // Mark for check
+                            this._changeDetectorRef.markForCheck();
                         });
-
-                        // logic here is to extract current selected variant and to reconstruct new object with its string identifier 
-                        // basically it create new array of object from this.product.productVariants to => this.requestParamVariant
-                        let _productVariants = this.product.productVariants
-                        _productVariants.map(variantBase => {
-                            let _productVariantsAvailable = variantBase.productVariantsAvailable;
-                            _productVariantsAvailable.forEach(element => {
-                                this.selectedVariants.map(currentVariant => {
-                                    if(currentVariant.indexOf(element.id) > -1){
-                                        let _data = {
-                                            basename: variantBase.name,
-                                            variantID: element.id,
-                                        }
-                                        this.selectedVariant.push(_data)
-                                    }
-                                })
-
-                            })
+    
+                    // get all products
+                    this._productsService.products$
+                        .subscribe((products: Product[]) => {
+                            // Shuffle the array
+                            this.products = this.shuffle(products); 
+                        })
+    
+                    // Get the products pagination
+                    this._productsService.pagination$
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((pagination: ProductPagination) => {
+                            
+                            // Update the pagination
+                            this.pagination = pagination;                
+        
+                            // Mark for check
+                            this._changeDetectorRef.markForCheck();
                         });
-
-                        // -----------------------
-                        // Product Combo
-                        // -----------------------
-
-                        // get product package if exists
-                        if (this.product.isPackage) {
-                            this._productsService.getProductPackageOptions(this.product.id)
-                            .subscribe((response)=>{
-
-                                this.combos = response["data"];
-                                
-                                this.combos.forEach(element => {
-                                    this.selectedCombo[element.id] = [];
-                                });
-
-                            });
-                        }
-
-                        // -----------------------
-                        // Create meta description for product
-                        // -----------------------
-
-                        if (this.product.description) {
-                            const meta = document.createElement('meta');
-                            meta.name = 'description';
-                            meta.content = this.product.description;
-                            document.head.appendChild(meta);
-                        }
-                    } else {
-                        // this means there is no data in product inventory, loading the default image
-                        this.galleryImages = [{
-                            small   : '' + this.store.storeAsset.logoUrl,
-                            medium  : '' + this.store.storeAsset.logoUrl,
-                            big     : '' + this.store.storeAsset.logoUrl
-                        }];
-                    }
-                });
-
-                // get all products
-                this._productsService.products$
-                    .subscribe((products: Product[]) => {
-                        // Shuffle the array
-                        this.products = this.shuffle(products);                        
-                        
-                    })
-
-                // Get the products pagination
-                this._productsService.pagination$
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((pagination: ProductPagination) => {
-                    
-                    // Update the pagination
-                    this.pagination = pagination;                
-
-                    // Mark for check
-                    this._changeDetectorRef.markForCheck();
-                });
-                                
-                return of(true);
-            })
-        ).subscribe(() => {
-        });
+                }
+                // Mark for change
+                this._changeDetectorRef.markForCheck();
+            });
         
         // initialise gallery
         // set galleryOptions

@@ -8,6 +8,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { CartService } from 'app/core/cart/cart.service';
 import { CartItem } from 'app/core/cart/cart.types';
+import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets } from 'app/core/store/store.types';
 import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { merge, Observable, Subject } from 'rxjs';
@@ -77,6 +78,7 @@ export class OrderListComponent implements OnInit
         private _router: Router,
         private _authService: AuthService,
         public _dialog: MatDialog,
+        private _storesService: StoresService,
         private _activatedRoute: ActivatedRoute,
         private _httpstatService: HttpStatService
 
@@ -256,10 +258,13 @@ export class OrderListComponent implements OnInit
         return index > -1 ? this._orderCountSummary[index] : null;
     }
 
-    redirectToProduct(storeDomain: string, seoName: string) {
-        let domainName = storeDomain.split(".")[0]
+    redirectToProduct(storeId: string, storeDomain: string, seoName: string) {
+        let domainName = storeDomain.split(".")[0];
 
-        let seo = seoName.split("/")[4]        
+        let seo = seoName.split("/")[4];
+
+        // resolve store id
+        this._storesService.storeId = storeId;
         
         // this._document.location.href = url;
         this._router.navigate(['store/' + domainName + '/' + 'all-products/' + seo]);

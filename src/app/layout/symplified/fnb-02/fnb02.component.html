@@ -28,7 +28,7 @@
                             <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
                         </div>
                     </ng-container>
-                    <search class="w-full hidden sm:block"></search>
+                    <search class="w-1/2 hidden sm:block"></search>
                     <div class="flex items-center flex-row">
     
                         <button class="sm:hidden" mat-icon-button (click)="open()">
@@ -40,9 +40,9 @@
                         <!-- <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span> -->
     
                         <!-- cart -->
-                        <cart class="mr-0 sm:mr-0"></cart>
+                        <cart></cart>
     
-                        <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span>
+                        <span class="text-gray-300 items-center w-full hidden sm:block">|</span>
     
                         <!-- Components -->
                         <div class="flex w-full items-center">
@@ -59,14 +59,14 @@
                 <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
                 <!-- <search *ngIf="currentScreenSize.includes('md')" class="w-full"></search> -->
             </div>
-            <div class="flex-auto w-full bg-primary z-30 hidden sm:block">
+            <!-- <div class="flex-auto w-full bg-primary z-30 hidden sm:block">
                 <div class="w-full flex flex-row justify-center items-center">
                     <span class="text-white"><&nbsp;</span>
                     <span class="text-white font-semibold">Up to 70% Off.</span>
                     <span class="text-white underline">&nbsp; Shop our latest sale styles</span>
                     <span class="text-white">&nbsp;></span>
                 </div>
-            </div>
+            </div> -->
             <div class="sm:hidden w-full flex flex-auto items-center px-2 pb-2 z-20 bg-primary"
                 *ngIf="opened" 
                 @expandCollapse

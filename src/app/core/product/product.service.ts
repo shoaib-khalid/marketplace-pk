@@ -117,7 +117,7 @@ export class ProductsService
     // -----------------------------------------------------------------------------------------------------
 
     resolveProduct(productSlug: string): Observable<any>
-    {
+    {        
         return of(true).pipe(
             map(()=>{
                 this.getProductBySeoName(productSlug).subscribe((product: Product)=>{});

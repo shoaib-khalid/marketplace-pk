@@ -3,7 +3,7 @@
     mat-icon-button
     [matMenuTriggerFor]="userActions"> -->
 <button
-    [matMenuTriggerFor]="cartMenu"
+    [routerLink]="'/carts'"
     class="cursor-pointer"
     mat-icon-button>
     <span class="relative">
@@ -49,20 +49,20 @@
     </span>
 </button>
 
-<mat-menu
+<!-- <mat-menu
     class="max-w-60 overflow-hidden"
     [ngClass]="seeMoreCarts === true ? 'h-auto' : 'max-h-[179px]'"
     [xPosition]="'before'"
     #cartMenu="matMenu">
     <ng-container *ngIf="carts.length > 0, else noCarts">
-        <!-- Divider  -->
+
         <div class="border-t"></div>
-        <!-- Stores  -->
+
         <ng-container *ngFor="let cart of carts">
             <div 
                 (click)="redirectToStore(cart.store, cart.id)"
                 class="p-4 cursor-pointer grid grid-cols-4 gap-2 justify-between hover:bg-primary-50">
-                <!-- Logo -->
+
                 <div class="flex items-center justify-center">
                     <img
                         class="w-5"
@@ -73,15 +73,15 @@
                     {{cart.store.name}}
                 </span>
             </div>
-            <!-- Divider  -->
+
             <div class="border-t"></div>
         </ng-container>
-        <!-- See more  -->
+
         <ng-container *ngIf="seeMoreCarts">
             <div [routerLink]="'/carts'" class="flex justify-center p-2 font-semibold bg-gray-100 hover:bg-primary-50 cursor-pointer hover:text-primary-500">
                 View More Carts
             </div>
-            <!-- Divider  -->
+
             <div class="border-t"></div>
         </ng-container>
     </ng-container>
@@ -89,5 +89,5 @@
     <ng-template #noCarts>
         <div [routerLink]="'/carts'" class="flex justify-center items-center h-full font-medium hover:bg-gray-100 cursor-pointer p-3 mt-[1px] tracking-tight">Cart is empty</div>
     </ng-template>
-</mat-menu>
+</mat-menu> -->
 
