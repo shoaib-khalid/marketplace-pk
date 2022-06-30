@@ -109,16 +109,16 @@
                                             </div>
                                         </div>
                                         <!-- Unit Price -->
-                                        <div class="hidden sm:flex flex-col justify-center items-center text-center px-1">
+                                        <div class="hidden sm:flex flex-col justify-center items-center text-center px-1 min-w-15">
                                             <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                             <span class="font-semibold text-sm md:text-md">{{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                         </div>
                                         <!-- Quantity -->
-                                        <div class="hidden sm:flex flex-col text-sm md:text-md justify-center items-center mx-2">
+                                        <div class="hidden sm:flex flex-col text-sm md:text-md justify-center items-center mx-2 min-w-15">
                                             <span> x {{cartItem.quantity}}</span>
                                         </div>
                                         <!-- Total Price -->
-                                        <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                        <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md truncate min-w-15">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                         <!-- Remove Item -->
                                         <span></span>
                                         <!-- Total Price , Unit Price , Remove button for sm-->
@@ -138,9 +138,12 @@
                                 <!-- Additional Info -->
                                 <div class="flex flex-col mt-4">
                                     <span class="text-secondary">Additional Information</span>
-                                    <span class="mt-2">Order Notes (Optional)</span>
+                                    <div class="flex flex-row gap-2 mt-2 items-center text-sm sm:text-md">
+                                        <span class="">Order Notes:</span>
+                                        <span class="text-gray-500">{{cart.orderNote}}</span>
+                                    </div>
                                     <!-- Additional info -->
-                                    <mat-form-field class="w-full mt-2" floatLabel="always">
+                                    <!-- <mat-form-field class="w-full mt-2" floatLabel="always">
                                         <textarea
                                             matInput
                                             readonly
@@ -150,10 +153,10 @@
                                             class="h-5"
                                             autocomplete="disabled"
                                             matTextareaAutosize></textarea>
-                                    </mat-form-field>
+                                    </mat-form-field> -->
                                 </div>
                                 <!-- Shipping Fee & Total Items -->
-                                <div class="flex flex-row justify-between items-center">
+                                <div class="flex flex-row justify-between items-center mt-2">
                                     <div class="flex flex-col sm:flex-row justify-between items-center sm:min-w-44">
                                         <span class="text-sm sm:text-md">Shipping Fee:</span>
                                         <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>

@@ -460,7 +460,7 @@ export class CartService
                         this._cartsWithDetails.next(cartsWithDetails);
                     }
 
-                    return response["data"];
+                    return response["message"];
                 })
             ))
         );

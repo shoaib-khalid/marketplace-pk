@@ -30,7 +30,7 @@ export class ModalConfirmationDeleteItemComponent implements OnInit {
 	}
 
 	deleteButton() {    
-		this._cartService.deleteCartItem(this.cartId, this.itemId).subscribe(()=>{ this.dialogRef.close(); });
+		this._cartService.deleteCartItem(this.cartId, this.itemId).subscribe((response)=>{ this.dialogRef.close('OK'); });
 	}
 
 }
