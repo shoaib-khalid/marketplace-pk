@@ -327,7 +327,7 @@ export class BuyerCheckoutComponent implements OnInit
             }); 
 
         // Get cart summary
-        this._cartService.cartSummary$
+        this._checkoutService.cartSummary$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: DiscountOfCartGroup)=>{
                 if(response) {
@@ -343,8 +343,8 @@ export class BuyerCheckoutComponent implements OnInit
         // this function will wait for both cartsWithDetails$ & cartSummary$ result first
         // then is isLoading to false
         combineLatest([
-            this._cartService.cartsWithDetails$,
-            this._cartService.cartSummary$
+            this._checkoutService.cartsWithDetails$,
+            this._checkoutService.cartSummary$
         ]).pipe(takeUntil(this._unsubscribeAll))
         .subscribe(([result1, result2 ] : [CartWithDetails[], DiscountOfCartGroup])=>{
             if (result1 && result2) {
@@ -387,7 +387,7 @@ export class BuyerCheckoutComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._checkoutService.getCartsWithDetails({page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false});
+                        return this._checkoutService.getCartsWithDetails({ cartIdList: this.checkoutItems.map(item => item.cartId), page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false}, this.checkoutItems);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -609,7 +609,7 @@ export class BuyerCheckoutComponent implements OnInit
             if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
                 // set loading to true
                 this.isLoading = true;
-                this._checkoutService.getCartsWithDetails({ page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], customerId: this.customerId, includeEmptyCart: false})
+                this._checkoutService.getCartsWithDetails({ cartIdList: this.checkoutItems.map(item => item.cartId) , page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], customerId: this.customerId, includeEmptyCart: false}, this.checkoutItems)
                     .subscribe((response)=>{
                             
                         // set loading to false

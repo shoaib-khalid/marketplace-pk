@@ -9,7 +9,7 @@ import { StoresService } from 'app/core/store/store.service';
 import { Customer } from 'app/core/user/user.types';
 import { Address, CartDiscount, CheckoutItems, DeliveryCharges, DeliveryProvider } from './checkout.types';
 import { AuthService } from 'app/core/auth/auth.service';
-import { Cart, CartPagination, CartWithDetails } from 'app/core/cart/cart.types';
+import { Cart, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { CartService } from 'app/core/cart/cart.service';
 
 @Injectable({
@@ -24,6 +24,8 @@ export class CheckoutService
     private _cartsWithDetails: ReplaySubject<CartWithDetails[]> = new ReplaySubject<CartWithDetails[]>(1);
     private _checkoutItems: ReplaySubject<CheckoutItems[]> = new ReplaySubject<CheckoutItems[]>(1);
     private _cartsWithDetailsPagination: ReplaySubject<CartPagination> = new ReplaySubject<CartPagination>(1);
+
+    private _cartSummary: ReplaySubject<DiscountOfCartGroup | null> = new ReplaySubject<DiscountOfCartGroup | null>(1);
 
     /**
      * Constructor
@@ -92,6 +94,20 @@ export class CheckoutService
     get cartsWithDetailsPagination$(): Observable<CartPagination>
     {
         return this._cartsWithDetailsPagination.asObservable();
+    }
+
+    /**
+     * Cart Summary
+     */
+
+    get cartSummary$(): Observable<DiscountOfCartGroup>
+    {
+        return this._cartSummary.asObservable();
+    }
+
+    set cartSummary(value: DiscountOfCartGroup)
+    {
+        this._cartSummary.next(value);
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -169,9 +185,9 @@ export class CheckoutService
                         let index = checkoutItems ? checkoutItems.findIndex(element => element.cartId === item.id) : -1;
                         let toMaintainCartItems = item.cartItems;
                         if (index > -1) {
-                            const toMaintain = new Set(checkoutItems[index].selectedItemId);
+                            let toMaintain = new Set(checkoutItems[index].selectedItemId);
                             toMaintainCartItems = item.cartItems.filter(element => toMaintain.has(element.id));
-                            item.orderNote = checkoutItems[index].orderNotes;
+                            item.orderNote = checkoutItems[index].orderNotes;                            
                         }
                         item.cartItems = toMaintainCartItems;
                     });
@@ -303,35 +319,6 @@ export class CheckoutService
                 })
             );
     }
-
-    /**
-     * Get Discount
-     */
-     getDiscountOfCartGroup(id: string[], deliveryQuotationId: string = null, deliveryType: string): Observable<CartDiscount>
-     {
-         let orderService = this._apiServer.settings.apiServer.orderService;
-         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
-         let accessToken = "accessToken";
- 
-         const header = {  
-             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-             params: {
-                 deliveryQuotationId,
-                 deliveryType
-             }
-         };
- 
-         if (deliveryQuotationId === null) { delete header.params.deliveryQuotationId; }
- 
-         return this._httpClient.post<any>(orderService + '/carts/groupdiscount', id, header)
-             .pipe(
-                 map((response) => {
-                     this._logging.debug("Response from StoresService (getDiscountOfCart)",response);
- 
-                     return response["data"];
-                 })
-             );
-     }
 
     getSubTotalDiscount(id: string): Observable<CartDiscount>
     {
@@ -605,6 +592,29 @@ export class CheckoutService
                     return response["data"].content;
                 })
             );
+    }
+
+    getDiscountOfCartGroup(CartListBody: any): Observable<DiscountOfCartGroup> 
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.post<any>(orderService + '/carts' + '/groupdiscount', CartListBody, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from StoresService (getDiscountOfCartGroup)",response);
+
+                    this._cartSummary.next(response['data']);
+
+                    // Return the new notification from observable
+                    return response['data'];
+                })
+        );
     }
     
     // /**

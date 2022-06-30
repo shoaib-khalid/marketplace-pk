@@ -11,15 +11,15 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Store } from 'app/core/store/store.types';
 import { fuseAnimations } from '@fuse/animations';
-import { forkJoin, merge, pipe, Subject, combineLatest, fromEvent } from 'rxjs';
-import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, filter, Subject, takeUntil, combineLatest, merge } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { CartDiscount, CheckoutItems, DeliveryProvider } from 'app/core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
 import { CheckoutService } from 'app/core/checkout/checkout.service';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
     selector     : 'carts',
@@ -200,7 +200,6 @@ export class CartListComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
-        @Inject(DOCUMENT) private _document: Document,
         public _dialog: MatDialog,
         private _platformService: PlatformService,
         private _checkoutService: CheckoutService,
@@ -208,6 +207,7 @@ export class CartListComponent implements OnInit, OnDestroy
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _currencyPipe: CurrencyPipe,
+        private _router: Router,
         private _cartService: CartService,
         private _jwtService: JwtService,
         private _authService: AuthService,
@@ -241,7 +241,6 @@ export class CartListComponent implements OnInit, OnDestroy
         this._cartService.cartsWithDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((cartsWithDetails: CartWithDetails[]) => {
-
                 if (cartsWithDetails) {
                     this.carts = cartsWithDetails;   
                                                           
@@ -343,6 +342,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
                     // this.selectCart(null,null,true);
                 }
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -353,11 +353,14 @@ export class CartListComponent implements OnInit, OnDestroy
             .subscribe((pagination: CartPagination) => {
                 if (pagination) {
                     // Update the pagination
-                    this.pagination = pagination;
+                    this.pagination = pagination;                    
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             }); 
+
+        // Reset Payment Details
+        this._cartService.cartSummary = null;
 
         // Get cartSummary data
         this._cartService.cartSummary$
@@ -426,6 +429,10 @@ export class CartListComponent implements OnInit, OnDestroy
      */
     ngOnDestroy(): void
     {
+
+        // Resolve back all carts
+        this._cartService.cartResolver().subscribe();
+
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
@@ -777,6 +784,9 @@ export class CartListComponent implements OnInit, OnDestroy
 
         // Call for cart summary
         this._cartService.getDiscountOfCartGroup(checkoutListBody).subscribe();
+
+        // Call for checkout summary
+        this._checkoutService.getDiscountOfCartGroup(checkoutListBody).subscribe();
 
         // Resolved checkout
         this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
