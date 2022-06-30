@@ -31,6 +31,7 @@ export class InitialDataResolver implements Resolve<any>
         private _shortcutsService: ShortcutsService,
         private _cartService: CartService,
         private _userService: UserService,
+        private _cartsService: CartService,
         private _httpstatService: HttpStatService
     )
     {
@@ -59,6 +60,8 @@ export class InitialDataResolver implements Resolve<any>
             this._shortcutsService.getAll(),
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
             this._cartService.getCartsByCustomerId(customerId),
+            this._cartsService.cartResolver(true), // cartResolver(true) means we resolving the cart notification header
+
             // this._httpstatService.get(500)
         ]);
     }

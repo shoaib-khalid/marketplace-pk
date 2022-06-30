@@ -1,10 +1,9 @@
 <!-- Voucher List -->
 <div class="relative flex flex-col items-center bg-card w-full h-full">
     <!-- Main menu -->
-    <div class="flex flex-col items-center w-full h-auto my-5 px-3 sm:px-5">
-
+    <div class="flex flex-col items-center w-full h-auto">
         <mat-tab-group [color]="'primary'" mat-stretch-tabs mat-align-tabs="center" class="w-full justify-between">
-                
+            <!-- Current -->
             <mat-tab label="Current"> 
                 <!--  Voucher Input -->
                 <div class="flex flex-col w-full">
@@ -12,7 +11,7 @@
                     <!-- Input Promo Code -->
                     <div class="flex flex-col w-full pt-4">
                         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
-                            <mat-icon class="text-gray-400" svgIcon="heroicons_outline:ticket"></mat-icon>
+                            <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:ticket'"></mat-icon>
                             <input
                                 class="pl-4"
                                 matInput
@@ -56,17 +55,12 @@
                             <span class="text-sm font-semibold text-black">Add</span>
                         </label>
                     </div>
-        
                 </div>
                 <!-- active voucher list -->
                 <div class="flex flex-col w-full my-1">
                     <div class="flex flex-row my-2">
                         <div class="pr-2">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 0H2C0.89 0 0 0.89 0 2V13C0 14.11 0.89 15 2 
-                                    15H6V20L10 18L14 20V15H18C19.11 15 20 14.11 20 13V2C20 
-                                    0.89 19.11 0 18 0ZM18 13H2V11H18V13ZM18 8H2V2H18V8Z" fill="#FFC12F"/>
-                            </svg>   
+                            <mat-icon class="text-primary" [svgIcon]="'mat_outline:card_membership'"></mat-icon>
                         </div>
                         <span class="font-bold">My Vouchers</span> 
                     </div>
@@ -145,11 +139,7 @@
                 <div class="flex flex-col w-full my-1">
                     <div class="flex flex-row my-2">
                         <div class="pr-2">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 0H2C0.89 0 0 0.89 0 2V13C0 14.11 0.89 15 2 
-                                    15H6V20L10 18L14 20V15H18C19.11 15 20 14.11 20 13V2C20 
-                                    0.89 19.11 0 18 0ZM18 13H2V11H18V13ZM18 8H2V2H18V8Z" fill="#FFC12F"/>
-                            </svg>   
+                            <mat-icon class="text-primary" [svgIcon]="'mat_outline:card_membership'"></mat-icon>   
                         </div>
                         <span class="font-bold">My Used Vouchers</span> 
                     </div>

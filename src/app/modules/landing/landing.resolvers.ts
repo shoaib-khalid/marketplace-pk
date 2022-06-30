@@ -40,7 +40,6 @@ export class LandingDataResolver implements Resolve<any>
         return forkJoin([
             this._adsService.set(),
             this._userService.getCustomerAddresses(),
-            this._cartsService.cartResolver(true), // cartResolver(true) means we resolving the cart notification header
             // this._httpstatService.get(500)
         ]);
     }

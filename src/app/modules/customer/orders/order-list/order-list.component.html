@@ -82,7 +82,7 @@
                                             </div>
                                             <div class="w-full md:pl-50">
                                                 <h3 
-                                                    class="font-semibold text-sm group-hover:text-primary">
+                                                    class="font-semibold text-sm group-hover:text-primary line-clamp-3">
                                                     {{orderItemDetail.productName}}
                                                 </h3>
                                                 <h3 class="text-gray-400 text-sm group-hover:text-primary">{{orderItemDetail.productVariant}}</h3>
@@ -160,7 +160,7 @@
 
                 <div class="flex w-full mt-4 items-center justify-center">
                     <pagination 
-                        *ngIf="pagination"
+                        *ngIf="pagination && pagination.length > pagination.size"
                         [itemLength]="pagination.length" 
                         [initialPage]="pagination.page + 1"
                         [pageSize]="pagination.size"
