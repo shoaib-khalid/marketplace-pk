@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, Subject, takeUntil, distinctUntilChanged } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
@@ -14,6 +14,7 @@ import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
 import { DisplayErrorService } from 'app/core/display-error/display-error.service';
+import { SearchService } from 'app/layout/common/_search/search.service';
 
 @Component({
     selector     : 'fnb02-layout',
@@ -57,7 +58,7 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
         private _userService: UserService,
         private _platformLocation: PlatformLocation,
         private _floatingBannerService: FloatingBannerService,
-        
+        private _searchService: SearchService
     )
     {
     }
@@ -83,6 +84,26 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this._router.events.pipe(
+            filter((event) => event instanceof NavigationEnd),
+            distinctUntilChanged(),
+            takeUntil(this._unsubscribeAll)
+        ).subscribe((response: NavigationEnd) => {            
+
+            let route = response.url.split('/');
+            
+            // If inside store page, set route to 'store'
+            if (route[1] === 'store') {
+                this._searchService.route = 'store';
+            }
+            // else set route and storeDetails to null
+            else
+            {
+                this._searchService.route = null;
+                this._searchService.storeDetails = null;
+            }
+        });
+
         // Subscribe to navigation data
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))

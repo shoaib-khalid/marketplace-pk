@@ -1,15 +1,17 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { debounceTime, filter, map, Subject, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, Subject, switchMap, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { SearchService } from './search.service';
 import { MatInput } from '@angular/material/input';
 import { Store, StoreAssets } from 'app/core/store/store.types';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
-import { CustomerSearch } from './search.types';
+import { CustomerSearch, StoreDetails } from './search.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { PlatformLocation } from '@angular/common';
+import { StoresService } from 'app/core/store/store.service';
 
 @Component({
     selector     : 'search',
@@ -31,7 +33,7 @@ export class _SearchComponent implements OnInit, OnDestroy
     @Output() search: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('searchInput') public searchElement: ElementRef;
     @Input() storeId: string;
-    @Input() store: { image: string, domain: string };
+    @Input() store: StoreDetails;
     searchControl: FormControl = new FormControl();
     resultSets: any[];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -43,6 +45,7 @@ export class _SearchComponent implements OnInit, OnDestroy
     placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
 
     currentScreenSize: string[] = [];
+    route: string;
 
     /**
      * Constructor
@@ -53,7 +56,7 @@ export class _SearchComponent implements OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-
+        private _storesService: StoresService
     )
     {
     }
@@ -71,11 +74,24 @@ export class _SearchComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this._searchService.route$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(resp => {
+                // resp is not null if inside store page
+                if (resp) {
+                    this.placeholder = 'Search products'
 
-        if (this.store) {
-            this.placeholder = 'Search products'
-        }
-
+                    this._searchService.storeDetails$
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((storeDetails: StoreDetails) => {
+                        this.store = storeDetails;
+                    })
+                }
+                else
+                {
+                    this.placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
+                }
+            })
         
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -396,9 +412,6 @@ export class _SearchComponent implements OnInit, OnDestroy
                     map((searches) => {
                         this.resultSets = searches;
                         this.autoCompleteList = searches;
-
-                        console.log("this.autoCompleteList", this.autoCompleteList);
-                        
                         
                         // Mark for check
                         this._changeDetectorRef.markForCheck();

@@ -7,7 +7,7 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { takeUntil } from 'rxjs/operators';
 import { LogService } from 'app/core/logging/log.service';
 import { FormControl } from '@angular/forms';
-import { CustomerSearch } from './search.types';
+import { CustomerSearch, StoreDetails } from './search.types';
 import { AuthService } from 'app/core/auth/auth.service';
 
 @Injectable({
@@ -18,7 +18,8 @@ export class SearchService
     private _customerSearch: BehaviorSubject<CustomerSearch[] | null> = new BehaviorSubject(null);
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     public searchControl: FormControl = new FormControl();
-
+    private _routeUrl: BehaviorSubject<string | null> = new BehaviorSubject(null);
+    private _storeDetails: BehaviorSubject<StoreDetails | null> = new BehaviorSubject(null);
     /**
      * Constructor
      */
@@ -81,21 +82,57 @@ export class SearchService
      * Getter for search value
      *
     */
-     get searchValue$(): Observable<CustomerSearch[]>
-     {
-         return this.searchControl.value;
-     }
+    get searchValue$(): Observable<CustomerSearch[]>
+    {
+        return this.searchControl.value;
+    }
  
      /**
       * Setter for search value
       *
       * @param value
       */
-     set searchValue(value: string)
-     {
-         // Store the value
-         this.searchControl.setValue(value)
-     }
+    set searchValue(value: string)
+    {
+        // Store the value
+        this.searchControl.setValue(value);
+    }
+
+    /**
+     * Setter route url
+     * 
+     */
+    set route(value: string)
+    {
+        this._routeUrl.next(value);
+    }
+
+    /**
+     * Getter route url
+     * 
+     */
+    get route$(): Observable<string>
+    {
+        return this._routeUrl.asObservable();
+    }
+
+    /**
+     * Setter store details for _search
+     * 
+     */
+    set storeDetails(value: StoreDetails)
+    {
+        this._storeDetails.next(value);
+    }
+ 
+     /**
+      * Getter store details for _search
+      * 
+      */
+    get storeDetails$(): Observable<StoreDetails>
+    {
+        return this._storeDetails.asObservable();
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
