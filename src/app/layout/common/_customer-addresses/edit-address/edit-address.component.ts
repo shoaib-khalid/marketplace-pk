@@ -155,8 +155,7 @@ export class EditAddressDialog implements OnInit {
             .subscribe((result) => {
                     
                 this.user = result;
-                console.log('user', result);
-                    
+                                    
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });

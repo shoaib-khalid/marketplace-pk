@@ -68,7 +68,7 @@
                                     <!-- Body -->
                                     <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails">
                                         <div 
-                                            (click)="redirectToProduct(orderDetails.store.domain, orderItemDetail.productInventory.product.seoUrl)"  
+                                            (click)="redirectToProduct(orderDetails.store.id, orderDetails.store.domain, orderItemDetail.productInventory.product.seoUrl)"  
                                             class="flex flex-row items-center justify-around w-full py-2 cursor-pointer group hover:bg-primary-50 sm:px-2 gap-2">
                                             <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
                                                 <img

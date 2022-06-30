@@ -395,10 +395,7 @@ export class _SearchComponent implements OnInit, OnDestroy
                     }),
                     map((searches) => {
                         this.resultSets = searches;
-                        this.autoCompleteList = searches;
-
-                        console.log("this.autoCompleteList", this.autoCompleteList);
-                        
+                        this.autoCompleteList = searches;                        
                         
                         // Mark for check
                         this._changeDetectorRef.markForCheck();
