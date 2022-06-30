@@ -7,3 +7,10 @@ export interface CustomerSearch
     storeId?     : string
 
 }
+
+export interface StoreDetails
+{
+    image?     : string,
+    domain?  : string,
+
+}

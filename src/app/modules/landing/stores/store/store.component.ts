@@ -12,6 +12,7 @@ import { ProductsService } from 'app/core/product/product.service';
 import { Product, ProductPagination } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
+import { SearchService } from 'app/layout/common/_search/search.service';
 import { Subject, switchMap, Observable } from 'rxjs';
 import { takeUntil, debounceTime, map } from 'rxjs/operators';
 import { StoreService } from './store.service';
@@ -102,6 +103,7 @@ export class LandingStoreComponent implements OnInit
         private _matIconRegistry: MatIconRegistry,
         private _domSanitizer: DomSanitizer,
         private _route: ActivatedRoute,
+        private _searchService: SearchService
     )
     {
         this._matIconRegistry
@@ -111,6 +113,9 @@ export class LandingStoreComponent implements OnInit
     }
 
     ngOnInit(): void {
+
+        // Set route to 'store' on init
+        this._searchService.route = 'store'
 
         this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -140,6 +145,9 @@ export class LandingStoreComponent implements OnInit
                         image : storeLogo,
                         domain: this.storeDomain
                     }
+                    // Setter for store details for _search component
+                    this._searchService.storeDetails = this.storeDetails;
+                    
                     // check if store id exists
                     if (this.store.id && this.store.id !== null) {
     
