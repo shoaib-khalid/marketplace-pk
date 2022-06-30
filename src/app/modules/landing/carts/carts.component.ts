@@ -1,4 +1,4 @@
-import { CurrencyPipe, DOCUMENT } from '@angular/common';
+import { CurrencyPipe, DOCUMENT, ViewportScroller } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -31,6 +31,9 @@ import { NavigationEnd, Router } from '@angular/router';
                 grid-template-columns: 24px auto 96px 96px 96px 30px;
 
                 @screen md {
+                    grid-template-columns: 24px auto 112px 86px 112px 20px;
+                }
+                @screen xl {
                     grid-template-columns: 24px auto 112px 112px 112px 30px;
                 }
             }
@@ -211,7 +214,9 @@ export class CartListComponent implements OnInit, OnDestroy
         private _cartService: CartService,
         private _jwtService: JwtService,
         private _authService: AuthService,
-        private _userService: UserService
+        private _userService: UserService,
+        private _scroller: ViewportScroller
+
     )
     {
     }
@@ -792,5 +797,16 @@ export class CartListComponent implements OnInit, OnDestroy
         this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
     }
 
+    scroll(id) {
+        this._scroller.scrollToAnchor(id)
+    }
+
+    scrollToTop(){        
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
+    }
  
 }

@@ -34,7 +34,14 @@ import { AppConfig } from 'app/config/service.config';
             .checkout-grid {
                 grid-template-columns: 0px auto 96px 96px 96px 0px;
 
+                // @screen md {
+                //     grid-template-columns: 0px auto 112px 112px 112px 0px;
+                // }
+
                 @screen md {
+                    grid-template-columns: 0px auto 112px 86px 112px 0px;
+                }
+                @screen xl {
                     grid-template-columns: 0px auto 112px 112px 112px 0px;
                 }
             }
@@ -808,6 +815,14 @@ export class BuyerCheckoutComponent implements OnInit
         });
 
         return confirmation;
+    }
+
+    scrollToTop(){        
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
     }
 
 }
