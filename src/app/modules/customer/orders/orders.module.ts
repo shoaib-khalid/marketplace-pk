@@ -14,6 +14,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { OrderListComponent } from './order-list/order-list.component';
 import { OrderDetailsComponent } from './order-details/order-details.component';
 import { ordersRoutes } from './orders.routing';
+import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { ordersRoutes } from './orders.routing';
         MatPaginatorModule,
         MatMenuModule,
         PaginationModule,
-        SharedModule
+        SharedModule,
+        ErrorBackgroundModule
     ],
     bootstrap   : [
     ]
