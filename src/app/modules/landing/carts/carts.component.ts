@@ -19,6 +19,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
 import { CheckoutService } from 'app/core/checkout/checkout.service';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
     selector     : 'carts',
@@ -409,7 +410,7 @@ export class CartListComponent implements OnInit, OnDestroy
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._cartService.getCartsWithDetails({page: 0, pageSize: 4, customerId: this.customerId, includeEmptyCart: false});
+                        return this._cartService.getCartsWithDetails({page: 0, pageSize: 5, customerId: this.customerId, includeEmptyCart: false});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -492,12 +493,15 @@ export class CartListComponent implements OnInit, OnDestroy
             if ( result === 'confirmed' )
             {
 
-                this._cartService.deleteCart(cartId)
-                    .subscribe(response => {
+                this.carts.findIndex
+                
+                // this._cartService.deleteCart(cartId)
+                //     .subscribe(response => {
 
-                        this._cartService.getCartsByCustomerId(this.customerId)
-                            .subscribe()
-                    })
+
+                //         this._cartService.getCartsByCustomerId(this.customerId)
+                //             .subscribe()
+                //     })
             }
         });    
         
@@ -614,20 +618,51 @@ export class CartListComponent implements OnInit, OnDestroy
 
     deleteCartItem(cartId: string, cartItem: CartWithDetails){
 
+        let selectedCartIndex = this.selectedCart.carts.findIndex(cart => cart.id === cartId)
+        let selectionStatusIndex = this.selectedCart.carts[selectedCartIndex].cartItem.findIndex(item => item.id === cartItem.id && (item.selected === true))
+
+        // If more than -1 means it is selected
+        if (selectionStatusIndex > -1) {
+
+            const confirmation = this._fuseConfirmationService.open({
+                title  : 'Unable To Delete Item',
+                message: 'Cannot delete selected item. If you wish to delete the item, unselect it first.',
+                icon:{
+                    name:"heroicons_outline:exclamation",
+                    color:"warn"
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel: {
+                        show: false,
+                    },
+                }
+            });
+
+            return;
+        }
+
         //To make custom pop up, and we pass the details in paramter data
         let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
-        dialogRef.afterClosed().subscribe((result) => {            
+        dialogRef.afterClosed().subscribe((result) => {    
+
+            if (result === 'OK') {
+                let cartIndex = this.carts.findIndex(cart => cart.id === cartId);        
+                let cartitemIndex = this.carts[cartIndex].cartItems.findIndex(item => item.id === cartItem.id);
+
+                let selectedCartItemIndex = this.selectedCart.carts[selectedCartIndex].cartItem.findIndex(item => item.id === cartItem.id);
+
+                this.carts[cartIndex].cartItems.splice(cartitemIndex, 1);
+                this.selectedCart.carts[selectedCartIndex].cartItem.splice(selectedCartItemIndex, 1);
+        
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            }
             
-            // // if cart has items, calculate the charges
-            // if (this.cartItems.length > 0) {
-                
-            //     this.calculateCharges()                
-            // }
-            // // if cart is empty, reset the values
-            // else {
-            //     // change button to Calculate Charges
-            //     this.addressFormChanges();
-            // }
+
         });
     }
 
@@ -679,10 +714,12 @@ export class CartListComponent implements OnInit, OnDestroy
 
     getDeliveryChargesRange(index: number) : string 
     {
-        if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
-            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
-        } else {
-            return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
+        if (this.selectedCart.carts[index]) {
+            if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
+                return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
+            } else {
+                return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
+            }
         }
     }
 
