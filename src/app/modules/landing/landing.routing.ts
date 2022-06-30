@@ -22,11 +22,11 @@ export const landingRoutes: Route[] = [
             // {path: 'legal', loadChildren: () => import('app/modules/admin/docs/legal/legal.module').then(m => m.LegalModule)}
         ]
     },
+
     // Store Front Redirect
     {
         path: 'payment-redirect',
         data: { 
-            layout: 'empty', 
             breadcrumb: 'Payment Redirect' 
         }, 
         loadChildren: () => import('app/modules/landing/payment-redirect/payment-redirect.module').then(m => m.LandingPaymentRedirectModule)
