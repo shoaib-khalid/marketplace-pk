@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StoresService } from 'app/core/store/store.service';
 import { PaymentRedirectService } from './payment-redirect.service';
 import { DOCUMENT } from '@angular/common';
+import { DisplayErrorService } from 'app/core/display-error/display-error.service';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class LandingPaymentRedirectComponent
         @Inject(DOCUMENT) private _document: Document,
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
+        private _displayErrorService: DisplayErrorService,
         private _paymentRedirectService: PaymentRedirectService,
         private _storesService: StoresService
     )
@@ -66,26 +68,30 @@ export class LandingPaymentRedirectComponent
                 status = "FAILED"
             }
 
-            if(this.payment.order_id.charAt(0) === "G") {
-                this._paymentRedirectService.getOrderGroupsById(this.payment.order_id)
-                    .subscribe((response)=>{
-                        let paymentType = "ONLINEPAYMENT";//response.paymentType;
-                        this._router.navigate(['/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg ])
-                    });
+            if (this.payment.order_id) {
+                if (this.payment.order_id.charAt(0) === "G") {
+                    this._paymentRedirectService.getOrderGroupsById(this.payment.order_id)
+                        .subscribe((response)=>{
+                            let paymentType = "ONLINEPAYMENT";//response.paymentType;
+                            this._router.navigate(['/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg ])
+                        });
+                } else {
+                    this._paymentRedirectService.getOrderById(this.payment.order_id)
+                        .subscribe((response) => {
+                            let storeId = response.storeId;
+                            let paymentType = response.paymentType;
+            
+                            // getStoreById(storeId, cartId) , does not need cartId here 
+                            // since we're redirecting to another page (SF of the store)
+                            this._storesService.getStoreById(storeId)
+                                .subscribe((storeResponse) => {
+                                    let storeDomain = storeResponse.domain;
+                                    this._document.location.href = 'https://' + storeDomain + '/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg;
+                                });
+                        });
+                }
             } else {
-                this._paymentRedirectService.getOrderById(this.payment.order_id)
-                    .subscribe((response) => {
-                        let storeId = response.storeId;
-                        let paymentType = response.paymentType;
-        
-                        // getStoreById(storeId, cartId) , does not need cartId here 
-                        // since we're redirecting to another page (SF of the store)
-                        this._storesService.getStoreById(storeId)
-                            .subscribe((storeResponse) => {
-                                let storeDomain = storeResponse.domain;
-                                this._document.location.href = 'https://' + storeDomain + '/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg;
-                            });
-                    });
+                this._displayErrorService.show({type: "4xx", code: "404", title: "Page Not Found!", message: "The page you are looking for might have been removed, had its name changed or is temporarily unavailable."})
             }
     
         });
