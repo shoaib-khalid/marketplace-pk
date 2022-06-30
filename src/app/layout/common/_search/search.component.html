@@ -13,7 +13,11 @@
             (keypress)="onKeypress($event)"
             (keydown.enter)="goToSearch($event.target.value)">
         <div *ngIf="currentScreenSize.includes('sm')" class="text-white font-semibold" matSuffix>
-            <button (click)="goToSearch($event.target.value);">Search</button>
+            <!-- <input mat-button id="search-btn" type="button">
+            <label for="search-btn" (click)="goToSearch(searchControl.value)">
+                <span>Search</span>
+            </label> -->
+            <button class="p-2.5 font-bold" (click)="goToSearch(searchControl.value);">Search</button>
         </div>
         <!-- </ng-container> -->
         <!-- <div class="w-15 py-1">

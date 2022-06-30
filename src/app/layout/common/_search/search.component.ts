@@ -191,7 +191,7 @@ export class _SearchComponent implements OnInit, OnDestroy
     goToSearch(value: string)
     {
         // Do nothing if value is empty string
-        if (value === '') {
+        if (value === '' || value === null) {
             return;
         }
 
