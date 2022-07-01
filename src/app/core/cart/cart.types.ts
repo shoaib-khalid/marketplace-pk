@@ -23,6 +23,7 @@ export interface CartWithDetails
     storeVoucherCode        : string;
     deliveryProviderId      : string;
     orderNote?              : string;
+    storeOpen?              : boolean;
 }
 
 export interface CartPagination
