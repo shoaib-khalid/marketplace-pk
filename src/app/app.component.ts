@@ -9,7 +9,7 @@ import { AnalyticService } from './core/analytic/analytic.service';
 import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { AppConfig } from './config/service.config';
-import { CartService } from './core/cart/cart.service';
+import { SwUpdate } from '@angular/service-worker';
 
 declare let gtag: Function;
 
@@ -41,9 +41,13 @@ export class AppComponent
         private _jwtService: JwtService,
         private _authService: AuthService,
         private _apiServer: AppConfig,
-        private _cartService: CartService,
+        private _swUpdate: SwUpdate
     )
     {
+        // reload if there are any update for PWA
+        _swUpdate.available.subscribe(event => {
+            _swUpdate.activateUpdate().then(()=>document.location.reload());
+        });
     }
 
     ngOnInit() {

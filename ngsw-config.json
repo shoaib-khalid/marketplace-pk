@@ -26,5 +26,22 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "config-api",
+      "urls": [
+        "https://dev-my.symplified.ai/assets/config/config.prod.json",
+        "https://dev-pk.symplified.ai/assets/config/config.prod.json",
+        "https://deliverin.my/assets/config/config.prod.json",
+        "https://easydukan.co/assets/config/config.prod.json"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 20,
+        "maxAge": "1hr",
+        "timeout": "5s"
+      }
+    }
   ]
 }
