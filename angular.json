@@ -3,7 +3,9 @@
     "version": 1,
     "cli": {
       "analytics": false,
-        "defaultCollection": "@angular-eslint/schematics"
+        "schematicCollections": [
+          "@angular-eslint/schematics"
+        ]
     },
     "newProjectRoot": "projects",
     "projects": {
@@ -146,6 +148,5 @@
                 }
             }
         }
-    },
-    "defaultProject": "fuse"
+    }
 }
