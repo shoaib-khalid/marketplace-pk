@@ -25,10 +25,12 @@
         "@angular/platform-browser": "13.2.3",
         "@angular/platform-browser-dynamic": "13.2.3",
         "@angular/router": "13.2.3",
+        "@angular/service-worker": "13.2.3",
         "@fortawesome/angular-fontawesome": "^0.10.2",
         "@fortawesome/fontawesome-svg-core": "^6.1.1",
         "@googlemaps/js-api-loader": "^1.13.11",
         "@ngneat/transloco": "3.1.4",
+        "@schematics/angular": "^14.0.4",
         "angularx-social-login": "^4.1.0",
         "apexcharts": "3.33.1",
         "crypto-js": "3.3.0",
@@ -54,7 +56,7 @@
         "zone.js": "0.11.4"
     },
     "devDependencies": {
-        "@angular-devkit/build-angular": "13.2.4",
+        "@angular-devkit/build-angular": "^14.0.4",
         "@angular-eslint/builder": "13.1.0",
         "@angular-eslint/eslint-plugin": "13.1.0",
         "@angular-eslint/eslint-plugin-template": "13.1.0",

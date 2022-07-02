@@ -43,7 +43,8 @@
                                 "input": "src",
                                 "output": "/"
                             },
-                            "src/.htaccess"
+                            "src/.htaccess",
+                            "src/manifest.webmanifest"
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
@@ -59,7 +60,9 @@
                             "src/styles/tailwind.scss",
                             "./node_modules/font-awesome/css/font-awesome.css"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "serviceWorker": true,
+                        "ngswConfigPath": "ngsw-config.json"
                     },
                     "configurations": {
                         "production": {
@@ -123,7 +126,8 @@
                         "assets": [
                             "src/favicon-16x16.png",
                             "src/favicon-32x32.png",
-                            "src/assets"
+                            "src/assets",
+                            "src/manifest.webmanifest"
                         ],
                         "styles": [
                             "src/styles/styles.scss"
