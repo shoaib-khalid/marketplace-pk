@@ -41,7 +41,7 @@ export const appConfig: AppConfig = {
         lg: '1280px',
         xl: '1440px'
     },
-    theme  : 'theme-turqoise', // theme  : 'theme-default',
+    theme  : 'theme-turquoise', // theme  : 'theme-default',
     themes : [
         {
             id  : 'theme-default',
@@ -68,8 +68,8 @@ export const appConfig: AppConfig = {
             name: 'Amber'
         },
         {
-            id  : 'theme-turqoise',
-            name: 'Turqoise'
+            id  : 'theme-turquoise',
+            name: 'Turquoise'
         }
     ]
 };
