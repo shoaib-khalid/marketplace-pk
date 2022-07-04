@@ -28,10 +28,6 @@ export class AppComponent
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    //get current location
-    currentLat:any=0;
-    currentLong:any=0;
-
     /**
      * Constructor
      */
@@ -57,17 +53,6 @@ export class AppComponent
     ngOnInit() {
         
         console.log("navigator",navigator.userAgent);
-
-        
-        //to implement get current location first to be display if in db is null
-        navigator.geolocation.getCurrentPosition((position) => {
-            var crd = position.coords;
-            this.currentLat = crd.latitude;
-            this.currentLong= crd.longitude;
-
-            console.log('position', position);
-            
-        })
 
         // Subscribe to platform data
         this._platformsService.platform$

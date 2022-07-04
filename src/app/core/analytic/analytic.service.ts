@@ -17,8 +17,8 @@ import { StoresService } from '../store/store.service';
 export class AnalyticService
 {
     //get current location
-    currentLat:any=0;
-    currentLong:any=0;
+    currentLat  : any = 0;
+    currentLong : any = 0;
 
     private _analytic: ReplaySubject<CustomerActivity> = new ReplaySubject<CustomerActivity>(1);
 
@@ -89,8 +89,6 @@ export class AnalyticService
             var crd = position.coords;
             this.currentLat = crd.latitude;
             this.currentLong = crd.longitude;
-
-            console.log('position', position);
 
         })
 
