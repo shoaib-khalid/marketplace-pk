@@ -321,29 +321,136 @@
                     <!-- <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Store Voucher</span>
                         <span class="text-md font-semibold">RM 0.00</span>
-                    </div>
+                    </div> -->
                     <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
-                        <span class="text-md font-semibold">RM 0.00</span>
-                    </div> -->
+                        <span class="text-md font-semibold">-{{paymentDetails.platformVoucherSubTotalDiscount | currency: platform.currency}}</span>
+                    </div>
 
                     <!-- Separator -->
                     <div class="border-b w-full my-1"></div>
 
-                    <!-- Voucher Input -->
-                    <mat-form-field class="w-full mt-2 fuse-mat-emphasized-affix" floatLabel="always">
-                        <input
-                            matInput
-                            placeholder="Enter Promo Code"
-                            autocomplete="disabled"
-                            [required]="true"
-                            maxlength="5">
-                            <button class="bg-primary py-2 px-4 rounded text-white">
-                                Apply
-                            </button>
-                    </mat-form-field>
+                    <ng-container *ngIf="customerId; else guestVoucher">
+                        <!-- Voucher Dropdown -->
+                        <ng-container *ngIf="customerVouchers && customerVouchers.length > 0">
+                            <mat-form-field class="fuse-mat-no-subscript w-full my-1 text-sm" floatLabel="always">
+                                <mat-select 
+                                    placeholder="Select My Voucher"
+                                    (selectionChange)="selectVoucher(voucherSelector.value);"
+                                    [(ngModel)]="voucherApplied"
+                                    [ngModelOptions]="{standalone: true}"
+                                    #voucherSelector="matSelect">
+                                    <mat-select-trigger>
+                                        <span class="flex items-center">
+                                            <span>{{ voucherSelector.triggerValue }}</span>
+                                        </span>
+                                    </mat-select-trigger>
+                                    <div *ngFor="let voucher of customerVouchers">
+                                        <ng-container *ngIf="(voucher.voucher.voucherType === 'PLATFORM' ) && validateVoucher(voucher)">
+                                            <mat-option [value]="voucher">{{voucher.voucher.name}}</mat-option>
+                                        </ng-container>
+                                    </div>
+                                </mat-select>
+                                <button
+                                    mat-icon-button
+                                    type="button"
+                                    *ngIf="voucherApplied"
+                                    (click)="deselectVoucher(); $event.stopPropagation()"
+                                    matSuffix>
+                                    <mat-icon
+                                        class="text-gray-500 icon-size-4 ml-2"
+                                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                </button>                                              
+                            </mat-form-field>
+                        </ng-container>
+    
+                        <!-- Voucher Input -->
+                        <ng-container *ngIf="displayRedeem; else displayHavePromo">
+                            <mat-form-field class="w-full mt-1 fuse-mat-no-subscript text-sm" floatLabel="always">
+                                <input
+                                    matInput
+                                    placeholder="Enter Promo Code"
+                                    autocomplete="disabled"
+                                    [(ngModel)]="promoCode"
+                                    [ngModelOptions]="{standalone: true}"
+                                    >
+                                    <button class="bg-primary py-2 px-4 rounded text-white"
+                                    [disabled]="isLoading" 
+                                    [ngClass]="isLoading ? 'cursor-wait bg-gray-200' : 'bg-primary-500 hover:bg-primary-600'"
+                                    (click)="claimPromoCode(); $event.preventDefault()">
+                                        Apply
+                                    </button>
+                            </mat-form-field>
+                        </ng-container>
 
-                    <span class="text-sm text-secondary">Redeem your voucher if you received any Promo Code.</span>
+                        <ng-template #displayHavePromo>
+                            <div class="text-xs mt-1">
+                                <span>Having a Promo Code? Redeem </span>
+                                <span class="underline cursor-pointer text-primary" 
+                                    (click)="displayRedeem = true">
+                                here
+                                </span>
+                            </div>
+                        </ng-template>
+
+                    </ng-container>
+
+                    <ng-template #guestVoucher>
+                        <!-- Voucher Dropdown -->
+                        <ng-container *ngIf="guestVouchers">
+                            <mat-form-field class="fuse-mat-no-subscript w-full mt-1 text-sm" floatLabel="always">
+                                <input
+                                matInput
+                                readonly
+                                [(ngModel)]="guestVouchers.voucher.name"
+                                [ngModelOptions]="{standalone: true}"
+                                >
+                                <button
+                                    mat-icon-button
+                                    type="button"
+                                    *ngIf="voucherApplied"
+                                    (click)="deselectVoucher(); $event.stopPropagation()"
+                                    matSuffix>
+                                    <mat-icon
+                                        class="text-gray-500 icon-size-4 ml-2"
+                                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                </button>                                              
+                            </mat-form-field>
+                        </ng-container>
+    
+                        <!-- Voucher Input -->
+                        <ng-container *ngIf="guestVouchers === null">
+                            <ng-container *ngIf="displayRedeem; else displayHavePromo">
+                                <mat-form-field class="w-full mt-1 fuse-mat-no-subscript text-sm" floatLabel="always">
+                                    <input
+                                        matInput
+                                        placeholder="Enter Promo Code"
+                                        autocomplete="disabled"
+                                        [(ngModel)]="promoCode"
+                                        [ngModelOptions]="{standalone: true}"
+                                        >
+                                        <button class="bg-primary py-2 px-4 rounded text-white"
+                                        [disabled]="isLoading" 
+                                        [ngClass]="isLoading ? 'cursor-wait bg-gray-200' : 'bg-primary-500 hover:bg-primary-600'"
+                                        (click)="claimPromoCode(); $event.preventDefault()">
+                                            Apply
+                                        </button>
+                                </mat-form-field>
+                            </ng-container>
+    
+                            <ng-template #displayHavePromo>
+                                <div class="text-xs mt-1">
+                                    <span>Having a Promo Code? Redeem </span>
+                                    <span class="underline cursor-pointer text-primary" 
+                                        (click)="displayRedeem = true">
+                                    here
+                                    </span>
+                                </div>
+                            </ng-template>
+                        </ng-container>
+    
+                    </ng-template>
+
 
                     <!-- Separator -->
                     <div class="border-b w-full my-2"></div>

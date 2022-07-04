@@ -554,15 +554,36 @@ export class CartService
     //      Cart Group
     //-----------------------
 
-    getDiscountOfCartGroup(CartListBody: any): Observable<DiscountOfCartGroup> 
+    getDiscountOfCartGroup(CartListBody: any, 
+        params: { 
+        platformVoucherCode : string,
+        customerId          : string,
+        email?              : string,
+        } = {
+            platformVoucherCode : null,
+            customerId          : null, 
+            email               : null, 
+        }
+        ): Observable<DiscountOfCartGroup> 
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
         let accessToken = "accessToken";
 
         const header = {  
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: params
         };
+
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+                delete header.params[key];
+            }
+        });  
 
         return this._httpClient.post<any>(orderService + '/carts' + '/groupdiscount', CartListBody, header)
             .pipe(

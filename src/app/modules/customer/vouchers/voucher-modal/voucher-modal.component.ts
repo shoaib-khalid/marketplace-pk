@@ -31,7 +31,9 @@ export class VoucherModalComponent implements OnInit {
         this.voucher = this.data['voucher'];
         this.storeName = this.data['storeName']
 
-        this.verticalList = this.voucher.voucher.voucherVerticalList.map(x => x.verticalCode);        
+        if (this.voucher) {
+            this.verticalList = this.voucher.voucher.voucherVerticalList.map(x => x.verticalCode);        
+        }
     }
 
     okButton() {
