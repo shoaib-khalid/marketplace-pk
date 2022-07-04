@@ -191,6 +191,8 @@ export class BuyerCheckoutComponent implements OnInit
         voucherDiscountType: null,
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
+        platformVoucherSubTotalDiscount: 0
+
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -288,7 +290,7 @@ export class BuyerCheckoutComponent implements OnInit
                     this._checkoutService.checkoutItems$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((checkoutItems: CheckoutItems[])=>{
-                            if (checkoutItems) {
+                            if (checkoutItems) {                                
                                 this.checkoutItems = checkoutItems;
                                 let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
                                 let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
@@ -341,6 +343,8 @@ export class BuyerCheckoutComponent implements OnInit
                     this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
                     this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
+                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount
+
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck()
@@ -426,6 +430,7 @@ export class BuyerCheckoutComponent implements OnInit
         // this.isLoading = true;
         
         let orderBodies = [];
+        let platformVoucherCode = null
         this.checkoutItems.forEach(checkout => {
 
             const orderBody = {
@@ -437,7 +442,7 @@ export class BuyerCheckoutComponent implements OnInit
                 }),
                 customerId: this.customerId,
                 customerNotes: checkout.orderNotes,
-                voucherCode: '',
+                // voucherCode: checkout.platformVoucherCode,
                 orderPaymentDetails: {
                     accountName: this.user ? this.user.name : this.customerAddress.name,
                     deliveryQuotationReferenceId: checkout.deliveryQuotationId ? checkout.deliveryQuotationId : null
@@ -458,11 +463,12 @@ export class BuyerCheckoutComponent implements OnInit
 
             };
             orderBodies.push(orderBody)
+            platformVoucherCode = checkout.platformVoucherCode;
         })
         
         // return
 
-        this._checkoutService.postPlaceGroupOrder(orderBodies, false)
+        this._checkoutService.postPlaceGroupOrder(orderBodies, true, platformVoucherCode)
             .subscribe((response) => {
 
                 this.order = response;

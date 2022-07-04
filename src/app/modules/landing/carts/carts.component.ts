@@ -21,6 +21,9 @@ import { CustomerAddress } from 'app/core/user/user.types';
 import { CheckoutService } from 'app/core/checkout/checkout.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { StoresService } from 'app/core/store/store.service';
+import { CustomerVoucher, CustomerVoucherPagination, GuestVoucher, UsedCustomerVoucherPagination, VoucherVerticalList } from 'app/modules/customer/vouchers/vouchers.types';
+import { VouchersService } from 'app/modules/customer/vouchers/vouchers.service';
+import { VoucherModalComponent } from 'app/modules/customer/vouchers/voucher-modal/voucher-modal.component';
 
 @Component({
     selector     : 'carts',
@@ -196,6 +199,7 @@ export class CartListComponent implements OnInit, OnDestroy
         voucherDiscountType: null,
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
+        platformVoucherSubTotalDiscount: 0
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -209,6 +213,24 @@ export class CartListComponent implements OnInit, OnDestroy
     }[] = [];
 
     
+
+    // -------------------------
+    // Voucher
+    // -------------------------
+
+    // Member Voucher
+    customerVouchers: CustomerVoucher[] = [] ;
+    customerVoucherPagination: CustomerVoucherPagination;
+
+    usedCustomerVouchers: CustomerVoucher[] = [] ;
+    usedCustomerVoucherPagination: UsedCustomerVoucherPagination;
+    promoCode: string = '';
+    voucherApplied: CustomerVoucher = null;
+    verticalList: VoucherVerticalList[] = [];
+
+    // Guest Voucher
+    guestVouchers: any = null ;
+    displayRedeem: boolean = false;
 
     /**
      * Constructor
@@ -228,7 +250,8 @@ export class CartListComponent implements OnInit, OnDestroy
         private _userService: UserService,
         private _scroller: ViewportScroller,
         private _datePipe: DatePipe,
-        private _storesService: StoresService
+        private _storesService: StoresService,
+        private _vouchersService: VouchersService
 
     )
     {
@@ -394,6 +417,8 @@ export class CartListComponent implements OnInit, OnDestroy
                     this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
                     this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
+                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount
+                    
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -413,6 +438,47 @@ export class CartListComponent implements OnInit, OnDestroy
             // Mark for check
             this._changeDetectorRef.markForCheck();
         });
+
+        // ----------------------
+        // Voucher
+        // ----------------------
+
+        // Get used customer voucher
+        this._vouchersService.getAvailableCustomerVoucher(false)
+            .subscribe((response: any) => {
+                this.customerVouchers = response;
+
+                let index = this.customerVouchers.findIndex(x => x.voucher.isNewUserVoucher === true )
+                // select the voucher if it is new user voucher
+                if (index > -1) {
+                    this.selectVoucher(this.customerVouchers[index])
+                    // this.calculateCharges();
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get customer voucher pagination, isUsed = false 
+        this._vouchersService.customerVoucherPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerVoucherPagination) => {
+
+                this.customerVoucherPagination = response; 
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();           
+            });
+
+        // Get used customer voucher pagination, isUsed = true 
+        this._vouchersService.usedCustomerVoucherPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: UsedCustomerVoucherPagination) => {
+
+                this.usedCustomerVoucherPagination = response;
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -791,7 +857,8 @@ export class CartListComponent implements OnInit, OnDestroy
                 deliveryQuotationId : item.deliveryQuotationId,
                 deliveryType : item.deliveryType,
                 deliveryProviderId : item.deliveryProviderId,
-                orderNotes : item.description.value
+                orderNotes : item.description.value,
+                platformVoucherCode: this.voucherApplied ? this.voucherApplied.voucher.voucherCode : null
             }
         // to remove if selected = false (undefined array of selectedItemId)
         }).filter(n => {
@@ -800,17 +867,54 @@ export class CartListComponent implements OnInit, OnDestroy
             }
         });
 
+        let newCheckoutListBodyArr = checkoutListBody.map(item => {
+            let {platformVoucherCode , ...newCheckoutListBody} = item;
+            return newCheckoutListBody;
+        })
+
         // Get totalSelectedCartItem to be displayed
         // .reduce will sum up all number in the array of number created by .map
         this.totalSelectedCartItem = checkoutListBody.map(item => item.selectedItemId.length).reduce((partialSum, a) => partialSum + a, 0);
 
         this.isPristine = (this.totalSelectedCartItem < 1) ? true : false;
 
+        let checkoutParams = null;
+
+        if (checkoutListBody.length > 0 && this.voucherApplied) {
+            checkoutParams = {
+                platformVoucherCode: this.voucherApplied.voucher.voucherCode, 
+                customerId: this.customerId, 
+                email: this.customerId ? null : this.customerAddress.email
+            }
+        } else {
+            checkoutParams = {
+                platformVoucherCode: null, 
+                customerId: null, 
+                email: null
+            }
+        }
+
         // Call for cart summary
-        this._cartService.getDiscountOfCartGroup(checkoutListBody).subscribe();
+        this._cartService.getDiscountOfCartGroup(
+            newCheckoutListBodyArr, 
+            checkoutParams
+            ).subscribe(resp => {}, (error) => {
+    
+                // if voucher is invalid
+                this.promoCode = '';
+
+                if (error.error.message) {
+                    // if voucher is invalid
+                    this.openVoucherModal('heroicons_outline:x','Error', error.error.message, null, true);
+                }  
+              
+            });
 
         // Call for checkout summary
-        this._checkoutService.getDiscountOfCartGroup(checkoutListBody).subscribe();
+        this._checkoutService.getDiscountOfCartGroup(
+            newCheckoutListBodyArr, 
+            checkoutParams
+            ).subscribe();
 
         // Resolved checkout
         this._checkoutService.resolveCheckout(checkoutListBody).subscribe();
@@ -1053,6 +1157,118 @@ export class CartListComponent implements OnInit, OnDestroy
             return true;
         else 
             return false;
+
+    }
+    selectVoucher(voucher: any) {
+        this.voucherApplied = voucher;
+        this.initializeCheckoutList();
+    }
+
+    deselectVoucher() {
+        this.voucherApplied = null;
+        this.paymentDetails.platformVoucherSubTotalDiscount = 0;
+        this.guestVouchers = null;
+
+        // change button to Calculate Charges
+        this.initializeCheckoutList();
+    }
+
+    validateVoucher(voucher: any) {
+
+        // Hardcode for now
+        let verticalCodes = [];
+        if (this.platform.country === 'MYS') {
+            verticalCodes = ['Fnb', 'E-Commerce'];
+        }
+        else
+        {
+            verticalCodes = ['FnB_PK', 'ECommerce_PK'];
+        }
+
+        let index = voucher.voucher.voucherVerticalList.findIndex(item => (item.verticalCode === verticalCodes[0]) || (item.verticalCode === verticalCodes[1]));
+        if (index > -1) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    claimPromoCode() {
+
+        if (this.promoCode === ''){
+            return;
+        }
+
+        if (this.customerId) {
+            this._vouchersService.postCustomerClaimVoucher(this.customerId, this.promoCode)
+                .subscribe((response) => {
+    
+                    this.promoCode = '';
+    
+                    // find the verticalcode in the voucher list
+                    // if index -1 mean that the voucher can't be used in current store
+    
+                    // if voucher is valid
+                    this.openVoucherModal('mat_solid:check_circle','Congratulations!', 'Promo code successfully claimed', null, true);
+                    this.displayRedeem = false;
+                    this.selectVoucher(response);
+    
+                    
+                }, (error) => {
+    
+                    // if voucher is invalid
+                    this.promoCode = '';
+    
+                    if (error['status'] === 409) {
+    
+                        if (error.error.message) {
+                            // if voucher is invalid
+                            this.openVoucherModal('heroicons_outline:x','Error', error.error.message, null, true);
+                        }  
+                        else {
+                            // if voucher is invalid
+                            this.openVoucherModal('heroicons_outline:x','Promo code already claimed!', 'Please enter a different code', null, true);
+    
+                        }
+    
+                    }
+                    else if (error['status'] === 404) {
+                        this.openVoucherModal('heroicons_outline:x','Error', error.error.message, null, true);
+                    }
+                });
+        }
+        else {
+            let guestVouchers = {
+                voucher: {
+                    name: this.promoCode, 
+                    voucherCode: this.promoCode 
+                }
+            }
+            this.displayRedeem = false;
+            this.guestVouchers = guestVouchers;
+            this.selectVoucher(guestVouchers);
+            this.promoCode = '';
+        }
+
+        
+    }
+
+    openVoucherModal(icon: string, title: string, description: string, voucher: CustomerVoucher, isValid: boolean) : void {
+        
+        const dialogRef = this._dialog.open( 
+        VoucherModalComponent,{
+            data:{ 
+                icon,
+                title,
+                description,
+                voucher, 
+                isValid
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe();
     }
  
 }

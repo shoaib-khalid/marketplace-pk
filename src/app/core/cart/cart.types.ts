@@ -118,6 +118,7 @@ export interface DiscountOfCartGroup
     sumCartSubTotal                             : number;
     sumDeliveryDiscount                         : number;
     sumSubTotalDiscount                         : number;
+    platformVoucherName                         : string;
 }
 
 export interface StoreDiscountList
