@@ -21,6 +21,7 @@ import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featur
 import { _StoreProductsModule } from 'app/layout/common/_store-products/store-products.module';
 import { _StoreCategoriesModule } from 'app/layout/common/_store-categories/store-categories.module';
 import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -46,7 +47,11 @@ import { ErrorBackgroundModule } from 'app/shared/error-background/error-backgro
         FontAwesomeModule,
         _StoreProductsModule,
         _StoreCategoriesModule,
-        ErrorBackgroundModule
+        ErrorBackgroundModule,
+    ],
+    providers: [
+        // CurrencyPipe,
+        DatePipe
     ],
     exports     : [
         FontAwesomeModule,
