@@ -35,6 +35,7 @@
     "apexcharts": "3.33.1",
     "crypto-js": "3.3.0",
     "font-awesome": "^4.7.0",
+    "geolocation": "^0.2.0",
     "hammerjs": "^2.0.8",
     "highlight.js": "11.4.0",
     "jw-angular-pagination": "^1.2.0",
