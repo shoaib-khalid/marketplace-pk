@@ -119,10 +119,15 @@ export class CartService
                 // for cart notification header, normal default cartItem is 5
                 let pageSize: number = resolveCartHeader ? 99 : 5;
                 if (customerId){
-                    this.getCartsWithDetails({ page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader).subscribe();
+                    this.getCartsWithDetails({ page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader)
+                    .subscribe(cart => {
+                        // console.log('cart', cart);
+                        
+                    });
                 }
                 else if (cartIds && cartIds.length) {
-                    this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, includeEmptyCart: false}, resolveCartHeader).subscribe();
+                    this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, includeEmptyCart: false}, resolveCartHeader)
+                    .subscribe();
 
                 }
             })

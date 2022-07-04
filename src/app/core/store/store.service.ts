@@ -878,7 +878,7 @@ export class StoresService
         );
     }
 
-    getStoreSnooze() : Observable<any>
+    getStoreSnooze(storeId: string = null) : Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
         //let accessToken = this._jwt.getJwtPayload(this._authService.jwtAccessToken).act;
@@ -888,7 +888,7 @@ export class StoresService
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
         };
 
-        return this._httpClient.get<any>(productService + '/stores/' + this.storeId$ + '/timings/snooze', header)
+        return this._httpClient.get<any>(productService + '/stores/' + storeId + '/timings/snooze', header)
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from StoresService (getStoreSnooze)",response);

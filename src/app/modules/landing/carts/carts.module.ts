@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaginationModule } from 'app/layout/common/pagination/pagination.module';
 import { MatMenuModule } from '@angular/material/menu';
@@ -42,7 +42,8 @@ import { ErrorBackgroundModule } from 'app/shared/error-background/error-backgro
         FuseCardModule
     ],
     providers: [
-        CurrencyPipe
+        CurrencyPipe,
+        DatePipe
     ],
     bootstrap   : [
     ]

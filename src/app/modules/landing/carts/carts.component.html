@@ -62,184 +62,190 @@
                         <span></span>
                     </div>
                     <ng-container *ngFor="let cart of carts; let i = index">
-                        <div class="w-full border lg:border-0 lg:border-b lg:last:border-b-0 lg:border-gray-600 rounded-lg lg:rounded-none px-2 lg:px-0 py-4 mb-4 last:mb-0">
-                            <!-- Cart Header -->
-                            <div class="cart-title-grid grid w-full sticky pb-2 border-b">
-                                <!-- Checkbox all in cart -->
-                                <div class="flex items-start justify-center mt-2 w-full">
-                                    <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
-                                </div>
-                                <div class="flex flex-col justify-start ml-2 md:ml-4">
-                                    <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
-                                    <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span>
-                                    <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
-                                </div>
+                        <div class="relative w-full border lg:border-0 lg:border-b lg:last:border-b-0 lg:border-gray-600 rounded-lg lg:rounded-none mb-4 last:mb-0">
+                            <div *ngIf="isStoreClose(cart.storeId)" class="absolute bg-black bg-opacity-60 z-10 w-full h-full flex flex-col items-center justify-center rounded-lg lg:rounded">
+                                <span class="text-white text-3xl font-medium tracking-tight">Store is Closed</span>
+                                <span class="w-3/4 text-center text-white text-md lg:text-lg font-medium tracking-tight">{{storesOpening[i].message}}</span>
                             </div>
-                            <!-- Cart Items -->
-                            <ng-container *ngIf="cart.cartItems && cart.cartItems.length; else noCartItem">
-                                <ng-container *ngFor="let cartItem of cart.cartItems; let j = index">
-                                    <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
-                                        <!-- Checkbox each item -->
-                                        <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
-                                            <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
-                                        </div>
-                                        <!-- Image, Title, Variants -->
-                                        <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
-                                            <img class="w-14 max-w-14 max-h-14 min-h-14 sm:w-18 sm:max-w-18 sm:h-18 sm:max-h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
-                                            <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
-                                                <span class="text-md sm:text-md font-semibold line-clamp-2">{{cartItem.productName}}</span>
-                                                <div class="flex flex-row items-center">
-                                                    <!-- Display variants -->
-                                                    <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
-                                                        <ng-container *ngFor="let variant of cartItem.productInventory.productInventoryItems">
-                                                            <span class="leading-tight text-xs lg:text-sm text-secondary flex flex-wrap">{{variant.productVariantAvailable.productVariant.name}}: {{variant.productVariantAvailable.value}}</span>
-                                                            <span class="block last:hidden leading-tight text-xs lg:text-sm text-secondary">,&nbsp;</span>
+                            <div class="px-2 lg:px-0 py-4">
+                                <!-- Cart Header -->
+                                <div class="cart-title-grid grid w-full sticky pb-2 border-b">
+                                    <!-- Checkbox all in cart -->
+                                    <div class="flex items-start justify-center mt-2 w-full">
+                                        <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
+                                    </div>
+                                    <div class="flex flex-col justify-start ml-2 md:ml-4">
+                                        <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
+                                        <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span>
+                                        <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
+                                    </div>
+                                </div>
+                                <!-- Cart Items -->
+                                <ng-container *ngIf="cart.cartItems && cart.cartItems.length; else noCartItem">
+                                    <ng-container *ngFor="let cartItem of cart.cartItems; let j = index">
+                                        <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
+                                            <!-- Checkbox each item -->
+                                            <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
+                                                <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
+                                            </div>
+                                            <!-- Image, Title, Variants -->
+                                            <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
+                                                <img class="w-14 max-w-14 max-h-14 min-h-14 sm:w-18 sm:max-w-18 sm:h-18 sm:max-h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
+                                                <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
+                                                    <span class="text-md sm:text-md font-semibold line-clamp-2">{{cartItem.productName}}</span>
+                                                    <div class="flex flex-row items-center">
+                                                        <!-- Display variants -->
+                                                        <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
+                                                            <ng-container *ngFor="let variant of cartItem.productInventory.productInventoryItems">
+                                                                <span class="leading-tight text-xs lg:text-sm text-secondary flex flex-wrap">{{variant.productVariantAvailable.productVariant.name}}: {{variant.productVariantAvailable.value}}</span>
+                                                                <span class="block last:hidden leading-tight text-xs lg:text-sm text-secondary">,&nbsp;</span>
+                                                            </ng-container>
                                                         </ng-container>
-                                                    </ng-container>
-                                                    <!-- Display Combo -->
-                                                    <ng-container *ngIf="cartItem.cartSubItem.length > 0">
-                                                        <ng-container  *ngFor="let combo of cartItem.cartSubItem">
-                                                            <span class="leading-tight text-xs lg:text-sm text-secondary flex flex-wrap">{{combo.productName}}</span>
-                                                            <span class="block last:hidden leading-tight text-xs lg:text-sm text-secondary">,&nbsp;</span>
+                                                        <!-- Display Combo -->
+                                                        <ng-container *ngIf="cartItem.cartSubItem.length > 0">
+                                                            <ng-container  *ngFor="let combo of cartItem.cartSubItem">
+                                                                <span class="leading-tight text-xs lg:text-sm text-secondary flex flex-wrap">{{combo.productName}}</span>
+                                                                <span class="block last:hidden leading-tight text-xs lg:text-sm text-secondary">,&nbsp;</span>
+                                                            </ng-container>
                                                         </ng-container>
-                                                    </ng-container>
-                                                </div>
-                                                <!-- Quantity -->
-                                                <div class="block md:hidden flex flex-col justify-center items-center mt-0.5">
-                                                    <div class="flex flex-row h-6 w-16 justify-center items-center rounded-md relative border border-primary">
-                                                        <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="text-black hover:bg-primary h-full w-20 rounded-l-md cursor-pointer outline-none">
-                                                            <span class="flex justify-center text-sm">−</span>
-                                                        </button>
-                                                            <input 
-                                                                matInput
-                                                                (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
-                                                                type="number" 
-                                                                class="pt-[0.1rem] focus:outline-none text-center w-full font-semibold text-xs text-black focus:text-black md:text-base cursor-default flex items-center outline-none" 
-                                                                name="custom-input-number-small" 
-                                                                [value]="cartItem.quantity"/>
-                                                        <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="text-black hover:bg-primary h-full w-20 rounded-r-md cursor-pointer">
-                                                            <span class="flex justify-center text-sm">+</span>
-                                                        </button>
                                                     </div>
-                                                    <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
-                                                        <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
-                                                            <ng-container *ngIf="cartItem.productInventory.quantity > 1">
-                                                                <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
-                                                            </ng-container>
-                                                            <ng-container *ngIf="cartItem.productInventory.quantity <= 1">
-                                                                <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} item left</span>
+                                                    <!-- Quantity -->
+                                                    <div class="block md:hidden flex flex-col justify-center items-center mt-0.5">
+                                                        <div class="flex flex-row h-6 w-16 justify-center items-center rounded-md relative border border-primary">
+                                                            <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="text-black hover:bg-primary h-full w-20 rounded-l-md cursor-pointer outline-none">
+                                                                <span class="flex justify-center text-sm">−</span>
+                                                            </button>
+                                                                <input 
+                                                                    matInput
+                                                                    (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
+                                                                    type="number" 
+                                                                    class="pt-[0.1rem] focus:outline-none text-center w-full font-semibold text-xs text-black focus:text-black md:text-base cursor-default flex items-center outline-none" 
+                                                                    name="custom-input-number-small" 
+                                                                    [value]="cartItem.quantity"/>
+                                                            <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="text-black hover:bg-primary h-full w-20 rounded-r-md cursor-pointer">
+                                                                <span class="flex justify-center text-sm">+</span>
+                                                            </button>
+                                                        </div>
+                                                        <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
+                                                            <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
+                                                                <ng-container *ngIf="cartItem.productInventory.quantity > 1">
+                                                                    <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
+                                                                </ng-container>
+                                                                <ng-container *ngIf="cartItem.productInventory.quantity <= 1">
+                                                                    <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} item left</span>
+                                                                </ng-container>
                                                             </ng-container>
                                                         </ng-container>
-                                                    </ng-container>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <!-- Unit Price -->
-                                        <div class="hidden sm:flex flex-col justify-center items-center text-center px-1">
-                                            <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                            <span class="font-semibold text-sm md:text-md">{{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                        </div>
-                                        <!-- Quantity -->
-                                        <div class="hidden md:flex flex-col justify-center items-center mx-2">
-                                            <div class="flex flex-row h-6 w-16 justify-center items-center rounded-md relative border border-primary">
-                                                <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-l-md cursor-pointer outline-none">
-                                                    <span class="flex justify-center">−</span>
-                                                </button>
-                                                    <input
-                                                        (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
-                                                        type="number" 
-                                                        class="pt-[0.1rem] focus:outline-none text-center w-full font-semibold text-md text-black focus:text-black md:text-basecursor-default flex items-center outline-none" 
-                                                        name="custom-input-number" 
-                                                        [value]="cartItem.quantity"/>
-                                                <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-r-md cursor-pointer">
-                                                    <span class="flex justify-center">+</span>
-                                                </button>
+                                            <!-- Unit Price -->
+                                            <div class="hidden sm:flex flex-col justify-center items-center text-center px-1">
+                                                <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                <span class="font-semibold text-sm md:text-md">{{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                             </div>
-                                            <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
-                                                <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
-                                                    <ng-container *ngIf="cartItem.productInventory.quantity > 1">
-                                                        <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
-                                                    </ng-container>
-                                                    <ng-container *ngIf="cartItem.productInventory.quantity <= 1">
-                                                        <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} item left</span>
+                                            <!-- Quantity -->
+                                            <div class="hidden md:flex flex-col justify-center items-center mx-2">
+                                                <div class="flex flex-row h-6 w-16 justify-center items-center rounded-md relative border border-primary">
+                                                    <button (click)="checkQuantity(cart.id,cartItem,null,'decrement')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-l-md cursor-pointer outline-none">
+                                                        <span class="flex justify-center">−</span>
+                                                    </button>
+                                                        <input
+                                                            (change)="checkQuantity(cart.id,cartItem,$event.target.value)" 
+                                                            type="number" 
+                                                            class="pt-[0.1rem] focus:outline-none text-center w-full font-semibold text-md text-black focus:text-black md:text-basecursor-default flex items-center outline-none" 
+                                                            name="custom-input-number" 
+                                                            [value]="cartItem.quantity"/>
+                                                    <button (click)="checkQuantity(cart.id,cartItem,null,'increment')" class="pb-[0.1rem] text-black hover:bg-primary h-full w-20 rounded-r-md cursor-pointer">
+                                                        <span class="flex justify-center">+</span>
+                                                    </button>
+                                                </div>
+                                                <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
+                                                    <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
+                                                        <ng-container *ngIf="cartItem.productInventory.quantity > 1">
+                                                            <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="cartItem.productInventory.quantity <= 1">
+                                                            <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} item left</span>
+                                                        </ng-container>
                                                     </ng-container>
                                                 </ng-container>
-                                            </ng-container>
-                                        </div>
-                                        <!-- Total Price -->
-                                        <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md min-w-20 max-w-auto truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                        <!-- Remove Item -->
-                                        <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer">
-                                            <mat-icon 
-                                            (click)="deleteCartItem(cart.id, cartItem)"
-                                                class="icon-size-4" 
-                                                [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                                        </span>
-                                        <!-- Total Price , Unit Price , Remove button for sm-->
-                                        <div class="flex flex-col sm:hidden items-end justify-between">
+                                            </div>
+                                            <!-- Total Price -->
+                                            <span class="hidden sm:flex justify-center items-center font-semibold text-center text-sm md:text-md min-w-20 max-w-auto truncate">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                             <!-- Remove Item -->
-                                            <span class="flex justify-center items-center text-center px-1 cursor-pointer">
-                                                <mat-icon
-                                                    (click)="deleteCartItem(cart.id,cartItem)" 
+                                            <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer">
+                                                <mat-icon 
+                                                (click)="deleteCartItem(cart.id, cartItem)"
                                                     class="icon-size-4" 
                                                     [svgIcon]="'heroicons_solid:trash'"></mat-icon>
                                             </span>
-                                            <div class="flex flex-col w-26 justify-end items-end">
-                                                <!-- Unit Price -->
-                                                <div class="flex flex-col justify-center items-end text-center px-1">
-                                                    <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                    <span class="text-sm md:text-xs">{{cartItem.quantity}} x {{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                            <!-- Total Price , Unit Price , Remove button for sm-->
+                                            <div class="flex flex-col sm:hidden items-end justify-between">
+                                                <!-- Remove Item -->
+                                                <span class="flex justify-center items-center text-center px-1 cursor-pointer">
+                                                    <mat-icon
+                                                        (click)="deleteCartItem(cart.id,cartItem)" 
+                                                        class="icon-size-4" 
+                                                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                                </span>
+                                                <div class="flex flex-col w-26 justify-end items-end">
+                                                    <!-- Unit Price -->
+                                                    <div class="flex flex-col justify-center items-end text-center px-1">
+                                                        <span class="text-xs md:text-sm line-through">{{cartItem.normalPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                        <span class="text-sm md:text-xs">{{cartItem.quantity}} x {{cartItem.productPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                    </div>
+                                                    <!-- Total Price -->
+                                                    <span class="flex justify-center items-center font-semibold text-center text-sm md:text-md px-1">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                 </div>
-                                                <!-- Total Price -->
-                                                <span class="flex justify-center items-center font-semibold text-center text-sm md:text-md px-1">{{cartItem.price | currency: cart.store.regionCountry.currencySymbol}}</span>
                                             </div>
+                                        </div>
+                                    </ng-container>
+                                    <!-- Additional Info -->
+                                    <div class="flex flex-col mt-4">
+                                        <span class="text-secondary">Additional Information</span>
+                                        <div class="w-full flex flex-row text-center items-center my-2 text-sm sm:text-md"> 
+                                            <span class="mr-2">Order Notes (Optional)</span>
+                                            <span  *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === false" (click)="open(cart.id)" class="text-primary cursor-pointer">Insert Order Notes</span>
+                                            <span *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === true" (click)="close(cart.id)" class="text-primary cursor-pointer">Cancel</span>
+                                        </div>
+                                        <!-- Additional info -->
+                                        <mat-form-field *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === true"
+                                        @zoomIn @zoomOut class="w-full mt-2" floatLabel="always">
+                                            <textarea
+                                                matInput
+                                                [(ngModel)] ="selectedCart.carts[i + pagination.startIndex].description.value"
+                                                placeholder="Tell us when you prefer this order to be delivered or any special request you may have"
+                                                [rows]="full"
+                                                maxlength="100"
+                                                class="h-5 text-sm sm:text-md"
+                                                autocomplete="disabled"
+                                                matTextareaAutosize></textarea>
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Shipping Fee & Total Items -->
+                                    <div class="flex flex-row justify-between items-center">
+                                        <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
+                                            <span class="text-sm sm:text-md">Shipping Fee:</span>
+                                            <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
+                                            <span class="text-sm sm:text-md">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
+                                            <span class="font-semibold text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                         </div>
                                     </div>
                                 </ng-container>
-                                <!-- Additional Info -->
-                                <div class="flex flex-col mt-4">
-                                    <span class="text-secondary">Additional Information</span>
-                                    <div class="w-full flex flex-row text-center items-center my-2 text-sm sm:text-md"> 
-                                        <span class="mr-2">Order Notes (Optional)</span>
-                                        <span  *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === false" (click)="open(cart.id)" class="text-primary cursor-pointer">Insert Order Notes</span>
-                                        <span *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === true" (click)="close(cart.id)" class="text-primary cursor-pointer">Cancel</span>
+                                <ng-template #noCartItem>
+                                    <!-- Main -->
+                                    <div class="relative flex justify-center items-center w-full h-full md:h-96">
+                                        <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
+                                        <div class="flex flex-col w-full h-full items-center justify-center z-10">
+                                            <span class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">Cart is empty!</span>
+                                            <span class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">Shop now at {{cart.store.name}}</span>
+                                        </div>
                                     </div>
-                                    <!-- Additional info -->
-                                    <mat-form-field *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === true"
-                                    @zoomIn @zoomOut class="w-full mt-2" floatLabel="always">
-                                        <textarea
-                                            matInput
-                                            [(ngModel)] ="selectedCart.carts[i + pagination.startIndex].description.value"
-                                            placeholder="Tell us when you prefer this order to be delivered or any special request you may have"
-                                            [rows]="full"
-                                            maxlength="100"
-                                            class="h-5 text-sm sm:text-md"
-                                            autocomplete="disabled"
-                                            matTextareaAutosize></textarea>
-                                    </mat-form-field>
-                                </div>
-                                <!-- Shipping Fee & Total Items -->
-                                <div class="flex flex-row justify-between items-center">
-                                    <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
-                                        <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
-                                        <span class="text-sm sm:text-md">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
-                                        <span class="font-semibold text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
-                                    </div>
-                                </div>
-                            </ng-container>
-                            <ng-template #noCartItem>
-                                <!-- Main -->
-                                <div class="relative flex justify-center items-center w-full h-full md:h-96">
-                                    <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
-                                    <div class="flex flex-col w-full h-full items-center justify-center z-10">
-                                        <span class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">Cart is empty!</span>
-                                        <span class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">Shop now at {{cart.store.name}}</span>
-                                    </div>
-                                </div>
-                            </ng-template>
+                                </ng-template>
+                            </div>
                         </div>
                     </ng-container>
                 </div>
