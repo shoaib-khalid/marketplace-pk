@@ -1,4 +1,4 @@
-import { Store } from "../store/store.types";
+import { Store, StoreSnooze } from "../store/store.types";
 
 export interface Cart
 {
@@ -24,6 +24,7 @@ export interface CartWithDetails
     deliveryProviderId      : string;
     orderNote?              : string;
     storeOpen?              : boolean;
+    storeSnooze?            : StoreSnooze
 }
 
 export interface CartPagination
