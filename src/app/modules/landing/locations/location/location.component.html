@@ -20,7 +20,7 @@
                 <h2 class="text-xl text-white sm:text-2xl">{{location.cityDetails.name}}</h2>
                 <h2 *ngIf="category" class="text-lg text-white sm:text-xl">{{category.parentName}}</h2>
                 <div class="border-t w-40 border-white"></div>
-                <div class="max-w-2xl mt-2 sm:text-xl text-center text-secondary text-white">
+                <div class="max-w-2xl mt-2 sm:text-xl text-center text-white">
                     <span>
                         {{ storesPagination && storesPagination.length > 0 ? (storesPagination.length === 1 ? storesPagination.length + ' store' : storesPagination.length + ' stores') : '' }} 
                     </span>
@@ -36,7 +36,7 @@
         <!-- Content -->
         <div class="flex flex-col bg-card w-full px-2 sm:px-4 pb-4">
             <!-- Featured Categories -->
-            <featured-categories class="w-full" [categories]="categories" [showViewAll]="false" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Categories'" [swiper]="true"></featured-categories>
+            <featured-categories class="w-full" [selectedCategoryId]="categoryId" [categories]="categories" [showViewAll]="false" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Categories'" [swiper]="true"></featured-categories>
             <!-- Featured Products -->
             <ng-container *ngIf="(featuredProducts && featuredProducts.length) && !categoryId">
                 <featured-products class="w-full" [products]="featuredProducts" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Featured Products'"></featured-products>

@@ -81,17 +81,22 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
     @Input() location: any;
     @Input() title: string = "Categories";
     @Input() showViewAll: boolean = false;
+    @Input() selectedCategoryId: string = null;
     @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
     @Input() swiper: boolean = true;
     @Input() numberOfCols: number = 4;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    categoryId: string;
+
 
     /**
      * Constructor
      */
     constructor(
         private _platformService: PlatformService,
-        private _router: Router
+        private _router: Router,
+
     )
     {
     }
@@ -108,7 +113,7 @@ export class _FeaturedCategoriesComponent implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void
-    {
+    {   
         this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform)=>{
