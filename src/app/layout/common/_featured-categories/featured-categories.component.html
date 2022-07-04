@@ -5,12 +5,12 @@
                 <span class="font-semibold text-xl">{{title}}</span>
                 <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 md:gap-3 items-start w-full justify-between w-full mt-1 sm:mt-2">
+            <div class="grid grid-cols-4 gap-2 md:gap-3 items-start w-full justify-between mt-1 sm:mt-2">
                 <ng-container *ngFor="let category of categories">
                     <div class="flex flex-col w-full items-center cursor-pointer group" 
                         (click)="chooseCategory(category.parentId, location)">
                         <img
-                            class="w-16 sm:w-20 w-16 sm:h-20 object-contain group-hover:border-1 group-hover:p-0.5 items-start justify-start bg-stone-200 rounded-full shadow"
+                            class="w-16 sm:w-20 sm:h-20 object-contain group-hover:border-1 group-hover:p-0.5 items-start justify-start bg-stone-200 rounded-full shadow"
                             [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
                         <span class="w-full text-center group-hover:text-primary text-sm sm:text-md mt-2 font-semibold text-ellipsis overflow-hidden">{{category.parentName}}</span>
                     </div>
@@ -57,9 +57,9 @@
                             <div class="flex flex-col w-full items-center cursor-pointer group" 
                                 (click)="chooseCategory(category.parentId, location)">
                                 <img
-                                    class="w-16 sm:w-20 w-16 sm:h-20 object-contain group-hover:border-1 group-hover:p-0.5 items-start justify-start bg-stone-200 rounded-full shadow"
+                                    class="w-16 sm:w-20 sm:h-20 object-contain group-hover:border-1 group-hover:p-0.5 items-start justify-start bg-stone-200 rounded-full shadow"
                                     [src]="category.parentThumbnailUrl ? category.parentThumbnailUrl : platform.logo">
-                                <span class="w-full text-center group-hover:text-primary text-sm sm:text-md mt-2 font-semibold text-ellipsis overflow-hidden">{{category.parentName}}</span>
+                                <span [ngClass]="category.parentId === selectedCategoryId  ? 'text-primary font-extrabold' : '' " class="w-full text-center group-hover:text-primary text-sm sm:text-md mt-2 font-semibold text-ellipsis overflow-hidden">{{category.parentName}}</span>
                             </div>
                         </ng-template>
                     </ng-container>
