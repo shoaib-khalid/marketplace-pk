@@ -15,6 +15,7 @@ import { appRoutes } from 'app/app.routing';
 import { AppConfig } from 'app/config/service.config';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { HttpClientModule } from '@angular/common/http';
 
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
@@ -40,6 +41,8 @@ const routerConfig: ExtraOptions = {
 
         // Layout module of your application
         LayoutModule,
+
+        HttpClientModule,
 
         // 3rd party modules that require global configuration via forRoot
         MarkdownModule.forRoot({}),

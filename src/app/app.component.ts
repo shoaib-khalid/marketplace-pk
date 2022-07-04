@@ -115,21 +115,22 @@ export class AppComponent
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response:any)=>{
                 if (response) {
+                    
                     this.ipAddress = response.ip_addr;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._router.events.forEach((event) => {                
-            
+        this._router.events.forEach((event) => {   
+                        
             // if customerId null means guest
             let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
             
             //get domain
             var domain = this._apiServer.settings.marketplaceDomain;
             //get ip address info
-            var _IpActivity = this.ipAddress;
+            var _IpActivity = this.ipAddress;            
             
             //get session id by get cart id
             var _sessionId = null // this._cartService.cartId$ 
