@@ -468,7 +468,7 @@ export class BuyerCheckoutComponent implements OnInit
         
         // return
 
-        this._checkoutService.postPlaceGroupOrder(orderBodies, false, platformVoucherCode)
+        this._checkoutService.postPlaceGroupOrder(orderBodies, true, platformVoucherCode)
             .subscribe((response) => {
 
                 this.order = response;
