@@ -22,7 +22,6 @@ export class ModalConfirmationDeleteItemComponent implements OnInit {
 	ngOnInit(): void {
 		this.cartId = this.data['cartId'];
 		this.itemId = this.data['itemId'];
-
 	}
 
 	cancelButton() {
@@ -30,7 +29,7 @@ export class ModalConfirmationDeleteItemComponent implements OnInit {
 	}
 
 	deleteButton() {    
-		this._cartService.deleteCartItem(this.cartId, this.itemId).subscribe((response)=>{ this.dialogRef.close('OK'); });
+		this.dialogRef.close({ action: "OK", cartId: this.cartId, itemId: this.itemId });
 	}
 
 }

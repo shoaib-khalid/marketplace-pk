@@ -114,21 +114,29 @@ export class CartService
                 
                 let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
                 let cartIds: { id: string, storeId: string, cartItems: CartItem[]}[] = this.cartIds$ ? JSON.parse(this.cartIds$) : [];
+                
 
                 // if resolveCartHeader true, we'll query 99 (max) paginated pageSize
                 // for cart notification header, normal default cartItem is 5
                 let pageSize: number = resolveCartHeader ? 99 : 5;
                 if (customerId){
                     this.getCartsWithDetails({ page: 0, pageSize: pageSize, customerId: customerId, includeEmptyCart: false}, resolveCartHeader)
-                    .subscribe(cart => {
-                        // console.log('cart', cart);
-                        
+                    .subscribe(cart => {                        
                     });
                 }
                 else if (cartIds && cartIds.length) {
                     this.getCartsWithDetails({ cartIdList: cartIds.map(item => item.id), page: 0, pageSize: pageSize, includeEmptyCart: false}, resolveCartHeader)
-                    .subscribe();
-
+                        .subscribe((response: CartWithDetails[])=>{
+                            if (response) {
+                                this.cartIds = JSON.stringify(response.map(item => {
+                                    return {
+                                        id: item.id,
+                                        cartItems: item.cartItems,
+                                        storeId: item.storeId
+                                    }
+                                }));
+                            }
+                        });
                 }
             })
         );
@@ -184,7 +192,7 @@ export class CartService
         customerId              : null,
         includeEmptyCart        : false,
     }, isNotificationCounter: boolean = false):
-    Observable<{ pagination: CartPagination; carts: Cart[] }>
+    Observable<any>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
@@ -206,7 +214,7 @@ export class CartService
         });        
 
         return this._httpClient.get<any>(orderService +'/carts/details', header).pipe(
-            tap((response) => {
+            map((response) => {
 
                 this._logging.debug("Response from CartService (getCartsHeaderWithDetails) " + (isNotificationCounter ? "Cart Header Notification" : "Cart Items") ,response);
 
@@ -225,6 +233,8 @@ export class CartService
                     this._cartsWithDetailsPagination.next(_pagination);
                     this._cartsWithDetails.next(response.data.content);
                 }
+
+                return response["data"].content;
             })
         );
     }
@@ -438,7 +448,7 @@ export class CartService
         );
     }
 
-    deleteCartItem(cartId: string, itemId: string):  Observable<CartItem>
+    deleteCartItem(cartId: string, itemId: string, resolveCartHeader: boolean = false):  Observable<CartItem>
     {
         let orderService = this._apiServer.settings.apiServer.orderService;
         //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
@@ -455,11 +465,11 @@ export class CartService
                 map((response) => {
                     this._logging.debug("Response from CartService (deleteCartItem)",response);
 
-                    let index = cartsWithDetails.findIndex(item => item.id === itemId);
-
-                    if (index > -1) {
+                    let cartIdIndex = cartsWithDetails.findIndex(item => item.id === cartId);
+                    let cartItemIdIndex = cartIdIndex > -1 ? cartsWithDetails[cartIdIndex].cartItems.findIndex(item => item.id === itemId) : -1;
+                    if (cartItemIdIndex > -1) {
                         // Delete the cartItems
-                        cartsWithDetails.splice(index, 1);
+                        cartsWithDetails[cartIdIndex].cartItems.splice(cartItemIdIndex, 1);
 
                         // Update the products
                         this._cartsWithDetails.next(cartsWithDetails);

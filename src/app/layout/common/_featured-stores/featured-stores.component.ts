@@ -284,7 +284,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                         }
                     } else {
 
-                        console.warn("We are CLOSED today");
+                        // console.warn("We are CLOSED today");
                         
                         // ------------------------
                         // Find next available day

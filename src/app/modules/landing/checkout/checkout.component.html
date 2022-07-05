@@ -192,9 +192,9 @@
             </div>
 
             <!-- Cart Summary -->
-            <div class="flex flex-col w-full md:w-140 md:ml-6 md:mt-8">
+            <div class="flex flex-col w-full md:w-140 md:ml-6 md:mt-8 mt-4">
                 <!-- Cart Summary -->
-                <div class="flex flex-col border rounded-lg p-2 mb-4">
+                <div class="flex flex-col border rounded-lg p-2">
                     <!-- Header -->
                     <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                         <mat-icon 
@@ -251,14 +251,18 @@
                         </div>
                     </ng-container>
 
-                    <div class="flex flex-row justify-between mt-2">
-                        <span class="text-md text-secondary">Shipping Fee Discount</span>
-                        <span class="text-md font-semibold">{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
-                    </div>
+                    <ng-container *ngIf="paymentDetails.deliveryDiscount != 0">
+                        <div class="flex flex-row justify-between mt-2">
+                            <span class="text-md text-secondary">Shipping Fee Discount</span>
+                            <span class="text-md font-semibold">{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
+                        </div>
+                    </ng-container>
+
                     <!-- <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Store Voucher</span>
                         <span class="text-md font-semibold">RM 5.00</span>
                     </div> -->
+
                     <div class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
                         <span class="text-md font-semibold">-{{paymentDetails.platformVoucherSubTotalDiscount | currency: platform.currency}}</span>
@@ -285,7 +289,7 @@
                     </button>
                 </div>
                 <!-- Delivery Address (md) -->
-                <div class="hidden md:block flex flex-col justify-center items-center border rounded-lg p-2">
+                <div class="hidden md:block flex flex-col justify-center items-center border rounded-lg p-2 mt-4">
                     <!-- Header -->
                     <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
                         <mat-icon 

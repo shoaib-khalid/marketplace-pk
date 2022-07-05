@@ -609,7 +609,7 @@ export class LandingStoreComponent implements OnInit
                         }
                     } else {
 
-                        console.warn("We are CLOSED today");
+                        // console.warn("We are CLOSED today");
                         
                         // ------------------------
                         // Find next available day

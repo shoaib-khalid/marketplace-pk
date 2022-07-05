@@ -557,10 +557,10 @@ export class LandingProductDetailsComponent implements OnInit
             }
         }
 
-
         // -----------------
         // Provisioning
         // -----------------
+        
         
         let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
@@ -570,7 +570,11 @@ export class LandingProductDetailsComponent implements OnInit
                 .subscribe((customerCart: CustomerCart) => {
                     let cartIndex = customerCart.cartList.findIndex(item => item.storeId === this.store.id);
                     if (cartIndex > -1) { // Cart of store belong to the customer found
-                        this.postCartItem(customerCart.cartList[cartIndex].id);
+                        this.postCartItem(customerCart.cartList[cartIndex].id).then(()=>{
+                            // Re-resolve the cart
+                            this._cartService.cartResolver().subscribe();
+                            this._cartService.cartResolver(true).subscribe();
+                        });
                     } else { // No cart found for that customer
                         const cart = {
                             customerId  : customerId, 
@@ -580,8 +584,12 @@ export class LandingProductDetailsComponent implements OnInit
                         this._cartService.createCart(cart)
                             .subscribe((cart: Cart)=>{
                                 // Post it to cart
-                                this.postCartItem(cart.id);
-                            })
+                                this.postCartItem(cart.id).then(()=>{
+                                    // Re-resolve the cart
+                                    this._cartService.cartResolver().subscribe();
+                                    this._cartService.cartResolver(true).subscribe();
+                                });
+                            });
                     }
                 });
         } else {
@@ -591,15 +599,21 @@ export class LandingProductDetailsComponent implements OnInit
                 if (cartIndex > -1) { // update cartItems if cartId exists
                     if (cartIds[cartIndex].cartItems.length > 9) {
                         console.error("Guest only allowed 10 cartItems only");
+                        alert("Guest only allowed 10 cartItems only");
                     } else {
                         this.postCartItem(cartIds[cartIndex].id).then((response: CartItem)=>{
                             cartIds[cartIndex].cartItems.push(response);
                             this._cartService.cartIds = JSON.stringify(cartIds);
+
+                            // Re-resolve the cart
+                            this._cartService.cartResolver().subscribe();
+                            this._cartService.cartResolver(true).subscribe();
                         });
                     }
                 } else { // New cart to be pushed
                     if (cartIds.length > 4) { // Too many in local storage
                         console.error("Guest only allowed 5 carts only");
+                        alert("Guest only allowed 5 carts only");
                     } else {
                         const cart = {
                             customerId  : null, 
@@ -618,6 +632,10 @@ export class LandingProductDetailsComponent implements OnInit
                                     });
 
                                     this._cartService.cartIds = JSON.stringify(cartIds);
+
+                                    // Re-resolve the cart
+                                    this._cartService.cartResolver().subscribe();
+                                    this._cartService.cartResolver(true).subscribe();
                                 });
                             })
                     }
@@ -640,6 +658,10 @@ export class LandingProductDetailsComponent implements OnInit
                             }];
 
                             this._cartService.cartIds = JSON.stringify(cartIds);
+
+                            // Re-resolve the cart
+                            this._cartService.cartResolver().subscribe();
+                            this._cartService.cartResolver(true).subscribe();
                         });
                     });
             }
@@ -1078,7 +1100,7 @@ export class LandingProductDetailsComponent implements OnInit
                         }
                     } else {
 
-                        console.warn("We are CLOSED today");
+                        // console.warn("We are CLOSED today");
                         
                         // ------------------------
                         // Find next available day

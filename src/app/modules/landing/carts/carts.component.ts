@@ -715,11 +715,12 @@ export class CartListComponent implements OnInit, OnDestroy
 
     deleteCartItem(cartId: string, cartItem: CartWithDetails){
 
-        let selectedCartIndex = this.selectedCart.carts.findIndex(cart => cart.id === cartId)
-        let selectionStatusIndex = this.selectedCart.carts[selectedCartIndex].cartItem.findIndex(item => item.id === cartItem.id && (item.selected === true))
+        let cartIndex = this.selectedCart.carts.findIndex(cart => cart.id === cartId);
+        let cartItemIndex = cartIndex ? this.carts[cartIndex].cartItems.findIndex(item => item.id === cartItem.id) : -1;
+        let isCartItemIsSelectedIndex = cartIndex > -1 ? this.selectedCart.carts[cartIndex].cartItem.findIndex(item => item.id === cartItem.id && (item.selected === true)) : -1;
 
         // If more than -1 means it is selected
-        if (selectionStatusIndex > -1) {
+        if (isCartItemIsSelectedIndex > -1) {
 
             const confirmation = this._fuseConfirmationService.open({
                 title  : 'Unable To Delete Item',
@@ -742,24 +743,21 @@ export class CartListComponent implements OnInit, OnDestroy
             return;
         }
 
-        //To make custom pop up, and we pass the details in paramter data
+        // To make custom pop up, and we pass the details in paramter data
+        // Deletion will occur at service level, here we'll only call the resolver
         let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
         dialogRef.afterClosed().subscribe((result) => {    
+            if (result && result.action === 'OK') {
 
-            if (result === 'OK') {
-                let cartIndex = this.carts.findIndex(cart => cart.id === cartId);        
-                let cartitemIndex = this.carts[cartIndex].cartItems.findIndex(item => item.id === cartItem.id);
-
-                let selectedCartItemIndex = this.selectedCart.carts[selectedCartIndex].cartItem.findIndex(item => item.id === cartItem.id);
-
-                this.carts[cartIndex].cartItems.splice(cartitemIndex, 1);
-                this.selectedCart.carts[selectedCartIndex].cartItem.splice(selectedCartItemIndex, 1);
+                this._cartService.deleteCartItem(result.cartId, result.itemId).subscribe((response)=>{
+                    // Resolve cart after deletion
+                    this._cartService.cartResolver().subscribe();
+                    this._cartService.cartResolver(true).subscribe();
+                });
         
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
-            }
-            
-
+            } 
         });
     }
 
@@ -1100,7 +1098,7 @@ export class CartListComponent implements OnInit, OnDestroy
                         }
                     } else {
 
-                        console.warn("We are CLOSED today");
+                        // console.warn("We are CLOSED today");
                         
                         // ------------------------
                         // Find next available day
