@@ -31,10 +31,10 @@
     {
       "name": "config-api",
       "urls": [
-        "https://dev-my.symplified.ai/assets/config/config.prod.json",
-        "https://dev-pk.symplified.ai/assets/config/config.prod.json",
-        "https://deliverin.my/assets/config/config.prod.json",
-        "https://easydukan.co/assets/config/config.prod.json"
+        "^https://dev-my.symplified.ai/assets/**",
+        "^https://dev-pk.symplified.ai/assets/config/**",
+        "^https://deliverin.my/assets/config/**",
+        "^https://easydukan.co/assets/config/**"
       ],
       "cacheConfig": {
         "strategy": "freshness",
