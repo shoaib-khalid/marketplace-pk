@@ -44,9 +44,10 @@ export interface Store
     storeAssets?: StoreAssets[];
     storeLogoUrl: string;
     displayAddress: string;
-    isSnooze: boolean;
-    snoozeEndTime: string;
-    snoozeReason: boolean;
+    // isSnooze: boolean;
+    // snoozeEndTime: string;
+    // snoozeReason: boolean;
+    storeSnooze: StoreSnooze;
 }
 
 export interface CreateStore

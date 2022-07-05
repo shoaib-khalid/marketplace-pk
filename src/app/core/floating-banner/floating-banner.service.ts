@@ -121,21 +121,4 @@ export class FloatingBannerService
         this._promoSmall.next(null);
     }
 
-    /**
-     * Set floating banners
-     * 
-     * @param cartId 
-     * @param storeId 
-     */
-    setBanners(cartId: string, storeId: string) {
-
-        let fullUrl = (this._platformLocation as any).location.origin;
-        let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
-        let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
-                '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) + '&guestCartId=' + cartId + '&storeId=' + storeId;
-
-        this.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
-        this.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl);
-    }
-
 }
