@@ -1044,7 +1044,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             this.storesOpening[storeOpeningIndex].storeId = storeId;
                                             this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -1128,7 +1128,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -1167,7 +1167,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }

@@ -194,7 +194,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             storesOpening[storeOpeningIndex].storeId = storeId;
                                             storesOpening[storeOpeningIndex].isOpen = false;
@@ -278,7 +278,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -317,7 +317,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }
