@@ -36,6 +36,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
     currentScreenSize: string[] = [];
 
     url:any;
+    customerId: string;
 
     /**
     * Constructor
@@ -57,7 +58,9 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
     ngOnInit(): void {
 
+
         this.url = this._domSanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q='+'3.060279,%20101.578040'+'&t=&z=15&ie=UTF8&iwloc=&output=embed');
+        this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
         // Create the form
         this.accountForm = this._formBuilder.group({
@@ -72,6 +75,8 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             .subscribe((response)=>{
                 this.accountForm.patchValue(response);
             })
+
+        this._userService.getCustomerAddresses().subscribe();
 
         this._userService.customersAddresses$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -178,9 +183,9 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         const dialogRef = this._dialog.open( 
             EditAddressDialog, {
                 width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '90vh',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '90vh',
                 disableClose: true,
                 data: {
                     type: "create",
@@ -190,10 +195,28 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             }
         );    
         dialogRef.afterClosed().subscribe(result=>{
+            
+            let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
+            
             if (result) {
-                //Customer Addresses
-                this._userService.createCustomerAddress(result)
+    
+                if (this.customerId) {
+                    //Customer Addresses
+                    this._userService.createCustomerAddress(result)
                     .subscribe(()=>{});
+                }
+                else {
+                    let date = new Date;
+                    let length = guestAddresses.length;
+                    result.id = ((length + 1).toString()).concat(date.toISOString());
+                    this._userService.customersAddress = result;
+                    guestAddresses.push(result);
+
+                    // Set to local
+                    this._userService.guestAddress = JSON.stringify(guestAddresses);
+                    this.customersAddresses = guestAddresses;
+                }
+                
             }
         });
     }
@@ -236,16 +259,53 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             // If the confirm button pressed...
             if ( result === 'confirmed' )
             {
-                // Delete the customer on the server
-                this._userService.deleteCustomerAddressById(customerAddressId)
-                .subscribe(() => {});
+                if (this.customerId) {
+                    // Delete the customer on the server
+                    this._userService.deleteCustomerAddressById(customerAddressId)
+                    .subscribe(() => {});
+
+                }
+                else {
+                    let index = this.customersAddresses.findIndex(item => item.id === customerAddressId);
+
+                    if (index > -1) {
+
+                        // Delete the address
+                        this.customersAddresses.splice(index, 1);
+
+                        // Update the address
+                        this._userService.customersAddresses = this.customersAddresses;
+
+                        // Set to local
+                        this._userService.guestAddress = JSON.stringify(this.customersAddresses);
+
+                    }
+                    
+                }
             }
         });
     }
 
-    setAsDefault(customerbody){
-        // Customer Addresses
-        this._userService.setDefaultCustomerAddressById(customerbody).subscribe(()=>{});
+    setAsDefault(customerbody) {
+        if (this.customerId) {
+            // Customer Addresses
+            this._userService.setDefaultCustomerAddressById(customerbody).subscribe((resp)=>{
+            });
+            // this.selectAddress(customerbody.id);
+        }
+        else {
+            this.customersAddresses.forEach(item => {
+                item.isDefault = false;
+            })
+
+            let index = this.customersAddresses.findIndex(addr => addr === customerbody)
+
+            if (index > -1) {
+                this.customersAddresses[index].isDefault = true;
+                this._userService.guestAddress = JSON.stringify(this.customersAddresses);
+                // this.selectAddress(customerbody.id);
+            }
+        }
     }
 
     selectAddress(addressId) {

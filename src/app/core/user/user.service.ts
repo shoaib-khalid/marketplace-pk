@@ -116,6 +116,22 @@ export class UserService
         // Store the value
         this._customerAddress.next(value);
     }
+
+    /**
+     * Setter for guestAddress
+     */
+    set guestAddress(value: string)
+    {
+        localStorage.setItem('guestAddresses', value);
+    }
+
+    /**
+     * Getter for guestAddress
+     */
+    get guestAddress$(): any
+    {
+        return localStorage.getItem('guestAddresses') ?? '';
+    }
          
 
     // -----------------------------------------------------------------------------------------------------
@@ -195,31 +211,54 @@ export class UserService
      *Customer Address Controller
      ===========================================
      */
-    getCustomerAddresses()
+    getCustomerAddresses(): Observable<any>
     {
         let userService = this._apiServer.settings.apiServer.userService;
         let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
-        };
-
-        return this._httpClient.get<any>(userService + "/customer/" + customerId +'/address', header)
-            .pipe(
-                tap((address: CustomerAddress) => {
-                    this._logging.debug("Response from UserService (getCustomerAddresses)",address);
-                    this._customerAddresses.next(address["data"].content);
-
-                    let defaultAddressIndex = address["data"].content.findIndex(item => item.isDefault === true);
-                    
-                    if (defaultAddressIndex > -1) {
-                        this._customerAddress.next(address["data"].content[defaultAddressIndex]);
-                    } else {
-                        this._customerAddress.next(address["data"].content[0]);
+        if (customerId) {
+            const header = {
+                headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+            };
+    
+            return this._httpClient.get<any>(userService + "/customer/" + customerId +'/address', header)
+                .pipe(
+                    tap((address: CustomerAddress) => {
+                        this._logging.debug("Response from UserService (getCustomerAddresses)",address);
+                        this._customerAddresses.next(address["data"].content);
+    
+                        let defaultAddressIndex = address["data"].content.findIndex(item => item.isDefault === true);
+                        
+                        if (defaultAddressIndex > -1) {
+                            this._customerAddress.next(address["data"].content[defaultAddressIndex]);
+                        } else {
+                            this._customerAddress.next(address["data"].content[0]);
+                        }
                     }
-                }
-            )
-        );
+                )
+            );
+
+        }
+        else {
+            return of({})
+                .pipe(
+                    map(resp => {
+
+                        let addresses = this.guestAddress$ ? JSON.parse(this.guestAddress$) : [];
+
+                        let defaultAddressIndex = addresses.findIndex(item => item.isDefault === true);
+                        
+                        this._customerAddresses.next(addresses);
+                        
+                        if (defaultAddressIndex > -1) {
+                            this._customerAddress.next(addresses[defaultAddressIndex]);
+                        } else {
+                            this._customerAddress.next(addresses[0]);
+                        }
+                        
+                    })
+                );
+        }
     }
 
     getSelectedCustomerAddress(id: string): Observable<CustomerAddress>
@@ -341,8 +380,10 @@ export class UserService
                     if (addresses) {
                         // Update the address with the new discount
                         this._customerAddresses.next([newAddress["data"], ...addresses]);
+                        this._customerAddress.next(newAddress["data"]);
                     } else {
                         this._customerAddresses.next([newAddress["data"]]);
+                        this._customerAddress.next(newAddress["data"]);
                     }
 
                     // Return the new discount
