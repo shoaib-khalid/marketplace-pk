@@ -167,7 +167,8 @@ export class CartListComponent implements OnInit, OnDestroy
             },
             deliveryQuotationId: string,
             deliveryType: string,
-            deliveryProviderId: string
+            deliveryProviderId: string,
+            deliveryErrorMessage?: string
         }[], 
         selected: boolean 
     };
@@ -814,19 +815,25 @@ export class CartListComponent implements OnInit, OnDestroy
                 deliveryProviderResponse.forEach(item => {
                     let cartIndex = this.selectedCart.carts.findIndex(element => element.id == item.cartId);
                     if (cartIndex > -1) {
-                        let minDeliveryCharges = Math.min(...item.quotation.map(item => item.price));
-                        let maxDeliveryCharges = Math.max(...item.quotation.map(item => item.price));
+                        let minDeliveryCharges = Math.min(...item.quotation.map(element => element.price));
+                        let maxDeliveryCharges = Math.max(...item.quotation.map(element => element.price));
                         
                         this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
                         this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
     
                         // find index at response to find the minimum price charges
-                        let minDeliveryChargesIndex = item.quotation.findIndex(item => item.price === minDeliveryCharges);
+                        let minDeliveryChargesIndex = item.quotation.findIndex(element => element.price === minDeliveryCharges);
     
-                        if (item[minDeliveryChargesIndex]) {
-                            this.selectedCart.carts[cartIndex].deliveryQuotationId = item[minDeliveryChargesIndex].refId;
-                            this.selectedCart.carts[cartIndex].deliveryType = item[minDeliveryChargesIndex].deliveryType;
-                            this.selectedCart.carts[cartIndex].deliveryProviderId = item[minDeliveryChargesIndex].providerId;
+                        
+                        if (item.quotation[minDeliveryChargesIndex] && !item.quotation[minDeliveryChargesIndex].isError) {                            
+                            this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[minDeliveryChargesIndex].refId;
+                            this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
+                            this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
+                        } else {
+                            this.selectedCart.carts[cartIndex].deliveryQuotationId = null;
+                            this.selectedCart.carts[cartIndex].deliveryType = null;
+                            this.selectedCart.carts[cartIndex].deliveryProviderId = null;
+                            this.selectedCart.carts[cartIndex].deliveryErrorMessage = item.quotation[minDeliveryChargesIndex].message;
                         }
                     }
                 });
@@ -836,6 +843,9 @@ export class CartListComponent implements OnInit, OnDestroy
     getDeliveryChargesRange(index: number) : string 
     {
         if (this.selectedCart.carts[index]) {
+            if (this.selectedCart.carts[index].deliveryQuotationId === null) {
+                return this.selectedCart.carts[index].deliveryErrorMessage;
+            }
             if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
             } else {

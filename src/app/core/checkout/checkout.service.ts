@@ -304,7 +304,7 @@ export class CheckoutService
         return this._httpClient.post<any>(deliveryService + '/orders/getPrices', deliveryCharges, header)
             .pipe(
                 map((response) => {
-                    this._logging.debug("Response from StoresService (postToRetrieveDeliveryCharges)",response);
+                    this._logging.debug("Response from StoresService (postToRetrieveDeliveriesCharges)",response);
 
                     return response["data"];
                 })
