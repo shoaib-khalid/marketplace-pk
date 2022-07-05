@@ -1,4 +1,4 @@
-import { DatePipe, DOCUMENT } from '@angular/common';
+import { DatePipe, DOCUMENT, ViewportScroller } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -115,6 +115,8 @@ export class LandingStoreComponent implements OnInit
         private _route: ActivatedRoute,
         private _searchService: SearchService,
         private _datePipe: DatePipe,
+        private _scroller: ViewportScroller,
+
     )
     {
         this._matIconRegistry
@@ -134,6 +136,18 @@ export class LandingStoreComponent implements OnInit
                 if (platform) {
                     this.platform = platform;
                 }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get the products pagination
+        this._productsService.pagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: ProductPagination) => {
+                
+                // Update the pagination
+                this.pagination = pagination;                
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -187,9 +201,9 @@ export class LandingStoreComponent implements OnInit
                                     this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
                                 }
                             
-                                // we'll get the previous url, any url split by / that have length more than 3 will considered product page
-                                // after user click back from product page , we'll maintain it's previous pagination 
-                                if (this._storeService.getPreviousUrl() && this._storeService.getPreviousUrl().split("/").length > 3) {                            
+                                // get back the previous pagination page
+                                // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                                if (this._storeService.getPreviousUrl() && this._storeService.getPreviousUrl().split("/").length > 4) {                            
                                     this.oldPaginationIndex = this.pagination ? this.pagination.page : 0;
                                 }
     
@@ -246,18 +260,6 @@ export class LandingStoreComponent implements OnInit
 
         // Get the products
         this.products$ = this._productsService.products$;        
-
-        // Get the products pagination
-        this._productsService.pagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: ProductPagination) => {
-                
-                // Update the pagination
-                this.pagination = pagination;                
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
@@ -666,6 +668,10 @@ export class LandingStoreComponent implements OnInit
             return true;
         else 
             return false;
+    }
+
+    scroll(id) {
+        this._scroller.scrollToAnchor(id)
     }
 
 }

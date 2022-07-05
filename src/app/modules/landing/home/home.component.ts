@@ -11,6 +11,7 @@ import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { ViewportScroller } from '@angular/common';
+import { NavigateService } from 'app/core/navigate-url/navigate.service';
 
 @Component({
     selector     : 'landing-home',
@@ -35,12 +36,15 @@ export class LandingHomeComponent implements OnInit
     featuredStoresPageOfItems: Array<any>;
     storesViewAll : boolean = false;
     featuredStorePageSize = 10;
+    oldFeaturedStoresPaginationIndex: number = 0;
+
 
     featuredProducts: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     productsViewAll : boolean = false;
     featuredProductPageSize = 30;
+    oldFeaturedProductsPaginationIndex: number = 0;
 
     isLoading: boolean = false;
     currentScreenSize: string[] = [];
@@ -57,12 +61,37 @@ export class LandingHomeComponent implements OnInit
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _apiServer: AppConfig,
-        private _scroller: ViewportScroller
+        private _scroller: ViewportScroller,
+        private _navigate: NavigateService
     )
     {
     }
 
     ngOnInit(): void {
+
+        // Get featured product pagination
+        this._locationService.featuredProductPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((productsPagination) => {
+                if (productsPagination) {
+                    this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
+                    this.featuredProductsPagination = productsPagination; 
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+        
+        // Get featured stores pagination
+        this._locationService.featuredStorePagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((storesPagination) => {
+                if (storesPagination) {
+                    this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
+                    this.featuredStoresPagination = storesPagination;  
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get platform data
         this._platformsService.platform$
@@ -71,23 +100,30 @@ export class LandingHomeComponent implements OnInit
                 if (platform) {
                     this.platform = platform;
 
+                    // get back the previous pagination page
+                    // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                    if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
+                        this.oldFeaturedStoresPaginationIndex = this.featuredStoresPagination ? this.featuredStoresPagination.page : 0;
+                        this.oldFeaturedProductsPaginationIndex = this.featuredProductsPagination ? this.featuredProductsPagination.page : 0;
+                    }
+
                     // Get categories
-                    this._locationService.getParentCategories({pageSize: 50, regionCountryId: this.platform.country })
+                    this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
                         .subscribe((category : ParentCategory[]) => {
                         });
 
                     // Get locations
-                        this._locationService.getFeaturedLocations({pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                            .subscribe((location : LandingLocation[]) => {
-                            });
+                    this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                        .subscribe((location : LandingLocation[]) => {
+                        });
 
                     // Get featured stores
-                    this._locationService.getFeaturedStores({pageSize: this.featuredStorePageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedStores({ page: this.oldFeaturedStoresPaginationIndex, pageSize: this.featuredStorePageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((stores : StoresDetails[]) => {
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({ page: this.oldFeaturedProductsPaginationIndex, pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }
@@ -129,36 +165,12 @@ export class LandingHomeComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get featured product pagination
-        this._locationService.featuredProductPagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((productsPagination) => {
-                if (productsPagination) {
-                    this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
-                    this.featuredProductsPagination = productsPagination; 
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
         // Get featured stores
         this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores) => {
                 if (stores) {
                     this.featuredStores = stores;  
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get featured stores pagination
-        this._locationService.featuredStorePagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((storesPagination) => {
-                if (storesPagination) {
-                    this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
-                    this.featuredStoresPagination = storesPagination;  
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

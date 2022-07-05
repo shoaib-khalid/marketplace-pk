@@ -16,6 +16,7 @@ export class ProductsService
     private _product: BehaviorSubject<Product | null> = new BehaviorSubject(null);
     private _products: BehaviorSubject<Product[] | null> = new BehaviorSubject(null);
     private _pagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
+    private _popularProducts: BehaviorSubject<Product[] | null> = new BehaviorSubject(null);
 
     private _variant: BehaviorSubject<ProductVariant | null> = new BehaviorSubject(null);
     private _variants: BehaviorSubject<ProductVariant[] | null> = new BehaviorSubject(null);
@@ -59,6 +60,14 @@ export class ProductsService
     get products$(): Observable<Product[]>
     {
         return this._products.asObservable();
+    }
+
+    /**
+     * Getter for popular products
+     */
+    get popularProducts$(): Observable<Product[]>
+    {
+        return this._popularProducts.asObservable();
     }
 
     /**
@@ -134,7 +143,7 @@ export class ProductsService
      * @param order
      * @param search
      */
-    getProducts(page: number = 0, size: number = 20, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', status: string = 'ACTIVE,INACTIVE', categoryId: string = null):
+    getProducts(page: number = 0, size: number = 20, sort: string = 'name', order: 'asc' | 'desc' | '' = 'asc', search: string = '', status: string = 'ACTIVE,INACTIVE', categoryId: string = null, isPopular: boolean = false):
         Observable<{ pagination: ProductPagination; products: Product[] }>
     {
         let productService = this._apiServer.settings.apiServer.productService;
@@ -159,18 +168,24 @@ export class ProductsService
         return this._httpClient.get<any>(productService +'/stores/'+this.storeId$+'/products', header).pipe(
             tap((response) => {
 
-                this._logging.debug("Response from ProductsService (getProducts)",response);
+                this._logging.debug("Response from ProductsService (getProducts)" + (isPopular ? " Popular" : "") ,response);
 
-                let _pagination = {
-                    length: response.data.totalElements,
-                    size: response.data.size,
-                    page: response.data.number,
-                    lastPage: response.data.totalPages,
-                    startIndex: response.data.pageable.offset,
-                    endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                if (isPopular) {
+                    this._popularProducts.next(response.data.content);
                 }
-                this._pagination.next(_pagination);
-                this._products.next(response.data.content);
+                else {
+                    let _pagination = {
+                        length: response.data.totalElements,
+                        size: response.data.size,
+                        page: response.data.number,
+                        lastPage: response.data.totalPages,
+                        startIndex: response.data.pageable.offset,
+                        endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
+                    }
+                    this._pagination.next(_pagination);
+                    this._products.next(response.data.content);
+                }
+
             })
         );
     }

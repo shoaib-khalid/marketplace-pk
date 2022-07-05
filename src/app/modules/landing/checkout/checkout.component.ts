@@ -457,7 +457,7 @@ export class BuyerCheckoutComponent implements OnInit
                     state: this.customerAddress.state,
                     storePickup: false,
                     zipcode: this.customerAddress.postCode,
-                    deliveryProviderId: null, // deliveryProviderId not needed if it's a store pickup
+                    deliveryProviderId: checkout.deliveryProviderId,
                     deliveryType: checkout.deliveryType ? checkout.deliveryType : null
                 }
 

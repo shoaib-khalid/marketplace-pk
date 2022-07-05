@@ -371,10 +371,11 @@ export class LandingProductDetailsComponent implements OnInit
                         });
     
                     // get all products
-                    this._productsService.products$
+                    this._productsService.popularProducts$
                         .subscribe((products: Product[]) => {
                             // Shuffle the array
-                            this.products = this.shuffle(products); 
+                            // this.products = this.shuffle(products); 
+                            this.products = products;
                         })
     
                     // Get the products pagination
