@@ -180,12 +180,39 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
     }
 
     addAddress() {
+
+        let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
+        let length = guestAddresses.length;
+
+        if (!this.customerId && length > 4) {
+            const confirmation = this._fuseConfirmationService.open({
+                title  : 'Unable to Add Address',
+                message: 'You are limited to 5 addresses only as a guest!',
+                icon:{
+                    name:"heroicons_outline:exclamation",
+                    color:"warn"
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel: {
+                        show: false,
+                    },
+                }
+            });
+
+            return;
+        }
+        
+
         const dialogRef = this._dialog.open( 
             EditAddressDialog, {
                 width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
-                height: this.currentScreenSize.includes('sm') ? 'auto' : '90vh',
+                height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
-                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '90vh',
+                maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
                 disableClose: true,
                 data: {
                     type: "create",
@@ -196,7 +223,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         );    
         dialogRef.afterClosed().subscribe(result=>{
             
-            let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
+            // let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
             
             if (result) {
     
@@ -207,13 +234,15 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
                 }
                 else {
                     let date = new Date;
-                    let length = guestAddresses.length;
+                    // let length = guestAddresses.length;
                     result.id = ((length + 1).toString()).concat(date.toISOString());
+                    // Set to customer address
                     this._userService.customersAddress = result;
                     guestAddresses.push(result);
 
                     // Set to local
                     this._userService.guestAddress = JSON.stringify(guestAddresses);
+                    // Set to customer addresses
                     this.customersAddresses = guestAddresses;
                 }
                 
@@ -237,8 +266,32 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         );
         dialogRef.afterClosed().subscribe(result => {
             if(result){
-                // Customer Addresses
-                this._userService.putCustomerAddressById(result).subscribe(()=>{});
+                if (this.customerId){
+                    // Customer Addresses
+                    this._userService.putCustomerAddressById(result).subscribe(()=>{});
+
+                }
+                else {
+                    let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
+                    let index = guestAddresses.findIndex(item => item.id === customerAddress.id);
+                    
+                    if (index > -1) {
+                        guestAddresses[index] = result;
+    
+                        // Update the addresses
+                        this._userService.customersAddresses = guestAddresses;
+
+                        // Set to customerAddress
+                        if (this.selectedAddress.id === result.id) {
+                            this._userService.customersAddress = result;
+                        }
+    
+                        // Set to local
+                        this._userService.guestAddress = JSON.stringify(guestAddresses);
+                        // Set to customer addresses
+                        this.customersAddresses = guestAddresses;
+                    }
+                }
             } 
         });        
     }
@@ -302,6 +355,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
             if (index > -1) {
                 this.customersAddresses[index].isDefault = true;
+                // Set to local
                 this._userService.guestAddress = JSON.stringify(this.customersAddresses);
                 // this.selectAddress(customerbody.id);
             }
