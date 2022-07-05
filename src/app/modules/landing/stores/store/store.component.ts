@@ -453,7 +453,7 @@ export class LandingStoreComponent implements OnInit
 
         let storeOpeningIndex = this.storesOpening.findIndex(i => i.storeId === storeId)
 
-        let storeSnooze = store.isSnooze
+        let storeSnooze = store.storeSnooze.isSnooze
     
         // let storeSnooze = snooze
 
@@ -488,7 +488,7 @@ export class LandingStoreComponent implements OnInit
                             // Check store snooze
                             // --------------------
 
-                            let snoozeEndTime = new Date(store.snoozeEndTime);
+                            let snoozeEndTime = new Date(store.storeSnooze.snoozeEndTime);
                             let nextStoreOpeningTime: string = "";                            
 
                             if (storeSnooze === true) {
@@ -521,7 +521,7 @@ export class LandingStoreComponent implements OnInit
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             this.storesOpening[storeOpeningIndex].storeId = storeId;
                                             this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -530,11 +530,11 @@ export class LandingStoreComponent implements OnInit
                                     });
 
                                 } else {
-                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.snoozeEndTime,'EEEE, h:mm a');
+                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.storeSnooze.snoozeEndTime,'EEEE, h:mm a');
                                 }                                
 
-                                if (store.snoozeReason && store.snoozeReason !== null) {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.snoozeReason + ". " + nextStoreOpeningTime;
+                                if (store.storeSnooze.snoozeReason && store.storeSnooze.snoozeReason !== null) {
+                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
                                     
                                     this.storesOpening[storeOpeningIndex].storeId = storeId;
                                     this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -605,7 +605,7 @@ export class LandingStoreComponent implements OnInit
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -644,7 +644,7 @@ export class LandingStoreComponent implements OnInit
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }

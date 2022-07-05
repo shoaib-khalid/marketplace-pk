@@ -128,7 +128,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
 
         let storeOpeningIndex = storesOpening.findIndex(i => i.storeId === storeId)
 
-        let storeSnooze = store.isSnooze
+        let isStoreSnooze: boolean = store.storeSnooze ? store.storeSnooze.isSnooze : false
 
         // the only thing that this function required is this.store.storeTiming
 
@@ -161,10 +161,10 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                             // Check store snooze
                             // --------------------
 
-                            let snoozeEndTime = new Date(store.snoozeEndTime);
+                            let snoozeEndTime = new Date(store.storeSnooze.snoozeEndTime);
                             let nextStoreOpeningTime: string = "";                            
 
-                            if (storeSnooze === true) {
+                            if (isStoreSnooze === true) {
 
                                 // check if snoozeEndTime exceed closeTime
                                 if (snoozeEndTime > closeTime) {
@@ -194,7 +194,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             storesOpening[storeOpeningIndex].storeId = storeId;
                                             storesOpening[storeOpeningIndex].isOpen = false;
@@ -203,11 +203,11 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                     });
 
                                 } else {
-                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.snoozeEndTime,'EEEE, h:mm a');
+                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.storeSnooze.snoozeEndTime,'EEEE, h:mm a');
                                 }                                
 
-                                if (store.snoozeReason && store.snoozeReason !== null) {
-                                    notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.snoozeReason + ". " + nextStoreOpeningTime;
+                                if (store.storeSnooze.snoozeReason && store.storeSnooze.snoozeReason !== null) {
+                                    notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
                                     
                                     storesOpening[storeOpeningIndex].storeId = storeId;
                                     storesOpening[storeOpeningIndex].isOpen = false;
@@ -278,7 +278,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -317,7 +317,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }

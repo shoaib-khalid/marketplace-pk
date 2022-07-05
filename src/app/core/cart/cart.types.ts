@@ -24,7 +24,7 @@ export interface CartWithDetails
     deliveryProviderId      : string;
     orderNote?              : string;
     storeOpen?              : boolean;
-    storeSnooze?            : StoreSnooze
+    storeSnooze?            : StoreSnooze;
 }
 
 export interface CartPagination

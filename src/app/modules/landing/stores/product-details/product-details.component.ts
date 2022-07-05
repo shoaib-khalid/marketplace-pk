@@ -532,24 +532,24 @@ export class LandingProductDetailsComponent implements OnInit
                             "title": "Incomplete Product Combo selection",
                             "message": 'You need to select ' + item.totalAllow + ' item of <b>"' + item.title + '"</b>',
                             "icon": {
-                              "show": true,
-                              "name": "heroicons_outline:exclamation",
-                              "color": "warn"
+                                "show": true,
+                                "name": "heroicons_outline:exclamation",
+                                "color": "warn"
                             },
                             "actions": {
-                              "confirm": {
+                                "confirm": {
                                 "show": true,
                                 "label": "Ok",
                                 "color": "warn"
-                              },
-                              "cancel": {
+                                },
+                                "cancel": {
                                 "show": false,
                                 "label": "Cancel"
-                              }
+                                }
                             },
                             "dismissible": true
-                          });
-                          throw BreakException;
+                        });
+                        throw BreakException;
                     }                 
                 });
             } catch (error) {
@@ -599,8 +599,30 @@ export class LandingProductDetailsComponent implements OnInit
                 let cartIndex = cartIds.findIndex(item => item.storeId === this.store.id);
                 if (cartIndex > -1) { // update cartItems if cartId exists
                     if (cartIds[cartIndex].cartItems.length > 9) {
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Too many items",
+                            "message": 'Guest only allowed 10 items per shop',
+                            "icon": {
+                                "show": true,
+                                "name": "heroicons_outline:exclamation",
+                                "color": "warn"
+                            },
+                            "actions": {
+                                "confirm": {
+                                "show": true,
+                                "label": "Ok",
+                                "color": "warn"
+                                },
+                                "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                                }
+                            },
+                            "dismissible": true
+                        });
+                        
                         console.error("Guest only allowed 10 cartItems only");
-                        alert("Guest only allowed 10 cartItems only");
+
                     } else {
                         this.postCartItem(cartIds[cartIndex].id).then((response: CartItem)=>{
                             cartIds[cartIndex].cartItems.push(response);
@@ -613,8 +635,28 @@ export class LandingProductDetailsComponent implements OnInit
                     }
                 } else { // New cart to be pushed
                     if (cartIds.length > 4) { // Too many in local storage
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Too many carts",
+                            "message": 'Guest only allowed maximum 5 carts',
+                            "icon": {
+                                "show": true,
+                                "name": "heroicons_outline:exclamation",
+                                "color": "warn"
+                            },
+                            "actions": {
+                                "confirm": {
+                                "show": true,
+                                "label": "Ok",
+                                "color": "warn"
+                                },
+                                "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                                }
+                            },
+                            "dismissible": true
+                        });
                         console.error("Guest only allowed 5 carts only");
-                        alert("Guest only allowed 5 carts only");
                     } else {
                         const cart = {
                             customerId  : null, 
@@ -943,7 +985,7 @@ export class LandingProductDetailsComponent implements OnInit
 
         let storeOpeningIndex = this.storesOpening.findIndex(i => i.storeId === storeId)
 
-        let storeSnooze = store.isSnooze
+        let storeSnooze = store.storeSnooze.isSnooze
     
         // let storeSnooze = snooze
 
@@ -978,7 +1020,7 @@ export class LandingProductDetailsComponent implements OnInit
                             // Check store snooze
                             // --------------------
 
-                            let snoozeEndTime = new Date(store.snoozeEndTime);
+                            let snoozeEndTime = new Date(store.storeSnooze.snoozeEndTime);
                             let nextStoreOpeningTime: string = "";                            
 
                             if (storeSnooze === true) {
@@ -1011,7 +1053,7 @@ export class LandingProductDetailsComponent implements OnInit
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             this.storesOpening[storeOpeningIndex].storeId = storeId;
                                             this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -1020,11 +1062,11 @@ export class LandingProductDetailsComponent implements OnInit
                                     });
 
                                 } else {
-                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.snoozeEndTime,'EEEE, h:mm a');
+                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.storeSnooze.snoozeEndTime,'EEEE, h:mm a');
                                 }                                
 
-                                if (store.snoozeReason && store.snoozeReason !== null) {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.snoozeReason + ". " + nextStoreOpeningTime;
+                                if (store.storeSnooze.snoozeReason && store.storeSnooze.snoozeReason !== null) {
+                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
                                     
                                     this.storesOpening[storeOpeningIndex].storeId = storeId;
                                     this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -1095,7 +1137,7 @@ export class LandingProductDetailsComponent implements OnInit
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -1134,7 +1176,7 @@ export class LandingProductDetailsComponent implements OnInit
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }

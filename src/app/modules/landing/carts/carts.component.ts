@@ -14,7 +14,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { distinctUntilChanged, filter, Subject, takeUntil, combineLatest, merge } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { CartDiscount, CheckoutItems, DeliveryProvider } from 'app/core/checkout/checkout.types';
+import { CartDiscount, CheckoutItems, DeliveryCharges, DeliveryProvider, DeliveryProviders } from 'app/core/checkout/checkout.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { UserService } from 'app/core/user/user.service';
 import { CustomerAddress } from 'app/core/user/user.types';
@@ -167,7 +167,8 @@ export class CartListComponent implements OnInit, OnDestroy
             },
             deliveryQuotationId: string,
             deliveryType: string,
-            deliveryProviderId: string
+            deliveryProviderId: string,
+            deliveryErrorMessage?: string
         }[], 
         selected: boolean 
     };
@@ -334,15 +335,38 @@ export class CartListComponent implements OnInit, OnDestroy
                                 this.selectedCart.carts.push(cart);
                             }
 
-                            // get delivery charges of every carts
-                            this.getDeliveryCharges(item.id,item.storeId);
-                            
-
                             if (cartIdIndex > -1 && allInCartSelected !== null && !allInCartSelected.allSelected.includes(false)) {
                                 this.selectedCart.carts[cartIdIndex].selected = true;
                             }
                         });
+
+                        // if customerId null means guest
+                        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
                         
+                        if (this.customerAddress) {
+                            // get delivery charges of every carts
+                            this.getDeliveryCharges(this.carts.map(element => {
+                                return {
+                                    cartId: element.id,
+                                    customerId: _customerId,
+                                    delivery: {
+                                        deliveryAddress     : this.customerAddress.address,
+                                        deliveryCity        : this.customerAddress.city,
+                                        deliveryState       : this.customerAddress.state,
+                                        deliveryPostcode    : this.customerAddress.postCode,
+                                        deliveryCountry     : this.customerAddress.country,
+                                        deliveryContactEmail: this.customerAddress.email,
+                                        deliveryContactName : this.customerAddress.name,
+                                        deliveryContactPhone: this.customerAddress.phoneNumber,
+                                        latitude            : null,
+                                        longitude           : null
+                                    },
+                                    deliveryProviderId: null,
+                                    storeId: element.storeId
+                                }
+                            }));
+                        }
+
                         if (allSelected.length && !allSelected.includes(false)) {
                             // set all selected cart to true since all items in cartItem is true
                             this.selectedCart.selected = true;                            
@@ -378,10 +402,30 @@ export class CartListComponent implements OnInit, OnDestroy
                             if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
 
-                                this.carts.forEach(item => {                        
-                                    // get delivery charges of every carts
-                                    this.getDeliveryCharges(item.id,item.storeId);
-                                });
+                                // if customerId null means guest
+                                let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
+
+                                // get delivery charges of every carts
+                                this.getDeliveryCharges(this.carts.map(element => {
+                                    return {
+                                        cartId: element.id,
+                                        customerId: _customerId,
+                                        delivery: {
+                                            deliveryAddress     : this.customerAddress.address,
+                                            deliveryCity        : this.customerAddress.city,
+                                            deliveryState       : this.customerAddress.state,
+                                            deliveryPostcode    : this.customerAddress.postCode,
+                                            deliveryCountry     : this.customerAddress.country,
+                                            deliveryContactEmail: this.customerAddress.email,
+                                            deliveryContactName : this.customerAddress.name,
+                                            deliveryContactPhone: this.customerAddress.phoneNumber,
+                                            latitude            : null,
+                                            longitude           : null
+                                        },
+                                        deliveryProviderId: null,
+                                        storeId: element.storeId
+                                    }
+                                }));
                             }
                             // Mark for check 
                             this._changeDetectorRef.markForCheck();
@@ -761,55 +805,47 @@ export class CartListComponent implements OnInit, OnDestroy
         });
     }
 
-    getDeliveryCharges(cartId: string, storeId: string)
+    getDeliveryCharges(deliveryChargesBody: DeliveryCharges[] )
     {
-        // if customerId null means guest
-        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
-        if (!this.customerAddress) return;        
-
-        const deliveryChargesBody = {
-            cartId: cartId,
-            customerId: _customerId,
-            delivery: {
-                deliveryAddress     : this.customerAddress.address,
-                deliveryCity        : this.customerAddress.city,
-                deliveryState       : this.customerAddress.state,
-                deliveryPostcode    : this.customerAddress.postCode,
-                deliveryCountry     : this.customerAddress.country,
-                deliveryContactEmail: this.customerAddress.email,
-                deliveryContactName : this.customerAddress.name,
-                deliveryContactPhone: this.customerAddress.phoneNumber,
-                latitude            : null,
-                longitude           : null
-            },
-            deliveryProviderId      : null,
-            storeId: storeId
-        }
-
-        this._checkoutService.postToRetrieveDeliveryCharges(deliveryChargesBody)
-            .subscribe((deliveryProviderResponse: DeliveryProvider[])=>{
-                let cartIndex = this.selectedCart.carts.findIndex(item => item.id == cartId);
-                if (cartIndex > -1) {
-                    let minDeliveryCharges = Math.min(...deliveryProviderResponse.map(item => item.price));
-                    let maxDeliveryCharges = Math.max(...deliveryProviderResponse.map(item => item.price));
-                    
-                    this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
-                    this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
-
-                    // find index at response to find the minimum price charges
-                    let minDeliveryChargesIndex = deliveryProviderResponse.findIndex(item => item.price === minDeliveryCharges);
-
-                    this.selectedCart.carts[cartIndex].deliveryQuotationId = deliveryProviderResponse[minDeliveryChargesIndex].refId;
-                    this.selectedCart.carts[cartIndex].deliveryType = deliveryProviderResponse[minDeliveryChargesIndex].deliveryType;
-                    this.selectedCart.carts[cartIndex].deliveryProviderId = deliveryProviderResponse[minDeliveryChargesIndex].providerId;
-                }                
+        if (!this.customerAddress) return;
+    
+        this._checkoutService.postToRetrieveDeliveriesCharges(deliveryChargesBody)
+            .subscribe((deliveryProviderResponse: DeliveryProviders[])=>{                
+                deliveryProviderResponse.forEach(item => {
+                    let cartIndex = this.selectedCart.carts.findIndex(element => element.id == item.cartId);
+                    if (cartIndex > -1) {
+                        let minDeliveryCharges = Math.min(...item.quotation.map(element => element.price));
+                        let maxDeliveryCharges = Math.max(...item.quotation.map(element => element.price));
+                        
+                        this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
+                        this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+    
+                        // find index at response to find the minimum price charges
+                        let minDeliveryChargesIndex = item.quotation.findIndex(element => element.price === minDeliveryCharges);
+    
+                        
+                        if (item.quotation[minDeliveryChargesIndex] && !item.quotation[minDeliveryChargesIndex].isError) {                            
+                            this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[minDeliveryChargesIndex].refId;
+                            this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
+                            this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
+                        } else {
+                            this.selectedCart.carts[cartIndex].deliveryQuotationId = null;
+                            this.selectedCart.carts[cartIndex].deliveryType = null;
+                            this.selectedCart.carts[cartIndex].deliveryProviderId = null;
+                            this.selectedCart.carts[cartIndex].deliveryErrorMessage = item.quotation[minDeliveryChargesIndex].message;
+                        }
+                    }
+                });
             });
     }
 
     getDeliveryChargesRange(index: number) : string 
     {
         if (this.selectedCart.carts[index]) {
+            if (this.selectedCart.carts[index].deliveryQuotationId === null) {
+                return this.selectedCart.carts[index].deliveryErrorMessage;
+            }
             if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
             } else {
@@ -1008,7 +1044,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                                 array.length = iteration + 1;
                                             }
                                         } else {
-                                            console.warn("Store currently snooze. Store close on " + object.day);
+                                            // console.warn("Store currently snooze. Store close on " + object.day);
                                             
                                             this.storesOpening[storeOpeningIndex].storeId = storeId;
                                             this.storesOpening[storeOpeningIndex].isOpen = false;
@@ -1092,7 +1128,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                         array.length = iteration + 1;
                                     }
                                 } else {
-                                    console.warn("Store close on " + object.day);
+                                    // console.warn("Store close on " + object.day);
                                 }
                             });
                         }
@@ -1131,7 +1167,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
-                                console.warn("Store close on this " + object.day);
+                                // console.warn("Store close on this " + object.day);
                             }
                         });
                     }

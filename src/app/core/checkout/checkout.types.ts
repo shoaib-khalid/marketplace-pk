@@ -58,6 +58,12 @@ export interface DeliveryProvider
     validUpTo: string;
 }
 
+export interface DeliveryProviders
+{
+    cartId: string;
+    quotation: DeliveryProvider[];
+}
+
 export interface CartDiscount
 {
     cartSubTotal                : number;
