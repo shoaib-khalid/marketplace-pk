@@ -103,22 +103,31 @@
     </div>
 </ng-container>
 <ng-template #noStoreProductAvailable>
-    <div class="flex flex-auto justify-center w-full h-full p-6 sm:p-10">
-        <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
-        <div class="items-center justify-center z-10">
-            <div class="mt-2 text-4xl md:text-6xl font-extrabold tracking-tight leading-tight md:leading-none text-center">Oops!</div>
-            <div class="mt-2 text-4xl md:text-8xl font-semibold tracking-tight leading-tight md:leading-none text-primary text-center">404</div>
-            <div class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">No available product</div>
-            <div class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">The product you are looking for might have been removed, had its name changed or is temporarily unavailable.</div>
-            <!-- <a
-                class="flex flex-row items-center mt-12 font-medium bg-primary-500 py-2 px-4 rounded"
-                [routerLink]="['/catalogue/' + 'all-products']">
-                <mat-icon
-                    class="icon-size-5 text-black"
-                    [svgIcon]="'heroicons_outline:chevron-left'"></mat-icon>
-                <span class="pr-2">Go Back</span>
-            </a> -->
+    <ng-container *ngIf="isLoading; else noResult">
+        <div class="flex flex-auto h-96 flex-col items-center justify-center rounded-lg border border-gray-300 dark:bg-transparent">
+            <img class="w-20" src="assets/gif/loading.gif" alt="loading">
+            <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">Loading Products</div>
         </div>
-    </div>
+        <div class="mb-12"></div>
+    </ng-container>
+    <ng-template #noResult>
+        <div class="flex flex-auto justify-center w-full h-full p-6 sm:p-10">
+            <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
+            <div class="items-center justify-center z-10">
+                <div class="mt-2 text-4xl md:text-6xl font-extrabold tracking-tight leading-tight md:leading-none text-center">Oops!</div>
+                <div class="mt-2 text-4xl md:text-8xl font-semibold tracking-tight leading-tight md:leading-none text-primary text-center">404</div>
+                <div class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">No available product</div>
+                <div class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">The product you are looking for might have been removed, had its name changed or is temporarily unavailable.</div>
+                <!-- <a
+                    class="flex flex-row items-center mt-12 font-medium bg-primary-500 py-2 px-4 rounded"
+                    [routerLink]="['/catalogue/' + 'all-products']">
+                    <mat-icon
+                        class="icon-size-5 text-black"
+                        [svgIcon]="'heroicons_outline:chevron-left'"></mat-icon>
+                    <span class="pr-2">Go Back</span>
+                </a> -->
+            </div>
+        </div>
+    </ng-template>
 </ng-template>
 
