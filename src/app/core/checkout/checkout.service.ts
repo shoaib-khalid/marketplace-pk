@@ -7,7 +7,7 @@ import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
 import { StoresService } from 'app/core/store/store.service';
 import { Customer } from 'app/core/user/user.types';
-import { Address, CartDiscount, CheckoutItems, DeliveryCharges, DeliveryProvider } from './checkout.types';
+import { Address, CartDiscount, CheckoutItems, DeliveryCharges, DeliveryProvider, DeliveryProviders } from './checkout.types';
 import { AuthService } from 'app/core/auth/auth.service';
 import { Cart, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { CartService } from 'app/core/cart/cart.service';
@@ -282,6 +282,26 @@ export class CheckoutService
         };
 
         return this._httpClient.post<any>(deliveryService + '/orders/getprice', deliveryCharges, header)
+            .pipe(
+                map((response) => {
+                    this._logging.debug("Response from StoresService (postToRetrieveDeliveryCharges)",response);
+
+                    return response["data"];
+                })
+            );
+    }
+
+    postToRetrieveDeliveriesCharges(deliveryCharges: DeliveryCharges[]) : Observable<DeliveryProviders[]>
+    {
+        let deliveryService = this._apiServer.settings.apiServer.deliveryService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.post<any>(deliveryService + '/orders/getPrices', deliveryCharges, header)
             .pipe(
                 map((response) => {
                     this._logging.debug("Response from StoresService (postToRetrieveDeliveryCharges)",response);
