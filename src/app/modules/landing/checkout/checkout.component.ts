@@ -6,7 +6,7 @@ import { CartService } from 'app/core/cart/cart.service';
 import { Cart, CartItem, CartPagination, CartWithDetails, DiscountOfCartGroup } from 'app/core/cart/cart.types';
 import { Store, StoreSnooze, StoreTiming } from 'app/core/store/store.types';
 import { of, Subject, merge, timer, interval as observableInterval, combineLatest } from 'rxjs';
-import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty } from 'rxjs/operators';
+import { map, switchMap, takeUntil, debounceTime, filter, distinctUntilChanged, startWith, isEmpty, retry } from 'rxjs/operators';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Address, CartDiscount, CheckoutItems, DeliveryProvider, GroupOrder } from 'app/core/checkout/checkout.types';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
@@ -191,7 +191,8 @@ export class BuyerCheckoutComponent implements OnInit
         voucherDiscountType: null,
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
-        platformVoucherSubTotalDiscount: 0
+        platformVoucherSubTotalDiscount: 0,
+        platformVoucherDeliveryDiscount: 0
 
     }
 
@@ -290,7 +291,8 @@ export class BuyerCheckoutComponent implements OnInit
                     this._checkoutService.checkoutItems$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((checkoutItems: CheckoutItems[])=>{
-                            if (checkoutItems) {                                
+                            if (checkoutItems) {                 
+                                               
                                 this.checkoutItems = checkoutItems;
                                 let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
                                 let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
@@ -343,7 +345,8 @@ export class BuyerCheckoutComponent implements OnInit
                     this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
                     this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
-                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount
+                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount;
+                    this.paymentDetails.platformVoucherDeliveryDiscount = response.platformVoucherDeliveryDiscount === null ? 0 : response.platformVoucherDeliveryDiscount;
 
                 }
                 // Mark for check
@@ -831,4 +834,13 @@ export class BuyerCheckoutComponent implements OnInit
      });
     }
 
+    getDeliverFee(cartId: string){
+        let index = this.checkoutItems.findIndex(item => item.cartId === cartId);
+
+        if (index > -1) {
+            return this.checkoutItems[index].deliveryFee;
+            
+        }
+        else return 0
+    }
 }

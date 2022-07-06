@@ -89,7 +89,7 @@
                                     <div class="flex flex-col justify-start ml-2 md:ml-4">
                                         <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
                                         <!-- <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span> -->
-                                        <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
+                                        <!-- <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span> -->
                                     </div>
                                 </div>
                                 <!-- Cart Items -->
@@ -216,7 +216,7 @@
                                     <!-- Additional Info -->
                                     <div class="flex flex-col mt-4">
                                         <span class="text-secondary">Additional Information</span>
-                                        <div class="w-full flex flex-row text-center items-center my-2 text-sm sm:text-md"> 
+                                        <div class="w-full flex flex-row text-center items-center my-2 text-sm"> 
                                             <span class="mr-2">Order Notes (Optional)</span>
                                             <span  *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === false" (click)="open(cart.id)" class="text-primary cursor-pointer">Insert Order Notes</span>
                                             <span *ngIf="selectedCart && selectedCart.carts[i + pagination.startIndex].description.isOpen === true" (click)="close(cart.id)" class="text-primary cursor-pointer">Cancel</span>
@@ -230,20 +230,124 @@
                                                 placeholder="Tell us when you prefer this order to be delivered or any special request you may have"
                                                 [rows]="full"
                                                 maxlength="100"
-                                                class="h-5 text-sm sm:text-md"
+                                                class="h-5 text-sm"
                                                 autocomplete="disabled"
                                                 matTextareaAutosize></textarea>
                                         </mat-form-field>
                                     </div>
-                                    <!-- Shipping Fee & Total Items -->
-                                    <div class="flex flex-row justify-between items-center">
-                                        <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
-                                            <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                            <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                    <span class="text-sm">Delivery Options</span>
+                                    <!-- Select Delivery Provider for DESKTOP-->
+                                    <ng-container *ngIf="currentScreenSize.includes('lg')">
+                                        <div class="flex flex-row justify-between items-center my-2 w-auto">
+                                            <!-- Shipping Info  -->
+                                            <div class="flex flex-row justify-between items-center w-auto gap-x-4">
+                                                <div class="flex flex-row justify-between items-center w-[200px]">
+                                                    <ng-container *ngIf="true">
+                                                        <div class="flex flex-row w-full">
+                                                            <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
+                                                                <mat-select
+                                                                    placeholder="Select a delivery provider"
+                                                                    (selectionChange)="changeDeliveryProvider(deliveryProviderSelector.value, i + pagination.startIndex);"
+                                                                    [(ngModel)]="selectedCart.carts[i + pagination.startIndex].deliveryProviderId"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    #deliveryProviderSelector="matSelect"
+                                                                    >
+                                                                    <mat-select-trigger>
+                                                                        <!-- For all vertical except E-Commerce MYS -->
+                                                                        <span class="flex items-center justify-between w-full">
+                                                                            <span>{{ selectedCart.carts[i + pagination.startIndex].deliveryProviderName }}</span>
+                                                                            <img
+                                                                                matSuffix
+                                                                                class="w-1/3 max-h-10"
+                                                                                *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryProviderImg"
+                                                                                [alt]="'Delivery provider image'"
+                                                                                [src]="selectedCart.carts[i + pagination.startIndex].deliveryProviderImg">
+                                                                        </span>
+                                                                    </mat-select-trigger>
+                                                                    <ng-container *ngFor="let deliveryProvider of selectedCart.carts[i + pagination.startIndex].deliveryQuotations">
+                                                                        <mat-option 
+                                                                            [value]="deliveryProvider.providerId">
+                                                                            <div class="flex flex-row justify-between items-center">
+                                                                                <span class="w-2/3">{{deliveryProvider.providerName}}</span>
+                                                                                <img
+                                                                                    matSuffix
+                                                                                    class="w-auto max-h-8 p-1"
+                                                                                    *ngIf="deliveryProvider.providerImage"
+                                                                                    [alt]="'Delivery provider image'"
+                                                                                    [src]="deliveryProvider.providerImage">
+                                                                            </div>
+                                                                        </mat-option>
+                                                                    </ng-container>
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </ng-container>
+                                                </div>
+                                                <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
+                                                    <span class="text-sm">Shipping Fee:</span>
+                                                    <span class="font-semibold text-xs sm:text-base">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                                </div>
+                                            </div>
+                                            <!-- Total Items  -->
+                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
+                                                <span class="text-sm">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
+                                                <span class="font-semibold text-xs sm:text-base">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                            </div>
                                         </div>
-                                        <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
-                                            <span class="text-sm sm:text-md">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
-                                            <span class="font-semibold text-xs sm:text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                    </ng-container>
+                                    <!-- Select Delivery Provider for MOBILE-->
+                                    <div *ngIf="!currentScreenSize.includes('lg')" class="mt-2 flex flex-col gap-y-2">
+                                        <div class="flex flex-row justify-between items-center w-full">
+                                            <ng-container *ngIf="true">
+                                                <div class="flex flex-row w-full">
+                                                    <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
+                                                        <mat-select
+                                                            placeholder="Select a delivery provider"
+                                                            (selectionChange)="changeDeliveryProvider(deliveryProviderSelector.value, i + pagination.startIndex)"
+                                                            [(ngModel)]="selectedCart.carts[i + pagination.startIndex].deliveryProviderId"
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            #deliveryProviderSelector="matSelect"
+                                                            >
+                                                            <mat-select-trigger>
+                                                                <!-- For all vertical except E-Commerce MYS -->
+                                                                <span class="flex items-center justify-between w-full">
+                                                                    <span>{{ deliveryProviderSelector.triggerValue }}</span>
+                                                                    <img
+                                                                        matSuffix
+                                                                        class="w-1/3 max-h-10"
+                                                                        *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryProviderImg"
+                                                                        [alt]="'Delivery provider image'"
+                                                                        [src]="selectedCart.carts[i + pagination.startIndex].deliveryProviderImg">
+                                                                </span>
+                                                            </mat-select-trigger>
+                                                            <ng-container *ngFor="let deliveryProvider of selectedCart.carts[i + pagination.startIndex].deliveryQuotations">
+                                                                <mat-option 
+                                                                    [value]="deliveryProvider.providerId">
+                                                                    <div class="flex flex-row justify-between items-center">
+                                                                        <span class="w-2/3">{{deliveryProvider.providerName}}</span>
+                                                                        <img
+                                                                            matSuffix
+                                                                            class="w-auto max-h-8 p-1"
+                                                                            *ngIf="deliveryProvider.providerImage"
+                                                                            [alt]="'Delivery provider image'"
+                                                                            [src]="deliveryProvider.providerImage">
+                                                                    </div>
+                                                                </mat-option>
+                                                            </ng-container>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                        <div class="flex flex-row justify-between items-center">
+                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
+                                                <span class="text-sm">Shipping Fee:</span>
+                                                <span class="font-semibold text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
+                                                <span class="text-sm">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
+                                                <span class="font-semibold text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </ng-container>
@@ -273,7 +377,7 @@
             </div>
 
             <!-- Cart Summary -->
-            <div class="flex flex-col w-full md:w-140 md:ml-6 md:mt-8 mt-4">
+            <div *ngIf="platform" class="flex flex-col w-full md:w-140 md:ml-6 md:mt-8 mt-4">
                 <!-- Cart Summary -->
                 <div class="flex flex-col border rounded-lg p-2">
                     <!-- Header -->
@@ -339,12 +443,12 @@
                         </div>
                     </ng-container>
 
-                    <!-- <div class="flex flex-row justify-between mt-2">
-                        <span class="text-md text-secondary">Store Voucher</span>
-                        <span class="text-md font-semibold">RM 0.00</span>
-                    </div> -->
+                    <div *ngIf="paymentDetails.platformVoucherDeliveryDiscount && paymentDetails.platformVoucherDeliveryDiscount !== 0" class="flex flex-row justify-between mt-2">
+                        <span class="text-md text-secondary">Deliverin Shipping Discount</span>
+                        <span class="text-md font-semibold">-{{paymentDetails.platformVoucherDeliveryDiscount | currency: platform.currency}}</span>
+                    </div>
                     
-                    <div class="flex flex-row justify-between mt-2">
+                    <div *ngIf="paymentDetails.platformVoucherSubTotalDiscount && paymentDetails.platformVoucherSubTotalDiscount !== 0" class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
                         <span class="text-md font-semibold">-{{paymentDetails.platformVoucherSubTotalDiscount | currency: platform.currency}}</span>
                     </div>

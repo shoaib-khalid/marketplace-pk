@@ -18,14 +18,14 @@
                         <span class="">{{customerAddress.phoneNumber}}</span>
                         <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
                     </div>
-                    <div class="flex w-full justify-center items-center">
+                    <!-- <div class="flex w-full justify-center items-center">
                         <button
                             [routerLink]="['/address']"
                             [queryParams]="{origin: 'carts'}"
                             class="my-2 w-full font-semibold p-1 rounded-md bg-primary"                            >
                             <span class="text-white">Change</span>
                         </button>
-                    </div>
+                    </div> -->
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->
@@ -72,8 +72,8 @@
                                 <span></span>
                                 <div class="flex flex-col justify-start">
                                     <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
-                                    <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span>
-                                    <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span>
+                                    <!-- <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span> -->
+                                    <!-- <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span> -->
                                 </div>
                             </div>
                             <!-- Cart Items -->
@@ -159,7 +159,7 @@
                                 <div class="flex flex-row justify-between items-center mt-2">
                                     <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
                                         <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliverFee(cart.id) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                     </div>
                                     <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
                                         <span class="text-sm sm:text-md">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
@@ -258,16 +258,15 @@
                         </div>
                     </ng-container>
 
-                    <!-- <div class="flex flex-row justify-between mt-2">
-                        <span class="text-md text-secondary">Store Voucher</span>
-                        <span class="text-md font-semibold">RM 5.00</span>
-                    </div> -->
-
-                    <div class="flex flex-row justify-between mt-2">
+                    <div *ngIf="paymentDetails.platformVoucherDeliveryDiscount && paymentDetails.platformVoucherDeliveryDiscount !== 0" class="flex flex-row justify-between mt-2">
+                        <span class="text-md text-secondary">Deliverin Shipping Discount</span>
+                        <span class="text-md font-semibold">-{{paymentDetails.platformVoucherDeliveryDiscount | currency: platform.currency}}</span>
+                    </div>
+                    
+                    <div *ngIf="paymentDetails.platformVoucherSubTotalDiscount && paymentDetails.platformVoucherSubTotalDiscount !== 0" class="flex flex-row justify-between mt-2">
                         <span class="text-md text-secondary">Deliverin Promo Code/Voucher</span>
                         <span class="text-md font-semibold">-{{paymentDetails.platformVoucherSubTotalDiscount | currency: platform.currency}}</span>
                     </div>
-
 
                     <!-- Separator -->
                     <div class="border-b w-full my-2"></div>
@@ -305,14 +304,14 @@
                                     <span class="">{{customerAddress.phoneNumber}}</span>
                                     <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
                                 </div>
-                                <div class="flex w-full justify-center items-center">
+                                <!-- <div class="flex w-full justify-center items-center">
                                     <button
                                         [routerLink]="'/address'"
                                         [queryParams]="{origin: 'carts'}"
                                         class="my-2 w-1/2 font-semibold p-1 rounded-md bg-primary"                            >
                                         <span class="text-white">Change</span>
                                     </button>
-                                </div>
+                                </div> -->
                             <!-- </ng-container> -->
                         <!-- </ng-container> -->
                     </ng-container>
