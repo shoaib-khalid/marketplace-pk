@@ -19,6 +19,7 @@ export interface CheckoutItems
     deliveryProviderId  : string;
     orderNotes?         : string;
     platformVoucherCode?: string;
+    deliveryFee         : number;
 }
 
 
@@ -89,7 +90,8 @@ export interface CartDiscount
     voucherDiscountCalculationType      : string;
     voucherDiscountCalculationValue     : number;
     voucherSubTotalDiscountDescription  : string;
-    platformVoucherSubTotalDiscount?    : number
+    platformVoucherSubTotalDiscount    : number;
+    platformVoucherDeliveryDiscount     : number;
 }
 
 export interface Payment

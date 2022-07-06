@@ -1,3 +1,4 @@
+import { DeliveryProvider } from "../checkout/checkout.types";
 import { Store, StoreSnooze } from "../store/store.types";
 
 export interface Cart
@@ -25,6 +26,7 @@ export interface CartWithDetails
     orderNote?              : string;
     storeOpen?              : boolean;
     storeSnooze?            : StoreSnooze;
+    deliveryQuotations?     : DeliveryProvider[];
 }
 
 export interface CartPagination

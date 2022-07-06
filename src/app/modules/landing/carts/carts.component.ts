@@ -156,7 +156,8 @@ export class CartListComponent implements OnInit, OnDestroy
             id: string, 
             cartItem: { 
                 id: string, 
-                selected: boolean
+                selected: boolean,
+                disabled: boolean
             }[], 
             selected: boolean, 
             minDeliveryCharges?: number, 
@@ -168,9 +169,14 @@ export class CartListComponent implements OnInit, OnDestroy
             deliveryQuotationId: string,
             deliveryType: string,
             deliveryProviderId: string,
-            deliveryErrorMessage?: string
+            deliveryErrorMessage?: string,
+            deliveryProviderImg: string,
+            deliveryQuotations: DeliveryProvider[],
+            selectedDeliveryPrice: number,
+            deliveryProviderName: string
         }[], 
-        selected: boolean 
+        selected: boolean,
+        disabled: boolean 
     };
     totalSelectedCartItem: number = 0;
     
@@ -200,7 +206,8 @@ export class CartListComponent implements OnInit, OnDestroy
         voucherDiscountType: null,
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
-        platformVoucherSubTotalDiscount: 0
+        platformVoucherSubTotalDiscount: 0,
+        platformVoucherDeliveryDiscount: 0
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -320,7 +327,8 @@ export class CartListComponent implements OnInit, OnDestroy
                                     cartItem: item.cartItems.map(element => {
                                         return {
                                             id: element.id,
-                                            selected: false
+                                            selected: false,
+                                            disabled: false
                                         }
                                     }),
                                     selected: false,
@@ -330,7 +338,12 @@ export class CartListComponent implements OnInit, OnDestroy
                                     },
                                     deliveryQuotationId: null,
                                     deliveryType: null,
-                                    deliveryProviderId: null
+                                    deliveryProviderId: null,
+                                    disabled: false,
+                                    deliveryQuotations: null,
+                                    deliveryProviderImg: null,
+                                    selectedDeliveryPrice: null,
+                                    deliveryProviderName: null
                                 };
                                 this.selectedCart.carts.push(cart);
                             }
@@ -379,7 +392,8 @@ export class CartListComponent implements OnInit, OnDestroy
                                     cartItem: item.cartItems.map(element => {
                                         return {
                                             id: element.id,
-                                            selected: false
+                                            selected: false,
+                                            disabled: false
                                         }
                                     }),
                                     selected: false,
@@ -389,10 +403,15 @@ export class CartListComponent implements OnInit, OnDestroy
                                     },
                                     deliveryQuotationId: null,
                                     deliveryType: null,
-                                    deliveryProviderId: null
+                                    deliveryProviderId: null,
+                                    deliveryQuotations: null,
+                                    deliveryProviderImg: null,
+                                    selectedDeliveryPrice: null,
+                                    deliveryProviderName: null
                                 }
                             }),
-                            selected: false
+                            selected: false,
+                            disabled: false
                         }
                     }
 
@@ -458,11 +477,11 @@ export class CartListComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: DiscountOfCartGroup)=>{
                 if(response) {
-                    this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal
-                    this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge
-                    this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
-                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount
-                    
+                    this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal;
+                    this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge;
+                    this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal;
+                    this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount;
+                    this.paymentDetails.platformVoucherDeliveryDiscount = response.platformVoucherDeliveryDiscount === null ? 0 : response.platformVoucherDeliveryDiscount;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -811,30 +830,58 @@ export class CartListComponent implements OnInit, OnDestroy
         if (!this.customerAddress) return;
     
         this._checkoutService.postToRetrieveDeliveriesCharges(deliveryChargesBody)
-            .subscribe((deliveryProviderResponse: DeliveryProviders[])=>{                
+            .subscribe((deliveryProviderResponse: DeliveryProviders[])=>{     
+                           
                 deliveryProviderResponse.forEach(item => {
                     let cartIndex = this.selectedCart.carts.findIndex(element => element.id == item.cartId);
                     if (cartIndex > -1) {
                         let minDeliveryCharges = Math.min(...item.quotation.map(element => element.price));
                         let maxDeliveryCharges = Math.max(...item.quotation.map(element => element.price));
-                        
-                        this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
-                        this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+
+                        // find delivery with no error
+                        let indexOfNoError = item.quotation.findIndex(item => item.isError === false);
+
+                        if (indexOfNoError > -1) {
+
+                            // find index at response to find the minimum price charges
+                            let minDeliveryChargesIndex = item.quotation.findIndex(element => element.price === minDeliveryCharges && element.isError === false);
+        
+                            if (item.quotation[minDeliveryChargesIndex].price !== item.quotation[indexOfNoError].price) {                            
+                                this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[minDeliveryChargesIndex].refId;
+                                this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
+                                this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
+                                this.selectedCart.carts[cartIndex].deliveryProviderImg = item.quotation[minDeliveryChargesIndex].providerImage;
+                                this.selectedCart.carts[cartIndex].selectedDeliveryPrice = minDeliveryCharges;
+                                this.selectedCart.carts[cartIndex].minDeliveryCharges = minDeliveryCharges;
+                                this.selectedCart.carts[cartIndex].maxDeliveryCharges = maxDeliveryCharges;
+                                this.selectedCart.carts[cartIndex].deliveryProviderName = item.quotation[minDeliveryChargesIndex].providerName;
+
     
-                        // find index at response to find the minimum price charges
-                        let minDeliveryChargesIndex = item.quotation.findIndex(element => element.price === minDeliveryCharges);
+                            } 
+                            else {
+                                this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[indexOfNoError].refId;
+                                this.selectedCart.carts[cartIndex].deliveryType = item.quotation[indexOfNoError].deliveryType;
+                                this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[indexOfNoError].providerId;
+                                this.selectedCart.carts[cartIndex].deliveryProviderImg = item.quotation[indexOfNoError].providerImage;
+                                this.selectedCart.carts[cartIndex].selectedDeliveryPrice = item.quotation[indexOfNoError].price;
+                                this.selectedCart.carts[cartIndex].minDeliveryCharges = item.quotation[indexOfNoError].price;
+                                this.selectedCart.carts[cartIndex].maxDeliveryCharges = item.quotation[indexOfNoError].price;
+                                this.selectedCart.carts[cartIndex].deliveryProviderName = item.quotation[indexOfNoError].providerName;
     
-                        
-                        if (item.quotation[minDeliveryChargesIndex] && !item.quotation[minDeliveryChargesIndex].isError) {                            
-                            this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[minDeliveryChargesIndex].refId;
-                            this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
-                            this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
-                        } else {
+                            }
+
+
+                        }
+                            
+                        // if has error
+                        else {
+
                             this.selectedCart.carts[cartIndex].deliveryQuotationId = null;
                             this.selectedCart.carts[cartIndex].deliveryType = null;
                             this.selectedCart.carts[cartIndex].deliveryProviderId = null;
-                            this.selectedCart.carts[cartIndex].deliveryErrorMessage = item.quotation[minDeliveryChargesIndex].message;
+                            this.selectedCart.carts[cartIndex].deliveryErrorMessage = item.quotation[0].message;
                         }
+                        this.selectedCart.carts[cartIndex].deliveryQuotations = item.quotation;
                     }
                 });
             });
@@ -843,15 +890,171 @@ export class CartListComponent implements OnInit, OnDestroy
     getDeliveryChargesRange(index: number) : string 
     {
         if (this.selectedCart.carts[index]) {
+            
             if (this.selectedCart.carts[index].deliveryQuotationId === null) {
                 return this.selectedCart.carts[index].deliveryErrorMessage;
+
             }
             if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
+
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
             } else {
+
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
             }
         }
+    }
+
+    changeDeliveryProvider(deliveryProviderId, index: number) {
+        if (this.selectedCart.carts[index]) {
+
+            this.selectedCart.carts[index].deliveryProviderId = null;
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+
+            let selectedProviderIdIndex = this.selectedCart.carts[index].deliveryQuotations.findIndex(item => item.providerId === deliveryProviderId);
+
+            if (selectedProviderIdIndex > -1) {
+                let isSelectedProviderError: boolean = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].isError;
+
+                if (isSelectedProviderError) {
+                    const confirmation = this._fuseConfirmationService.open({
+                        "title": "Error",
+                        "message": `Provider ${this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].providerName} is currently unavailable`,
+                        "icon": {
+                        "show": true,
+                        "name": "heroicons_outline:exclamation",
+                        "color": "warn"
+                        },
+                        "actions": {
+                        "confirm": {
+                            "show": true,
+                            "label": "OK",
+                            "color": "primary"
+                        },
+                        "cancel": {
+                            "show": false,
+                            "label": "Cancel"
+                        }
+                        },
+                        "dismissible": true
+                    });
+
+                    let nextSelectedProviderIdIndex = this.selectedCart.carts[index].deliveryQuotations.findIndex(item => item.isError === false);
+                    if (nextSelectedProviderIdIndex > -1) {
+                        this.selectedCart.carts[index].deliveryProviderName = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].providerName;
+                        this.selectedCart.carts[index].deliveryProviderId = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].providerId;
+                        this.selectedCart.carts[index].deliveryProviderImg = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].providerImage;
+                        this.selectedCart.carts[index].deliveryQuotationId = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].refId;
+                        this.selectedCart.carts[index].deliveryType = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].deliveryType;
+                        this.selectedCart.carts[index].minDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
+                        this.selectedCart.carts[index].maxDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
+                        this.selectedCart.carts[index].selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
+                    }
+                } else {
+                    this.selectedCart.carts[index].deliveryProviderName = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].providerName;
+                    this.selectedCart.carts[index].deliveryProviderId = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].providerId;
+                    this.selectedCart.carts[index].deliveryProviderImg = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].providerImage;
+                    this.selectedCart.carts[index].deliveryQuotationId = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].refId;
+                    this.selectedCart.carts[index].deliveryType = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].deliveryType;
+                    this.selectedCart.carts[index].minDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
+                    this.selectedCart.carts[index].maxDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
+                    this.selectedCart.carts[index].selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
+                }
+            }
+
+            // if (this.selectedCart.carts[index])
+
+            // let newProvider: DeliveryProvider;
+            // newProvider = this.selectedCart.carts[index].deliveryQuotations.filter(element => element.providerId === deliveryProviderId)[0];
+
+            // let noErrorIndex = this.selectedCart.carts[index].deliveryQuotations.findIndex(element => element.isError === false);
+
+            // if (noErrorIndex > -1) {
+            //     this.selectedCart.carts[index].deliveryProviderId = newProvider.providerId;
+            //     this.selectedCart.carts[index].deliveryProviderImg = newProvider.providerImage;
+            //     this.selectedCart.carts[index].deliveryQuotationId = newProvider.refId;
+            //     this.selectedCart.carts[index].deliveryType = newProvider.deliveryType;
+            //     this.selectedCart.carts[index].minDeliveryCharges = newProvider.price;
+            //     this.selectedCart.carts[index].maxDeliveryCharges = newProvider.price;
+            //     this.selectedCart.carts[index].selectedDeliveryPrice = newProvider.price;
+            // }
+            // else {
+            //     const confirmation = this._fuseConfirmationService.open({
+            //         "title": "Error",
+            //         "message": `Provider ${newProvider.providerName} is currently unavailable`,
+            //         "icon": {
+            //         "show": true,
+            //         "name": "heroicons_outline:exclamation",
+            //         "color": "warn"
+            //         },
+            //         "actions": {
+            //         "confirm": {
+            //             "show": true,
+            //             "label": "OK",
+            //             "color": "primary"
+            //         },
+            //         "cancel": {
+            //             "show": false,
+            //             "label": "Cancel"
+            //         }
+            //         },
+            //         "dismissible": true
+            //     });
+
+
+            // }
+
+            // // If selected provider has error
+            // if (newProvider.isError) {
+            //     const confirmation = this._fuseConfirmationService.open({
+            //         "title": "Error",
+            //         "message": `Provider ${newProvider.providerName} is currently unavailable`,
+            //         "icon": {
+            //         "show": true,
+            //         "name": "heroicons_outline:exclamation",
+            //         "color": "warn"
+            //         },
+            //         "actions": {
+            //         "confirm": {
+            //             "show": true,
+            //             "label": "OK",
+            //             "color": "primary"
+            //         },
+            //         "cancel": {
+            //             "show": false,
+            //             "label": "Cancel"
+            //         }
+            //         },
+            //         "dismissible": true
+            //     });
+
+
+            //     newProvider = this.selectedCart.carts[index].deliveryQuotations.filter(element => element.isError === false)[0];
+
+            //     this.selectedCart.carts[index].deliveryProviderId = newProvider.providerId;
+            //     this.selectedCart.carts[index].deliveryProviderImg = newProvider.providerImage;
+            //     this.selectedCart.carts[index].deliveryQuotationId = newProvider.refId;
+            //     this.selectedCart.carts[index].deliveryType = newProvider.deliveryType;
+            //     this.selectedCart.carts[index].minDeliveryCharges = newProvider.price;
+            //     this.selectedCart.carts[index].maxDeliveryCharges = newProvider.price;
+            //     this.selectedCart.carts[index].selectedDeliveryPrice = newProvider.price;
+
+            // }
+            // // else no error
+            // else {
+                
+                                
+            // }
+            this.initializeCheckoutList();
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+
+        }
+        
+        return;
     }
 
     /**
@@ -879,8 +1082,6 @@ export class CartListComponent implements OnInit, OnDestroy
 
     initializeCheckoutList() {
 
-        
-
         // to list out the array of selectedCart
         let checkoutListBody: CheckoutItems[] = this.selectedCart.carts.map(item => {
             return {
@@ -895,7 +1096,8 @@ export class CartListComponent implements OnInit, OnDestroy
                 deliveryType : item.deliveryType,
                 deliveryProviderId : item.deliveryProviderId,
                 orderNotes : item.description.value,
-                platformVoucherCode: this.voucherApplied ? this.voucherApplied.voucher.voucherCode : null
+                platformVoucherCode: this.voucherApplied ? this.voucherApplied.voucher.voucherCode : null,
+                deliveryFee: item.selectedDeliveryPrice
             }
         // to remove if selected = false (undefined array of selectedItemId)
         }).filter(n => {
