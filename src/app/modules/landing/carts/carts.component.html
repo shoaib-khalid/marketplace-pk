@@ -14,10 +14,22 @@
                     <span class="ml-2 font-bold">Delivery Address</span>
                 </div>
                 <ng-container *ngIf="customerAddress; else noAddress">
-                    <div class="flex flex-col m-2 font-medium gap-1">
-                        <span class="">{{customerAddress.name}}</span>
-                        <span class="">{{customerAddress.phoneNumber}}</span>
-                        <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                    <div class="flex flex-row p-2 font-medium gap-1 items-center justify-between w-full">
+                        <!-- Address  -->
+                        <div class="flex flex-col font-medium gap-1">
+                            <span class="">{{customerAddress.name}}</span>
+                            <span class="">{{customerAddress.phoneNumber}}</span>
+                            <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                        </div>
+                        <!-- Remove Address -->
+                        <div *ngIf="!customerId">
+                            <span class="flex justify-center items-center text-center px-1 cursor-pointer">
+                                <mat-icon 
+                                    (click)="deleteGuestAddress()"
+                                    class="icon-size-4" 
+                                    [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                            </span>
+                        </div>
                     </div>
                     <div class="flex w-full justify-center items-center">
                         <button
@@ -30,7 +42,7 @@
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->
-                    <span class="mt-2 text-center">Enter House No. or Apartment No.</span>
+                    <span class="flex mt-2 text-center">Add your delivery address</span>
                     <!-- Button -->
                     <button 
                         [routerLink]="'/address'"
@@ -473,9 +485,8 @@
 
                     <!-- Checkout -->
                     <button 
-                        (click)="initializeCheckoutList()"
-                        [disabled]="isLoading || isPristine"
-                        [routerLink]="['/checkout']" 
+                        (click)="goToCheckout()"
+                        [disabled]="isLoading"
                         class="py-2 px-4 rounded w-full mt-2 text-white"
                         [ngClass]="{ 'cursor-wait bg-gray-400' : isLoading, 
                                      'cursor-pointer bg-primary' : !isLoading || !isPristine,
@@ -495,10 +506,22 @@
                     <ng-container *ngIf="customerAddress; else noAddress">
                         <!-- <ng-container *ngFor="let address of customerAddresses"> -->
                             <!-- <ng-container *ngIf="customerAddress.isDefault"> -->
-                                <div class="flex flex-col m-2 font-medium gap-1">
-                                    <span class="">{{customerAddress.name}}</span>
-                                    <span class="">{{customerAddress.phoneNumber}}</span>
-                                    <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                                <div class="flex flex-row p-2 font-medium gap-1 items-center justify-between w-full">
+                                    <!-- Address  -->
+                                    <div class="flex flex-col font-medium gap-1">
+                                        <span class="">{{customerAddress.name}}</span>
+                                        <span class="">{{customerAddress.phoneNumber}}</span>
+                                        <span class="">{{customerAddress.address}}, {{customerAddress.postCode}}, {{customerAddress.city}}, {{customerAddress.state}}</span>
+                                    </div>
+                                    <!-- Remove Address -->
+                                    <div *ngIf="!customerId">
+                                        <span class="hidden sm:flex justify-center items-center text-center px-1 cursor-pointer">
+                                            <mat-icon 
+                                                (click)="deleteGuestAddress()"
+                                                class="icon-size-4" 
+                                                [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                        </span>
+                                    </div>
                                 </div>
                                 <div class="flex w-full justify-center items-center">
                                     <button
@@ -513,7 +536,7 @@
                     </ng-container>
                     <ng-template #noAddress>
                         <!-- Enter Address -->
-                        <span class="mt-2 text-center">Enter House No. or Apartment No.</span>
+                        <span class="flex mt-2 text-center">Add your delivery address</span>
                         <!-- Button -->
                         <button 
                             [routerLink]="'/address'"

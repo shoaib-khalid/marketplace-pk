@@ -878,6 +878,9 @@ export class CartListComponent implements OnInit, OnDestroy
     }
 
     initializeCheckoutList() {
+
+        
+
         // to list out the array of selectedCart
         let checkoutListBody: CheckoutItems[] = this.selectedCart.carts.map(item => {
             return {
@@ -1305,4 +1308,103 @@ export class CartListComponent implements OnInit, OnDestroy
         dialogRef.afterClosed().subscribe();
     }
  
+    deleteGuestAddress() {
+
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete Address',
+            message: 'Are you sure you want to delete this address?',
+            icon:{
+                name:"mat_outline:delete_forever",
+                color:"primary"
+            },
+            actions: {
+                confirm: {
+                    label: 'Delete',
+                    color: 'primary'
+                }
+            }
+        });
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+
+            // If the confirm button pressed...
+            if ( result === 'confirmed' )
+            {                
+                let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
+                let index = guestAddresses.findIndex(item => item.id === this.customerAddress.id);
+
+                if (index > -1) {
+
+                    // Delete the address
+                    guestAddresses.splice(index, 1);
+
+                    // Update the address
+                    this._userService.customersAddresses = guestAddresses;
+
+                    // Set to local
+                    this._userService.guestAddress = JSON.stringify(guestAddresses);
+
+                    this.customerAddress = null;
+                }
+            }
+        });   
+    }
+
+    goToCheckout() {
+        if (this.customerAddress === null) {
+            
+            const confirmation = this._fuseConfirmationService.open({
+                "title": "Address in empty!",
+                "message": "Please add your delivery address before checking out",
+                "icon": {
+                "show": true,
+                "name": "heroicons_outline:exclamation",
+                "color": "warn"
+                },
+                "actions": {
+                "confirm": {
+                    "show": true,
+                    "label": "OK",
+                    "color": "primary"
+                },
+                "cancel": {
+                    "show": false,
+                    "label": "Cancel"
+                }
+                },
+                "dismissible": true
+            });
+            
+            return;
+        }
+
+        if (this.totalSelectedCartItem < 1) {
+            
+            const confirmation = this._fuseConfirmationService.open({
+                "title": "No cart items selected!",
+                "message": "Please select cart items before checking out",
+                "icon": {
+                "show": true,
+                "name": "heroicons_outline:exclamation",
+                "color": "warn"
+                },
+                "actions": {
+                "confirm": {
+                    "show": true,
+                    "label": "OK",
+                    "color": "primary"
+                },
+                "cancel": {
+                    "show": false,
+                    "label": "Cancel"
+                }
+                },
+                "dismissible": true
+            });
+            
+            return;
+        }
+
+        this._router.navigate(['/checkout']);
+    }
 }
