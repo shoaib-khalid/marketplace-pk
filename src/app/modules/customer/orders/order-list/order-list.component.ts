@@ -278,5 +278,38 @@ export class OrderListComponent implements OnInit
         this._router.navigate(['store/' + domainName + '/' + 'all-products' ]);
 
     }
+
+    getOrderPlaced( order: OrderDetails){
+
+        let timezoneString: any;
+        let dateCreated: Date;
+        let dateUpdated: Date;
+
+        let orderDetails = order;
+        var TimezoneName = orderDetails.store.regionCountry.timezone;
+
+        // Generating the formatted text
+        var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
+        var dateText = Intl.DateTimeFormat([], options).format(new Date);
+
+        // Scraping the numbers we want from the text
+        timezoneString = dateText.split(" ")[1].slice(3);
+
+        // Getting the offset
+        var timezoneOffset = parseInt(timezoneString.split(':')[0])*60;
+
+        // Checking for a minutes offset and adding if appropriate
+        if (timezoneString.includes(":")) {
+            var timezoneOffset = timezoneOffset + parseInt(timezoneString.split(':')[1]);
+        }
+
+        dateCreated = new Date(orderDetails.created);
+        dateUpdated = new Date(orderDetails.updated);
+
+        dateCreated.setHours(dateCreated.getHours() - (-timezoneOffset) / 60);
+        dateUpdated.setHours(dateUpdated.getHours() - (-timezoneOffset) / 60);
+
+        return dateCreated;
+    }
     
 }
