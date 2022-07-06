@@ -80,16 +80,15 @@
                 </button>
             </div>       
         </div>
-    
         <!-- Content -->
         <div class="flex flex-col flex-auto px-2 py-4 sm:px-4 lg:px-0 lg:max-w-300">
             <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
                  Otherwise, layout changes won't be registered and the view won't be updated! -->
             <router-outlet *ngIf="true"></router-outlet>
         </div>
-    
         <!-- Footer -->
-        <footer [footerType]="'footer-02'" class="w-full"></footer>
-        
+        <div class="flex w-full bg-primary justify-center">
+            <footer [footerType]="'footer-02'" class="w-full max-w-300"></footer>
+        </div>
     </div>
 </ng-template>
