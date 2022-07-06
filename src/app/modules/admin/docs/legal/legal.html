@@ -1,6 +1,7 @@
 <div class="flex flex-col flex-auto min-w-0 p-10">
     <!-- Privacy Policy  -->
     <ng-container *ngIf="docId === 'privacy-policy'">
+        <mat-icon class="hover:text-teal-400 cursor-pointer" onclick="history.back()" [svgIcon]="'mat_solid:arrow_back'"></mat-icon>
             <h3 style="text-align: center;"><strong><span style="font-size: 22px;">Privacy Policy (PDPA)</span></strong></h3>
         <p>&nbsp;</p>
         <p>This Data Protection Policy is designed to assist you in understanding how we collect, use, disclose and/or process the personal data you have provided to us, as well as to assist you in making an informed decision before providing us with any of your personal data.</p>
@@ -74,6 +75,7 @@
     </ng-container>
     <!-- Refund Policy  -->
     <ng-container *ngIf="docId === 'refund-policy'">
+        <mat-icon class="hover:text-teal-400 cursor-pointer" onclick="history.back()" [svgIcon]="'mat_solid:arrow_back'"></mat-icon>
         <h3 style="text-align: center;"><strong><span style="font-size: 22px;">Refund Policy</span></strong></h3>
         <p>&nbsp;</p>
         <p>We understand that sometimes things don&rsquo;t always go according to plan, so we have made this Refund Policy to help you!</p>
@@ -131,6 +133,7 @@
     </ng-container>
     <!-- Terms & Conditions -->
     <ng-container *ngIf="docId === 'terms-conditions'">
+        <mat-icon class="hover:text-teal-400 cursor-pointer" onclick="history.back()" [svgIcon]="'mat_solid:arrow_back'"></mat-icon>
         <h2 style="text-align: center;"><strong><span style="font-size: 22px;">Terms &amp; Conditions</span></strong></h2>
         <p>&nbsp;</p>
         <ol class="list-decimal list-inside">
