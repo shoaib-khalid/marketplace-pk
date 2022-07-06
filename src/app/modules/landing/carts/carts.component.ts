@@ -1351,7 +1351,7 @@ export class CartListComponent implements OnInit, OnDestroy
     }
 
     goToCheckout() {
-        if (this.customerAddress === null) {
+        if (!this.customerAddress) {
             
             const confirmation = this._fuseConfirmationService.open({
                 "title": "Address in empty!",
