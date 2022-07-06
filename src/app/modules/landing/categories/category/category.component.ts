@@ -4,7 +4,7 @@ import { LocationService } from 'app/core/location/location.service';
 import { LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, Subject, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
 import { ProductPagination, StorePagination } from 'app/core/store/store.types';
 
@@ -48,6 +48,8 @@ export class CategoryComponent implements OnInit
     storesViewAll: boolean = false;
     productsViewAll: boolean = false;
     locationsViewAll: boolean = false;
+
+    isLoading: boolean = true;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     
@@ -317,7 +319,21 @@ export class CategoryComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-            
+        
+        // once selectCart() is triggered, it will set isLoading to true
+        // this function will wait for both featuredStores$ & featuredProducts$ result first
+        // then is isLoading to false
+        combineLatest([
+            this._locationService.featuredStores$,
+            this._locationService.featuredProducts$
+        ]).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([result1, result2 ] : [StoresDetails[], ProductDetails[]])=>{
+            if (result1 && result2) {
+                this.isLoading = false;
+            }            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
     }
 
     /**

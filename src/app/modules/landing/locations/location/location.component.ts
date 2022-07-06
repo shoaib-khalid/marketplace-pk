@@ -4,7 +4,7 @@ import { LocationService } from 'app/core/location/location.service';
 import { LandingLocation, LocationArea, ParentCategory, ProductDetails, StoreDetails, StoresDetails } from 'app/core/location/location.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { distinctUntilChanged, filter, map, merge, Subject, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, merge, Subject, switchMap, takeUntil, combineLatest } from 'rxjs';
 import { Location } from '@angular/common';
 import { ProductPagination, StorePagination } from 'app/core/store/store.types';
 import { MatPaginator } from '@angular/material/paginator';
@@ -57,7 +57,7 @@ export class LocationComponent implements OnInit
     maxProductsDisplay: number = 30;
     maxCategoriesDisplay: number = 50;
     
-    isLoading: boolean = false;
+    isLoading: boolean = true;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -279,7 +279,6 @@ export class LocationComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
         
-
         // Get Featured Products
         this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -324,6 +323,21 @@ export class LocationComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // once selectCart() is triggered, it will set isLoading to true
+        // this function will wait for both featuredStores$ & featuredProducts$ result first
+        // then is isLoading to false
+        combineLatest([
+            this._locationService.featuredStores$,
+            this._locationService.featuredProducts$
+        ]).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([result1, result2 ] : [StoresDetails[], ProductDetails[]])=>{
+            if (result1 && result2) {
+                this.isLoading = false;
+            }            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
     }
 
     /**
