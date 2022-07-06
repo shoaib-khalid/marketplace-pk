@@ -253,7 +253,6 @@
                                                                     #deliveryProviderSelector="matSelect"
                                                                     >
                                                                     <mat-select-trigger>
-                                                                        <!-- For all vertical except E-Commerce MYS -->
                                                                         <span class="flex items-center justify-between w-full">
                                                                             <span>{{ selectedCart.carts[i + pagination.startIndex].deliveryProviderName }}</span>
                                                                             <img
@@ -309,9 +308,8 @@
                                                             #deliveryProviderSelector="matSelect"
                                                             >
                                                             <mat-select-trigger>
-                                                                <!-- For all vertical except E-Commerce MYS -->
                                                                 <span class="flex items-center justify-between w-full">
-                                                                    <span>{{ deliveryProviderSelector.triggerValue }}</span>
+                                                                    <span>{{ selectedCart.carts[i + pagination.startIndex].deliveryProviderName }}</span>
                                                                     <img
                                                                         matSuffix
                                                                         class="w-1/3 max-h-10"
