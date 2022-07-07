@@ -98,7 +98,7 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
             // else set route and storeDetails to null
             else
             {
-                this._searchService.route = null;
+                this._searchService.route = '';
                 this._searchService.storeDetails = null;
             }
         });

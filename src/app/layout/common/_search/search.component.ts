@@ -76,33 +76,34 @@ export class _SearchComponent implements OnInit, OnDestroy
     {
         this._searchService.route$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(resp => {
-                // resp is not null if inside store page
-                if (resp) {
+            .subscribe(response => {
+                if (response) { // response is not null if inside store page
                     this.placeholder = 'Search products'
-
                     this._searchService.storeDetails$
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((storeDetails: StoreDetails) => {
-                        this.store = storeDetails;
-                    })
-                }
-                else
-                {
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((storeDetails: StoreDetails) => {
+                            this.store = storeDetails;
+                            // Mark for check
+                            this._changeDetectorRef.markForCheck();
+                        });
+                } else {
                     this.placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
                 }
-            })
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
         
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user: User)=>{
-                this.customer = user
+                this.customer = user;
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
         this._searchService.get()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response)=> {   
-                                
                 this.resultSets = response;                
                 this.autoCompleteList = response;  
                 
