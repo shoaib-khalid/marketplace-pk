@@ -61,6 +61,18 @@
                 <div class="grid w-full">
                     <!-- Title -->
                     <span class="text-lg sm:text-3xl font-semibold mb-2">Your Cart</span>
+
+                    <!-- Checkbox all carts MOBILE -->
+                    <div class="lg:hidden cart-title-grid grid w-full pb-2 px-2 border border-white">
+                        <!-- Checkbox all in cart -->
+                        <div class="flex items-start justify-center items-center w-full">
+                            <input type="checkbox" [disabled]="selectedCart.disabled" [checked]="selectedCart.selected" (change)="selectCart(carts,null,null,$event.target.checked)"/>
+                        </div>
+                        <div class="flex flex-col justify-start ml-2">
+                            <span class="font-medium text-base tracking-tight">Product</span>
+                        </div>
+                    </div>
+
                     <!-- Header -->
                     <div class="hidden lg:grid cart-grid w-full sticky py-2 border-b border-gray-600 tracking-tight">
                         <!-- Checkbox all carts -->
