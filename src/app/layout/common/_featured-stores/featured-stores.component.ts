@@ -51,6 +51,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((platform: Platform)=>{
                 this.platform = platform;
+                
             });                        
     }
 
@@ -97,7 +98,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return this.platform.logo;
+            return this.platform.logoSquare;
         }
     }
 

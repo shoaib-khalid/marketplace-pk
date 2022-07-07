@@ -4,6 +4,7 @@ export interface Platform
     name?       : string;
     logo?       : string;
     logoDark?   : string;
+    logoSquare? : string;
     slug?       : string;
     url?        : string;
     country?    : string;

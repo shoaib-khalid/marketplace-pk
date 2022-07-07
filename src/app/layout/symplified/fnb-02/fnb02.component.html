@@ -15,7 +15,7 @@
         <!-- Header -->
         <div class="md:relative flex flex-col flex-0 justify-center lg:items-center w-full h-auto overflow-hidden z-49 shadow dark:shadow-none print:hidden sticky top-0">
             <!-- Top Header bar -->
-            <div class="flex flex-auto w-full justify-center items-center lg:px-0 lg:max-w-300 bg-card z-40 dark:bg-gray-700">
+            <div class="flex flex-auto w-full justify-center items-center px-3 sm:px-4 lg:px-0 lg:max-w-300 bg-card z-40 dark:bg-gray-700">
                 <div class="relative flex items-center justify-between w-full h-16">
                     <!-- Logo -->
                     <ng-container *ngIf="platform">
@@ -48,11 +48,11 @@
                         <div class="flex w-full items-center">
                             <!-- <search [appearance]="'bar'"></search> -->
                             <user></user>
-                            <ng-container *ngIf="!isScreenSmall">
+                            <!-- <ng-container *ngIf="!isScreenSmall">
                                 <div class="ml-4 text-medium font-medium leading-5 truncate">
                                     {{displayUsername}}
                                 </div>
-                            </ng-container>
+                            </ng-container> -->
                         </div>
                     </div>
                 </div>
