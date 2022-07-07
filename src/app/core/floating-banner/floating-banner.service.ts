@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject } from 'rxjs';
 import { AppConfig } from 'app/config/service.config';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 import { Promo } from './floating-banner.types';
 import { PlatformLocation } from '@angular/common';
+import { JwtService } from '../jwt/jwt.service';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +26,8 @@ export class FloatingBannerService
         private _apiServer: AppConfig,
         private _router: Router,
         private _platformLocation: PlatformLocation,
+        private _jwt: JwtService,
+        private _authService: AuthService,
 
     )
     {
@@ -121,4 +125,27 @@ export class FloatingBannerService
         this._promoSmall.next(null);
     }
 
+    /**
+     * Set floating banners
+     * 
+     */
+    setBanners(): Observable<any>
+    {
+        return of(true).pipe(
+            switchMap(async (response: any) => {
+
+                let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid : null
+
+                if (!customerId) {
+                    let fullUrl = (this._platformLocation as any).location.origin;
+                    let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
+                    let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
+                            '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
+            
+                    this.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
+                    this.setBigBanner('assets/promo/7.7-Flash-Sales-Promo_Popup-Banner_400x500_V2.png', redirectUrl);
+                }
+            })
+        );
+    }
 }

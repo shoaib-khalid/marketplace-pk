@@ -170,18 +170,6 @@ export class PlatformService
                             return newPlatform;
                         });
 
-                    let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid : null
-                    // Set promo banner
-                    if (!customerId) {
-                        let fullUrl = (this._platformLocation as any).location.origin;
-                        let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
-                        let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
-                                '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
-                                // + '&guestCartId=' + this._cartService.cartId$ + '&storeId=' + this._storesService.storeId$;
-                        this._floatingBannerService.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl)
-                        this._floatingBannerService.setBigBanner('assets/promo/7.7-Flash-Sales-Promo_Popup-Banner_400x500_V2.png', redirectUrl)
-                    }
-
                     // Get banner
                     this._adsService.getBanner(response["data"][0].platformCountry).subscribe();
                 })

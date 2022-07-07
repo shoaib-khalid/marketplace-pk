@@ -5,6 +5,7 @@ import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { AdsService } from 'app/core/ads/ads.service';
 import { CartService } from 'app/core/cart/cart.service';
 import { UserService } from 'app/core/user/user.service';
+import { FloatingBannerService } from 'app/core/floating-banner/floating-banner.service';
 
 
 @Injectable({
@@ -20,6 +21,8 @@ export class LandingDataResolver implements Resolve<any>
         private _cartsService: CartService,
         private _userService: UserService,
         private _httpstatService: HttpStatService,
+        private _floatingBannerService: FloatingBannerService,
+
     )
     {
     }
@@ -40,6 +43,7 @@ export class LandingDataResolver implements Resolve<any>
         return forkJoin([
             this._adsService.set(),
             this._userService.getCustomerAddresses(),
+            this._floatingBannerService.setBanners()
             // this._httpstatService.get(500)
         ]);
     }

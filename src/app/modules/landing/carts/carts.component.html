@@ -474,7 +474,7 @@
                     <ng-container *ngIf="customerId; else guestVoucher">
                         <!-- Voucher Dropdown -->
                         <ng-container *ngIf="customerVouchers && customerVouchers.length > 0">
-                            <mat-form-field class="fuse-mat-no-subscript w-full my-1 text-sm" floatLabel="always">
+                            <mat-form-field class="fuse-mat-no-subscript fuse-mat-dense w-full my-1 text-sm" floatLabel="always">
                                 <mat-select 
                                     placeholder="Select My Voucher"
                                     (selectionChange)="selectVoucher(voucherSelector.value);"
