@@ -148,6 +148,7 @@ export class PlatformService
                                 name        : response ? response["data"][0].platformName : null,
                                 logo        : response ? response["data"][0].platformLogo : null,
                                 logoDark    : response ? response["data"][0].platformLogoDark : null,
+                                logoSquare  : response ? response["data"][0].platformLogoSquare : null,
                                 country     : response ? response["data"][0].platformCountry : null,
                                 favicon16   : response ? response["data"][0].platformFavIcon : null,
                                 favicon32   : response ? response["data"][0].platformFavIcon32 : null,
