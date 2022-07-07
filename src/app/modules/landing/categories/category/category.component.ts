@@ -330,17 +330,17 @@ export class CategoryComponent implements OnInit
         .subscribe(([featuredStores, featuredProducts ] : [StoresDetails[], ProductDetails[]])=>{
             if (featuredStores && featuredProducts) {
                 this.isLoading = false;
+
+                if (featuredStores.length === 0) {
+                    // Get stores
+                    this.featuredStores = this.stores;
+                }
+    
+                if (featuredProducts.length === 0) {
+                    // Get products
+                    this.featuredProducts = this.products;
+                }
             }            
-
-            if (featuredStores.length === 0) {
-                // Get stores
-                this.featuredStores = this.stores;
-            }
-
-            if (featuredProducts.length === 0) {
-                // Get products
-                this.featuredProducts = this.products;
-            }
 
             // Mark for check
             this._changeDetectorRef.markForCheck();
