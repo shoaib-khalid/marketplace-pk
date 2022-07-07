@@ -23,6 +23,7 @@ import { CheckoutService } from 'app/core/checkout/checkout.service';
 import { Router } from '@angular/router';
 import { AnalyticService } from 'app/core/analytic/analytic.service';
 import { AppConfig } from 'app/config/service.config';
+import { StoresService } from 'app/core/store/store.service';
 
 
 @Component({
@@ -222,6 +223,7 @@ export class BuyerCheckoutComponent implements OnInit
         private _analyticService: AnalyticService,
         private _apiServer: AppConfig,
         private _platformLocation: PlatformLocation,
+        private _storesService: StoresService,
 
     )
     {
@@ -844,11 +846,14 @@ export class BuyerCheckoutComponent implements OnInit
         else return 0
     }
 
-    redirect(type : string, storeDomain : string, productSeo : string) {
+    redirect(type : string, store : Store, productSeo : string) {
         
-        let storeSlug = storeDomain.split(".")[0]
+        let storeSlug = store.domain.split(".")[0]
 
-        if (type === 'store' && storeDomain) {
+        // resolve store 
+        this._storesService.storeId = store.id;
+
+        if (type === 'store' && storeSlug) {
             
             this._router.navigate(['/store/' + storeSlug]);
         }

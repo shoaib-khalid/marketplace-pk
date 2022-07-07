@@ -71,7 +71,7 @@
                                 </div> -->
                                 <span></span>
                                 <div class="flex flex-col justify-start">
-                                    <span (click)="redirect('store', cart.store.domain, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
+                                    <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
                                     <!-- <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span> -->
                                     <!-- <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span> -->
                                 </div>
@@ -89,7 +89,7 @@
                                         <div class="flex flex-row grow items-center justify-start">                                            
                                             <img class="w-14 max-w-14 max-h-14 min-h-14 sm:w-18 sm:max-w-18 sm:h-18 sm:max-h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
                                             <div class="flex flex-col ml-2 items-start justify-start sm:justify-center gap-1">
-                                                <span (click)="redirect('product', cart.store.domain, cartItem.productInventory.product.seoName)" class="text-md sm:text-md font-semibold line-clamp-2 hover:cursor-pointer">{{cartItem.productName}}</span>
+                                                <span (click)="redirect('product', cart.store, cartItem.productInventory.product.seoName)" class="text-md sm:text-md font-semibold line-clamp-2 hover:cursor-pointer">{{cartItem.productName}}</span>
                                                 <div class="flex flex-row items-center">
                                                     <!-- Display variants -->
                                                     <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">

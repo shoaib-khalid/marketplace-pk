@@ -1587,11 +1587,14 @@ export class CartListComponent implements OnInit, OnDestroy
         this._router.navigate(['/checkout']);
     }
 
-    redirect(type : string, storeDomain : string, productSeo : string) {
+    redirect(type : string, store : Store, productSeo : string) {
         
-        let storeSlug = storeDomain.split(".")[0]
+        let storeSlug = store.domain.split(".")[0]
 
-        if (type === 'store' && storeDomain) {
+        // resolve store 
+        this._storesService.storeId = store.id;
+
+        if (type === 'store' && storeSlug) {
             
             this._router.navigate(['/store/' + storeSlug]);
         }
