@@ -12,6 +12,8 @@ import { Platform } from './platform.types';
 import { AuthService } from '../auth/auth.service';
 import { StoresService } from 'app/core/store/store.service';
 import { AdsService } from '../ads/ads.service';
+import { FloatingBannerService } from '../floating-banner/floating-banner.service';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -41,7 +43,10 @@ export class PlatformService
         private _apiServer: AppConfig,
         private _jwt: JwtService,
         private _logging: LogService,
-        private _adsService: AdsService
+        private _adsService: AdsService,
+        private _floatingBannerService: FloatingBannerService,
+        private _router: Router,
+
     )
     {
     }
@@ -164,6 +169,18 @@ export class PlatformService
                             // Return the store
                             return newPlatform;
                         });
+
+                    let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid : null
+                    // Set promo banner
+                    if (!customerId) {
+                        let fullUrl = (this._platformLocation as any).location.origin;
+                        let sanatiseUrl = fullUrl.replace(/^(https?:|)\/\//, '').split(':')[0]; // this will get the domain from the URL
+                        let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
+                                '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
+                                // + '&guestCartId=' + this._cartService.cartId$ + '&storeId=' + this._storesService.storeId$;
+                        this._floatingBannerService.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl)
+                        this._floatingBannerService.setBigBanner('assets/promo/7.7-Flash-Sales-Promo_Popup-Banner_400x500_V2.png', redirectUrl)
+                    }
 
                     // Get banner
                     this._adsService.getBanner(response["data"][0].platformCountry).subscribe();

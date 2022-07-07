@@ -113,6 +113,20 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             });
     }
 
+    /**
+    * After view init
+    */
+    ngAfterViewInit(): void
+    {
+        setTimeout(() => {
+            if (this.customersAddresses.length < 1 )
+            {
+                this.addAddress();
+            }
+        }, 0);
+
+    }
+
     ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
@@ -325,6 +339,8 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
                         // Delete the address
                         this.customersAddresses.splice(index, 1);
+
+                        this._userService.customersAddress = null;
 
                         // Update the address
                         this._userService.customersAddresses = this.customersAddresses;

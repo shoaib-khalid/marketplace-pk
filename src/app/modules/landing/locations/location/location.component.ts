@@ -331,9 +331,19 @@ export class LocationComponent implements OnInit
             this._locationService.featuredStores$,
             this._locationService.featuredProducts$
         ]).pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(([result1, result2 ] : [StoresDetails[], ProductDetails[]])=>{
-            if (result1 && result2) {
+        .subscribe(([featuredStores, featuredProducts ] : [StoresDetails[], ProductDetails[]])=>{
+            if (featuredStores && featuredProducts) {
                 this.isLoading = false;
+
+                if (featuredStores.length === 0) {
+                    // Get stores
+                    this.featuredStores = this.stores;
+                }
+
+                if (featuredProducts.length === 0) {
+                    // Get products
+                    this.featuredProducts = this.products;
+                }
             }            
             // Mark for check
             this._changeDetectorRef.markForCheck();
