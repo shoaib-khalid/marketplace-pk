@@ -55,7 +55,7 @@ export class LandingPaymentRedirectComponent
             this.payment.msg = params['msg'];
 
             // fastPay redirect
-            if (this.payment.msg !== "Payment_was_successful"){
+            if (this.payment.msg !== "Payment_was_successful" && params['err_code']){
                 this.payment.msg = params['err_code'];
                 this.payment.msg = this.payment.msg + "-" + params['err_msg'];
                 this.payment.transaction_id = params['basket_id'];
@@ -71,23 +71,31 @@ export class LandingPaymentRedirectComponent
             if (this.payment.order_id) {
                 if (this.payment.order_id.charAt(0) === "G") {
                     this._paymentRedirectService.getOrderGroupsById(this.payment.order_id)
-                        .subscribe((response)=>{
-                            let paymentType = "ONLINEPAYMENT";//response.paymentType;
-                            this._router.navigate(['/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg ])
+                        .subscribe((response)=>{                            
+                            if (response) {
+                                let paymentType = "ONLINEPAYMENT";//response.paymentType;
+                                this._router.navigate(['/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg ]);
+                            } else {
+                                this._router.navigate(['/thankyou/FAILED/UNKNOWN/ORDER_NOT_FOUND']);
+                            }
                         });
                 } else {
                     this._paymentRedirectService.getOrderById(this.payment.order_id)
                         .subscribe((response) => {
-                            let storeId = response.storeId;
-                            let paymentType = response.paymentType;
-            
-                            // getStoreById(storeId, cartId) , does not need cartId here 
-                            // since we're redirecting to another page (SF of the store)
-                            this._storesService.getStoreById(storeId)
-                                .subscribe((storeResponse) => {
-                                    let storeDomain = storeResponse.domain;
-                                    this._document.location.href = 'https://' + storeDomain + '/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg;
-                                });
+                            if (response) {
+                                let storeId = response.storeId;
+                                let paymentType = response.paymentType;
+                
+                                // getStoreById(storeId, cartId) , does not need cartId here 
+                                // since we're redirecting to another page (SF of the store)
+                                this._storesService.getStoreById(storeId)
+                                    .subscribe((storeResponse) => {
+                                        let storeDomain = storeResponse.domain;
+                                        this._document.location.href = 'https://' + storeDomain + '/thankyou/' + status + '/' + paymentType + '/' + this.payment.msg;
+                                    });
+                            } else {
+                                this._router.navigate(['/thankyou/FAILED/UNKNOWN/ORDER_NOT_FOUND']);
+                            }
                         });
                 }
             } else {

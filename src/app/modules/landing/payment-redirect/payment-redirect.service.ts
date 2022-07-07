@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, ReplaySubject } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { Observable, of, ReplaySubject } from 'rxjs';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -50,7 +50,11 @@ export class PaymentRedirectService
 
         return this._httpClient.get<any>(orderService + '/orders/' + id, header)
             .pipe(
-                map((response) => {
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
                     this._logging.debug("Response from StoresService (getOrderById)",response);
 
                     return response["data"];
@@ -66,13 +70,16 @@ export class PaymentRedirectService
             headers: new HttpHeaders().set("Authorization", `Bearer ${this._authService.publicToken}`)
         };
 
-        return this._httpClient.get<any>(orderService + '/ordergroups/' + id, header)
-            .pipe(
-                map((response) => {
-                    this._logging.debug("Response from StoresService (getOrderGroupsById)",response);
+        return this._httpClient.get<any>(orderService + '/ordergroups/' + id, header).pipe(
+            catchError(() =>
+                // Return false
+                of(false)
+            ),
+            switchMap(async (response: any) => {
+                this._logging.debug("Response from StoresService (getOrderGroupsById)",response);
 
-                    return response["data"];
-                })
-            );
+                return response["data"];
+            })
+        );
     }
 }

@@ -512,12 +512,9 @@ export class BuyerCheckoutComponent implements OnInit
                                     "email": this.order.shipmentEmail, 
                                     "phone": this.order.shipmentPhoneNumber, 
                                     "hash": this.payment.hash 
-                                },
-                                    'post', true );
-
+                                },'post', true );
                             } else if (this.payment.providerId == "3") {      
-                                let fullUrl = (this._platformLocation as any).location.origin;   
-
+                                let fullUrl = (this._platformLocation as any).location.origin;
                                 this.postForm("post-to-fastpay", this.payment.paymentLink, 
                                     { 
                                         "CURRENCY_CODE" : "PKR", 
