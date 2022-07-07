@@ -65,7 +65,7 @@
                     <div class="hidden lg:grid cart-grid w-full sticky py-2 border-b border-gray-600 tracking-tight">
                         <!-- Checkbox all carts -->
                         <div class="flex items-center justify-center w-full">
-                            <!-- <input type="checkbox" [(ngModel)]="selectedCart.selected" (change)="selectCart(carts,null,null,$event.target.checked)"/> -->
+                            <input type="checkbox" [disabled]="selectedCart.disabled" [checked]="selectedCart.selected" (change)="selectCart(carts,null,null,$event.target.checked)"/>
                         </div>
                         <span class="font-semibold text-left ml-4">Product</span>
                         <span class="font-semibold text-center">Unit Price</span>
@@ -83,11 +83,11 @@
                                 <!-- Cart Header -->
                                 <div class="cart-title-grid grid w-full sticky pb-2 border-b">
                                     <!-- Checkbox all in cart -->
-                                    <div class="flex items-start justify-center mt-2 w-full">
-                                        <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
+                                    <div class="flex items-start justify-center items-center w-full">
+                                        <input [disabled]="selectedCart.carts[i + pagination.startIndex].disabled" [checked]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
                                     </div>
                                     <div class="flex flex-col justify-start ml-2 md:ml-4">
-                                        <span class="text-md sm:text-xl font-semibold">{{cart.store.name}}</span>
+                                        <span (click)="redirect('store', cart.store.domain, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
                                         <!-- <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span> -->
                                         <!-- <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span> -->
                                     </div>
@@ -98,13 +98,13 @@
                                         <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
                                             <!-- Checkbox each item -->
                                             <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
-                                                <input [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
+                                                <input [disabled]="selectedCart.carts[i + pagination.startIndex].cartItem[j].disabled" [checked]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
                                             </div>
                                             <!-- Image, Title, Variants -->
                                             <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
                                                 <img class="w-14 max-w-14 max-h-14 min-h-14 sm:w-18 sm:max-w-18 sm:h-18 sm:max-h-18 shadow rounded" [src]="cartItem.productAsset ? cartItem.productAsset.url : cartItem.productInventory.product.thumbnailUrl ? cartItem.productInventory.product.thumbnailUrl : displayStoreLogo(cart.store)">
-                                                <div class="flex flex-col ml-2 items-start justify-start sm:justify-center">
-                                                    <span class="text-md sm:text-md font-semibold line-clamp-2">{{cartItem.productName}}</span>
+                                                <div class="flex flex-col ml-2 items-start justify-start sm:justify-center gap-1">
+                                                    <span (click)="redirect('product', cart.store.domain, cartItem.productInventory.product.seoName)" class="text-md sm:text-md font-semibold line-clamp-2 hover:cursor-pointer">{{cartItem.productName}}</span>
                                                     <div class="flex flex-row items-center">
                                                         <!-- Display variants -->
                                                         <ng-container *ngIf="cartItem.productInventory.productInventoryItems.length > 0">
@@ -120,6 +120,11 @@
                                                                 <span class="block last:hidden leading-tight text-xs lg:text-sm text-secondary">,&nbsp;</span>
                                                             </ng-container>
                                                         </ng-container>
+                                                    </div>
+                                                    <!-- Display Special Instruction -->
+                                                    <div *ngIf="cartItem.specialInstruction" class="flex flex-row items-center">
+                                                        <span class="leading-tight text-xs md:text-sm text-secondary flex flex-wrap">Instruction: {{cartItem.specialInstruction}}</span>
+                                                        <!-- <span class="leading-tight text-xs text-secondary flex flex-wrap">{{cartItem.specialInstruction}}</span> -->
                                                     </div>
                                                     <!-- Quantity -->
                                                     <div class="block md:hidden flex flex-col justify-center items-center mt-0.5">
@@ -284,7 +289,7 @@
                                                 </div>
                                                 <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
                                                     <span class="text-sm">Shipping Fee:</span>
-                                                    <span class="font-semibold text-xs sm:text-base">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                                    <span class="font-semibold text-xs sm:text-base tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
                                                 </div>
                                             </div>
                                             <!-- Total Items  -->
@@ -340,7 +345,7 @@
                                         <div class="flex flex-row justify-between items-center">
                                             <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
                                                 <span class="text-sm">Shipping Fee:</span>
-                                                <span class="font-semibold text-sm">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
+                                                <span class="font-semibold text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span>
                                             </div>
                                             <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
                                                 <span class="text-sm">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>

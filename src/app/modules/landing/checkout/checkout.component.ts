@@ -834,7 +834,7 @@ export class BuyerCheckoutComponent implements OnInit
      });
     }
 
-    getDeliverFee(cartId: string){
+    getDeliveryFee(cartId: string){
         let index = this.checkoutItems.findIndex(item => item.cartId === cartId);
 
         if (index > -1) {
@@ -842,5 +842,19 @@ export class BuyerCheckoutComponent implements OnInit
             
         }
         else return 0
+    }
+
+    redirect(type : string, storeDomain : string, productSeo : string) {
+        
+        let storeSlug = storeDomain.split(".")[0]
+
+        if (type === 'store' && storeDomain) {
+            
+            this._router.navigate(['/store/' + storeSlug]);
+        }
+        else if (type === 'product' && productSeo) {
+
+            this._router.navigate(['store/' + storeSlug + '/all-products/' + productSeo]);
+        }
     }
 }
