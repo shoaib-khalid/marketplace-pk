@@ -79,3 +79,14 @@ export interface HttpResponse<T>{
     status: number;
     timestamp:string;
 }
+
+export interface UserSession
+{
+    created : string;
+    device  : string;
+    browser : string;
+    id?     : string;
+    ip      : string;
+    os      : string;
+    updated : string;
+}

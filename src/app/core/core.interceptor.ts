@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, concatMap, delay, retry, retryWhen } from 'rxjs/operators';
+import { Observable, of, Subject, throwError } from 'rxjs';
+import { catchError, concatMap, delay, retry, retryWhen, takeUntil } from 'rxjs/operators';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { DeviceDetectorService } from 'ngx-device-detector';
@@ -22,6 +22,8 @@ export class CoreInterceptor implements HttpInterceptor
     deviceInfo = null;
     _event     : string;
 
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
     /**
      * Constructor
      */
@@ -39,11 +41,12 @@ export class CoreInterceptor implements HttpInterceptor
     {
         // Get User IP Address
         this._ipAddressService.ipAdressInfo$
-        .subscribe((response:any)=>{
-            if (response) {
-                this.ipAddress = response.ip_addr;                
-            }
-        });
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response:any)=>{
+                if (response) {
+                    this.ipAddress = response.ip_addr;                
+                }
+            });
 
         this._router.events.forEach((event) => {
             this._event = event["urlAfterRedirects"]

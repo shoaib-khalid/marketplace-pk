@@ -10,6 +10,8 @@ import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { AppConfig } from './config/service.config';
 import { SwUpdate } from '@angular/service-worker';
+import { UserService } from './core/user/user.service';
+import { UserSession } from './core/user/user.types';
 
 declare let gtag: Function;
 
@@ -20,8 +22,9 @@ declare let gtag: Function;
 })
 export class AppComponent
 {
-    platform: Platform;
-    ipAddress  : string; 
+    platform    : Platform;
+    ipAddress   : string; 
+    userSession : UserSession;
 
     favIcon16: HTMLLinkElement = document.querySelector('#appIcon16');
     favIcon32: HTMLLinkElement = document.querySelector('#appIcon32');
@@ -36,11 +39,10 @@ export class AppComponent
         private _router: Router,
         private _platformsService: PlatformService,
         private _ipAddressService: IpAddressService,
+        private _apiServer: AppConfig,
         private _analyticService: AnalyticService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _jwtService: JwtService,
-        private _authService: AuthService,
-        private _apiServer: AppConfig,
+        private _userService: UserService,
         private _swUpdate: SwUpdate
     )
     {
@@ -108,55 +110,48 @@ export class AppComponent
                         });
                     }
                 }
-            });
-
-        // Get User IP Address
-        this._ipAddressService.ipAdressInfo$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((response:any)=>{
-                if (response) {
-                    
-                    this.ipAddress = response.ip_addr;
-                }
-                // Mark for check
+                // Mark for Check
                 this._changeDetectorRef.markForCheck();
             });
+        
+        this._userService.userSession$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((userSession: UserSession)=>{
+                if (userSession) {
+                    this.userSession = userSession;
+                }
+                // Mark for Check
+                this._changeDetectorRef.markForCheck();
+            })
 
-        this._router.events.forEach((event) => {   
-                        
-            // if customerId null means guest
-            let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
-            
-            //get domain
-            var domain = this._apiServer.settings.marketplaceDomain;
-            //get ip address info
-            var _IpActivity = this.ipAddress;            
-            
-            //get session id by get cart id
-            var _sessionId = null // this._cartService.cartId$ 
+        // Check for router changes
+        this._router.events.forEach(
+            (event) => {               
+                
+                // get domain
+                let domain = this._apiServer.settings.marketplaceDomain;
 
-            const activityBody = 
-            {
-                browserType : null,
-                customerId  : _customerId,
-                deviceModel : null,
-                errorOccur  : null,
-                errorType   : null,
-                ip          : _IpActivity,
-                os          : null,
-                pageVisited : 'https://' + domain + event["urlAfterRedirects"],
-                sessionId   : _sessionId,
-                storeId     : null
+                const activityBody = 
+                {
+                    browserType : this.userSession ? this.userSession.browser : null,
+                    deviceModel : this.userSession ? this.userSession.device : null,
+                    ip          : this.userSession ? this.userSession.ip : null,
+                    os          : this.userSession ? this.userSession.os : null,
+                    sessionId   : this.userSession ? this.userSession.id : null,
+
+                    storeId     : null,
+                    customerId  : null,
+                    errorOccur  : null,
+                    errorType   : null,
+
+                    pageVisited : 'https://' + domain + event["urlAfterRedirects"]
+                }
+
+                if(event instanceof RoutesRecognized) {
+                    this._analyticService.postActivity(activityBody).subscribe((response) => {
+                    });           
+                }         
             }
-
-            if(event instanceof RoutesRecognized) {
-                this._analyticService.postActivity(activityBody).subscribe((response) => {
-                });           
-            }
-            // NavigationEnd
-            // NavigationCancel
-            // NavigationError
-            // RoutesRecognized            
-        });
+        );
     }
 }
