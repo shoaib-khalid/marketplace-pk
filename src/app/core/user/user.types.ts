@@ -38,6 +38,8 @@ export interface CustomerAddress
     postCode: string;
     state: string;
     isDefault: boolean;
+    latitude: string;
+    longitude: string;
 }
 
 export interface Client

@@ -147,7 +147,9 @@ export class EditAddressDialog implements OnInit {
             phoneNumber : ['', [UserProfileValidationService.phonenumberValidator, Validators.maxLength(30)]],
             postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
-            isDefault   : ['']
+            isDefault   : [''],
+            latitude    : [''],
+            longitude   : ['']
         });
 
         this._userService.user$
@@ -195,21 +197,37 @@ export class EditAddressDialog implements OnInit {
                     this._changeDetectorRef.markForCheck();
                 });
             });
-         //to implement get current location first to be display if in db is null
-         navigator.geolocation.getCurrentPosition((position) => {
+        //to implement get current location first to be display if in db is null
+        navigator.geolocation.getCurrentPosition((position) => {
             var crd = position.coords;
             this.currentLat = crd.latitude;
             this.currentLong= crd.longitude;            
-        });              
-
+        });   
+        
+        console.log("data sini", this.data);
+        
         //======================== Insert google maps =========================
         //if db got null then we need to set the curren location so that it will display the google maps instead of hardcode the value of latitude and longitude
         
-        this.displayLat = this.currentLat;
-        this.displayLong = this.currentLong;
+        if(!this.data.customerAddress) {
+            this.displayLat = this.currentLat;
+            this.displayLong = this.currentLong;
 
-        this.displayLatitude.next(this.displayLat.toString());
-        this.displayLongtitude.next(this.displayLong.toString());
+            this.displayLatitude.next(this.displayLat.toString());
+            this.displayLongtitude.next(this.displayLong.toString());
+        } else {
+            if(!this.data.customerAddress.latitude  && !this.data.customerAddress.longitude ) {
+                this.displayLat = this.currentLat;
+                this.displayLong = this.currentLong;
+            } else {
+                this.displayLat = parseFloat(this.data.customerAddress.latitude) ;
+                this.displayLong = parseFloat(this.data.customerAddress.longitude);
+                this.displayLatitude.next(this.data.customerAddress.latitude);
+                this.displayLongtitude.next(this.data.customerAddress.longitude);
+            }
+
+        }
+
         // implement google maos
         let loader = new Loader({
             apiKey: 'AIzaSyCFhf1LxbPWNQSDmxpfQlx69agW-I-xBIw',
@@ -356,8 +374,17 @@ export class EditAddressDialog implements OnInit {
                 );
                 this.displayLatitude.next(coordinateClickParse.lat);
                 this.displayLongtitude.next(coordinateClickParse.lng);
+
+                this.addressForm.get('latitude').patchValue(this.location.lat.toString());
+                this.addressForm.get('longitude').patchValue(this.location.lng.toString());
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             
             });
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
             
         });
 
@@ -409,6 +436,11 @@ export class EditAddressDialog implements OnInit {
                 });
         });
 
+        // this.addressForm.get('latitude').setValue(this.location.lat.toString());
+        // this.addressForm.get('longitude').setValue(this.location.lng.toString());
+
+        // this.addressForm.value.latitude = this.location.lat.toString();
+        // this.addressForm.value.longitude = this.location.lng.toString();
 
         if(this.data.type === "create"){
             this.addressForm.get('customerId').setValue(this.data.customerId);
@@ -416,6 +448,8 @@ export class EditAddressDialog implements OnInit {
             this.addressForm.get('country').setValue(this.countryName);
             this.addressForm.get('email').setValue(this.data.user.email);
         } else {
+            // this.addressForm.get('latitude').patchValue(this.location.lat.toString());
+            // this.addressForm.get('longitude').patchValue(this.location.lng.toString());
             this.addressForm.patchValue(this.data.customerAddress);
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
@@ -423,7 +457,13 @@ export class EditAddressDialog implements OnInit {
     }
 
     updateAddress(){
+        this.addressForm.value.latitude = this.location.lat.toString();
+        this.addressForm.value.longitude = this.location.lng.toString();
+
         this.dialogRef.close(this.addressForm.value);
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 
     closeDialog(){
