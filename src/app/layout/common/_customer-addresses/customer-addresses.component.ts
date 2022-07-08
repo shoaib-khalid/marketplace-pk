@@ -12,7 +12,7 @@ import { FuseMediaWatcherService } from "@fuse/services/media-watcher";
 import { FuseConfirmationService } from "@fuse/services/confirmation";
 import { UserService } from "app/core/user/user.service";
 
-import { CustomerAddress } from "app/core/user/user.types";
+import { CustomerAddress, User } from "app/core/user/user.types";
 import { EditAddressDialog } from './edit-address/edit-address.component';
 
 @Component({
@@ -37,6 +37,8 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
     url:any;
     customerId: string;
+
+    user: User;
 
     /**
     * Constructor
@@ -70,11 +72,26 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         
         });        
 
-        // Customer Details
-        this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
-            .subscribe((response)=>{
-                this.accountForm.patchValue(response);
-            })
+        // // Customer Details
+        // this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
+        //     .subscribe((response)=>{
+        //         console.log("response", response);
+                
+        //         this.accountForm.patchValue(response);
+
+        //         this.accountForm.get
+        //     })
+
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) => {
+
+                if(user) {
+                    this.accountForm.patchValue(user);
+
+                }
+
+            });
 
         this._userService.getCustomerAddresses().subscribe();
 
@@ -123,7 +140,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             {
                 this.addAddress();
             }
-        }, 0);
+        }, 100);
 
     }
 
