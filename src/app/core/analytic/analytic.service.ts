@@ -94,13 +94,13 @@ export class AnalyticService
     postActivity(bodyActivity: CustomerActivity): Observable<any>
     {
 
-        //to implement get current location first to be display if in db is null
-        navigator.geolocation.getCurrentPosition((position) => {
-            let crd = position.coords;
-            this.currentLat = crd.latitude;
-            this.currentLong = crd.longitude;
+        // //to implement get current location first to be display if in db is null
+        // navigator.geolocation.getCurrentPosition((position) => {
+        //     let crd = position.coords;
+        //     this.currentLat = crd.latitude;
+        //     this.currentLong = crd.longitude;
 
-        });
+        // });
 
         // get storeId
         let storeId = this._storeService.storeId$;
@@ -109,8 +109,8 @@ export class AnalyticService
         let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
         
         bodyActivity["storeId"]     = storeId;
-        bodyActivity["latitude"]    = this.currentLat;
-        bodyActivity["longitude"]   = this.currentLong;
+        // bodyActivity["latitude"]    = this.currentLat;
+        // bodyActivity["longitude"]   = this.currentLong;
         bodyActivity["customerId"]  = customerId;
 
         let analyticService = this._apiServer.settings.apiServer.analyticService;

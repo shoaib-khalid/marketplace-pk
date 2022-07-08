@@ -142,7 +142,14 @@ export class CoreInterceptor implements HttpInterceptor
                             os          : _deviceOs,
                             pageVisited : this._event,
                             sessionId   : _sessionId,
-                            storeId     : null
+                            storeId     : null,
+                            latitude    : null,
+                            longitude   : null,
+                            address     : null,
+                            postcode    : null,
+                            city        : null,
+                            state       : null,
+                            country     : null,
                         }
 
                         this._analyticService.postActivity(activityBody)
