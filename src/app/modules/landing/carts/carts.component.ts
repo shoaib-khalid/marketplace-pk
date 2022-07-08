@@ -357,14 +357,14 @@ export class CartListComponent implements OnInit, OnDestroy
                         });
 
                         // if customerId null means guest
-                        let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
+                        // let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
                         
                         if (this.customerAddress) {
                             // get delivery charges of every carts
                             this.getDeliveryCharges(this.carts.map(element => {
                                 return {
                                     cartId: element.id,
-                                    customerId: _customerId,
+                                    customerId: this.customerId,
                                     delivery: {
                                         deliveryAddress     : this.customerAddress.address,
                                         deliveryCity        : this.customerAddress.city,
@@ -427,13 +427,13 @@ export class CartListComponent implements OnInit, OnDestroy
                                 this.customerAddress = customerAddress;
 
                                 // if customerId null means guest
-                                let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
+                                // let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
 
                                 // get delivery charges of every carts
                                 this.getDeliveryCharges(this.carts.map(element => {
                                     return {
                                         cartId: element.id,
-                                        customerId: _customerId,
+                                        customerId: this.customerId,
                                         delivery: {
                                             deliveryAddress     : this.customerAddress.address,
                                             deliveryCity        : this.customerAddress.city,
@@ -674,10 +674,14 @@ export class CartListComponent implements OnInit, OnDestroy
 
     checkQuantity(cartId: string, cartItem: CartItem, quantity: number = null, operator: string = null) {
         quantity = quantity ? quantity : cartItem.quantity;
+
+        cartItem.productInventory.product.allowOutOfStockPurchases === false ? this.maxQuantity = cartItem.productInventory.quantity : 99;
+
         if (operator === 'decrement')
             quantity > this.minQuantity ? quantity -- : quantity = this.minQuantity;
-        else if (operator === 'increment')
+        else if (operator === 'increment') {
             quantity < this.maxQuantity ? quantity ++ : quantity = this.maxQuantity;
+        }
         else {
             if (quantity < this.minQuantity) 
                 quantity = this.minQuantity;
@@ -797,9 +801,16 @@ export class CartListComponent implements OnInit, OnDestroy
 
     deleteCartItem(cartId: string, cartItem: CartWithDetails){
 
+        // This section is to get this.selectedCart.carts index
         let cartIndex = this.selectedCart.carts.findIndex(cart => cart.id === cartId);
         let cartItemIndex = cartIndex ? this.carts[cartIndex].cartItems.findIndex(item => item.id === cartItem.id) : -1;
+        
+        // This is to get index of selected cart item
         let isCartItemIsSelectedIndex = cartIndex > -1 ? this.selectedCart.carts[cartIndex].cartItem.findIndex(item => item.id === cartItem.id && (item.selected === true)) : -1;
+        
+        // This section is to get this.carts index
+        let thisCartIndex = this.carts.findIndex(cart => cart.id === cartId);
+        let thisCartItemIndex = thisCartIndex ? this.carts[thisCartIndex].cartItems.findIndex(item => item.id === cartItem.id) : -1;
 
         // If more than -1 means it is selected
         if (isCartItemIsSelectedIndex > -1) {
@@ -830,8 +841,18 @@ export class CartListComponent implements OnInit, OnDestroy
         let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
         dialogRef.afterClosed().subscribe((result) => {    
             if (result && result.action === 'OK') {
-
+                
+                this.selectedCart.carts[cartIndex].cartItem.splice(cartItemIndex, 1);
+                this.carts[thisCartIndex].cartItems.splice(thisCartItemIndex, 1);
+                // If cart item inside the cart only one, splice the cart terus
+                if (this.selectedCart.carts[cartIndex].cartItem.length === 0) {
+                    this.selectedCart.carts.splice(cartIndex, 1);
+                    this.carts.splice(thisCartIndex, 1);
+                    
+                }
+                
                 this._cartService.deleteCartItem(result.cartId, result.itemId).subscribe((response)=>{
+
                     // Resolve cart after deletion
                     this._cartService.cartResolver().subscribe();
                     this._cartService.cartResolver(true).subscribe();
@@ -866,22 +887,14 @@ export class CartListComponent implements OnInit, OnDestroy
                             // find index at response to find the minimum price charges
                             let minDeliveryChargesIndex = item.quotation.findIndex(element => element.price === minDeliveryCharges);
 
-                            let log = {
-                                cartId: item.cartId,
-                                minDeliveryCharges: minDeliveryCharges,
-                                maxDeliveryCharges: maxDeliveryCharges,
-                                minDeliveryChargesIndex: minDeliveryChargesIndex,
-                                noErrorQuots: item.quotation.filter(x => x.isError === false)
-                            }
-
                             this.selectedCart.carts[cartIndex].deliveryQuotationId = item.quotation[minDeliveryChargesIndex].refId;
-                                this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
-                                this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
-                                this.selectedCart.carts[cartIndex].deliveryProviderImg = item.quotation[minDeliveryChargesIndex].providerImage;
-                                this.selectedCart.carts[cartIndex].selectedDeliveryPrice = item.quotation[minDeliveryChargesIndex].price;
-                                this.selectedCart.carts[cartIndex].minDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
-                                this.selectedCart.carts[cartIndex].maxDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
-                                this.selectedCart.carts[cartIndex].deliveryProviderName = item.quotation[minDeliveryChargesIndex].providerName;
+                            this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
+                            this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
+                            this.selectedCart.carts[cartIndex].deliveryProviderImg = item.quotation[minDeliveryChargesIndex].providerImage;
+                            this.selectedCart.carts[cartIndex].selectedDeliveryPrice = item.quotation[minDeliveryChargesIndex].price;
+                            this.selectedCart.carts[cartIndex].minDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
+                            this.selectedCart.carts[cartIndex].maxDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
+                            this.selectedCart.carts[cartIndex].deliveryProviderName = item.quotation[minDeliveryChargesIndex].providerName;
                             
                         }
                         // if has error
@@ -1075,7 +1088,7 @@ export class CartListComponent implements OnInit, OnDestroy
             else {
                 const confirmation = this._fuseConfirmationService.open({
                     "title": "Address is empty!",
-                    "message": "Please add your delivery address to use your voucher",
+                    "message": "Please add your delivery address to use your voucher.",
                     "icon": {
                     "show": true,
                     "name": "heroicons_outline:exclamation",
@@ -1524,6 +1537,19 @@ export class CartListComponent implements OnInit, OnDestroy
                     this._userService.guestAddress = JSON.stringify(guestAddresses);
 
                     this.customerAddress = null;
+
+                    this.selectedCart.carts.forEach(cart => {
+                        cart.deliveryErrorMessage = null;
+                        cart.deliveryQuotationId = null;
+                        cart.deliveryType = null;
+                        cart.deliveryProviderId = null;
+                        cart.deliveryQuotations = null;
+                        cart.deliveryProviderImg = null;
+                        cart.selectedDeliveryPrice = null;
+                        cart.deliveryProviderName = null;
+                    })
+                    this.initializeCheckoutList();
+
                 }
             }
         });   
@@ -1534,7 +1560,7 @@ export class CartListComponent implements OnInit, OnDestroy
             
             const confirmation = this._fuseConfirmationService.open({
                 "title": "Address is empty!",
-                "message": "Please add your delivery address before checking out",
+                "message": "Please add your delivery address before checking out.",
                 "icon": {
                 "show": true,
                 "name": "heroicons_outline:exclamation",
@@ -1561,7 +1587,7 @@ export class CartListComponent implements OnInit, OnDestroy
             
             const confirmation = this._fuseConfirmationService.open({
                 "title": "No cart items selected!",
-                "message": "Please select cart items before checking out",
+                "message": "Please select cart items before checking out.",
                 "icon": {
                 "show": true,
                 "name": "heroicons_outline:exclamation",
@@ -1601,6 +1627,36 @@ export class CartListComponent implements OnInit, OnDestroy
         else if (type === 'product' && productSeo) {
 
             this._router.navigate(['store/' + storeSlug + '/all-products/' + productSeo]);
+        }
+    }
+
+    openProviderSelection() {
+
+        // If address is empty, show popup
+        if (!this.customerAddress) {
+            const confirmation = this._fuseConfirmationService.open({
+                "title": "Address is empty!",
+                "message": "Please add your delivery address to select the delivery option.",
+                "icon": {
+                "show": true,
+                "name": "heroicons_outline:exclamation",
+                "color": "warn"
+                },
+                "actions": {
+                "confirm": {
+                    "show": true,
+                    "label": "OK",
+                    "color": "primary"
+                },
+                "cancel": {
+                    "show": false,
+                    "label": "Cancel"
+                }
+                },
+                "dismissible": true
+            });
+
+            return;
         }
     }
 }

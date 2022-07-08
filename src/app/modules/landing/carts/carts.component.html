@@ -96,7 +96,8 @@
                                 <div class="cart-title-grid grid w-full sticky pb-2 border-b">
                                     <!-- Checkbox all in cart -->
                                     <div class="flex items-start justify-center items-center w-full">
-                                        <input [disabled]="selectedCart.carts[i + pagination.startIndex].disabled" [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
+                                        <input 
+                                        [disabled]="selectedCart.carts[i + pagination.startIndex].disabled" [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
                                     </div>
                                     <div class="flex flex-col justify-start ml-2 md:ml-4">
                                         <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
@@ -110,7 +111,8 @@
                                         <div class="w-full sticky mt-4" [ngClass]="currentScreenSize.includes('lg') ?  'cart-grid grid' : 'flex flex-row justify-between'">
                                             <!-- Checkbox each item -->
                                             <div class="flex flex-none items-center lg:justify-center mt-2 w-auto lg:w-full px-1 lg:px-0">
-                                                <input [disabled]="selectedCart.carts[i + pagination.startIndex].cartItem[j].disabled" [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
+                                                <input
+                                                [disabled]="selectedCart.carts[i + pagination.startIndex].cartItem[j].disabled" [(ngModel)]="selectedCart.carts[i + pagination.startIndex].cartItem[j].selected" type="checkbox" (change)="selectCart(null,cart,cartItem,$event.target.checked)">
                                             </div>
                                             <!-- Image, Title, Variants -->
                                             <div class="flex flex-row grow items-center justify-start ml-3 md:ml-4">
@@ -155,7 +157,7 @@
                                                                 <span class="flex justify-center text-sm">+</span>
                                                             </button>
                                                         </div>
-                                                        <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
+                                                        <ng-container *ngIf="cartItem.productInventory.product.allowOutOfStockPurchases === false">
                                                             <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
                                                                 <ng-container *ngIf="cartItem.productInventory.quantity > 1">
                                                                     <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
@@ -189,7 +191,7 @@
                                                         <span class="flex justify-center">+</span>
                                                     </button>
                                                 </div>
-                                                <ng-container *ngIf="cart.store.verticalCode === 'E-Commerce'">
+                                                <ng-container *ngIf="cartItem.productInventory.product.allowOutOfStockPurchases === false">
                                                     <ng-container *ngIf="cartItem.productInventory.quantity <= 10 ">
                                                         <ng-container *ngIf="cartItem.productInventory.quantity > 1">
                                                             <span class="text-xs text-red-500 sm:mt-0.5">{{cartItem.productInventory.quantity}} items left</span>
@@ -252,8 +254,8 @@
                                                 matTextareaAutosize></textarea>
                                         </mat-form-field>
                                     </div>
-                                    <span class="text-sm">Delivery Options</span>
                                     <!-- Select Delivery Provider for DESKTOP-->
+                                    <span class="text-sm">Delivery Options</span>
                                     <ng-container *ngIf="currentScreenSize.includes('lg')">
                                         <div class="flex flex-row justify-between items-center my-2 w-auto">
                                             <!-- Shipping Info  -->
@@ -264,6 +266,7 @@
                                                             <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
                                                                 <mat-select
                                                                     placeholder="Select a delivery provider"
+                                                                    (click)="openProviderSelection()"
                                                                     (selectionChange)="changeDeliveryProvider(deliveryProviderSelector.value, i + pagination.startIndex);"
                                                                     [(ngModel)]="selectedCart.carts[i + pagination.startIndex].deliveryProviderId"
                                                                     [ngModelOptions]="{standalone: true}"
@@ -319,6 +322,7 @@
                                                     <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
                                                         <mat-select
                                                             placeholder="Select a delivery provider"
+                                                            (click)="openProviderSelection()"
                                                             (selectionChange)="changeDeliveryProvider(deliveryProviderSelector.value, i + pagination.startIndex)"
                                                             [(ngModel)]="selectedCart.carts[i + pagination.startIndex].deliveryProviderId"
                                                             [ngModelOptions]="{standalone: true}"
