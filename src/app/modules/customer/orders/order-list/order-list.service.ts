@@ -174,7 +174,7 @@ export class OrderListService
         return this._httpClient.get<any>(orderService + '/orders/details' , header)
         .pipe(
             tap((response) => {
-                this._logging.debug("Response from orderService (getOrdersWithDetails)",response);
+                this._logging.debug("Response from OrderService (getOrdersWithDetails)",response);
 
                 let _pagination = {
                     length: response.data.totalElements,

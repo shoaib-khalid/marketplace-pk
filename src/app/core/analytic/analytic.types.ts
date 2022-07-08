@@ -11,5 +11,12 @@ export interface CustomerActivity
     os          : string;
     pageVisited : string;
     sessionId   : string;
-    storeId     : string
+    storeId     : string;
+    latitude    : string;
+    longitude   : string;
+    address     : string;
+    postcode    : string;
+    city        : string;
+    state       : string;
+    country     : string;
 }

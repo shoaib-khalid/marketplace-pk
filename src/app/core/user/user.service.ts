@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, filter, map, switchMap, take, tap } from 'rxjs/operators';
-import { Client, Customer, CustomerAddress, HttpResponse, User } from 'app/core/user/user.types';
+import { Client, Customer, CustomerAddress, HttpResponse, User, UserSession } from 'app/core/user/user.types';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { LogService } from 'app/core/logging/log.service';
@@ -19,6 +19,8 @@ export class UserService
 
     private _customerAddress: BehaviorSubject<CustomerAddress | null> = new BehaviorSubject(null);
     private _customerAddresses: BehaviorSubject<CustomerAddress[] | null> = new BehaviorSubject(null);
+
+    private _userSession: BehaviorSubject<UserSession | null> = new BehaviorSubject(null);
     
     /**
      * Constructor
@@ -132,7 +134,21 @@ export class UserService
     {
         return localStorage.getItem('guestAddresses') ?? '';
     }
-         
+
+    get userSession$(): Observable<UserSession>
+    {
+        return this._userSession.asObservable();
+    }
+    
+    get userSessionId$(): string
+    {
+        return sessionStorage.getItem('userSessionId') ?? '';
+    }
+
+    set userSessionId(value: string)
+    {
+        sessionStorage.setItem('userSessionId', value);
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
@@ -565,6 +581,29 @@ export class UserService
                     return response["data"];
                 })  
             )) 
+        );
+    }
+
+    generateSession(body: UserSession): Observable<any>
+    {
+        let userService = this._apiServer.settings.apiServer.userService;
+        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
+
+        const header = {
+            headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
+        };
+
+        return this._httpClient.post<any>(userService + "/guest/generateSession", body, header).pipe(
+            map((response) => {
+
+                this._logging.debug("Response from addressService (generateSession)", response);
+
+                // Resolved
+                this._userSession.next(response["data"]);
+
+                // Return the deleted status
+                return response["data"];
+            })
         );
     }
 }

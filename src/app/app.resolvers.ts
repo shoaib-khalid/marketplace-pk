@@ -12,7 +12,7 @@ import { JwtService } from './core/jwt/jwt.service';
 import { AuthService } from './core/auth/auth.service';
 import { CartService } from './core/cart/cart.service';
 import { HttpStatService } from './mock-api/httpstat/httpstat.service';
-import { IpAddressService } from './core/ip-address/ip-address.service';
+import { AnalyticService } from './core/analytic/analytic.service';
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +33,7 @@ export class InitialDataResolver implements Resolve<any>
         private _cartService: CartService,
         private _userService: UserService,
         private _cartsService: CartService,
-        private _ipAddressService: IpAddressService,
+        private _analyticService: AnalyticService,
         private _httpstatService: HttpStatService
     )
     {
@@ -63,7 +63,7 @@ export class InitialDataResolver implements Resolve<any>
             this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid),
             this._cartService.getCartsByCustomerId(customerId),
             this._cartsService.cartResolver(true), // cartResolver(true) means we resolving the cart notification header
-            this._ipAddressService.getIPAddress()
+            this._analyticService.resolveAnalytic()
             // this._httpstatService.get(500)
         ]);
     }
