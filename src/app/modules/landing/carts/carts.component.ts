@@ -1074,7 +1074,7 @@ export class CartListComponent implements OnInit, OnDestroy
             // If Customer Address is empty, show popup
             else {
                 const confirmation = this._fuseConfirmationService.open({
-                    "title": "Address in empty!",
+                    "title": "Address is empty!",
                     "message": "Please add your delivery address",
                     "icon": {
                     "show": true,
@@ -1533,7 +1533,7 @@ export class CartListComponent implements OnInit, OnDestroy
         if (!this.customerAddress) {
             
             const confirmation = this._fuseConfirmationService.open({
-                "title": "Address in empty!",
+                "title": "Address is empty!",
                 "message": "Please add your delivery address before checking out",
                 "icon": {
                 "show": true,
