@@ -507,7 +507,7 @@
     
                         <!-- Voucher Input -->
                         <ng-container *ngIf="displayRedeem; else displayHavePromo">
-                            <mat-form-field class="w-full mt-1 fuse-mat-no-subscript text-sm" floatLabel="always">
+                            <mat-form-field class="w-full mt-1 fuse-mat-no-subscript fuse-mat-dense text-sm" floatLabel="always">
                                 <input
                                     matInput
                                     placeholder="Enter Promo Code"
@@ -561,8 +561,8 @@
     
                         <!-- Voucher Input -->
                         <ng-container *ngIf="guestVouchers === null">
-                            <ng-container *ngIf="displayRedeem; else displayHavePromo">
-                                <mat-form-field class="w-full mt-1 fuse-mat-no-subscript text-sm" floatLabel="always">
+                            <ng-container *ngIf="true; else displayHavePromo">
+                                <mat-form-field class="w-full mt-1 fuse-mat-no-subscript fuse-mat-dense text-sm" floatLabel="always">
                                     <input
                                         matInput
                                         placeholder="Enter Promo Code"

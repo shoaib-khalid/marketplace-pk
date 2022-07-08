@@ -40,7 +40,7 @@ export class CategoryComponent implements OnInit
     products: ProductDetails[] = [];
     productsPagination: ProductPagination;
 
-    maxStoresDisplay: number = 3;
+    maxStoresDisplay: number = 5;
     maxProductsDisplay: number = 30;
     maxLocationsDisplay: number = 50;
     

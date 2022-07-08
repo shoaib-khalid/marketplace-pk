@@ -1056,7 +1056,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
         if (checkoutListBody.length > 0 && this.voucherApplied) {
             // If login
-            if (this.customerId) {
+            if (this.customerId && this.customerAddress) {
                 checkoutParams = {
                     platformVoucherCode: this.voucherApplied.voucher.voucherCode, 
                     customerId: this.customerId, 
@@ -1075,7 +1075,7 @@ export class CartListComponent implements OnInit, OnDestroy
             else {
                 const confirmation = this._fuseConfirmationService.open({
                     "title": "Address is empty!",
-                    "message": "Please add your delivery address",
+                    "message": "Please add your delivery address to use your voucher",
                     "icon": {
                     "show": true,
                     "name": "heroicons_outline:exclamation",
