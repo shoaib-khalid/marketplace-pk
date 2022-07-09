@@ -13,8 +13,8 @@ import { Store, StoreAssets } from 'app/core/store/store.types';
 import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { merge, Observable, Subject } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
-import { OrderListService } from './order-list.service';
-import { OrderDetails, OrderItemWithDetails, OrderPagination, OrdersCountSummary } from './order-list.type';
+import { OrderService } from 'app/core/_order/order.service';
+import { OrderDetails, OrderGroup, OrderItemWithDetails, OrderPagination, OrdersCountSummary } from 'app/core/_order/order.types';
 
 @Component({
     selector     : 'order-list',
@@ -40,33 +40,31 @@ import { OrderDetails, OrderItemWithDetails, OrderPagination, OrdersCountSummary
 })
 export class OrderListComponent implements OnInit
 {
-    @ViewChild(MatPaginator) private _paginator: MatPaginator;
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    @ViewChild("ordersDetailsPaginator", {read: MatPaginator}) private _ordersDetailsPaginator: MatPaginator;
+    @ViewChild("ordersGroupsPaginator", {read: MatPaginator}) private _ordersGroupsPaginator: MatPaginator;
+    
+    // Orders 
+    ordersDetails$: Observable<OrderDetails[]>;    
+    ordersDetailsPagination: OrderPagination;
+    ordersDetailsPageOfItems: Array<any>;
+
+    ordersGroups$: Observable<OrderGroup[]>;    
+    ordersGroupsPagination: OrderPagination;
+    ordersGroupsPageOfItems: Array<any>;
+    
+    customerAuthenticate: CustomerAuthenticate;
+    
+    filterCustNameControl: FormControl = new FormControl();
+    filterCustNameControlValue: string;
+    
+    openTab: string = "ALL";
+    tabControl: FormControl = new FormControl();
+    orderCountSummary: { id: string; label: string; completionStatus: string | string[]; count: number; class: string; icon: string; }[];
 
     currentScreenSize: string[] = [];
     isLoading: boolean = false;
     
-    // Orders 
-    ordersDetails$: Observable<OrderDetails[]>;
-    orderList: OrderItemWithDetails[] = [];
-
-    orderCategory
-    orderSlug: string;
-    
-    pagination: OrderPagination;
-    pageOfItems: Array<any>;
-
-    customerAuthenticate: CustomerAuthenticate;
-    regionCountryStates: any;
-
-    filterCustNameControl: FormControl = new FormControl();
-    filterCustNameControlValue: string;
-    recentOrderProgress: string [] = []
-
-    openTab: string = "ALL";
-    _orderCountSummary: any;
-    orderCountSummary: OrdersCountSummary[];
-    tabControl: FormControl = new FormControl();
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
     * Constructor
@@ -74,46 +72,17 @@ export class OrderListComponent implements OnInit
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _orderService: OrderListService,
+        private _orderService: OrderService,
         private _router: Router,
         private _authService: AuthService,
         public _dialog: MatDialog,
-        private _storesService: StoresService,
-        private _activatedRoute: ActivatedRoute,
-        private _httpstatService: HttpStatService
-
+        private _storesService: StoresService
     )
     {
     }
 
     ngOnInit() :void {
-
-        // this._httpstatService.get(503).subscribe((response) =>{
-                
-        // });
-
-        this.ordersDetails$ = this._orderService.ordersDetails$;        
-
-        this._orderCountSummary = [
-            { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0, class: null, icon: null },
-            { id: "TO_SHIP", label: "To Deliver", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0, class: "text-green-500 icon-size-5", icon: "heroicons_solid:clock" },            
-            { id: "SENT_OUT", label: "Delivering", completionStatus: "BEING_DELIVERED", count: 0, class: "text-green-500 icon-size-5", icon: "mat_solid:local_shipping" },
-            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0, class: "text-green-500 icon-size-5", icon: "heroicons_solid:check-circle" },
-            { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0, class: "text-red-600 icon-size-5", icon: "heroicons_solid:x-circle" },
-        ];
-
-        this.tabControl.setValue(this._orderCountSummary.find(item => item.id === "ALL").completionStatus);
-                
-        // Subscribe to media changes
-        this._fuseMediaWatcherService.onMediaChange$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(({matchingAliases}) => {
-
-                this.currentScreenSize = matchingAliases;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+        // this._httpstatService.get(503).subscribe((response) =>{});
 
         // Get Customer
         this._authService.customerAuthenticate$
@@ -124,6 +93,45 @@ export class OrderListComponent implements OnInit
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+        
+        this.orderCountSummary = [
+            { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0, class: null, icon: null },
+            { id: "TO_SHIP", label: "To Deliver", completionStatus: ["RECEIVED_AT_STORE","PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0, class: "text-green-500 icon-size-5", icon: "heroicons_solid:clock" },            
+            { id: "SENT_OUT", label: "Delivering", completionStatus: "BEING_DELIVERED", count: 0, class: "text-green-500 icon-size-5", icon: "mat_solid:local_shipping" },
+            { id: "DELIVERED", label: "Delivered", completionStatus: "DELIVERED_TO_CUSTOMER", count: 0, class: "text-green-500 icon-size-5", icon: "heroicons_solid:check-circle" },
+            { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0, class: "text-red-600 icon-size-5", icon: "heroicons_solid:x-circle" },
+        ];
+
+        // this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 3, this.orderCountSummary.find(item => item.id === "ALL").completionStatus).subscribe((response) =>{ });
+        this._orderService.getOrderGroups({ page:0, pageSize: 3, customerId: this.customerAuthenticate.session.ownerId}).subscribe();
+        
+        this.ordersDetails$ = this._orderService.ordersDetails$;
+        this.ordersGroups$ = this._orderService.orderGroups$;
+
+        // Get the orders details pagination
+        this._orderService.ordersDetailsPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((ordersDetailsPagination: OrderPagination) => {
+                if (ordersDetailsPagination) {
+                    // Update the pagination
+                    this.ordersDetailsPagination = ordersDetailsPagination;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get the orders details pagination
+        this._orderService.orderGroupPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response)=>{
+                if(response) {                    
+                    this.ordersGroupsPagination = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this.tabControl.setValue(this.orderCountSummary.find(item => item.id === "ALL").completionStatus);        
 
         this.filterCustNameControl.valueChanges
             .pipe(
@@ -141,23 +149,6 @@ export class OrderListComponent implements OnInit
             )
             .subscribe();
 
-        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 3, this._orderCountSummary.find(item => item.id === "ALL").completionStatus)
-            .subscribe((response) =>{
-
-            });
-
-        // Get the orders pagination
-        this._orderService.pagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: OrderPagination) => {
-                
-                // Update the pagination
-                this.pagination = pagination;
-                
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });        
-
         this.tabControl.valueChanges
             .pipe(
                 takeUntil(this._unsubscribeAll),
@@ -172,6 +163,17 @@ export class OrderListComponent implements OnInit
                 })
             )
             .subscribe();
+
+        // Subscribe to media changes
+        this._fuseMediaWatcherService.onMediaChange$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(({matchingAliases}) => {
+
+                this.currentScreenSize = matchingAliases;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Mark for check
         this._changeDetectorRef.markForCheck(); 
@@ -193,16 +195,32 @@ export class OrderListComponent implements OnInit
     ngAfterViewInit(): void
     {
         setTimeout(() => {
-            if (this._paginator )
+            if (this._ordersDetailsPaginator )
             {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
 
                 // Get products if sort or page changes
-                merge(this._paginator.page).pipe(
+                merge(this._ordersDetailsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
                         return this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 12);
+                    }),
+                    map(() => {
+                        this.isLoading = false;
+                    })
+                ).subscribe();
+            }
+            if (this._ordersGroupsPaginator )
+            {
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+
+                // Get products if sort or page changes
+                merge(this._ordersGroupsPaginator.page).pipe(
+                    switchMap(() => {
+                        this.isLoading = true;
+                        return this._orderService.getOrderGroups({ page:0, pageSize: 3, customerId: this.customerAuthenticate.session.ownerId});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -220,32 +238,48 @@ export class OrderListComponent implements OnInit
         this.openTab = displayStatuses;
 
         // set current page to 1
-        this.pageOfItems['currentPage'] = 1;
+        if (this.ordersDetailsPageOfItems) {
+            this.ordersDetailsPageOfItems['currentPage'] = 1;
+        }
 
-        this.tabControl.setValue(this._orderCountSummary.find(item => item.id === this.openTab).completionStatus);
+        this.tabControl.setValue(this.orderCountSummary.find(item => item.id === this.openTab).completionStatus);
         
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
     }
 
-    onChangePage(pageOfItems: Array<any>) {
-        
-        // update current page of items
-        this.pageOfItems = pageOfItems;
-        
-        if(this.pagination && this.pageOfItems['currentPage']) {
-
-            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
-                // set loading to true
-                this.isLoading = true;
-    
-                this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'], this.tabControl.value)
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
-    
+    onChangePage(pageOfItems: Array<any>, type: string) {
+        if (type === 'orderGroups') {           
+            // update current page of items
+            this.ordersGroupsPageOfItems = pageOfItems;
+            
+            if(this.ordersGroupsPagination && this.ordersGroupsPageOfItems['currentPage']) {
+                if (this.ordersGroupsPageOfItems['currentPage'] - 1 !== this.ordersGroupsPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
+                    this._orderService.getOrderGroups({ page: this.ordersGroupsPageOfItems['currentPage'] - 1, pageSize: this.ordersGroupsPageOfItems['pageSize'], customerId: this.customerAuthenticate.session.ownerId})
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });                        
+                }
+            }
+        }
+        if (type === 'orderDetails') {
+            // update current page of items
+            this.ordersDetailsPageOfItems = pageOfItems;
+            
+            if(this.ordersDetailsPagination && this.ordersDetailsPageOfItems['currentPage']) {
+                if (this.ordersDetailsPageOfItems['currentPage'] - 1 !== this.ordersDetailsPagination.page) {
+                    // set loading to true
+                    this.isLoading = true;
+                    this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId,this.ordersDetailsPageOfItems['currentPage'] - 1, this.ordersDetailsPageOfItems['pageSize'], this.tabControl.value)
+                        .subscribe(()=>{
+                            // set loading to false
+                            this.isLoading = false;
+                        });
+                }
             }
         }
         // Mark for check
@@ -253,9 +287,9 @@ export class OrderListComponent implements OnInit
     }
 
     displayStatus(completionStatus: string) {
-        let index = this._orderCountSummary.findIndex(item => item.id !== 'ALL' && item.completionStatus.includes(completionStatus));
+        let index = this.orderCountSummary.findIndex(item => item.id !== 'ALL' && item.completionStatus.includes(completionStatus));
 
-        return index > -1 ? this._orderCountSummary[index] : null;
+        return index > -1 ? this.orderCountSummary[index] : null;
     }
 
     redirectToProduct(storeId: string, storeDomain: string, seoName: string) {
@@ -271,45 +305,39 @@ export class OrderListComponent implements OnInit
 
     }
 
-    redirectToStore(storeDomain: string) {
+    redirectToStore(storeDomain: string) {        
         let domainName = storeDomain.split(".")[0]
-        
         // this._document.location.href = url;
         this._router.navigate(['store/' + domainName + '/' + 'all-products' ]);
-
     }
 
-    getOrderPlaced( order: OrderDetails){
+    getOrderPlaced(date: string, storeTimezone: string) {
 
         let timezoneString: any;
-        let dateCreated: Date;
-        let dateUpdated: Date;
+        let dateConverted: Date;
 
-        let orderDetails = order;
-        var TimezoneName = orderDetails.store.regionCountry.timezone;
+        let timezoneName = storeTimezone;
 
         // Generating the formatted text
-        var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
-        var dateText = Intl.DateTimeFormat([], options).format(new Date);
+        let options : any = {timeZone: timezoneName, timeZoneName: "short"};
+        let dateText = Intl.DateTimeFormat([], options).format(new Date);
 
         // Scraping the numbers we want from the text
         timezoneString = dateText.split(" ")[1].slice(3);
 
         // Getting the offset
-        var timezoneOffset = parseInt(timezoneString.split(':')[0])*60;
+        let timezoneOffset = parseInt(timezoneString.split(':')[0])*60;
 
         // Checking for a minutes offset and adding if appropriate
         if (timezoneString.includes(":")) {
-            var timezoneOffset = timezoneOffset + parseInt(timezoneString.split(':')[1]);
+            timezoneOffset = timezoneOffset + parseInt(timezoneString.split(':')[1]);
         }
 
-        dateCreated = new Date(orderDetails.created);
-        dateUpdated = new Date(orderDetails.updated);
+        dateConverted = new Date(date);
 
-        dateCreated.setHours(dateCreated.getHours() - (-timezoneOffset) / 60);
-        dateUpdated.setHours(dateUpdated.getHours() - (-timezoneOffset) / 60);
+        dateConverted.setHours(dateConverted.getHours() - (-timezoneOffset) / 60);
 
-        return dateCreated;
+        return dateConverted;
     }
     
 }

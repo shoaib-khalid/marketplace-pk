@@ -21,8 +21,8 @@ import { CustomerAddress } from 'app/core/user/user.types';
 import { CheckoutService } from 'app/core/checkout/checkout.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { StoresService } from 'app/core/store/store.service';
-import { CustomerVoucher, CustomerVoucherPagination, GuestVoucher, UsedCustomerVoucherPagination, VoucherVerticalList } from 'app/modules/customer/vouchers/vouchers.types';
-import { VouchersService } from 'app/modules/customer/vouchers/vouchers.service';
+import { CustomerVoucher, CustomerVoucherPagination, GuestVoucher, UsedCustomerVoucherPagination, VoucherVerticalList } from 'app/core/_voucher/voucher.types';
+import { VoucherService } from 'app/core/_voucher/voucher.service';
 import { VoucherModalComponent } from 'app/modules/customer/vouchers/voucher-modal/voucher-modal.component';
 
 @Component({
@@ -261,7 +261,7 @@ export class CartListComponent implements OnInit, OnDestroy
         private _scroller: ViewportScroller,
         private _datePipe: DatePipe,
         private _storesService: StoresService,
-        private _vouchersService: VouchersService
+        private _voucherService: VoucherService
 
     )
     {
@@ -512,7 +512,7 @@ export class CartListComponent implements OnInit, OnDestroy
         // ----------------------
 
         // Get used customer voucher
-        this._vouchersService.getAvailableCustomerVoucher(false)
+        this._voucherService.getAvailableCustomerVoucher(false)
             .subscribe((response: any) => {
                 this.customerVouchers = response;
 
@@ -527,7 +527,7 @@ export class CartListComponent implements OnInit, OnDestroy
             });
 
         // Get customer voucher pagination, isUsed = false 
-        this._vouchersService.customerVoucherPagination$
+        this._voucherService.customerVouchersPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: CustomerVoucherPagination) => {
 
@@ -538,7 +538,7 @@ export class CartListComponent implements OnInit, OnDestroy
             });
 
         // Get used customer voucher pagination, isUsed = true 
-        this._vouchersService.usedCustomerVoucherPagination$
+        this._voucherService.usedCustomerVoucherPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: UsedCustomerVoucherPagination) => {
 
@@ -1418,7 +1418,7 @@ export class CartListComponent implements OnInit, OnDestroy
         }
 
         if (this.customerId) {
-            this._vouchersService.postCustomerClaimVoucher(this.customerId, this.promoCode)
+            this._voucherService.postCustomerClaimVoucher(this.customerId, this.promoCode)
                 .subscribe((response) => {
     
                     this.promoCode = '';

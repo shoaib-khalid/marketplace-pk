@@ -11,8 +11,8 @@ import { Store } from 'app/core/store/store.types';
 import { merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { VoucherModalComponent } from '../voucher-modal/voucher-modal.component';
-import { VouchersService } from '../vouchers.service';
-import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from '../vouchers.types';
+import { VoucherService } from 'app/core/_voucher/voucher.service';
+import { CustomerVoucher, CustomerVoucherPagination, UsedCustomerVoucherPagination, Voucher } from 'app/core/_voucher/voucher.types';
 
 @Component({
     selector     : 'voucher-list',
@@ -106,7 +106,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
         public _dialog: MatDialog,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _vouchersService: VouchersService,
+        private _voucherService: VoucherService,
         private _authService: AuthService,
         private _platformService : PlatformService,
         private _storesService: StoresService,
@@ -125,74 +125,73 @@ export class VoucherListComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
         // don't display this, if you do, customer will see all the voucher code and get free item all the time la
-        // this._vouchersService.getAvailableVoucher().subscribe(response => {});
+        // this._voucherService.getAvailableVoucher().subscribe(response => {});
 
         // Get customer Authenticate to get customer id
         this._authService.customerAuthenticate$
-        .subscribe((response: CustomerAuthenticate) => {
-            
-            this.customerAuthenticate = response;                
-        
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerAuthenticate) => {
+                if (response) {
+                    this.customerAuthenticate = response;                
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get unused customer voucher
-        this._vouchersService.customerVouchers$
-        .subscribe((response: CustomerVoucher[]) => {
-
-            this.customerVoucher = response;
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+        this._voucherService.customerVouchers$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerVoucher[]) => {
+                if (response) {
+                    this.customerVoucher = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get used customer voucher
-        this._vouchersService.usedCustomerVouchers$
-        .subscribe((response: CustomerVoucher[]) => {
-
-            this.usedCustomerVoucher = response;
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+        this._voucherService.usedCustomerVouchers$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerVoucher[]) => {
+                if (response) {
+                    this.usedCustomerVoucher = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get customer voucher pagination, isUsed = false 
-        this._vouchersService.customerVoucherPagination$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((response: CustomerVoucherPagination) => {
-
-            this.customerVoucherPagination = response; 
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();           
-        });
+        this._voucherService.customerVouchersPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerVoucherPagination) => {
+                if (response) {
+                    this.customerVoucherPagination = response; 
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();           
+            });
 
         // Get used customer voucher pagination, isUsed = true 
-        this._vouchersService.usedCustomerVoucherPagination$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((response: UsedCustomerVoucherPagination) => {
-
-            this.usedCustomerVoucherPagination = response;
-            
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+        this._voucherService.usedCustomerVoucherPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: UsedCustomerVoucherPagination) => {
+                if (response) {
+                    this.usedCustomerVoucherPagination = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get platform service to get logo based on country (deliverin/easydukan) 
         this._platformService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((response: Platform) => {
-
-            this.platform = response;
-
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });        
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();  
-
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: Platform) => {
+                if (response) {
+                    this.platform = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     /**
@@ -210,7 +209,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 merge(this._customerVoucherPagination.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._vouchersService.getAvailableCustomerVoucher(false, 0, 10);
+                        return this._voucherService.getAvailableCustomerVoucher(false, 0, 10);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -227,7 +226,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 merge(this._usedCustomerVoucherPagination.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._vouchersService.getAvailableCustomerVoucher(true, 0, 10);
+                        return this._voucherService.getAvailableCustomerVoucher(true, 0, 10);
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -259,7 +258,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 // set loading to true
                 this.isLoading = true;
     
-                this._vouchersService.getAvailableCustomerVoucher(false,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._voucherService.getAvailableCustomerVoucher(false,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
                     .subscribe((response)=>{
                             
                         // set loading to false
@@ -275,7 +274,7 @@ export class VoucherListComponent implements OnInit, OnDestroy
                 // set loading to true
                 this.isLoading = true;
     
-                this._vouchersService.getAvailableCustomerVoucher(true,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
+                this._voucherService.getAvailableCustomerVoucher(true,this.pageOfItems['currentPage'] - 1, this.pageOfItems['pageSize'])
                     .subscribe((response)=>{
                         
                         // set loading to false
@@ -288,14 +287,14 @@ export class VoucherListComponent implements OnInit, OnDestroy
         this._changeDetectorRef.markForCheck();
     }
 
-    enterPromoCode(){
+    enterPromoCode() {
 
         // do nothing if no promo code entered
         if (this.inputPromoCode === ''){
             return;
         }
 
-        this._vouchersService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
+        this._voucherService.postCustomerClaimVoucher(this.customerAuthenticate.session.ownerId, this.inputPromoCode)
         .subscribe((response) => {
             // if voucher is valid
             this.openVoucherModal('mat_solid:check_circle','Congratulations', 'Promo code successfully added', null, {width: '255px', maxWidth: '80vw'});
