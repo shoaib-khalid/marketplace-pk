@@ -143,7 +143,7 @@ export class FloatingBannerService
                             '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
             
                     this.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
-                    this.setBigBanner('assets/promo/7.7-Flash-Sales-Promo_Popup-Banner_400x500_V2.png', redirectUrl);
+                    this.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl);
                 }
             })
         );
