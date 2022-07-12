@@ -296,6 +296,9 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             }
         );
         dialogRef.afterClosed().subscribe(result => {
+
+            console.log("result", result);
+            
             if(result){
                 if (this.customerId){
                     // Customer Addresses

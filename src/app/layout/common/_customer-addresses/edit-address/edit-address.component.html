@@ -20,6 +20,8 @@
                         placeholder="Search Location"/>
                     <div class="map w-full h-64 md:h-80 rounded-lg" id="map"></div>
                 </div>
+                <input [formControlName]="'latitude'" type="text">
+                <input [formControlName]="'longitude'" type="text">
                 <!-- Name -->
                 <div class="w-full flex flex-col sm:flex-row sm:mb-0 pt-8 sm:pt-6">
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
