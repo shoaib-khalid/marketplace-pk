@@ -230,7 +230,7 @@ export class EditAddressDialog implements OnInit {
 
         // implement google maos
         let loader = new Loader({
-            apiKey: 'AIzaSyCFhf1LxbPWNQSDmxpfQlx69agW-I-xBIw',
+            apiKey: 'AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4',
             libraries: ['places']
             
         })

@@ -14,9 +14,9 @@ export interface CustomerActivity
     storeId     : string;
     latitude    : string;
     longitude   : string;
-    address     : string;
-    postcode    : string;
-    city        : string;
-    state       : string;
-    country     : string;
+    // address     : string;
+    // postcode    : string;
+    // city        : string;
+    // state       : string;
+    // country     : string;
 }

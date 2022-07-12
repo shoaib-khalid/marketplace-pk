@@ -145,11 +145,11 @@ export class CoreInterceptor implements HttpInterceptor
                             storeId     : null,
                             latitude    : null,
                             longitude   : null,
-                            address     : null,
-                            postcode    : null,
-                            city        : null,
-                            state       : null,
-                            country     : null,
+                            // address     : null,
+                            // postcode    : null,
+                            // city        : null,
+                            // state       : null,
+                            // country     : null,
                         }
 
                         this._analyticService.postActivity(activityBody)
