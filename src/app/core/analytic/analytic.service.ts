@@ -115,12 +115,12 @@ export class AnalyticService
         let customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
         
         bodyActivity["storeId"]     = storeId;
+        bodyActivity["customerId"]  = customerId;
         bodyActivity["latitude"]    = this.currentLat;
         bodyActivity["longitude"]   = this.currentLong;
-        bodyActivity["customerId"]  = customerId;
-        bodyActivity["browserType"] = _deviceBrowser;
-        bodyActivity["deviceModel"] = _deviceModel;
-        bodyActivity["os"] = _deviceOs;    
+        // bodyActivity["browserType"] = _deviceBrowser;
+        // bodyActivity["deviceModel"] = _deviceModel;
+        // bodyActivity["os"] = _deviceOs;    
 
         let analyticService = this._apiServer.settings.apiServer.analyticService;
 
