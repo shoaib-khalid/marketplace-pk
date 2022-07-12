@@ -5,8 +5,8 @@ import { ProductsService } from 'app/core/product/product.service';
 import { StoresService } from 'app/core/store/store.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { DeliveryRiderDetails, OrderDetails } from '../order-list/order-list.type';
-import { OrderListService } from '../order-list/order-list.service';
+import { DeliveryRiderDetails, OrderDetails } from 'app/core/_order/order.types';
+import { OrderService } from 'app/core/_order/order.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { Store } from 'app/core/store/store.types';
@@ -47,12 +47,13 @@ export class OrderDetailsComponent implements OnInit
 { 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    ordersDetails$: Observable<OrderDetails[]>;
     orderId: string;
-    orderDetails: any;
-    rider$: any;
-
+    orderDetails: OrderDetails;
+    ordersDetails$: Observable<OrderDetails[]>;
+    
     store$: Store;
+
+    rider$: any;
     timezoneString: any;
     dateCreated: Date;
     dateUpdated: Date;
@@ -65,13 +66,11 @@ export class OrderDetailsComponent implements OnInit
      * Constructor
      */
     constructor(
-        private _orderService: OrderListService,
+        private _orderService: OrderService,
         private _route: ActivatedRoute,
         private _router: Router,
         private _authService: AuthService,
-        private _changeDetectorRef: ChangeDetectorRef,
-        private _storesService: StoresService,
-
+        private _changeDetectorRef: ChangeDetectorRef
     )
     {
     }
@@ -84,6 +83,8 @@ export class OrderDetailsComponent implements OnInit
 
         this.orderId = this._route.snapshot.paramMap.get('order-id');
 
+        this.ordersDetails$ = this._orderService.ordersDetails$;
+
         this._orderCountSummary = [
             { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0, class: null, icon: null },
             { id: "TO_SHIP", label: "To Deliver", completionStatus: ["PAYMENT_CONFIRMED", "BEING_PREPARED", "AWAITING_PICKUP"], count: 0, class: "text-green-500 icon-size-5", icon: "heroicons_solid:clock" },            
@@ -92,47 +93,46 @@ export class OrderDetailsComponent implements OnInit
             { id: "CANCELLED", label: "Cancelled", completionStatus: "CANCELED_BY_MERCHANT", count: 0, class: "text-red-600 icon-size-5", icon: "heroicons_solid:x-circle" },
         ];
 
-        this.ordersDetails$ = this._orderService.ordersDetails$;
-
         // Get Customer
         this._authService.customerAuthenticate$
-        .subscribe((response: CustomerAuthenticate) => {
-            
-            this.customerAuthenticate = response;
-
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
-
-        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId).subscribe((response) =>{
-            
-            this._orderService.getOrderById(this.orderId).subscribe((response)=>{
-                this.orderDetails = response.data
-                var TimezoneName = this.orderDetails.store.regionCountry.timezone;
-                        
-                // Generating the formatted text
-                var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
-                var dateText = Intl.DateTimeFormat([], options).format(new Date);
-                
-                // Scraping the numbers we want from the text
-                this.timezoneString = dateText.split(" ")[1].slice(3);
-                
-                // Getting the offset
-                var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
-    
-                // Checking for a minutes offset and adding if appropriate
-                if (this.timezoneString.includes(":")) {
-                    var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CustomerAuthenticate) => {
+                if (response) {
+                    this.customerAuthenticate = response;
                 }
-    
-                this.dateCreated = new Date(this.orderDetails.created);
-                this.dateUpdated = new Date(this.orderDetails.updated);
-    
-                this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
-                this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
-                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
-        });
+
+        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
+            .subscribe((ordersWithDetailsResponse) =>{
+                this._orderService.getOrderById(this.orderId)
+                    .subscribe((orderByIdResponse)=>{                        
+                        this.orderDetails = orderByIdResponse
+                        var TimezoneName = this.orderDetails.store.regionCountry.timezone;
+                                
+                        // Generating the formatted text
+                        var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
+                        var dateText = Intl.DateTimeFormat([], options).format(new Date);
+                        
+                        // Scraping the numbers we want from the text
+                        this.timezoneString = dateText.split(" ")[1].slice(3);
+                        
+                        // Getting the offset
+                        var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
+            
+                        // Checking for a minutes offset and adding if appropriate
+                        if (this.timezoneString.includes(":")) {
+                            var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
+                        }
+            
+                        this.dateCreated = new Date(this.orderDetails.created);
+                        this.dateUpdated = new Date(this.orderDetails.updated);
+            
+                        this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
+                        this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
+                    });
+            });
         
         // get DeliveryRiderDetails
         this._orderService.getDeliveryRiderDetails(this.orderId)

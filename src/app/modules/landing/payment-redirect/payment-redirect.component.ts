@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StoresService } from 'app/core/store/store.service';
-import { PaymentRedirectService } from './payment-redirect.service';
+import { OrderService } from 'app/core/_order/order.service';
 import { DOCUMENT } from '@angular/common';
 import { DisplayErrorService } from 'app/core/display-error/display-error.service';
 
@@ -34,7 +34,7 @@ export class LandingPaymentRedirectComponent
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
         private _displayErrorService: DisplayErrorService,
-        private _paymentRedirectService: PaymentRedirectService,
+        private _orderService: OrderService,
         private _storesService: StoresService
     )
     {
@@ -70,7 +70,7 @@ export class LandingPaymentRedirectComponent
 
             if (this.payment.order_id) {
                 if (this.payment.order_id.charAt(0) === "G") {
-                    this._paymentRedirectService.getOrderGroupsById(this.payment.order_id)
+                    this._orderService.getOrderGroupsById(this.payment.order_id)
                         .subscribe((response)=>{                            
                             if (response) {
                                 let paymentType = "ONLINEPAYMENT";//response.paymentType;
@@ -80,7 +80,7 @@ export class LandingPaymentRedirectComponent
                             }
                         });
                 } else {
-                    this._paymentRedirectService.getOrderById(this.payment.order_id)
+                    this._orderService.getOrderById(this.payment.order_id)
                         .subscribe((response) => {
                             if (response) {
                                 let storeId = response.storeId;

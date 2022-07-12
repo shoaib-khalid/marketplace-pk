@@ -5,7 +5,7 @@
         <!-- categories -->
         <div class="w-full truncate z-10">
             <div class="flex flex-nowrap items-center justify-start sm:justify-around overflow-x-scroll sm:overflow-x-hidden">
-                <ng-container *ngFor="let orderStatus of _orderCountSummary">
+                <ng-container *ngFor="let orderStatus of orderCountSummary">
                     <div class="flex flex-wrap items-center p-1 text-center">
                         <input 
                             [id]="orderStatus.id + '-btn'"
@@ -30,12 +30,12 @@
             <!-- Order Details -->
             <div class="flex flex-col w-full">
                 <!-- Orders -->
-                <ng-container *ngIf="(ordersDetails$ | async) as ordersDetails">
-                    <ng-container *ngIf="ordersDetails.length > 0; else noOrder">
-                        <ng-container *ngFor="let orderDetails of ordersDetails">
-                            <!-- Orders -->
-                            <div class="w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-2 mb-4">
-                                <div class="flex flex-col w-full">
+                <ng-container *ngIf="openTab !== 'ALL'; else orderGroups">
+                    <ng-container *ngIf="(ordersDetails$ | async) as ordersDetails">
+                        <ng-container *ngIf="ordersDetails.length > 0; else noOrder">
+                            <ng-container *ngFor="let orderDetails of ordersDetails">
+                                <!-- Orders -->
+                                <div class="flex flex-col w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-2 mb-4">
                                     <!-- Header -->
                                     <div class="flex flex-row my-3 items-start justify-between w-full sm:px-2">
                                         <!-- Store Details -->
@@ -44,7 +44,7 @@
                                             <div class="flex flex-col px-2">
                                                 <h3 class="font-bold cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
                                                 <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
-                                                <h3 class="text-gray-400 text-xs">Order Placed : {{getOrderPlaced(orderDetails) | date:'MMM dd, h:mm a' }}</h3>
+                                                <h3 class="text-gray-400 text-xs">Order Placed : {{getOrderPlaced(orderDetails.created, orderDetails.customer.regionCountry.timezone) | date:'MMM dd, h:mm a' }}</h3>
                                             </div>
                                         </div>
                                         <!-- Progress Status Icon -->
@@ -54,14 +54,14 @@
                                                 [class]="displayStatus(orderDetails.completionStatus)?.class" 
                                                 [svgIcon]="displayStatus(orderDetails.completionStatus)?.icon">
                                             </mat-icon>
-
+    
                                             <!-- Progress Status -->
                                             <span 
                                                 class="font-semibold text-sm items-center pl-2">{{displayStatus(orderDetails.completionStatus)?.label}}
                                             </span>
                                         </div>
                                     </div>
-
+    
                                     <!-- Border -->
                                     <div class="border-t w-full"></div>
                                     
@@ -94,7 +94,7 @@
                                             </div>
                                         </div>
                                     </ng-container>
-
+    
                                     <!-- Border -->
                                     <div class="border-b w-full"></div>
                                     
@@ -139,33 +139,253 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </ng-container>
-                    </ng-container>    
-                </ng-container>
-
-                <!-- No Products -->
-                <ng-template #noOrder>
-                    <div class="relative w-full h-100 sm:h-auto max-h-160">
-                        <error-background class="w-full static opacity-40"></error-background>
-                        <div class="absolute flex flex-col inset-0 justify-center items-center">
-                            <div class="w-full flex flex-col items-center justify-center z-10">
-                                <div class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">No Order Found !</div>
-                                <div class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">No order found, shop and place your first order with us.</div>
+                            </ng-container>
+                        </ng-container>    
+                    </ng-container>
+                    <!-- No Products -->
+                    <ng-template #noOrder>
+                        <div class="relative w-full h-100 sm:h-auto max-h-160">
+                            <error-background class="w-full static opacity-40"></error-background>
+                            <div class="absolute flex flex-col inset-0 justify-center items-center">
+                                <div class="w-full flex flex-col items-center justify-center z-10">
+                                    <div class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">No Order Found !</div>
+                                    <div class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">No order found, shop and place your first order with us.</div>
+                                </div>
                             </div>
                         </div>
+                        <!-- <div class="mb-12"></div> -->
+                    </ng-template>
+                    <!-- Pagination -->
+                    <div class="flex w-full mt-4 items-center justify-center">
+                        <pagination 
+                            *ngIf="ordersDetailsPagination && ordersDetailsPagination.length > ordersDetailsPagination.size"
+                            [itemLength]="ordersDetailsPagination.length" 
+                            [initialPage]="ordersDetailsPagination.page + 1"
+                            [pageSize]="ordersDetailsPagination.size"
+                            (changePage)="onChangePage($event, 'orderDetails')"
+                            #ordersDetailsPaginator></pagination>
                     </div>
-                    <!-- <div class="mb-12"></div> -->
-                </ng-template>
+                </ng-container>
+                <ng-template #orderGroups>
+                    <ng-container *ngIf="(ordersGroups$ | async) as ordersGroups">
+                        <ng-container *ngIf="ordersGroups.length > 0; else noOrderGroup">
+                            <ng-container *ngFor="let ordersGroup of ordersGroups">
+                                <!-- Order Groups -->
+                                <div class="flex flex-col w-full border border-gray-300 rounded-lg py-1 sm:py-2 px-2 sm:px-2 mb-4">
+                                    <!-- Header -->
+                                    <div class="flex flex-row my-1 items-start justify-start w-full sm:px-2">
+                                        <!-- Store Details -->
+                                        <div class="flex flex-row">
+                                            <mat-icon class="text-primary" [svgIcon]="'mat_outline:receipt_long'"></mat-icon>
+                                            <div class="flex flex-col px-2">
+                                                <h3 class="text-gray-400 text-xs">Order ID : {{ ordersGroup.id }}</h3>
+                                                <h3 class="text-gray-400 text-xs">Order Placed : {{ getOrderPlaced(ordersGroup.created, ordersGroup.customer.regionCountry.timezone) | date:'MMM dd, h:mm a' }} </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+            
+                                    <ng-container *ngFor="let orderDetails of ordersGroup.orderList">
+                                        <!-- Orders -->
+                                        <div class="flex flex-col w-full border border-gray-300 rounded-lg px-2 sm:px-2 mb-2">
+                                            <!-- Header -->
+                                            <div class="flex flex-row my-3 items-start justify-between w-full sm:px-2">
+                                                <!-- Store Details -->
+                                                <div class="flex flex-row">
+                                                    <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
+                                                    <div class="flex flex-col px-2">
+                                                        <h3 class="font-bold cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
+                                                        <h3 class="text-gray-400 text-xs">Order ID : {{orderDetails.invoiceId}}</h3>
+                                                        <h3 class="text-gray-400 text-xs">Order Placed : {{ getOrderPlaced(orderDetails.created, orderDetails.customer.regionCountry.timezone) | date:'MMM dd, h:mm a' }}</h3>
+                                                    </div>
+                                                </div>
+                                                <!-- Progress Status Icon -->
+                                                <div class="flex flex-row items-center justify-center min-w-24 border border-primary p-1 sm:p-2 rounded">
+                                                    <!-- Progress Status Icon -->
+                                                    <mat-icon 
+                                                        [class]="displayStatus(orderDetails.completionStatus)?.class" 
+                                                        [svgIcon]="displayStatus(orderDetails.completionStatus)?.icon">
+                                                    </mat-icon>
+            
+                                                    <!-- Progress Status -->
+                                                    <span 
+                                                        class="font-semibold text-sm items-center pl-2">{{displayStatus(orderDetails.completionStatus)?.label}}
+                                                    </span>
+                                                </div>
+                                            </div>
+            
+                                            <!-- Border -->
+                                            <div class="border-t w-full"></div>
+                                            
+                                            <!-- Body -->
+                                            <ng-container *ngFor="let orderItemDetail of orderDetails.orderItemWithDetails">
+                                                <div 
+                                                    (click)="redirectToProduct(orderDetails.store.id, orderDetails.store.domain, orderItemDetail.productInventory.product.seoUrl)"  
+                                                    class="flex flex-row items-center justify-around w-full py-2 cursor-pointer group hover:bg-primary-50 sm:px-2 gap-2">
+                                                    <div class="relative flex flex-0 items-center justify-center w-13 h-13 mr-4 rounded overflow-hidden border">
+                                                        <img
+                                                            class="w-full"
+                                                            [alt]="'Product thumbnail image of ' + orderItemDetail.productName"
+                                                            [src]=
+                                                                "orderItemDetail.itemAssetDetails ? orderItemDetail.itemAssetDetails.url 
+                                                                : orderItemDetail.productInventory.product.thumbnailUrl ? orderItemDetail.productInventory.product.thumbnailUrl 
+                                                                : orderDetails.store.storeLogoUrl ? orderDetails.store.storeLogoUrl
+                                                                : 'assets/branding/deliverin/logo/DeliverIN-Original.jpg'">
+                                                    </div>
+                                                    <div class="w-full md:pl-50">
+                                                        <h3 
+                                                            class="font-semibold text-sm group-hover:text-primary line-clamp-3">
+                                                            {{orderItemDetail.productName}}
+                                                        </h3>
+                                                        <h3 class="text-gray-400 text-sm group-hover:text-primary">{{orderItemDetail.productVariant}}</h3>
+                                                    </div>
+                                                    <div class="w-full flex flex-row justify-between max-w-26 sm:max-w-72">
+                                                        <h3 class="text-gray-400 items-center text-sm group-hover:text-primary">x{{orderItemDetail.quantity}}</h3>
+                                                        <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
+                                                        <h3 class="font-bold text-primary text-sm">{{orderItemDetail.productPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+            
+                                            <!-- Border -->
+                                            <div class="border-b w-full"></div>
+                                            
+                                            <!-- Footer -->
+                                            <div class="flex flex-row justify-between w-full py-2 sm:px-2">
+                                                <!-- Order Details Button -->
+                                                <div class="flex flex-row">
+                                                    <div class="w-24">
+                                                        <input
+                                                            id="order-list-button"
+                                                            type="button"
+                                                            class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                                            mat-button
+                                                            >
+                                                        <label 
+                                                            [routerLink]="['/orders/details/' + orderDetails.id]"
+                                                            class="flex items-center justify-center h-8 sm:h-10 px-1 sm:px-2 rounded-lg bg-primary hover:bg-primary-600 cursor-pointer"
+                                                            for="add-to-cart-button"
+                                                            matRipple>
+                                                            <span class="text-sm font-semibold text-black tracking-tight">Order Details</span>
+                                                        </label>
+                                                    </div>
+                                                    <!-- <div class="w-20 pl-2">
+                                                        <input
+                                                            id="order-list-button"
+                                                            type="button"
+                                                            class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                                            mat-button
+                                                            >
+                                                        <label 
+                                                            (click)="viewDetails(orderDetails.id)"
+                                                            class="flex items-center justify-center h-10 w-10 rounded-full bg-primary hover:border-primary-500 cursor-pointer"
+                                                            for="add-to-cart-button"
+                                                            matRipple>
+                                                            <mat-icon class="text-black" svgIcon="mat_outline:receipt_long"></mat-icon>
+                                                        </label>
+                                                    </div> -->
+                                                </div>
+                                                <div class="flex flex-col w-full items-end">
+                                                    <!-- Sub Total -->
+                                                    <div class="flex flex-row justify-between">
+                                                        <p class="text-left font-semibold text-gray-400 text-sm w-44">Sub Total</p> 
+                                                        <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                                        <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-18">{{ orderDetails.subTotal | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
+                                                    </div>
+                                                    <!-- Service Charges -->
+                                                    <ng-container *ngIf="orderDetails.storeServiceCharges !== 0">
+                                                        <div class="flex flex-row justify-between">
+                                                            <p class="text-left font-semibold text-gray-400 text-sm w-44">Service Charges</p> 
+                                                            <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                                            <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-18">{{ orderDetails.storeServiceCharges | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
+                                                        </div>
+                                                    </ng-container>
+                                                    <!-- Delivery Charges -->
+                                                    <ng-container *ngIf="orderDetails.deliveryCharges !== 0">
+                                                        <div class="flex flex-row justify-between">
+                                                            <p class="text-left font-semibold text-gray-400 text-sm w-44">Delivery Charges</p> 
+                                                            <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                                            <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-18">{{ orderDetails.deliveryCharges | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
+                                                        </div>
+                                                    </ng-container>
+                                                    <!-- Total Amount -->
+                                                    <div class="flex flex-row justify-between border-t">
+                                                        <p class="text-left font-semibold text-sm w-44">Total Amount</p> 
+                                                        <span class="items-center font-semibold text-sm">:</span>
+                                                        <h3 class="w-full text-right font-semibold text-sm w-18">{{ orderDetails.total | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
+                                                    </div>
+                                                    <!-- <p class="items-center font-semibold text-gray-400 text-sm">Total Order :</p> 
+                                                    <h3 class="w-fulltext-lg font-semibold text-sm">{{orderDetails.total | currency: orderDetails.store.regionCountry.currencySymbol}}</h3> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
 
-                <div class="flex w-full mt-4 items-center justify-center">
-                    <pagination 
-                        *ngIf="pagination && pagination.length > pagination.size"
-                        [itemLength]="pagination.length" 
-                        [initialPage]="pagination.page + 1"
-                        [pageSize]="pagination.size"
-                        (changePage)="onChangePage($event)"></pagination>
-                </div>
+                                    <!-- Footer -->
+                                    <div class="flex flex-col items-end w-full sm:px-4">
+                                        <!-- Sub Total -->
+                                        <div class="flex flex-row justify-between">
+                                            <p class="text-left font-semibold text-gray-400 text-sm w-44">Sub Total</p> 
+                                            <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                            <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-18">{{ ordersGroup.subTotal | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                        </div>
+                                        <!-- Service Charges -->
+                                        <!-- <ng-container *ngIf="ordersGroup.serviceCharges !== 0">
+                                            <div class="flex flex-row justify-between">
+                                                <p class="text-left font-semibold text-gray-400 text-sm w-44">Service Charges</p> 
+                                                <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                                <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-18">{{ ordersGroup.serviceCharges | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                            </div>
+                                        </ng-container> -->
+                                        <!-- Platform Voucher Discount -->
+                                        <ng-container *ngIf="ordersGroup.platformVoucherDiscount && ordersGroup.platformVoucherDiscount !== 0">
+                                            <div class="flex flex-row justify-between">
+                                                <p class="text-left font-semibold text-primary-400 text-sm w-44">DeliverIN Voucher Discount</p> 
+                                                <span class="items-center font-semibold text-gray-400 text-sm">:</span>
+                                                <h3 class="w-full text-right font-semibold text-primary-400 text-sm w-18">-{{ ordersGroup.platformVoucherDiscount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                            </div>
+                                        </ng-container>
+                                        
+                                        <!-- Total Amount -->
+                                        <div class="flex flex-row justify-between border-t">
+                                            <p class="text-left font-semibold text-sm w-44">Total Amount</p> 
+                                            <span class="items-center font-semibold text-sm">:</span>
+                                            <h3 class="w-full text-right font-semibold text-sm w-18">{{ ordersGroup.total | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                        </div>
+                                        <!-- Amount Paid -->
+                                        <div class="flex flex-row justify-between">
+                                            <p class="text-left font-semibold text-sm w-44">Paid Amount</p> 
+                                            <span class="items-center font-semibold text-sm">:</span>
+                                            <h3 class="w-full text-right font-semibold text-sm w-18">{{ ordersGroup.paidAmount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <!-- No Products -->
+                    <ng-template #noOrderGroup>
+                        <div class="relative w-full h-100 sm:h-auto max-h-160">
+                            <error-background class="w-full static opacity-40"></error-background>
+                            <div class="absolute flex flex-col inset-0 justify-center items-center">
+                                <div class="w-full flex flex-col items-center justify-center z-10">
+                                    <div class="mt-2 text-4xl md:text-5xl font-semibold tracking-tight leading-tight md:leading-none text-center">No Order Found !</div>
+                                    <div class="mt-4 max-w-120 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">No order found, shop and place your first order with us.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="mb-12"></div> -->
+                    </ng-template>
+                    <!-- Pagination -->
+                    <div class="flex w-full mt-4 items-center justify-center">
+                        <pagination 
+                            *ngIf="ordersGroupsPagination && ordersGroupsPagination.length > ordersGroupsPagination.size"
+                            [itemLength]="ordersGroupsPagination.length" 
+                            [initialPage]="ordersGroupsPagination.page + 1"
+                            [pageSize]="ordersGroupsPagination.size"
+                            (changePage)="onChangePage($event, 'orderGroups')"
+                            #ordersGroupsPaginator></pagination>
+                    </div>
+                </ng-template>
             </div>
         </div>
         
