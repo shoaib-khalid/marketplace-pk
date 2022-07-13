@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { AppConfig } from 'app/config/service.config';
 import { JwtService } from 'app/core/jwt/jwt.service';
@@ -61,7 +61,6 @@ export class VoucherService
     // -----------------------------------------------------------------------------------------------------
 
     getAvailableVoucher () {
-
         let orderService = this._apiServer.settings.apiServer.orderService;
         let accessToken = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).act;
         let clientId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid;
@@ -89,6 +88,11 @@ export class VoucherService
         let accessToken = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).act;
         let clientId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid;
 
+        if (!clientId || clientId === '') {
+            // No need to resolve if customer not logged in
+            return of(null);
+        }
+
         const header = {  
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
             params : {
@@ -105,7 +109,6 @@ export class VoucherService
 
                     if(isUsed){
                         let usedCustomerVoucherPagination = {
-                            
                             length: response.data.totalElements,
                             size: response.data.size,
                             page: response.data.number,
@@ -113,15 +116,14 @@ export class VoucherService
                             startIndex: response.data.pageable.offset,
                             endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
                         }
-                        this._usedCustomerVoucherPagination.next(usedCustomerVoucherPagination); 
-                                                
+
+                        this._usedCustomerVoucherPagination.next(usedCustomerVoucherPagination);                         
                         this._usedCustomerVouchers.next(response["data"].content);
                         
                         return response["data"].content
 
                     } else {
                         let customerVoucherPagination = {
-
                             length: response.data.totalElements,
                             size: response.data.size,
                             page: response.data.number,
@@ -130,7 +132,6 @@ export class VoucherService
                             endIndex: response.data.pageable.offset + response.data.numberOfElements - 1
                         }
                         this._customerVoucherPagination.next(customerVoucherPagination); 
-                        
                         this._customerVouchers.next(response["data"].content);
 
                         return response["data"].content
