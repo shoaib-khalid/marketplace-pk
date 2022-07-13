@@ -13,6 +13,7 @@ import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { environment } from 'environments/environment';
 // import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 @Component({
@@ -239,7 +240,7 @@ export class EditAddressDialog implements OnInit {
         let loader = new Loader({
             // AIzaSyCFhf1LxbPWNQSDmxpfQlx69agW-I-xBIw - iman
             // AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4 - albert
-            apiKey: 'AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4',
+            apiKey: environment.googleMapsAPIKey,
             libraries: ['places']
             
         });
@@ -255,7 +256,7 @@ export class EditAddressDialog implements OnInit {
                 center: this.location,
                 zoom: 15,
                 mapTypeControl:false,
-                draggableCursor: 'url(https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/536px-Google_Maps_icon_%282020%29.svg.png)',
+                draggableCursor: 'pointer',
                 streetViewControl:false,//Removing the pegman from map
                 // styles: styles,
                 mapTypeId: "roadmap",
