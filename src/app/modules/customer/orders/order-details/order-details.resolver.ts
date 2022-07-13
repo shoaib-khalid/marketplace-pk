@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@a
 import { ProductsService } from 'app/core/product/product.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { OrderListService } from '../order-list/order-list.service';
+import { OrderService } from 'app/core/_order/order.service';
 
 
 @Injectable({
@@ -15,7 +15,7 @@ export class OrderDetailsResolver implements Resolve<any>
      * Constructor
      */
     constructor(
-        private _ordersService: OrderListService,
+        private _orderService: OrderService,
         private _router: Router
     )
     {
@@ -35,7 +35,7 @@ export class OrderDetailsResolver implements Resolve<any>
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any>
     {
         // Fork join multiple API endpoint calls to wait all of them to finish
-        return this._ordersService.getOrderById(route.paramMap.get('order-id'))
+        return this._orderService.getOrderById(route.paramMap.get('order-id'))
             .pipe(
                 // Error here means the requested product is not available
                 catchError((error) => {
