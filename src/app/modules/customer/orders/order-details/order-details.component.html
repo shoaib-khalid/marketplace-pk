@@ -7,51 +7,54 @@
             <!-- Order Details -->
             <div class="flex flex-col w-full">
                 <ng-container *ngIf="orderDetails">
-                    <div class="flex flex-col w-full border border-gray-300 rounded-lg py-2 sm:py-4 px-4 mb-4">
+                    <div class="flex flex-col w-full border border-gray-300 rounded-lg p-2 sm:p-4 mb-4">
                         <!-- Header -->
                         <div class="flex flex-row justify-between items-center pb-2 sm:pb-4">
-                            <h3 class="font-semibold text-lg items-center">Order ID : {{orderDetails.invoiceId}}</h3>
-                            <button *ngIf="displayStatus(orderDetails.completionStatus)" class="flex flex-row justify-center w-34 border border-primary p-2 rounded items-center">
+                            <h3 class="font-semibold items-center">Order ID : {{orderDetails.invoiceId}}</h3>
+                            <!-- Progress Status Icon -->
+                            <div *ngIf="displayStatus(orderDetails.completionStatus)" 
+                                class="flex flex-row items-center justify-center min-w-24 border border-primary p-1 sm:p-2 rounded">
                                 <!-- Progress Status Icon -->
                                 <mat-icon 
-                                    [class]="displayStatus(orderDetails.completionStatus).class" 
-                                    [svgIcon]="displayStatus(orderDetails.completionStatus).icon">
+                                    [class]="displayStatus(orderDetails.completionStatus)?.class" 
+                                    [svgIcon]="displayStatus(orderDetails.completionStatus)?.icon">
                                 </mat-icon>
+
                                 <!-- Progress Status -->
                                 <span 
-                                    class="font-semibold text-sm items-center pl-2">{{displayStatus(orderDetails.completionStatus).label}}
+                                    class="font-semibold text-sm items-center pl-2">{{displayStatus(orderDetails.completionStatus)?.label}}
                                 </span>
-                            </button> 
+                            </div>
                         </div>
 
                         <!-- Border -->
                         <div class="border-t w-full"></div>
 
                         <!-- Details -->
-                        <div class="flex flex-col my-3 w-full py-4">
+                        <div class="flex flex-col w-full py-2">
                             <div class="flex flex-row">
                                 <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                 <div class="flex flex-col pl-2">
-                                    <h3 class="font-bold text-xl cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
-                                    <h3 class="font-medium text-gray-400 text-md">Order Placed : {{dateCreated | date:'MMM dd yyyy, h:mm a' }}</h3>
+                                    <h3 class="font-bold cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
+                                    <h3 class="font-medium text-gray-400 text-xs sm:text-sm">Order Placed : {{dateCreated | date:'MMM dd yyyy, h:mm a' }}</h3>
                                 </div>
                             </div>
-                            <div class="flex flex-row pt-4">
+                            <div class="flex flex-row pt-2">
                                 <mat-icon class="text-primary" svgIcon="mat_outline:location_on"></mat-icon>
                                 <div class="flex flex-col pl-2">
-                                    <h3 class="font-semibold text-primary text-lg">Delivery Address</h3>
-                                    <h3 class="font-medium pt-2 text-md">Name : {{orderDetails.orderShipmentDetail.receiverName}}</h3>
-                                    <h3 class="font-medium pt-2 text-md">Contact : {{orderDetails.orderShipmentDetail.phoneNumber}}</h3>
-                                    <h3 class="font-medium pt-2 text-md">Address : {{orderDetails.orderShipmentDetail.address}}, {{orderDetails.orderShipmentDetail.zipcode}}, {{orderDetails.orderShipmentDetail.city}}, {{orderDetails.orderShipmentDetail.state}}</h3>
+                                    <h3 class="font-semibold text-primary">Delivery Address</h3>
+                                    <h3 class="font-medium text-md">Name : {{orderDetails.orderShipmentDetail.receiverName}}</h3>
+                                    <h3 class="font-medium text-md">Contact : {{orderDetails.orderShipmentDetail.phoneNumber}}</h3>
+                                    <h3 class="font-medium text-md">Address : {{orderDetails.orderShipmentDetail.address}}, {{orderDetails.orderShipmentDetail.zipcode}}, {{orderDetails.orderShipmentDetail.city}}, {{orderDetails.orderShipmentDetail.state}}</h3>
                                 </div>
                             </div>
-                            <div class="flex flex-row pt-4">
+                            <div class="flex flex-row pt-2">
                                 <svg class="h-6 w-6 text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" 
                                     stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" 
                                     d="M0 0h24v24H0z"/>  <circle cx="7" cy="17" r="2" />  <circle cx="17" cy="17" r="2" />  <path 
                                     d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />  <line x1="3" y1="9" x2="7" y2="9" /></svg>
                                 <div class="flex flex-col pl-2">
-                                    <h3 class="font-semibold text-primary text-lg">Delivery Option</h3>
+                                    <h3 class="font-semibold text-primary">Delivery Option</h3>
                                     <h3 class="font-medium pt-2 text-md">{{orderDetails.orderShipmentDetail.deliveryPeriodDetails?orderDetails.orderShipmentDetail.deliveryPeriodDetails.id:'-'}}</h3>
                                 </div>
                             </div>
@@ -187,7 +190,7 @@
                                 </div>
                             </ng-container>
                             <!-- Service Charges -->
-                            <ng-container *ngIf="orderDetails.store.serviceChargesPercentage !== 0">
+                            <ng-container *ngIf="orderDetails.storeServiceCharges !== 0">
                                 <div class="flex flex-row justify-between w-full">
                                     <h3 class="font-semibold text-md sm:text-base text-gray-500">Service Charges ({{orderDetails.store.serviceChargesPercentage | number}}%)</h3>
                                     <p class="items-center font-semibold text-md sm:text-base text-gray-400">{{orderDetails.storeServiceCharges | currency: orderDetails.store.regionCountry.currencySymbol}}</p> 
