@@ -11,7 +11,7 @@
                         <!-- Header -->
                         <div class="flex flex-row justify-between items-center pb-2 sm:pb-4">
                             <h3 class="font-semibold text-lg items-center">Order ID : {{orderDetails.invoiceId}}</h3>
-                            <button class="flex flex-row justify-center w-34 border border-primary p-2 rounded items-center">
+                            <button *ngIf="displayStatus(orderDetails.completionStatus)" class="flex flex-row justify-center w-34 border border-primary p-2 rounded items-center">
                                 <!-- Progress Status Icon -->
                                 <mat-icon 
                                     [class]="displayStatus(orderDetails.completionStatus).class" 

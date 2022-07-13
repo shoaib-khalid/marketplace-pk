@@ -1,15 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CartService } from 'app/core/cart/cart.service';
-import { ProductsService } from 'app/core/product/product.service';
-import { StoresService } from 'app/core/store/store.service';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DeliveryRiderDetails, OrderDetails } from 'app/core/_order/order.types';
 import { OrderService } from 'app/core/_order/order.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { Store } from 'app/core/store/store.types';
+import { DeliveryService } from 'app/core/_delivery/delivery.service';
 
 
 @Component({
@@ -49,11 +46,10 @@ export class OrderDetailsComponent implements OnInit
 
     orderId: string;
     orderDetails: OrderDetails;
-    ordersDetails$: Observable<OrderDetails[]>;
     
-    store$: Store;
+    rider: any;
+    deliveryOrderStatus: any;
 
-    rider$: any;
     timezoneString: any;
     dateCreated: Date;
     dateUpdated: Date;
@@ -69,6 +65,7 @@ export class OrderDetailsComponent implements OnInit
         private _orderService: OrderService,
         private _route: ActivatedRoute,
         private _router: Router,
+        private _deliveryService: DeliveryService,
         private _authService: AuthService,
         private _changeDetectorRef: ChangeDetectorRef
     )
@@ -82,8 +79,6 @@ export class OrderDetailsComponent implements OnInit
     ngOnInit() {
 
         this.orderId = this._route.snapshot.paramMap.get('order-id');
-
-        this.ordersDetails$ = this._orderService.ordersDetails$;
 
         this._orderCountSummary = [
             { id: "ALL", label: "All", completionStatus: ["PAYMENT_CONFIRMED", "RECEIVED_AT_STORE", "BEING_PREPARED", "AWAITING_PICKUP", "BEING_DELIVERED", "DELIVERED_TO_CUSTOMER", "CANCELED_BY_MERCHANT"], count: 0, class: null, icon: null },
@@ -104,44 +99,45 @@ export class OrderDetailsComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId)
-            .subscribe((ordersWithDetailsResponse) =>{
-                this._orderService.getOrderById(this.orderId)
-                    .subscribe((orderByIdResponse)=>{                        
-                        this.orderDetails = orderByIdResponse
-                        var TimezoneName = this.orderDetails.store.regionCountry.timezone;
-                                
-                        // Generating the formatted text
-                        var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
-                        var dateText = Intl.DateTimeFormat([], options).format(new Date);
+        // getOrderById
+        this._orderService.getOrderById(this.orderId)
+            .subscribe((orderByIdResponse)=>{                        
+                this.orderDetails = orderByIdResponse
+                var TimezoneName = this.orderDetails.store.regionCountry.timezone;
                         
-                        // Scraping the numbers we want from the text
-                        this.timezoneString = dateText.split(" ")[1].slice(3);
-                        
-                        // Getting the offset
-                        var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
-            
-                        // Checking for a minutes offset and adding if appropriate
-                        if (this.timezoneString.includes(":")) {
-                            var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
-                        }
-            
-                        this.dateCreated = new Date(this.orderDetails.created);
-                        this.dateUpdated = new Date(this.orderDetails.updated);
-            
-                        this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
-                        this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
-                    });
+                // Generating the formatted text
+                var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
+                var dateText = Intl.DateTimeFormat([], options).format(new Date);
+                
+                // Scraping the numbers we want from the text
+                this.timezoneString = dateText.split(" ")[1].slice(3);
+                
+                // Getting the offset
+                var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
+    
+                // Checking for a minutes offset and adding if appropriate
+                if (this.timezoneString.includes(":")) {
+                    var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
+                }
+    
+                this.dateCreated = new Date(this.orderDetails.created);
+                this.dateUpdated = new Date(this.orderDetails.updated);
+    
+                this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
+                this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
             });
         
-        // get DeliveryRiderDetails
+        // getDeliveryRiderDetails
         this._orderService.getDeliveryRiderDetails(this.orderId)
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((rider: DeliveryRiderDetails) => {
+            .subscribe((rider: DeliveryRiderDetails) => {
+                this.rider = rider            
+            });
 
-            this.rider$ = rider            
-        });
-        
+        // getDeliveryDetails
+        this._deliveryService.getDeliveryOrderStatusList(this.orderId)
+            .subscribe((response)=>{
+                this.deliveryOrderStatus = response;
+            });
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -155,26 +151,20 @@ export class OrderDetailsComponent implements OnInit
 
     // redirectToProduct(storeDomain: string, seoName: string) {
     //     let domainName = storeDomain.split(".")[0]
-
     //     let seo = seoName.split("/")[4]        
-        
     //     // this._document.location.href = url;
     //     this._router.navigate(['store/' + domainName + '/' + 'all-products/' + seo]);
-
     // }
 
     redirectToStore(storeDomain: string) {
         let domainName = storeDomain.split(".")[0]
-        
         // this._document.location.href = url;
         this._router.navigate(['store/' + domainName + '/' + 'all-products' ]);
-
     }
     
 
     displayStatus(completionStatus: string) {
         let index = this._orderCountSummary.findIndex(item => item.id !== 'ALL' && item.completionStatus.includes(completionStatus));
-
         return index > -1 ? this._orderCountSummary[index] : null;
     }
 
