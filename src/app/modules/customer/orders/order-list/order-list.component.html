@@ -287,7 +287,7 @@
                                                 <div class="flex flex-col w-full items-end">
                                                     <!-- Sub Total -->
                                                     <div class="flex flex-row justify-between">
-                                                        <p class="text-left font-semibold text-gray-500 text-sm w-44">Sub Total</p> 
+                                                        <p class="text-left font-semibold text-gray-500 text-sm w-56">Sub Total</p> 
                                                         <span class="items-center font-semibold text-gray-500 text-sm">:</span>
                                                         <h3 class="w-full text-right font-semibold text-gray-500 text-sm w-20">{{ orderDetails.subTotal | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
                                                     </div>
@@ -295,7 +295,7 @@
                                                     <ng-container *ngIf="orderDetails.appliedDiscount !== 0">
                                                         <div class="flex flex-row justify-between">
                                                             <div class="flex flex-col leading-tight">
-                                                                <div class="text-left font-semibold text-gray-500 text-sm w-44">
+                                                                <div class="text-left font-semibold text-gray-500 text-sm w-56">
                                                                     <span>Order Discount</span> 
                                                                     <span *ngIf="orderDetails.appliedDiscountDescription">&nbsp;({{orderDetails.appliedDiscountDescription}})</span>
                                                                 </div>
@@ -309,7 +309,7 @@
                                                     <!-- Service Charges -->
                                                     <ng-container *ngIf="orderDetails.storeServiceCharges !== 0">
                                                         <div class="flex flex-row justify-between">
-                                                            <p class="text-left font-semibold text-gray-500 text-sm w-44">Service Charges</p> 
+                                                            <p class="text-left font-semibold text-gray-500 text-sm w-56">Service Charges</p> 
                                                             <span class="items-center font-semibold text-gray-500 text-sm">:</span>
                                                             <h3 class="w-full text-right font-semibold text-gray-500 text-sm w-20">{{ orderDetails.storeServiceCharges | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
                                                         </div>
@@ -317,7 +317,7 @@
                                                     <!-- Delivery Charges -->
                                                     <ng-container *ngIf="orderDetails.deliveryCharges !== 0">
                                                         <div class="flex flex-row justify-between">
-                                                            <p class="text-left font-semibold text-gray-500 text-sm w-44">Delivery Charges</p> 
+                                                            <p class="text-left font-semibold text-gray-500 text-sm w-56">Delivery Charges</p> 
                                                             <span class="items-center font-semibold text-gray-500 text-sm">:</span>
                                                             <h3 class="w-full text-right font-semibold text-gray-500 text-sm w-20">{{ orderDetails.deliveryCharges | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
                                                         </div>
@@ -326,7 +326,7 @@
                                                     <ng-container *ngIf="orderDetails.deliveryDiscount !== 0">
                                                         <div class="flex flex-row justify-between">
                                                             <div class="flex flex-col leading-tight">
-                                                                <div class="text-left font-semibold text-gray-500 text-sm w-44">
+                                                                <div class="text-left font-semibold text-gray-500 text-sm w-56">
                                                                     <span>Delivery Discount</span> 
                                                                     <span *ngIf="orderDetails.deliveryDiscountDescription">&nbsp;({{orderDetails.deliveryDiscountDescription}})</span>
                                                                 </div>
@@ -339,7 +339,7 @@
                                                     </ng-container>
                                                     <!-- Total Amount -->
                                                     <div class="flex flex-row justify-between border-t">
-                                                        <p class="text-left font-semibold text-sm w-44">Total Amount</p> 
+                                                        <p class="text-left font-semibold text-sm w-56">Total Amount</p> 
                                                         <span class="items-center font-semibold text-sm">:</span>
                                                         <h3 class="w-full text-right font-semibold text-sm w-20">{{ orderDetails.total | currency: orderDetails.customer.regionCountry.currencySymbol }}</h3>
                                                     </div>
@@ -354,14 +354,14 @@
                                     <div class="flex flex-col items-end w-full sm:px-4">
                                         <!-- Total Order Amount -->
                                         <div class="flex flex-row justify-between">
-                                            <p class="text-left font-semibold text-gray-400 text-sm w-44">Total Order Amount</p> 
+                                            <p class="text-left font-semibold text-gray-400 text-sm w-56">Total Order Amount</p> 
                                             <span class="items-center font-semibold text-gray-400 text-sm">:</span>
                                             <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-20">{{ ordersGroup.totalOrderAmount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                         </div>
                                         <!-- Service Charges -->
                                         <!-- <ng-container *ngIf="ordersGroup.serviceCharges !== 0">
                                             <div class="flex flex-row justify-between">
-                                                <p class="text-left font-semibold text-gray-400 text-sm w-44">Service Charges</p> 
+                                                <p class="text-left font-semibold text-gray-400 text-sm w-56">Service Charges</p> 
                                                 <span class="items-center font-semibold text-gray-400 text-sm">:</span>
                                                 <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-20">{{ ordersGroup.serviceCharges | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                             </div>
@@ -369,14 +369,14 @@
                                         <!-- Platform Voucher Discount -->
                                         <ng-container *ngIf="ordersGroup.platformVoucherDiscount && ordersGroup.platformVoucherDiscount !== 0">
                                             <div class="flex flex-row justify-between">
-                                                <p class="text-left font-semibold text-primary-400 text-sm w-44">DeliverIN Voucher Discount</p> 
+                                                <p class="text-left font-semibold text-primary-400 text-sm w-56">DeliverIN Voucher Discount</p> 
                                                 <span class="items-center font-semibold text-gray-400 text-sm">:</span>
                                                 <h3 class="w-full text-right font-semibold text-primary-400 text-sm w-20">-{{ ordersGroup.platformVoucherDiscount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                             </div>
                                         </ng-container>
                                         <!-- Total Amount -->
                                         <div class="flex flex-row justify-between border-t">
-                                            <p class="text-left font-semibold text-sm w-44">Total Amount</p> 
+                                            <p class="text-left font-semibold text-sm w-56">Total Amount</p> 
                                             <span class="items-center font-semibold text-sm">:</span>
                                             <h3 class="w-full text-right font-semibold text-sm w-20">{{ ordersGroup.total | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                         </div>
