@@ -33,7 +33,7 @@
             </ng-container>
             <img
                 class="object-cover w-full h-30 rounded-t-lg shadow"
-                [src]="product.thumbnailUrl ? product.thumbnailUrl : (product ? displayStoreLogo(product.storeDetails.storeAssets) : product.storeCategory.parentCategory.parentThumbnailUrl)">
+                [src]="product.thumbnailUrl ? product.thumbnailUrl : (product ? product.storeCategory.parentCategory.parentThumbnailUrl : displayStoreLogo(product.storeDetails.storeAssets))">
         </div>
         <div class="flex flex-col justify-between h-full py-2 mx-2 mt-1">
             <div class="flex flex-col">
