@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { FuseAlertModule } from '@fuse/components/alert';
 
 @NgModule({
     declarations: [
@@ -34,7 +35,8 @@ import { MatDialogModule } from '@angular/material/dialog';
         NgxMatSelectSearchModule,
         MatDialogModule,
         SharedModule,
-        NgxMatSelectSearchModule
+        NgxMatSelectSearchModule,
+        FuseAlertModule
 
     ],
     exports     : [
