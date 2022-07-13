@@ -808,7 +808,7 @@ export class StoresService
             );
     }
 
-    getStoreRegionCountryStateCity(state: string, city: string = null): Observable<any>
+    getStoreRegionCountryStateCity(state: string, city: string = null, isResolved: boolean = true): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
         let accessToken = "accessToken";
@@ -832,7 +832,9 @@ export class StoresService
                     // ---------------
                     // Update Store
                     // ---------------
-                    this._cities.next(response.data);
+                    if(isResolved) {
+                        this._cities.next(response.data);
+                    }
 
                     return response.data;
                 })

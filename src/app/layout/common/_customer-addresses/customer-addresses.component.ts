@@ -25,6 +25,7 @@ import { EditAddressDialog } from './edit-address/edit-address.component';
 export class _CustomerAddressesComponent implements OnInit, OnDestroy
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    private _onDestroy = new Subject<void>();
 
     customersAddresses: CustomerAddress[];
     customerAddress: CustomerAddress = null;
@@ -32,13 +33,16 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
     
     accountForm: FormGroup;
 
-    alert: any;
+    alert: any
     currentScreenSize: string[] = [];
 
     url:any;
     customerId: string;
-
+s
     user: User;
+
+    longitude: any;
+    latitude: any
 
     /**
     * Constructor
@@ -60,8 +64,6 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
     ngOnInit(): void {
 
-
-        this.url = this._domSanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q='+'3.060279,%20101.578040'+'&t=&z=15&ie=UTF8&iwloc=&output=embed');
         this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
         // Create the form
@@ -109,7 +111,12 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((address: CustomerAddress) => {
                 if (address) {
-                    this.selectedAddress = address;
+                    this.selectedAddress = address;     
+
+                    this.latitude = this.selectedAddress.latitude
+                    this.longitude = this.selectedAddress.longitude
+
+                    this.url = this._domSanitizer.bypassSecurityTrustResourceUrl('https://maps.google.com/maps?q='+this.latitude+',%20'+this.longitude+'&t=&z=16&ie=UTF8&iwloc=&output=embed');                    
                 }    
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -127,7 +134,15 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
-            });
+            });        
+        
+        // this.url.valueChanges
+        //     .pipe(takeUntil(this._onDestroy))
+        //     .subscribe((result) => {
+        //         console.log("result1111", result);
+                  
+        //     });
+
     }
 
     /**
@@ -296,8 +311,6 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             }
         );
         dialogRef.afterClosed().subscribe(result => {
-
-            console.log("result", result);
             
             if(result){
                 if (this.customerId){
@@ -403,6 +416,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         this._userService.getSelectedCustomerAddress(addressId)
         .subscribe(response=>{
             this.customerAddress = response
+
         })
     }
 

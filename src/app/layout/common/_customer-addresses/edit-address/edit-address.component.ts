@@ -11,6 +11,8 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { UserProfileValidationService } from 'app/modules/customer/user-profile/user-profile.validation.service';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 // import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 @Component({
@@ -36,17 +38,18 @@ import { User } from 'app/core/user/user.types';
             .map {
                 width: 50vw;
                 height: 50vh;
+                cursor: pointer !important;  
             }
             #pac-input {
-                background-color: #fff;
+                background-color: var(--fuse-primary-50);
                 font-family: 'Lato', sans-serif;
                 font-size: 15px;
                 font-weight: 300;
                 padding: 0 11px 0 13px;
-                padding-right: 150px;
                 text-overflow: ellipsis;
                 width: 400px;
                 height: 40px;
+                border-color: var(--fuse-primary-500) !important;                  
             }
             
             #pac-input:focus {
@@ -57,6 +60,7 @@ import { User } from 'app/core/user/user.types';
             .pac-controls {
                 padding: 5px 11px;
                 display: inline-block;
+
             }
             
             .pac-controls label {
@@ -88,7 +92,6 @@ export class EditAddressDialog implements OnInit {
     countryCode: string = '';
     
     displayToogleNotDefault: boolean = false;
-    isLoading: boolean = false;
 
     dialingCode: string;
 
@@ -117,8 +120,8 @@ export class EditAddressDialog implements OnInit {
     displayLongtitude: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     //get current location
-    currentLat:any=0;
-    currentLong:any=0;
+    currentLat  :any = 3.1378038301945894;
+    currentLong :any = 101.68720603977643;
 
     user: User
 
@@ -129,9 +132,14 @@ export class EditAddressDialog implements OnInit {
         private _platformsService: PlatformService,
         private _storesService: StoresService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService: UserService
-
-    ) { }
+        private _userService: UserService,
+        private _matIconRegistry: MatIconRegistry,
+        private _domSanitizer: DomSanitizer,
+    )
+    {
+        this._matIconRegistry
+        .addSvgIcon('search',this._domSanitizer.bypassSecurityTrustResourceUrl('assets/layouts/fnb/icons/search.svg'))
+    }
 
     ngOnInit(): void {
 
@@ -148,12 +156,12 @@ export class EditAddressDialog implements OnInit {
             postCode    : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), UserProfileValidationService.postcodeValidator]],
             state       : ['Selangor', Validators.required],
             isDefault   : [''],
-            latitude    : [''],
-            longitude   : ['']
+            latitude    : ['', Validators.required],
+            longitude   : ['', Validators.required]
         });
 
         this._userService.user$
-        .pipe(takeUntil(this._onDestroy))
+            .pipe(takeUntil(this._onDestroy))
             .subscribe((result) => {
                     
                 this.user = result;
@@ -197,15 +205,14 @@ export class EditAddressDialog implements OnInit {
                     this._changeDetectorRef.markForCheck();
                 });
             });
+
         //to implement get current location first to be display if in db is null
         navigator.geolocation.getCurrentPosition((position) => {
             var crd = position.coords;
             this.currentLat = crd.latitude;
             this.currentLong= crd.longitude;            
         });   
-        
-        console.log("data sini", this.data);
-        
+                
         //======================== Insert google maps =========================
         //if db got null then we need to set the curren location so that it will display the google maps instead of hardcode the value of latitude and longitude
         
@@ -230,10 +237,12 @@ export class EditAddressDialog implements OnInit {
 
         // implement google maos
         let loader = new Loader({
+            // AIzaSyCFhf1LxbPWNQSDmxpfQlx69agW-I-xBIw - iman
+            // AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4 - albert
             apiKey: 'AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4',
             libraries: ['places']
             
-        })
+        });
 
         //  hardcode value first        
         this.location = {
@@ -246,14 +255,15 @@ export class EditAddressDialog implements OnInit {
                 center: this.location,
                 zoom: 15,
                 mapTypeControl:false,
+                draggableCursor: 'url(https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/536px-Google_Maps_icon_%282020%29.svg.png)',
                 streetViewControl:false,//Removing the pegman from map
                 // styles: styles,
                 mapTypeId: "roadmap",
             })
     
             const initialMarker = new google.maps.Marker({
-            position: this.location,
-            map: this.map,
+                position: this.location,
+                map: this.map,
             });
     
             // Create the search box and link it to the UI element.
@@ -277,7 +287,7 @@ export class EditAddressDialog implements OnInit {
         
                 if (places.length == 0) {
                     return;
-                }
+                }                
         
                 // Clear out the old markers.
                 markers.forEach((marker) => {
@@ -292,7 +302,39 @@ export class EditAddressDialog implements OnInit {
                 const bounds = new google.maps.LatLngBounds();
         
                 places.forEach((place) => {
-        
+
+                    let address = place.address_components
+                    
+                    // Find state
+                    let stateIndex = address.findIndex(item => item.types.includes("administrative_area_level_1"));
+                    let state = address[stateIndex] ? address[stateIndex].long_name : ''
+                    this.addressForm.get('state').patchValue(state)
+
+                    // Find city
+                    let cityIndex = address.findIndex(item => item.types.includes("locality"));
+                    let city = address[cityIndex] ? address[cityIndex].long_name : ''
+                
+                    if(state && state !== '') {  
+                        this._storesService.getStoreRegionCountryStateCity(state, city, false )
+                        .subscribe((response)=>{
+                            if(response && response.length) {
+                                this.addressForm.get('city').patchValue(response[0].id)
+                            } else {
+                                this.addressForm.get('city').patchValue('')
+                            }
+                            // Mark for check
+                            this._changeDetectorRef.markForCheck();
+                        });
+                    }
+
+                    // find postcode
+                    let postcodeIndex = address.findIndex(item => item.types.includes("postal_code"))
+                    let postcode = address[postcodeIndex] ? address[postcodeIndex].long_name : ''
+                    this.addressForm.get('postCode').patchValue(postcode)
+                    
+                    // find address
+                    this.addressForm.get('address').patchValue(place.vicinity)
+                    
                     let coordinateStringify = JSON.stringify(place?.geometry?.location);
                     let coordinateParse = JSON.parse(coordinateStringify);
         
@@ -313,7 +355,7 @@ export class EditAddressDialog implements OnInit {
                     if (!place.geometry || !place.geometry.location) {
                         // console.info("Returned place contains no geometry");
                         return;
-                    }
+                    }                    
             
                     // const icon = {
                     //   url: place.icon as string,
@@ -326,10 +368,8 @@ export class EditAddressDialog implements OnInit {
                     // Create a marker for each place.
                     markers.push(
                         new google.maps.Marker({
-                            map:this.map,
-                            // icon,
-                            title: place.name,
                             position: place.geometry.location,
+                            map: this.map,
                         })
                     );
             
@@ -357,7 +397,7 @@ export class EditAddressDialog implements OnInit {
     
                 // Clear out the old markers.
                 markers.forEach((marker) => {
-                marker.setMap(null);
+                    marker.setMap(null);
                 });
                 markers = [];
     
@@ -436,20 +476,12 @@ export class EditAddressDialog implements OnInit {
                 });
         });
 
-        // this.addressForm.get('latitude').setValue(this.location.lat.toString());
-        // this.addressForm.get('longitude').setValue(this.location.lng.toString());
-
-        // this.addressForm.value.latitude = this.location.lat.toString();
-        // this.addressForm.value.longitude = this.location.lng.toString();
-
         if(this.data.type === "create"){
             this.addressForm.get('customerId').setValue(this.data.customerId);
             this.addressForm.get('isDefault').setValue(false);
             this.addressForm.get('country').setValue(this.countryName);
             this.addressForm.get('email').setValue(this.data.user.email);
         } else {
-            // this.addressForm.get('latitude').patchValue(this.location.lat.toString());
-            // this.addressForm.get('longitude').patchValue(this.location.lng.toString());
             this.addressForm.patchValue(this.data.customerAddress);
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
@@ -457,8 +489,6 @@ export class EditAddressDialog implements OnInit {
     }
 
     updateAddress(){
-        this.addressForm.value.latitude = this.location.lat.toString();
-        this.addressForm.value.longitude = this.location.lng.toString();
 
         this.dialogRef.close(this.addressForm.value);
 
