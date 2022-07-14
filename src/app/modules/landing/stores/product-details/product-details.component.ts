@@ -265,7 +265,7 @@ export class LandingProductDetailsComponent implements OnInit
                                         let _imageObject = {
                                             small   : '' + object.url,
                                             medium  : '' + object.url,
-                                            big     : '' + object.url
+                                            big     : '' + object.url + '?original=true'
                                         }
                                         
                                         if(object.itemCode != this.displayedProduct.itemCode){
@@ -278,7 +278,7 @@ export class LandingProductDetailsComponent implements OnInit
                                         let _imageObject = {
                                             small   : '' + object.url,
                                             medium  : '' + object.url,
-                                            big     : '' + object.url
+                                            big     : '' + object.url + '?original=true'
                                         }
                                         
                                         if(object.itemCode == this.displayedProduct.itemCode){
@@ -295,7 +295,7 @@ export class LandingProductDetailsComponent implements OnInit
                                                 this.galleryImages = [{
                                                     small   : '' + item.assetUrl,
                                                     medium  : '' + item.assetUrl,
-                                                    big     : '' + item.assetUrl
+                                                    big     : '' + item.assetUrl + '?original=true'
                                                 }];
                                             }
                                         });
@@ -362,7 +362,7 @@ export class LandingProductDetailsComponent implements OnInit
                                     this.galleryImages = [{
                                         small   : '' + this.store.storeAsset.logoUrl,
                                         medium  : '' + this.store.storeAsset.logoUrl,
-                                        big     : '' + this.store.storeAsset.logoUrl
+                                        big     : '' + this.store.storeAsset.logoUrl + '?original=true'
                                     }];
                                 }
                             }
@@ -871,7 +871,7 @@ export class LandingProductDetailsComponent implements OnInit
                     let _imageObject = {
                         small   : '' + object.url,
                         medium  : '' + object.url,
-                        big     : '' + object.url
+                        big     : '' + object.url + '?original=true'
                     }
                     
                     if(object.itemCode != this.displayedProduct.itemCode){
@@ -884,7 +884,7 @@ export class LandingProductDetailsComponent implements OnInit
                     let _imageObject = {
                         small   : '' + object.url,
                         medium  : '' + object.url,
-                        big     : '' + object.url
+                        big     : '' + object.url + '?original=true'
                     }
                     
                     if(object.itemCode == this.displayedProduct.itemCode){
@@ -898,7 +898,7 @@ export class LandingProductDetailsComponent implements OnInit
                     this.galleryImages = [{
                         small   : '' + this.store.storeAsset.logoUrl,
                         medium  : '' + this.store.storeAsset.logoUrl,
-                        big     : '' + this.store.storeAsset.logoUrl
+                        big     : '' + this.store.storeAsset.logoUrl + '?original=true'
                     }];
                 }
                 // end of reorder image collection
