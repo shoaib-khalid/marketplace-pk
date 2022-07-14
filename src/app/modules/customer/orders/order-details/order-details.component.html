@@ -158,9 +158,9 @@
                                     <div class="items-center justify-end sm:justify-center">
                                         <h3 class="text-gray-400">x{{orderItem.quantity}}</h3>
                                     </div>
-                                    <div class="items-end w-full flex flex-col">
-                                        <!-- <h3 style="text-decoration: line-through;" class="font-bold">19.44</h3> -->
-                                        <h3 class="font-semibold text-md sm:text-base text-primary">{{orderItem.price | currency: orderDetails.store.regionCountry.currencySymbol}}</h3>
+                                    <div class="items-end w-1/2 flex flex-col">
+                                        <span *ngIf="orderItem.normalPrice !== orderItem.price" class="text-gray-400 items-start text-left text-sm line-through">{{orderItem.normalPrice | currency: orderDetails.store.regionCountry.currencySymbol}}</span>
+                                        <span class="font-semibold text-md sm:text-base text-primary">{{orderItem.price | currency: orderDetails.store.regionCountry.currencySymbol}}</span>
                                     </div>
                                 </div>
                             </ng-container>
