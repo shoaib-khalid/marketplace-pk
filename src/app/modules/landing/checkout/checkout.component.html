@@ -162,9 +162,26 @@
                                 </div>
                                 <!-- Shipping Fee & Total Items -->
                                 <div class="flex flex-row justify-between items-center mt-2">
-                                    <div class="flex flex-col sm:flex-row items-center sm:min-w-44 gap-1 sm:gap-2">
+                                    <div class="flex flex-col sm:flex-row sm:min-w-44 gap-1 sm:gap-2">
                                         <span class="text-sm sm:text-md">Shipping Fee:</span>
-                                        <span class="font-semibold text-xs sm:text-sm">{{ getDeliveryFee(cart.id) | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                        <!-- <span class="font-semibold text-xs sm:text-sm">{{ (getDeliveryFee(cart.id) ? getDeliveryFee(cart.id).deliveryFee : 0) | currency: cart.store.regionCountry.currencySymbol }}</span> -->
+                                        <ng-container *ngIf="getDeliveryFee(cart.id)">
+                                            <div class="flex flex-col">
+                                                <div class="flex flex-row gap-1">
+                                                    <!-- Ori Price  -->
+                                                    <span 
+                                                        [ngClass]="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount ? 
+                                                            'line-through font-normal' : 'font-semibold'"
+                                                        class="text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryFee) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                    <!-- Discounted price  -->
+                                                    <span *ngIf="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount"
+                                                        class="font-semibold text-sm tracking-tight">{{(getDeliveryFee(cart.id).discountedPrice) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                </div>
+                                                <!-- Off  -->
+                                                <span *ngIf="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount" 
+                                                    class="-mt-[0.15rem] text-xs tracking-tight">(save {{(getDeliveryFee(cart.id).discountAmount) | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                            </div>
+                                        </ng-container>
                                     </div>
                                     <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
                                         <span class="text-sm sm:text-md">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
@@ -229,10 +246,10 @@
                         </div>
                     </ng-container>
                     <!-- Service Charges -->
-                    <ng-container *ngIf="paymentDetails.storeServiceChargePercentage">
-                        <div class="flex flex-row w-full justify-between mt-2">
-                            <span class="text-md text-secondary">Service Charges ({{paymentDetails.storeServiceChargePercentage | number}}%)</span> 
-                            <span class="font-semibold">{{paymentDetails.storeServiceCharge | currency: platform.currency}}</span>
+                    <ng-container *ngIf="paymentDetails.storeServiceCharge !== 0">
+                        <div class="flex flex-row justify-between mt-2">
+                            <span class="text-md text-secondary">Service Charge</span> 
+                            <span class="text-md font-semibold">{{paymentDetails.storeServiceCharge | currency: platform.currency}}</span>
                         </div>
                     </ng-container>
                     <!-- Delivery Fee -->
@@ -241,7 +258,7 @@
                         <span class="text-md font-semibold">{{paymentDetails.deliveryCharges | currency: platform.currency}}</span>
                     </div>
                     <!-- Delivery Discount -->
-                    <ng-container *ngIf="paymentDetails.deliveryDiscount !== 0">
+                    <!-- <ng-container *ngIf="paymentDetails.deliveryDiscount !== 0">
                         <div class="flex flex-row w-full justify-between py-1">
                             <div class="flex flex-col">
                                 <div class="text-md text-secondary mt-2">
@@ -254,12 +271,12 @@
                             </div>
                             <span class="font-semibold">-{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
                         </div>
-                    </ng-container>
+                    </ng-container> -->
 
                     <ng-container *ngIf="paymentDetails.deliveryDiscount != 0">
                         <div class="flex flex-row justify-between mt-2">
                             <span class="text-md text-secondary">Shipping Fee Discount</span>
-                            <span class="text-md font-semibold">{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
+                            <span class="text-md font-semibold">-{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
                         </div>
                     </ng-container>
 

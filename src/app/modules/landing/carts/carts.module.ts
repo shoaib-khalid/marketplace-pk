@@ -18,6 +18,7 @@ import { FuseCardModule } from '@fuse/components/card';
 import { CartListComponent } from './carts.component';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
     declarations: [
@@ -39,7 +40,8 @@ import { ErrorBackgroundModule } from 'app/shared/error-background/error-backgro
         SharedModule,
         MatTabsModule,
         ErrorBackgroundModule,
-        FuseCardModule
+        FuseCardModule,
+        MatRadioModule
     ],
     providers: [
         CurrencyPipe,

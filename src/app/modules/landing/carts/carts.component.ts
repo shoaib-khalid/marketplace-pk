@@ -174,8 +174,13 @@ export class CartListComponent implements OnInit, OnDestroy
             deliveryErrorMessage?: string,
             deliveryProviderImg: string,
             deliveryQuotations: DeliveryProvider[],
-            selectedDeliveryPrice: number,
-            deliveryProviderName: string
+            deliveryProviderName: string,
+            isSelfPickup: boolean,
+            deliveryPrice: {
+                selectedDeliveryPrice: number,
+                discountAmount: number,
+                discountedPrice: number
+            }
         }[], 
         selected: boolean,
         disabled: boolean 
@@ -195,7 +200,7 @@ export class CartListComponent implements OnInit, OnDestroy
         discountType: null,
         storeServiceChargePercentage: 0,
         storeServiceCharge: 0,
-        deliveryCharges: 0, // not exist in (cart discount api), fetched from getPrice delivery service
+        deliveryCharges: 0,
         deliveryDiscount: 0,
         deliveryDiscountDescription: null,
         deliveryDiscountMaxAmount: 0,
@@ -209,7 +214,8 @@ export class CartListComponent implements OnInit, OnDestroy
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
         platformVoucherSubTotalDiscount: 0,
-        platformVoucherDeliveryDiscount: 0
+        platformVoucherDeliveryDiscount: 0,
+        storeDiscountList: []
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -345,8 +351,13 @@ export class CartListComponent implements OnInit, OnDestroy
                                     disabled: false,
                                     deliveryQuotations: null,
                                     deliveryProviderImg: null,
-                                    selectedDeliveryPrice: null,
-                                    deliveryProviderName: null
+                                    deliveryProviderName: null,
+                                    isSelfPickup: false,
+                                    deliveryPrice: {
+                                        selectedDeliveryPrice: null,
+                                        discountAmount: null,
+                                        discountedPrice: null
+                                    }
                                 };
                                 this.selectedCart.carts.push(cart);
                             }
@@ -411,8 +422,13 @@ export class CartListComponent implements OnInit, OnDestroy
                                     deliveryProviderId: null,
                                     deliveryQuotations: null,
                                     deliveryProviderImg: null,
-                                    selectedDeliveryPrice: null,
-                                    deliveryProviderName: null
+                                    deliveryProviderName: null,
+                                    isSelfPickup: false,
+                                    deliveryPrice: {
+                                        selectedDeliveryPrice: null,
+                                        discountAmount: null,
+                                        discountedPrice: null
+                                    }
                                 }
                             }),
                             selected: false,
@@ -481,13 +497,27 @@ export class CartListComponent implements OnInit, OnDestroy
         this._cartService.cartSummary$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: DiscountOfCartGroup)=>{
-                if(response) {
+                if (response) {
                     this.paymentDetails.cartSubTotal = response.sumCartSubTotal === null ? 0 : response.sumCartSubTotal;
                     this.paymentDetails.deliveryCharges = response.sumCartDeliveryCharge === null ? 0 : response.sumCartDeliveryCharge;
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal;
                     this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount;
                     this.paymentDetails.platformVoucherDeliveryDiscount = response.platformVoucherDeliveryDiscount === null ? 0 : response.platformVoucherDeliveryDiscount;
+                    this.paymentDetails.deliveryDiscount = response.sumDeliveryDiscount === null ? 0 : response.sumDeliveryDiscount;
+                    this.paymentDetails.subTotalDiscount = response.sumSubTotalDiscount === null ? 0 : response.sumSubTotalDiscount;
+                    this.paymentDetails.storeServiceCharge = response.sumServiceCharge === null ? 0 : response.sumServiceCharge;
+                    this.paymentDetails.storeDiscountList = response.storeDiscountList;
+
+                    response.storeDiscountList.forEach(item => {
+                        let selectedCartIndex = this.selectedCart.carts.findIndex(cart => cart.id === item.cartId);
+                        
+                        if (selectedCartIndex > -1) {
+                            this.selectedCart.carts[selectedCartIndex].deliveryPrice.discountAmount = item.deliveryDiscount;
+                            this.selectedCart.carts[selectedCartIndex].deliveryPrice.discountedPrice = item.cartDeliveryCharge - item.deliveryDiscount;
+                        }
+                    })
                 }
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -514,13 +544,16 @@ export class CartListComponent implements OnInit, OnDestroy
         // Get used customer voucher
         this._voucherService.getAvailableCustomerVoucher(false)
             .subscribe((response: any) => {
-                this.customerVouchers = response;
 
-                let index = this.customerVouchers.findIndex(x => x.voucher.isNewUserVoucher === true )
-                // select the voucher if it is new user voucher
-                if (index > -1) {
-                    this.selectVoucher(this.customerVouchers[index])
-                    // this.calculateCharges();
+                if (response) {
+                    this.customerVouchers = response;
+    
+                    let index = this.customerVouchers.findIndex(x => x.voucher.isNewUserVoucher === true )
+                    // select the voucher if it is new user voucher
+                    if (index > -1) {
+                        this.selectVoucher(this.customerVouchers[index])
+                        // this.calculateCharges();
+                    }
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -531,7 +564,9 @@ export class CartListComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response: CustomerVoucherPagination) => {
 
-                this.customerVoucherPagination = response; 
+                if (response) {
+                    this.customerVoucherPagination = response; 
+                }
                 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();           
@@ -675,7 +710,7 @@ export class CartListComponent implements OnInit, OnDestroy
     checkQuantity(cartId: string, cartItem: CartItem, quantity: number = null, operator: string = null) {
         quantity = quantity ? quantity : cartItem.quantity;
 
-        cartItem.productInventory.product.allowOutOfStockPurchases === false ? this.maxQuantity = cartItem.productInventory.quantity : 99;
+        this.maxQuantity = cartItem.productInventory.product.allowOutOfStockPurchases === false ? cartItem.productInventory.quantity : 99;
 
         if (operator === 'decrement')
             quantity > this.minQuantity ? quantity -- : quantity = this.minQuantity;
@@ -891,7 +926,7 @@ export class CartListComponent implements OnInit, OnDestroy
                             this.selectedCart.carts[cartIndex].deliveryType = item.quotation[minDeliveryChargesIndex].deliveryType;
                             this.selectedCart.carts[cartIndex].deliveryProviderId = item.quotation[minDeliveryChargesIndex].providerId;
                             this.selectedCart.carts[cartIndex].deliveryProviderImg = item.quotation[minDeliveryChargesIndex].providerImage;
-                            this.selectedCart.carts[cartIndex].selectedDeliveryPrice = item.quotation[minDeliveryChargesIndex].price;
+                            this.selectedCart.carts[cartIndex].deliveryPrice.selectedDeliveryPrice = item.quotation[minDeliveryChargesIndex].price;
                             this.selectedCart.carts[cartIndex].minDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
                             this.selectedCart.carts[cartIndex].maxDeliveryCharges = item.quotation[minDeliveryChargesIndex].price;
                             this.selectedCart.carts[cartIndex].deliveryProviderName = item.quotation[minDeliveryChargesIndex].providerName;
@@ -921,15 +956,29 @@ export class CartListComponent implements OnInit, OnDestroy
     getDeliveryChargesRange(index: number) : string 
     {
         if (this.selectedCart.carts[index]) {
+
+            let cartId = this.selectedCart.carts[index].id;
+            let deliveryDiscount = null;
+
+            let paymentIndex = this.paymentDetails.storeDiscountList.findIndex(item => item.cartId === cartId)
+
+            if (paymentIndex > -1) {
+                deliveryDiscount = this.paymentDetails.storeDiscountList[paymentIndex].deliveryDiscount;
+            }
             
             if (this.selectedCart.carts[index].deliveryQuotationId === null) {
                 return this.selectedCart.carts[index].deliveryErrorMessage;
 
             }
-            if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges) {
+            if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges && (deliveryDiscount === 0 || deliveryDiscount === null) ) {
 
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency);
-            } else {
+            } 
+            else if (this.selectedCart.carts[index].minDeliveryCharges === this.selectedCart.carts[index].maxDeliveryCharges && (deliveryDiscount !== 0 || deliveryDiscount !== null) ) {
+
+                return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " ( -" + this._currencyPipe.transform(deliveryDiscount, this.platform.currency) + " )";
+            }
+            else {
 
                 return this._currencyPipe.transform(this.selectedCart.carts[index].minDeliveryCharges, this.platform.currency) + " - " + this._currencyPipe.transform(this.selectedCart.carts[index].maxDeliveryCharges, this.platform.currency);
             }
@@ -981,7 +1030,7 @@ export class CartListComponent implements OnInit, OnDestroy
                         this.selectedCart.carts[index].deliveryType = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].deliveryType;
                         this.selectedCart.carts[index].minDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
                         this.selectedCart.carts[index].maxDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
-                        this.selectedCart.carts[index].selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
+                        this.selectedCart.carts[index].deliveryPrice.selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[nextSelectedProviderIdIndex].price;
                     }
                 } else {
                     this.selectedCart.carts[index].deliveryProviderName = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].providerName;
@@ -991,7 +1040,7 @@ export class CartListComponent implements OnInit, OnDestroy
                     this.selectedCart.carts[index].deliveryType = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].deliveryType;
                     this.selectedCart.carts[index].minDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
                     this.selectedCart.carts[index].maxDeliveryCharges = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
-                    this.selectedCart.carts[index].selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
+                    this.selectedCart.carts[index].deliveryPrice.selectedDeliveryPrice = this.selectedCart.carts[index].deliveryQuotations[selectedProviderIdIndex].price;
                 }
             }
 
@@ -1040,12 +1089,16 @@ export class CartListComponent implements OnInit, OnDestroy
                     }
                 // to remove if selected = false (undefined array of cart item)
                 }).filter(x => x),
-                deliveryQuotationId : item.deliveryQuotationId,
-                deliveryType : item.deliveryType,
-                deliveryProviderId : item.deliveryProviderId,
+                deliveryQuotationId : item.isSelfPickup ? null : item.deliveryQuotationId,
+                deliveryType : item.isSelfPickup ? 'PICKUP' : item.deliveryType,
+                deliveryProviderId : item.isSelfPickup ? null : item.deliveryProviderId,
                 orderNotes : item.description.value,
                 platformVoucherCode: this.voucherApplied ? this.voucherApplied.voucher.voucherCode : null,
-                deliveryFee: item.selectedDeliveryPrice
+                deliveryPrice: {
+                    deliveryFee: item.isSelfPickup ? null : item.deliveryPrice.selectedDeliveryPrice,
+                    discountAmount: item.isSelfPickup ? null : item.deliveryPrice.discountAmount,
+                    discountedPrice: item.isSelfPickup ? null : item.deliveryPrice.discountedPrice
+                }
             }
         // to remove if selected = false (undefined array of selectedItemId)
         }).filter(n => {
@@ -1545,7 +1598,7 @@ export class CartListComponent implements OnInit, OnDestroy
                         cart.deliveryProviderId = null;
                         cart.deliveryQuotations = null;
                         cart.deliveryProviderImg = null;
-                        cart.selectedDeliveryPrice = null;
+                        cart.deliveryPrice.selectedDeliveryPrice = null;
                         cart.deliveryProviderName = null;
                     })
                     this.initializeCheckoutList();
@@ -1609,7 +1662,7 @@ export class CartListComponent implements OnInit, OnDestroy
             
             return;
         }
-
+        this.initializeCheckoutList();
         this._router.navigate(['/checkout']);
     }
 
@@ -1658,5 +1711,11 @@ export class CartListComponent implements OnInit, OnDestroy
 
             return;
         }
+    }
+
+    selectSelfPickup(index: number) {
+        this.initializeCheckoutList();
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 }
