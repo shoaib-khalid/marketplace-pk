@@ -65,7 +65,8 @@ export class StoresService
     {
         return of(true).pipe(
             map(()=>{
-                this.getStoreByDomainName(storeDomain)
+                let storeFrontUrl = this._apiServer.settings.storeFrontDomain;
+                this.getStoreByDomainName(storeDomain + storeFrontUrl)
                     .subscribe((response: Store)=>{
                         if (response) {
                             this.storeId = response.id;
