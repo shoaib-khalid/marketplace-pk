@@ -178,7 +178,7 @@
                                         <div class="flex flex-row">
                                             <mat-icon class="text-primary" [svgIcon]="'mat_outline:receipt_long'"></mat-icon>
                                             <div class="flex flex-col px-2">
-                                                <h3 class="text-gray-400 text-xs">Order ID : {{ ordersGroup.id }}</h3>
+                                                <!-- <h3 class="text-gray-400 text-xs">Order ID : {{ ordersGroup.id }}</h3> -->
                                                 <h3 class="text-gray-400 text-xs">Order Placed : {{ getOrderPlaced(ordersGroup.created, ordersGroup.customer.regionCountry.timezone) | date:'MMM dd, h:mm a' }} </h3>
                                             </div>
                                         </div>
@@ -337,16 +337,16 @@
                                     <div class="flex flex-col sm:items-end w-full px-2 sm:px-4">
                                         <!-- Total Order Amount -->
                                         <div class="flex flex-row justify-between">
-                                            <p class="text-left font-semibold text-gray-400 text-sm w-56">Total Order Amount</p> 
+                                            <p class="text-left font-semibold text-gray-500 text-sm w-56">Total Order Amount</p> 
                                             <span class="items-center font-semibold text-gray-400 text-sm">:</span>
-                                            <h3 class="w-full text-right font-semibold text-gray-400 text-sm w-20">{{ ordersGroup.totalOrderAmount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                            <h3 class="w-full text-right font-semibold text-gray-500 text-sm w-20">{{ ordersGroup.totalOrderAmount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                         </div>
                                         <!-- Platform Voucher Discount -->
                                         <ng-container *ngIf="ordersGroup.platformVoucherDiscount && ordersGroup.platformVoucherDiscount !== 0">
                                             <div class="flex flex-row justify-between">
-                                                <p class="text-left font-semibold text-primary-400 text-sm w-56">DeliverIN Voucher Discount</p> 
+                                                <p class="text-left font-semibold text-primary-600 text-sm w-56">DeliverIn Voucher Discount</p> 
                                                 <span class="items-center font-semibold text-gray-400 text-sm">:</span>
-                                                <h3 class="w-full text-right font-semibold text-primary-400 text-sm w-20">-{{ ordersGroup.platformVoucherDiscount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
+                                                <h3 class="w-full text-right font-semibold text-primary-600 text-sm w-20">-{{ ordersGroup.platformVoucherDiscount | currency: ordersGroup.customer.regionCountry.currencySymbol }}</h3>
                                             </div>
                                         </ng-container>
                                         <!-- Total Amount -->
