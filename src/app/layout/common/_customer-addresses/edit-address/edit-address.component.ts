@@ -82,6 +82,9 @@ export class EditAddressDialog implements OnInit {
 
     @ViewChild('stateCitySelector') stateCitySelector: MatSelect;
 
+    resultSets: any[];
+    autoCompleteList: any[]
+
     storeStateCities: string[] = [];
     storeStateCities$: Observable<City[]>;
 
@@ -95,6 +98,8 @@ export class EditAddressDialog implements OnInit {
     displayToogleNotDefault: boolean = false;
 
     dialingCode: string;
+
+    result: any;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -158,7 +163,8 @@ export class EditAddressDialog implements OnInit {
             state       : ['Selangor', Validators.required],
             isDefault   : [''],
             latitude    : ['', Validators.required],
-            longitude   : ['', Validators.required]
+            longitude   : ['', Validators.required],
+            locate      : ['']
         });
 
         this._userService.user$
@@ -233,13 +239,10 @@ export class EditAddressDialog implements OnInit {
                 this.displayLatitude.next(this.data.customerAddress.latitude);
                 this.displayLongtitude.next(this.data.customerAddress.longitude);
             }
-
         }
 
-        // implement google maos
+        // implement google maps
         let loader = new Loader({
-            // AIzaSyCFhf1LxbPWNQSDmxpfQlx69agW-I-xBIw - iman
-            // AIzaSyB-WKjTtvxRRQ5ZQnQAnlUa8xlXjDnSgG4 - albert
             apiKey: environment.googleMapsAPIKey,
             libraries: ['places']
             
@@ -256,136 +259,85 @@ export class EditAddressDialog implements OnInit {
                 center: this.location,
                 zoom: 15,
                 mapTypeControl:false,
-                draggableCursor: 'pointer',
                 streetViewControl:false,//Removing the pegman from map
                 // styles: styles,
                 mapTypeId: "roadmap",
             })
     
             const initialMarker = new google.maps.Marker({
-                position: this.location,
-                map: this.map,
+            position: this.location,
+            map: this.map,
             });
-    
-            // Create the search box and link it to the UI element.
-            const input = document.getElementById("pac-input") as HTMLInputElement;
-            const searchBox = new google.maps.places.SearchBox(input);
-            
-            this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-    
-            // Bias the SearchBox results towards current map's viewport.
-            this.map.addListener("bounds_changed", () => {
-                searchBox.setBounds(this.map.getBounds() as google.maps.LatLngBounds);
-            });
-    
+
             //use for when user mark other location
             let markers: google.maps.Marker[] = [];
-    
-            // Listen for the event fired when the user selects a prediction and retrieve
-            // more details for that place.
-            searchBox.addListener("places_changed", () => {
-            const places = searchBox.getPlaces();
-        
-                if (places.length == 0) {
-                    return;
-                }                
-        
-                // Clear out the old markers.
-                markers.forEach((marker) => {
-                    marker.setMap(null);
-                });
-                markers = [];
-    
-                // Clear out the init markers.
-                initialMarker.setMap(null);
-    
-                // For each place, get the icon, name and location.
-                const bounds = new google.maps.LatLngBounds();
-        
-                places.forEach((place) => {
+                            
+            //Trigger when click Relocate
+            let geocoder: google.maps.Geocoder;
+            const locateButton = document.getElementById("locate-button") as HTMLInputElement;
+            // const submitButton =  document.getElementById("submit-btn");
+            geocoder = new google.maps.Geocoder();
 
-                    let address = place.address_components
+            locateButton.addEventListener('click',(e)=> {
+                geocoder.geocode({ address: this.addressForm.get('locate').value})
+                .then((result) => {
+                    const { results } = result
+
+                    this.result = results
                     
-                    // Find state
-                    let stateIndex = address.findIndex(item => item.types.includes("administrative_area_level_1"));
-                    let state = address[stateIndex] ? address[stateIndex].long_name : ''
-                    this.addressForm.get('state').patchValue(state)
-
-                    // Find city
-                    let cityIndex = address.findIndex(item => item.types.includes("locality"));
-                    let city = address[cityIndex] ? address[cityIndex].long_name : ''
-                
-                    if(state && state !== '') {  
-                        this._storesService.getStoreRegionCountryStateCity(state, city, false )
-                        .subscribe((response)=>{
-                            if(response && response.length) {
-                                this.addressForm.get('city').patchValue(response[0].id)
-                            } else {
-                                this.addressForm.get('city').patchValue('')
-                            }
-                            // Mark for check
-                            this._changeDetectorRef.markForCheck();
-                        });
-                    }
-
-                    // find postcode
-                    let postcodeIndex = address.findIndex(item => item.types.includes("postal_code"))
-                    let postcode = address[postcodeIndex] ? address[postcodeIndex].long_name : ''
-                    this.addressForm.get('postCode').patchValue(postcode)
+                    this.resultSets = this.result;                
+                    this.autoCompleteList = this.result;  
                     
-                    // find address
-                    this.addressForm.get('address').patchValue(place.vicinity)
-                    
-                    let coordinateStringify = JSON.stringify(place?.geometry?.location);
-                    let coordinateParse = JSON.parse(coordinateStringify);
+                    console.log("results", results);
+
+                    //to be display coordinate
+                    let coordinateAddressStringify = JSON.stringify(results[0].geometry.location);
+                    let coordinateAddressParse = JSON.parse(coordinateAddressStringify);
         
-                    this.displayLat = coordinateParse.lat;
-                    this.displayLong = coordinateParse.lng;
-
-                    this.displayLatitude.next(coordinateParse.lat);
-                    this.displayLongtitude.next(coordinateParse.lng);
-
-
                     this.location = {
-                        lat: coordinateParse.lat,
-                        lng: coordinateParse.lng,
+                        lat: coordinateAddressParse.lat,
+                        lng: coordinateAddressParse.lng,
                     };
+
+                    //to display for location code
+                    this.displayLatitude.next(coordinateAddressParse.lat);
+                    this.displayLongtitude.next(coordinateAddressParse.lng);
         
-                    this.fullAddress = place.address_components.map((data)=>data.long_name)
-                
-                    if (!place.geometry || !place.geometry.location) {
-                        // console.info("Returned place contains no geometry");
-                        return;
-                    }                    
-            
-                    // const icon = {
-                    //   url: place.icon as string,
-                    //   size: new google.maps.Size(71, 71),
-                    //   origin: new google.maps.Point(0, 0),
-                    //   anchor: new google.maps.Point(17, 34),
-                    //   scaledSize: new google.maps.Size(25, 25),
-                    // };
+                    // Clear out the old markers.
+                    markers.forEach((marker) => {
+                        marker.setMap(null);
+                    });
+                    markers = [];
+        
+                    // Clear out the init markers1.
+                    initialMarker.setMap(null);
         
                     // Create a marker for each place.
                     markers.push(
                         new google.maps.Marker({
-                            position: place.geometry.location,
-                            map: this.map,
+                        map:this.map,
+                        // icon,
+                        position: results[0].geometry.location,
                         })
                     );
-            
-                    if (place.geometry.viewport) {
-                        // Only geocodes have viewport.
-                        bounds.union(place.geometry.viewport);
-                    } else {
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                this.map.fitBounds(bounds);
+
+                    this.addressForm.get('latitude').patchValue(this.location.lat.toString());
+                    this.addressForm.get('longitude').patchValue(this.location.lng.toString());
+
+                    const bounds1 = new google.maps.LatLngBounds();
+        
+                    bounds1.extend(results[0].geometry.location);
+        
+                    this.map.fitBounds(bounds1);
+                    
+                    return results;
+
+                }).catch((e) => { alert("Geocode was not successful for the following reason: " + e);});
             });
-    
+
             // Configure the click listener.
             this.map.addListener("click", (event) => {
+                this.addressForm.markAsDirty();
 
                 //to be display coordinate
                 let coordinateClickStringify = JSON.stringify(event.latLng);
@@ -395,10 +347,10 @@ export class EditAddressDialog implements OnInit {
                     lat: coordinateClickParse.lat,
                     lng: coordinateClickParse.lng,
                 };
-    
+
                 // Clear out the old markers.
                 markers.forEach((marker) => {
-                    marker.setMap(null);
+                marker.setMap(null);
                 });
                 markers = [];
     
@@ -413,14 +365,12 @@ export class EditAddressDialog implements OnInit {
                     position: event.latLng,
                 })
                 );
-                this.displayLatitude.next(coordinateClickParse.lat);
-                this.displayLongtitude.next(coordinateClickParse.lng);
 
                 this.addressForm.get('latitude').patchValue(this.location.lat.toString());
                 this.addressForm.get('longitude').patchValue(this.location.lng.toString());
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
+                this.displayLatitude.next(coordinateClickParse.lat);
+                this.displayLongtitude.next(coordinateClickParse.lng);
             
             });
 
@@ -486,13 +436,10 @@ export class EditAddressDialog implements OnInit {
             this.addressForm.patchValue(this.data.customerAddress);
             this.displayToogleNotDefault = this.addressForm.get('isDefault').value === false ? true : false;
         }
-
     }
 
     updateAddress(){
-
         this.dialogRef.close(this.addressForm.value);
-
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
@@ -532,6 +479,25 @@ export class EditAddressDialog implements OnInit {
             return phoneNumber;
         }
 
+    }
+
+    selectedResult( result: any ) {
+
+        console.log("this.result",this.result);
+        
+        return result;
+        
+    }
+
+    /**
+    * Track by function for ngFor loops
+    *
+    * @param index
+    * @param item
+    */
+    trackByFn(index: number, item: any): any
+    {
+        return item.id || index;
     }
 
     private setInitialValue() {

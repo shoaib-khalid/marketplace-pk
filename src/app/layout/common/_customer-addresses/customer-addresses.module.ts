@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FuseAlertModule } from '@fuse/components/alert';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
     declarations: [
@@ -36,7 +37,8 @@ import { FuseAlertModule } from '@fuse/components/alert';
         MatDialogModule,
         SharedModule,
         NgxMatSelectSearchModule,
-        FuseAlertModule
+        FuseAlertModule,
+        MatAutocompleteModule
 
     ],
     exports     : [
