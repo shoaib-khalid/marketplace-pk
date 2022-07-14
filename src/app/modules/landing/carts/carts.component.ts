@@ -306,7 +306,7 @@ export class CartListComponent implements OnInit, OnDestroy
                     cartsWithDetails.forEach((cart: CartWithDetails) => {
                         this.checkStoreTiming(cart)
                     })
-                                                          
+
                     let allSelected: boolean[] = [];
                     let allInCartSelected: { id: string; allSelected: boolean[]} = null;
                     if (this.selectedCart) {
@@ -329,16 +329,38 @@ export class CartListComponent implements OnInit, OnDestroy
                                     allSelected: this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected)
                                 }
                                 // this.selectedCart.carts[cartIdIndex] = {...this.selectedCart.carts[cartIdIndex], ...cart};
+
+                                // Enable item if quantity is valid 
+                                item.cartItems.forEach(cartItem => {
+                                    let selectedCartItemIndex = this.selectedCart.carts[cartIdIndex].cartItem.findIndex(x => x.id === cartItem.id);
+
+                                    if (selectedCartItemIndex > -1) {
+                                        if ((cartItem.quantity > cartItem.productInventory.quantity) && (cartItem.productInventory.product.allowOutOfStockPurchases === false)) {
+                                            this.selectedCart.carts[cartIdIndex].cartItem[selectedCartItemIndex].disabled = true;
+                                        }
+                                        else {
+                                            this.selectedCart.carts[cartIdIndex].cartItem[selectedCartItemIndex].disabled = false;
+                                        }
+                                    }
+                                })
                             } else {
                                 let cart = {
                                     id: item.id, 
                                     storeId: item.storeId,
                                     cartItem: item.cartItems.map(element => {
-                                        return {
+                                        let obj = {
                                             id: element.id,
                                             selected: false,
                                             disabled: false
                                         }
+                                        // Disable the item if quantity is invalid
+                                        if ((element.quantity > element.productInventory.quantity) && (element.productInventory.product.allowOutOfStockPurchases === false)) {
+                                            obj.disabled = true
+                                        }
+                                        else {
+                                            obj.disabled = false
+                                        }
+                                        return obj
                                     }),
                                     selected: false,
                                     description: {
@@ -366,9 +388,6 @@ export class CartListComponent implements OnInit, OnDestroy
                                 this.selectedCart.carts[cartIdIndex].selected = true;
                             }
                         });
-
-                        // if customerId null means guest
-                        // let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
                         
                         if (this.customerAddress) {
                             // get delivery charges of every carts
@@ -405,11 +424,20 @@ export class CartListComponent implements OnInit, OnDestroy
                                     id: item.id,
                                     storeId: item.storeId,
                                     cartItem: item.cartItems.map(element => {
-                                        return {
+                                        let obj = {
                                             id: element.id,
                                             selected: false,
                                             disabled: false
                                         }
+                                        // Disable the item if quantity is invalid
+                                        if ((element.quantity > element.productInventory.quantity) && (element.productInventory.product.allowOutOfStockPurchases === false)) {
+                                            obj.disabled = true
+                                        }
+                                        else {
+                                            obj.disabled = false
+                                        }
+                                        return obj
+
                                     }),
                                     selected: false,
                                     disabled: false,
@@ -441,9 +469,6 @@ export class CartListComponent implements OnInit, OnDestroy
                         .subscribe((customerAddress : CustomerAddress) => {
                             if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
-
-                                // if customerId null means guest
-                                // let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null;
 
                                 // get delivery charges of every carts
                                 this.getDeliveryCharges(this.carts.map(element => {
@@ -773,11 +798,14 @@ export class CartListComponent implements OnInit, OnDestroy
                             element.disabled = true;
                         });
                     }
-                } else {
+                } 
+                else {
                     item.selected = checked;
                     if (cartsIds.includes(item.id)) {
                         item.cartItem.forEach(element => {
-                            element.selected = checked;
+                            if (!element.disabled) {
+                                element.selected = checked;
+                            }
                         });
                     }
                 }
@@ -788,7 +816,9 @@ export class CartListComponent implements OnInit, OnDestroy
             let cartIndex = this.selectedCart.carts.findIndex(item => item.id === cart.id);
             if (cartIndex > -1) {
                 this.selectedCart.carts[cartIndex].cartItem.forEach(item => {
-                    item.selected = checked;
+                    if (!item.disabled) {
+                        item.selected = checked;
+                    }
                 });
             }
             // check for select all cartItems in a cart
