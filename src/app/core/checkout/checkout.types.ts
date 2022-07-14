@@ -1,4 +1,4 @@
-import { CartItem } from "../cart/cart.types";
+import { CartItem, StoreDiscountList } from "../cart/cart.types";
 
 export interface DeliveryCharges
 {
@@ -19,7 +19,11 @@ export interface CheckoutItems
     deliveryProviderId  : string;
     orderNotes?         : string;
     platformVoucherCode?: string;
-    deliveryFee         : number;
+    deliveryPrice?: {
+        deliveryFee: number,
+        discountAmount: number,
+        discountedPrice: number
+    };
 }
 
 
@@ -92,6 +96,7 @@ export interface CartDiscount
     voucherSubTotalDiscountDescription  : string;
     platformVoucherSubTotalDiscount    : number;
     platformVoucherDeliveryDiscount     : number;
+    storeDiscountList?          : StoreDiscountList[];
 }
 
 export interface Payment

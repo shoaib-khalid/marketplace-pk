@@ -114,13 +114,14 @@ export interface DiscountOfCartGroup
     platformVoucherDiscountType                 : string;
     platformVoucherSubTotalDiscount             : number;
     platformVoucherSubTotalDiscountDescription  : string;
-    storeDiscountList                           : StoreDiscountList;
+    storeDiscountList                           : StoreDiscountList[];
     sumCartDeliveryCharge                       : number;
     sumCartGrandTotal                           : number;
     sumCartSubTotal                             : number;
     sumDeliveryDiscount                         : number;
     sumSubTotalDiscount                         : number;
     platformVoucherName                         : string;
+    sumServiceCharge                            : number;
 }
 
 export interface StoreDiscountList
@@ -156,6 +157,7 @@ export interface StoreDiscountList
     voucherDiscountType                     : string;
     voucherSubTotalDiscount                 : number;
     voucherSubTotalDiscountDescription      : string;
+    cartId                                  : string;
 }
 
 export interface SelectedCart 

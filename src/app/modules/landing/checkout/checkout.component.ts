@@ -179,7 +179,7 @@ export class BuyerCheckoutComponent implements OnInit
         discountType: null,
         storeServiceChargePercentage: 0,
         storeServiceCharge: 0,
-        deliveryCharges: 0, // not exist in (cart discount api), fetched from getPrice delivery service
+        deliveryCharges: 0, 
         deliveryDiscount: 0,
         deliveryDiscountDescription: null,
         deliveryDiscountMaxAmount: 0,
@@ -193,8 +193,8 @@ export class BuyerCheckoutComponent implements OnInit
         voucherSubTotalDiscount: 0,
         voucherSubTotalDiscountDescription: null,
         platformVoucherSubTotalDiscount: 0,
-        platformVoucherDeliveryDiscount: 0
-
+        platformVoucherDeliveryDiscount: 0,
+        storeDiscountList: []
     }
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -293,8 +293,8 @@ export class BuyerCheckoutComponent implements OnInit
                     this._checkoutService.checkoutItems$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((checkoutItems: CheckoutItems[])=>{
-                            if (checkoutItems) {                 
-                                               
+                            if (checkoutItems) {        
+                                
                                 this.checkoutItems = checkoutItems;
                                 let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
                                 let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
@@ -313,7 +313,7 @@ export class BuyerCheckoutComponent implements OnInit
 
                                 this.carts.forEach(item => {                        
                                     // get delivery charges of every carts
-                                    this.getDeliveryCharges(item.id,item.storeId);
+                                    // this.getDeliveryCharges(item.id,item.storeId);
                                 });
                             }
                             // Mark for check 
@@ -349,6 +349,10 @@ export class BuyerCheckoutComponent implements OnInit
                     this.paymentDetails.cartGrandTotal = response.sumCartGrandTotal === null ? 0 : response.sumCartGrandTotal
                     this.paymentDetails.platformVoucherSubTotalDiscount = response.platformVoucherSubTotalDiscount === null ? 0 : response.platformVoucherSubTotalDiscount;
                     this.paymentDetails.platformVoucherDeliveryDiscount = response.platformVoucherDeliveryDiscount === null ? 0 : response.platformVoucherDeliveryDiscount;
+                    this.paymentDetails.deliveryDiscount = response.sumDeliveryDiscount === null ? 0 : response.sumDeliveryDiscount;
+                    this.paymentDetails.subTotalDiscount = response.sumSubTotalDiscount === null ? 0 : response.sumSubTotalDiscount;
+                    this.paymentDetails.storeServiceCharge = response.sumServiceCharge === null ? 0 : response.sumServiceCharge;
+                    this.paymentDetails.storeDiscountList = response.storeDiscountList;
 
                 }
                 // Mark for check
@@ -460,7 +464,7 @@ export class BuyerCheckoutComponent implements OnInit
                     phoneNumber: this.customerAddress.phoneNumber,
                     receiverName: this.customerAddress.name,
                     state: this.customerAddress.state,
-                    storePickup: false,
+                    storePickup: checkout.deliveryType === 'PICKUP' ? true : false,
                     zipcode: this.customerAddress.postCode,
                     deliveryProviderId: checkout.deliveryProviderId,
                     deliveryType: checkout.deliveryType ? checkout.deliveryType : null
@@ -837,10 +841,10 @@ export class BuyerCheckoutComponent implements OnInit
         let index = this.checkoutItems.findIndex(item => item.cartId === cartId);
 
         if (index > -1) {
-            return this.checkoutItems[index].deliveryFee;
+            return this.checkoutItems[index].deliveryPrice;
             
         }
-        else return 0
+        else return null;
     }
 
     redirect(type : string, store : Store, productSeo : string) {
