@@ -43,8 +43,8 @@ import { Cart, CartItem, CustomerCart } from 'app/core/cart/cart.types';
 
         :host ::ng-deep ngx-gallery {
             position: relative;
-            z-index: 10;
             border-radius:15px !important;
+            z-index: 30;
 
             @screen sm {
                 position: relative;
@@ -53,36 +53,25 @@ import { Cart, CartItem, CustomerCart } from 'app/core/cart/cart.types';
             }
         }
 
-        :host ::ng-deep .fa-arrow-circle-right:before {
-            color: var(--fuse-primary);
-            z-index: 40 !important;
-        }
+        // Xjd gop
+        // :host ::ng-deep .ngx-gallery-preview-wrapper {
+        //     z-index: 999 !important;
+        // }
 
-        :host ::ng-deep .fa-arrow-circle-left:before {
-            color: var(--fuse-primary);
-            z-index: 40 !important;
-        }
+        // :host ::ng-deep .ngx-gallery-preview-img-wrapper {
+        //     z-index: 999 !important;
+        // }
 
-        :host ::ng-deep .ngx-gallery-bullet.ngx-gallery-active {
-            background: white !important;
-            border: 2px double var(--fuse-primary) !important;
-            z-index: 40 !important;
-        }
-
-        :host ::ng-deep .ngx-gallery-bullet{
-            background: white !important;
-            border: 2px double black !important;
-            z-index: 40 !important;
-        }
+        // :host ::ng-deep .ngx-gallery-preview-img {
+        //     z-index: 999 !important;
+        // }
 
         :host ::ng-deep .ngx-gallery-image {
             border-radius:15px !important;
-            z-index: 40 !important;
         }
 
         :host ::ng-deep .ngx-gallery-thumbnail {
             border-radius:15px !important;
-            z-index: 40 !important;
         }
 
         :host ::ng-deep .ngx-gallery-preview-img {
@@ -91,6 +80,23 @@ import { Cart, CartItem, CustomerCart } from 'app/core/cart/cart.types';
             border-radius:15px !important;
         }
 
+        :host ::ng-deep .fa-arrow-circle-right:before {
+            color: var(--fuse-primary);
+        }
+
+        :host ::ng-deep .fa-arrow-circle-left:before {
+            color: var(--fuse-primary);
+        }
+
+        :host ::ng-deep .ngx-gallery-bullet.ngx-gallery-active {
+            background: white !important;
+            border: 2px double var(--fuse-primary) !important;
+        }
+
+        :host ::ng-deep .ngx-gallery-bullet{
+            background: white !important;
+            border: 2px double black !important;
+        }
         `
     ]
 })
@@ -265,7 +271,7 @@ export class LandingProductDetailsComponent implements OnInit
                                         let _imageObject = {
                                             small   : '' + object.url,
                                             medium  : '' + object.url,
-                                            big     : '' + object.url
+                                            big     : '' + object.url + '?original=true'
                                         }
                                         
                                         if(object.itemCode != this.displayedProduct.itemCode){
@@ -278,7 +284,7 @@ export class LandingProductDetailsComponent implements OnInit
                                         let _imageObject = {
                                             small   : '' + object.url,
                                             medium  : '' + object.url,
-                                            big     : '' + object.url
+                                            big     : '' + object.url + '?original=true'
                                         }
                                         
                                         if(object.itemCode == this.displayedProduct.itemCode){
@@ -295,7 +301,7 @@ export class LandingProductDetailsComponent implements OnInit
                                                 this.galleryImages = [{
                                                     small   : '' + item.assetUrl,
                                                     medium  : '' + item.assetUrl,
-                                                    big     : '' + item.assetUrl
+                                                    big     : '' + item.assetUrl + '?original=true'
                                                 }];
                                             }
                                         });
@@ -362,7 +368,7 @@ export class LandingProductDetailsComponent implements OnInit
                                     this.galleryImages = [{
                                         small   : '' + this.store.storeAsset.logoUrl,
                                         medium  : '' + this.store.storeAsset.logoUrl,
-                                        big     : '' + this.store.storeAsset.logoUrl
+                                        big     : '' + this.store.storeAsset.logoUrl + '?original=true'
                                     }];
                                 }
                             }
@@ -871,7 +877,7 @@ export class LandingProductDetailsComponent implements OnInit
                     let _imageObject = {
                         small   : '' + object.url,
                         medium  : '' + object.url,
-                        big     : '' + object.url
+                        big     : '' + object.url + '?original=true'
                     }
                     
                     if(object.itemCode != this.displayedProduct.itemCode){
@@ -884,7 +890,7 @@ export class LandingProductDetailsComponent implements OnInit
                     let _imageObject = {
                         small   : '' + object.url,
                         medium  : '' + object.url,
-                        big     : '' + object.url
+                        big     : '' + object.url + '?original=true'
                     }
                     
                     if(object.itemCode == this.displayedProduct.itemCode){
@@ -898,7 +904,7 @@ export class LandingProductDetailsComponent implements OnInit
                     this.galleryImages = [{
                         small   : '' + this.store.storeAsset.logoUrl,
                         medium  : '' + this.store.storeAsset.logoUrl,
-                        big     : '' + this.store.storeAsset.logoUrl
+                        big     : '' + this.store.storeAsset.logoUrl + '?original=true'
                     }];
                 }
                 // end of reorder image collection
