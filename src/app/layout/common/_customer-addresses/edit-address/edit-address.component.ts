@@ -233,7 +233,11 @@ export class EditAddressDialog implements OnInit {
             geocoder = new google.maps.Geocoder();
 
             locateButton.addEventListener('click',(e)=> {
-                geocoder.geocode({ address: this.addressForm.get('address').value})
+
+                let address= this.addressForm.get('address').value + ' ' + this.addressForm.get('city').value +' '+ this.addressForm.get('postCode').value +' '+ this.addressForm.get('state').value +' '+ this.addressForm.get('country').value;
+                console.log("address", address);
+                
+                geocoder.geocode({ address: address})
                 .then((result) => {
                     const { results } = result
                       
