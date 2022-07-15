@@ -41,34 +41,7 @@ import { environment } from 'environments/environment';
                 height: 50vh;
                 cursor: pointer !important;  
             }
-            #pac-input {
-                background-color: var(--fuse-primary-50);
-                font-family: 'Lato', sans-serif;
-                font-size: 15px;
-                font-weight: 300;
-                padding: 0 11px 0 13px;
-                text-overflow: ellipsis;
-                width: 400px;
-                height: 40px;
-                border-color: var(--fuse-primary-500) !important;                  
-            }
-            
-            #pac-input:focus {
-                border-color: #4d90fe;
-                padding: 5px 5px 5px 5px;
-            }
-            
-            .pac-controls {
-                padding: 5px 11px;
-                display: inline-block;
 
-            }
-            
-            .pac-controls label {
-                font-family: Roboto;
-                font-size: 13px;
-                font-weight: 300;
-            }
         `
     ]
 })
@@ -82,8 +55,8 @@ export class EditAddressDialog implements OnInit {
 
     @ViewChild('stateCitySelector') stateCitySelector: MatSelect;
 
-    resultSets: any[];
-    autoCompleteList: any[]
+    // resultSets: any[];
+    // autoCompleteList: any[]
 
     storeStateCities: string[] = [];
     storeStateCities$: Observable<City[]>;
@@ -99,8 +72,6 @@ export class EditAddressDialog implements OnInit {
 
     dialingCode: string;
 
-    result: any;
-
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     //------------------------
@@ -108,27 +79,14 @@ export class EditAddressDialog implements OnInit {
     //------------------------
     
     private map: google.maps.Map;
-
-    @ViewChild('search')public searchElementRef!: ElementRef;
-    
     location :any;
-
-    // latitude!: any;
-    // longitude!: any;
     center!: google.maps.LatLngLiteral;
     fullAddress:any='';
-  
     displayLat:any;
     displayLong:any;
-
-    //string interpolation doesn't-update-on-eventListener hence need to use behaviour subject
-    displayLatitude: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    displayLongtitude: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
-    //get current location
+    //get current location (hardcoded to KL first)
     currentLat  :any = 3.1378038301945894;
     currentLong :any = 101.68720603977643;
-
     user: User
 
     constructor(
@@ -164,7 +122,7 @@ export class EditAddressDialog implements OnInit {
             isDefault   : [''],
             latitude    : ['', Validators.required],
             longitude   : ['', Validators.required],
-            locate      : ['']
+            // locate      : ['']
         });
 
         this._userService.user$
@@ -227,8 +185,6 @@ export class EditAddressDialog implements OnInit {
             this.displayLat = this.currentLat;
             this.displayLong = this.currentLong;
 
-            this.displayLatitude.next(this.displayLat.toString());
-            this.displayLongtitude.next(this.displayLong.toString());
         } else {
             if(!this.data.customerAddress.latitude  && !this.data.customerAddress.longitude ) {
                 this.displayLat = this.currentLat;
@@ -236,8 +192,6 @@ export class EditAddressDialog implements OnInit {
             } else {
                 this.displayLat = parseFloat(this.data.customerAddress.latitude) ;
                 this.displayLong = parseFloat(this.data.customerAddress.longitude);
-                this.displayLatitude.next(this.data.customerAddress.latitude);
-                this.displayLongtitude.next(this.data.customerAddress.longitude);
             }
         }
 
@@ -279,17 +233,42 @@ export class EditAddressDialog implements OnInit {
             geocoder = new google.maps.Geocoder();
 
             locateButton.addEventListener('click',(e)=> {
-                geocoder.geocode({ address: this.addressForm.get('locate').value})
+                geocoder.geocode({ address: this.addressForm.get('address').value})
                 .then((result) => {
                     const { results } = result
+                      
+                    // this.resultSets = results;                
+                    // this.autoCompleteList = results;  
 
-                    this.result = results
+                    let address = results[0].address_components
                     
-                    this.resultSets = this.result;                
-                    this.autoCompleteList = this.result;  
-                    
-                    console.log("results", results);
+                    // Find state
+                    let stateIndex = address.findIndex(item => item.types.includes("administrative_area_level_1"));
+                    let state = address[stateIndex] ? address[stateIndex].long_name : ''
+                    this.addressForm.get('state').patchValue(state)
 
+                    // Find city
+                    let cityIndex = address.findIndex(item => item.types.includes("locality"));
+                    let city = address[cityIndex] ? address[cityIndex].long_name : ''
+                
+                    if(state && state !== '') {  
+                        this._storesService.getStoreRegionCountryStateCity(state, city, false )
+                        .subscribe((response)=>{
+                            if(response && response.length) {
+                                this.addressForm.get('city').patchValue(response[0].id)
+                            } else {
+                                this.addressForm.get('city').patchValue('')
+                            }
+                            // Mark for check
+                            this._changeDetectorRef.markForCheck();
+                        });
+                    }
+
+                    // find postcode
+                    let postcodeIndex = address.findIndex(item => item.types.includes("postal_code"))
+                    let postcode = address[postcodeIndex] ? address[postcodeIndex].long_name : ''
+                    this.addressForm.get('postCode').patchValue(postcode)
+                                 
                     //to be display coordinate
                     let coordinateAddressStringify = JSON.stringify(results[0].geometry.location);
                     let coordinateAddressParse = JSON.parse(coordinateAddressStringify);
@@ -298,10 +277,6 @@ export class EditAddressDialog implements OnInit {
                         lat: coordinateAddressParse.lat,
                         lng: coordinateAddressParse.lng,
                     };
-
-                    //to display for location code
-                    this.displayLatitude.next(coordinateAddressParse.lat);
-                    this.displayLongtitude.next(coordinateAddressParse.lng);
         
                     // Clear out the old markers.
                     markers.forEach((marker) => {
@@ -368,9 +343,6 @@ export class EditAddressDialog implements OnInit {
 
                 this.addressForm.get('latitude').patchValue(this.location.lat.toString());
                 this.addressForm.get('longitude').patchValue(this.location.lng.toString());
-
-                this.displayLatitude.next(coordinateClickParse.lat);
-                this.displayLongtitude.next(coordinateClickParse.lng);
             
             });
 
@@ -480,14 +452,7 @@ export class EditAddressDialog implements OnInit {
         }
 
     }
-
-    selectedResult( result: any ) {
-
-        console.log("this.result",this.result);
-        
-        return result;
-        
-    }
+    
 
     /**
     * Track by function for ngFor loops

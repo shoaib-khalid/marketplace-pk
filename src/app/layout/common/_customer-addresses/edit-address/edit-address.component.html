@@ -9,86 +9,7 @@
             [formGroup]="addressForm">
 
             <div class="flex flex-col w-full">
-                <fuse-alert
-                    *ngIf="addressForm.get('latitude').hasError('required') && addressForm.get('longitude').hasError('required')"
-                    [appearance]="'outline'"
-                    [type]="'info'">
-                    Please pin or search your Location. 
-                </fuse-alert>
-                <!-- map display -->
-                <!-- <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-emphasized-affix">
-                    <input [formControlName]="'locate'" matInput>
-                    <div class="text-white font-semibold" matSuffix>
-                        <button id="locate-button" class="p-2.5 font-bold">Search</button>
-                    </div>
-                </mat-form-field> -->
-                <div class="relative w-full pb-2 mt-3">
-                    <!-- Custom Search and dropdown -->
-                    <div class="absolute z-10 left-2 top-2.5 w-4/5">
-                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-emphasized-affix w-full">
-                            <input 
-                                [formControlName]="'locate'" 
-                                matInput
-                                [matAutocomplete]="matAutocomplete">
-                            <div class="text-white font-semibold" matSuffix>
-                                <button id="locate-button" class="items-center flex">
-                                    <mat-icon class="text-white" svgIcon="heroicons_outline:search"></mat-icon>
-                                </button>
-                            </div>
-                        </mat-form-field>
-                        <mat-autocomplete
-                            class="max-h-128 mt-1 rounded"
-                            [disableRipple]="true"
-                            #matAutocomplete="matAutocomplete">
-                            <!-- <mat-option
-                                class="py-0 px-6 text-md pointer-events-none text-secondary bg-transparent"
-                                *ngIf="(autoCompleteList && !autoCompleteList.length) && resultSets.length > 0">
-                                No results found!
-                            </mat-option> -->
-                            <ng-container *ngFor="let result of autoCompleteList; trackBy: trackByFn">
-                                <!-- {{resultSet | json}} -->
-                                <!-- <mat-optgroup class="flex items-center mt-2 px-2">
-                                    <span class="text-sm font-semibold tracking-wider text-secondary">{{ result.storeId ? result.storeId : "No Store" }}</span>
-                                </mat-optgroup> -->
-                                <mat-option
-                                    class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover"
-                                >
-                                    <ng-container *ngTemplateOutlet="historyResult; context: {$implicit: result}"></ng-container>
-                                </mat-option>
-                            </ng-container>
-                        </mat-autocomplete>
-                        <!-- Contact result template -->
-                        <ng-template
-                            #historyResult
-                            let-result>
-                            <div class="flex flex-row items-center">
-
-                                <div class="flex items-center justify-between w-full"
-                                    (click)="selectedResult(result.id)">
-                                    <div class="flex flex-row items-center">
-                                        <div class="flex shrink-0 items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
-                                            <img
-                                                class="object-cover"
-                                                *ngIf="result.image"
-                                                [src]="result.image">
-                                            <img
-                                                class="p-0.5"
-                                                *ngIf="!result.image"
-                                                [src]="'https://symplified.it/store-assets/deliverin-logo.png'">
-                                        </div>
-                                        <div class="ml-6 truncate">
-                                            <span [innerHTML]="result.formatted_address"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </div>
-                    <div class="map w-full h-64 md:h-80 rounded-lg" id="map"></div>
-                </div>
-                <!-- <input [formControlName]="'latitude'" type="text">
-                <input [formControlName]="'longitude'" type="text"> -->
-                <!-- Name -->
+                <!-- Address Form -->
                 <div class="w-full flex flex-col sm:flex-row sm:mb-0 pt-2">
                     <mat-form-field [ngClass]="user ? 'w-full' : 'sm:w-1/2'" class="fuse-mat-emphasized-affix sm:pr-1" floatLabel="always">
                         <mat-label>Name</mat-label>
@@ -155,16 +76,6 @@
                 <!-- City, Postcode -->
                 <div class="w-full flex flex-col sm:flex-row sm:mb-0">
                     <!-- city -->
-                    <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
-                        <mat-label>City</mat-label>
-                        <input
-                            [formControlName]="'city'"
-                            placeholder="Enter city name"
-                            matInput>
-                            <mat-error *ngIf="addressForm.get('city').hasError('required')">
-                                City is required
-                            </mat-error>
-                    </mat-form-field> -->
                     <mat-form-field class="fuse-mat-emphasized-affix w-full sm:w-1/2 sm:pr-1" floatLabel="always">
                         <mat-label>City</mat-label>
                         <mat-select 
@@ -222,18 +133,6 @@
                 
                 <!-- Address -->
                 <div class="w-full flex flex-col sm:flex-row sm:mb-0">
-                    <!-- <mat-form-field class="fuse-mat-emphasized-affix w-full" floatLabel="always">
-                        <mat-label>Address</mat-label>
-                        <textarea
-                            matInput
-                            placeholder="Enter your address"
-                            maxlength="500"
-                            [required]="true"
-                            [rows]="5"
-                            [formControlName]="'address'"
-                            cdkTextareaAutosize
-                            [cdkAutosizeMinRows]="5"></textarea>
-                    </mat-form-field> -->
                     <!-- Address -->
                     <mat-form-field
                         class="w-full" 
@@ -250,6 +149,67 @@
                             Address information is required
                         </mat-error>
                     </mat-form-field>
+                </div>
+
+                <!-- map display -->
+                <div class="relative w-full pb-2 mt-3">
+                    <!-- Custom Search and dropdown -->
+                    <!-- <div class="absolute z-10 left-2 top-2.5 w-4/5">
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-emphasized-affix w-full">
+                            <input 
+                                [formControlName]="'locate'" 
+                                matInput
+                                [matAutocomplete]="matAutocomplete">
+                            <div class="text-white font-semibold" matSuffix>
+                                <button id="locate-button" class="items-center flex">
+                                    <mat-icon class="text-white" svgIcon="heroicons_outline:search"></mat-icon>
+                                </button>
+                            </div>
+                        </mat-form-field>
+                        <mat-autocomplete
+                            class="max-h-128 mt-1 rounded"
+                            [disableRipple]="true"
+                            #matAutocomplete="matAutocomplete">
+
+                            <ng-container *ngFor="let result of autoCompleteList; trackBy: trackByFn">
+
+                                <mat-option
+                                    class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover"
+                                >
+                                    <ng-container *ngTemplateOutlet="historyResult; context: {$implicit: result}"></ng-container>
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                        <ng-template
+                            #historyResult
+                            let-result>
+                            <div class="flex flex-row items-center">
+
+                                <div class="flex items-center justify-between w-full"
+                                    (click)="selectedResult(result.place_id)">
+                                    <div class="flex flex-row items-center">
+                                        <div class="flex shrink-0 items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-800">
+                                            <img
+                                                class="object-cover"
+                                                *ngIf="result.image"
+                                                [src]="result.image">
+                                            <img
+                                                class="p-0.5"
+                                                *ngIf="!result.image"
+                                                [src]="'https://symplified.it/store-assets/deliverin-logo.png'">
+                                        </div>
+                                        <div class="ml-6 truncate">
+                                            <span [innerHTML]="result.formatted_address"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div> -->
+                    <!-- <button id="locate-button" class="items-center bg-primary flex absolute z-10 top-2 left-2">
+                        <mat-icon class="text-white" svgIcon="heroicons_outline:search"></mat-icon>
+                    </button> -->
+                    <div class="map w-full h-64 md:h-80 rounded-lg" id="map"></div>
                 </div>
     
                 <!-- Set default -->
@@ -273,32 +233,36 @@
                         </mat-slide-toggle>
                     </div>
                 </ng-template>
-    
-                <!-- Actions -->
-                <div class="flex sm:flex-row sm:items-center justify-end mt-4 sm:mt-6">
+                
+                <div class="w-full justify-between flex flex-row items-center mt-2">
                     <button
-                        class="hover:bg-gray-500 border border-gray-500"
+                        id="locate-button"
                         mat-flat-button
                         type="button"
-                        [color]="'gray'"
-                        (click)="closeDialog()"
-                        >
-                        Cancel
+                        class="text-white items-center"
+                        [color]="'primary'">Relocate
                     </button>
-                    <span>&nbsp;&nbsp;</span>
-                    <button
-                        mat-flat-button
-                        [disabled]="addressForm.invalid"
-                        type="button"
-                        (click)="updateAddress()"
-                        [color]="'primary'">Save
-                    </button>
-                    <!-- <button
-                        mat-flat-button
-                        type="button"
-                        (click)="checkForm()"
-                        [color]="'primary'">Check
-                    </button> -->
+                    <!-- Actions -->
+                    <div class="flex sm:flex-row items-end">
+                        <button
+                            class="hover:bg-gray-500 bg-gray-400"
+                            mat-flat-button
+                            type="button"
+                            [color]="'default'"
+                            (click)="closeDialog()"
+                            >
+                            Cancel
+                        </button>
+                        <span>&nbsp;&nbsp;</span>
+                        <button
+                            mat-flat-button
+                            [disabled]="addressForm.invalid"
+                            type="button"
+                            class="text-white"
+                            (click)="updateAddress()"
+                            [color]="'primary'">Save
+                        </button>
+                    </div>
                 </div>
 
             </div>
