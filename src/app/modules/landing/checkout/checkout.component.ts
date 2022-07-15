@@ -202,6 +202,13 @@ export class BuyerCheckoutComponent implements OnInit
     order: GroupOrder;
     payment: any;
 
+    selfPickupInfo: {
+        name: string,
+        email: string,
+        phoneNumber: string
+    } = null;
+    hasSelfPickup: boolean;
+
     /**
      * Constructor
      */
@@ -299,6 +306,13 @@ export class BuyerCheckoutComponent implements OnInit
                                 let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
                                 let cartsWithDetailsTotalItems = cartsWithDetailsTotalItemsArr.reduce((partialSum, a) => partialSum + a, 0);
                                 this.totalSelectedCartItem = cartsWithDetailsTotalItems;
+
+                                // Check if has self pickup 
+                                this.hasSelfPickup = checkoutItems.some(item => item.deliveryType === 'PICKUP');
+                                
+                                // Get self pickup info
+                                let selfPickupIndex = checkoutItems.findIndex(item => item.selfPickupInfo.name);
+                                if (selfPickupIndex > -1) this.selfPickupInfo = checkoutItems[selfPickupIndex].selfPickupInfo;
                             }
                             // Mark for check 
                             this._changeDetectorRef.markForCheck();

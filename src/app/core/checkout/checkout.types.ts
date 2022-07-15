@@ -24,6 +24,11 @@ export interface CheckoutItems
         discountAmount: number,
         discountedPrice: number
     };
+    selfPickupInfo: {
+        name        : string,
+        email       : string,
+        phoneNumber : string
+    }
 }
 
 
