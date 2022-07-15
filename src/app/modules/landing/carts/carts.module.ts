@@ -19,11 +19,13 @@ import { CartListComponent } from './carts.component';
 import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delete-item/modal-confirmation-delete-item.component';
 import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 import { MatRadioModule } from '@angular/material/radio';
+import { SelfPickupInfoDialog } from './modal-self-pickup-info/modal-self-pickup-info.component';
 
 @NgModule({
     declarations: [
         CartListComponent,
-        ModalConfirmationDeleteItemComponent
+        ModalConfirmationDeleteItemComponent,
+        SelfPickupInfoDialog
     ],
     imports     : [
         RouterModule.forChild(voucherRoutes),

@@ -100,7 +100,24 @@
                                         [disabled]="selectedCart.carts[i + pagination.startIndex].disabled" [(ngModel)]="selectedCart.carts[i + pagination.startIndex].selected" type="checkbox" (change)="selectCart(null,cart,null,$event.target.checked)">
                                     </div>
                                     <div class="flex flex-col justify-start ml-2 md:ml-4">
-                                        <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
+                                        <div class="flex flex-row justify-between items-center">
+                                            <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
+                                            <div [ngClass]="selectedCart.carts[i + pagination.startIndex].showRequiredInfo ? 'visible' : 'invisible'" 
+                                                class="flex flex-col justify-center items-center text-center mx-1">
+                                                <span class="flex tracking-tight justify-center items-center text-sm">Required Info
+                                                </span>
+                                                <mat-icon 
+                                                    *ngIf="validateCustomerInfo(i + pagination.startIndex)"
+                                                    class="icon-size-6 text-primary cursor-pointer" 
+                                                    (click)="addRequiredInfo(i + pagination.startIndex)"
+                                                    [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+                                                <mat-icon 
+                                                    *ngIf="!validateCustomerInfo(i + pagination.startIndex)"
+                                                    class="icon-size-6 text-red-500 cursor-pointer" 
+                                                    (click)="addRequiredInfo(null)"
+                                                    [svgIcon]="'heroicons_outline:exclamation-circle'"></mat-icon>
+                                            </div>
+                                        </div>
                                         <!-- <span class="text-sm sm:text-sm text-secondary">Cart ID: {{cart.id}}</span> -->
                                         <!-- <span class="text-sm sm:text-sm text-secondary">Last Updated: {{cart.updated | date:'MMM dd, h:mm a'}}</span> -->
                                     </div>
@@ -255,7 +272,7 @@
                                         </mat-form-field>
                                     </div>
                                     <!-- Select delivery type  -->
-                                    <ng-container *ngIf="false">
+                                    <ng-container *ngIf="true">
                                         <span class="text-sm">Delivery Type</span>
                                         <div class="flex flex-row w-auto justify-between my-2 text-sm">
                                             <mat-radio-group
@@ -265,7 +282,7 @@
                                                 [(ngModel)]="selectedCart.carts[i + pagination.startIndex].isSelfPickup"
                                                 [ngModelOptions]="{standalone: true}"
                                                 [color]="'primary'"
-                                                (change)="selectSelfPickup(i + pagination.startIndex)"
+                                                (change)="selectSelfPickup(cart.id, $event.value)"
                                                 >
                                                 <mat-radio-button
                                                     class=""
@@ -743,6 +760,30 @@
                         </button>
                     </ng-template>
                 </div>
+                <!-- Store Address (md) -->
+                <ng-container *ngIf="storesAddresses.length > 0">
+                    <div class="hidden md:block flex flex-col justify-center items-center border rounded-lg p-2 mt-4">
+                        <!-- Header -->
+                        <div class="flex flex-row border-b justify-start items-center pb-2 w-full">
+                            <mat-icon 
+                                class="icon-size-5 text-primary" 
+                                [svgIcon]="'mat_solid:home'"></mat-icon>
+                            <span class="ml-2 font-bold">Store Address for Self Pick-up</span>
+                        </div>
+                        <ng-container *ngFor="let storeAddress of storesAddresses">
+                            <fuse-card class="rounded my-3 first:mt-2 last:mb-2">
+                                <div class="flex flex-row p-2 font-medium gap-1 items-center justify-between w-full">
+                                    <!-- Address  -->
+                                    <div class="flex flex-col font-medium gap-1">
+                                        <span class="">{{storeAddress.storeName}}</span>
+                                        <span class="">{{storeAddress.phoneNumber}}</span>
+                                        <span class="">{{storeAddress.address}}, {{storeAddress.postCode}}, {{storeAddress.city}}, {{storeAddress.state}}</span>
+                                    </div>
+                                </div>
+                            </fuse-card>
+                        </ng-container>
+                    </div>
+                </ng-container>
             </div>
         </ng-container>    
 
