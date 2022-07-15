@@ -29,7 +29,7 @@
                 </ng-container>
                 <ng-template #noAddress>
                     <!-- Enter Address -->
-                    <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                    <span class="mt-2 text-center">Add your delivery address</span>
                     <!-- Button -->
                     <button 
                         [routerLink]="'/address'"
@@ -163,23 +163,30 @@
                                 <!-- Shipping Fee & Total Items -->
                                 <div class="flex flex-row justify-between items-center mt-2">
                                     <div class="flex flex-col sm:flex-row sm:min-w-44 gap-1 sm:gap-2">
-                                        <span class="text-sm sm:text-md">Shipping Fee:</span>
                                         <!-- <span class="font-semibold text-xs sm:text-sm">{{ (getDeliveryFee(cart.id) ? getDeliveryFee(cart.id).deliveryFee : 0) | currency: cart.store.regionCountry.currencySymbol }}</span> -->
+                                        <span class="text-sm sm:text-md">Shipping Fee:</span>
                                         <ng-container *ngIf="getDeliveryFee(cart.id)">
                                             <div class="flex flex-col">
-                                                <div class="flex flex-row gap-1">
-                                                    <!-- Ori Price  -->
-                                                    <span 
-                                                        [ngClass]="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount ? 
-                                                            'line-through font-normal' : 'font-semibold'"
-                                                        class="text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryFee) | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                    <!-- Discounted price  -->
-                                                    <span *ngIf="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount"
-                                                        class="font-semibold text-sm tracking-tight">{{(getDeliveryFee(cart.id).discountedPrice) | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                </div>
-                                                <!-- Off  -->
-                                                <span *ngIf="getDeliveryFee(cart.id).discountAmount !== 0 && getDeliveryFee(cart.id).discountAmount" 
-                                                    class="-mt-[0.15rem] text-xs tracking-tight">(save {{(getDeliveryFee(cart.id).discountAmount) | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                                <ng-container *ngIf="getDeliveryFee(cart.id).deliveryType !== 'PICKUP'; else selfPickup">
+                                                    <div class="flex flex-row gap-1">
+                                                        <!-- Ori Price  -->
+                                                        <span 
+                                                            [ngClass]="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount ? 
+                                                                'line-through font-normal' : 'font-semibold'"
+                                                            class="text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryPrice.deliveryFee) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                        <!-- Discounted price  -->
+                                                        <span *ngIf="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount"
+                                                            class="font-semibold text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryPrice.discountedPrice) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                    </div>
+                                                    <!-- Off  -->
+                                                    <span *ngIf="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount" 
+                                                        class="-mt-[0.15rem] text-xs tracking-tight">(save {{(getDeliveryFee(cart.id).deliveryPrice.discountAmount) | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                                </ng-container>
+                                                <ng-template #selfPickup>
+                                                    <div class="font-semibold text-sm tracking-tight">
+                                                        Self pick-up
+                                                    </div>
+                                                </ng-template>
                                             </div>
                                         </ng-container>
                                     </div>
@@ -339,7 +346,7 @@
                     </ng-container>
                     <ng-template #noAddress>
                         <!-- Enter Address -->
-                        <span class="mt-2 text-center">Enter House Number of Apartment No.</span>
+                        <span class="mt-2 text-center">Add your delivery address</span>
                         <!-- Button -->
                         <button 
                             [routerLink]="'/address'"

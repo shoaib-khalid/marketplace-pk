@@ -841,7 +841,7 @@ export class BuyerCheckoutComponent implements OnInit
         let index = this.checkoutItems.findIndex(item => item.cartId === cartId);
 
         if (index > -1) {
-            return this.checkoutItems[index].deliveryPrice;
+            return this.checkoutItems[index];
             
         }
         else return null;
