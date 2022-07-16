@@ -286,6 +286,18 @@ export interface DeliveryRiderDetails
     airwayBill: string;
 }
 
+export interface DeliveryOrderStatus
+{
+    deliveryCompletionStatus: string;
+    description             : string;
+    id                      : string;
+    orderId                 : string;
+    spOrderId               : string;
+    status                  : string;
+    systemTransactionId     : string;
+    updated                 : string;
+}
+
 export interface OrderPagination
 {
     length: number;
