@@ -311,7 +311,7 @@ export class OrderListComponent implements OnInit
         this._router.navigate(['store/' + domainName + '/' + 'all-products' ]);
     }
 
-    getOrderPlaced(date: string, storeTimezone: string) {
+    convertDate(date: string, storeTimezone: string) {
 
         let timezoneString: any;
         let dateConverted: Date;

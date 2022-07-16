@@ -58,7 +58,7 @@ export class DeliveryService
 
                 this._logging.debug("Response from DeliveryService (getDeliveryOrderStatusList)", response);
 
-                return response["data"].content;
+                return response["data"];
             })
         );
     }

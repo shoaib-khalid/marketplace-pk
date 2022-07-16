@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { DeliveryRiderDetails, OrderDetails } from 'app/core/_order/order.types';
+import { DeliveryOrderStatus, DeliveryRiderDetails, OrderDetails } from 'app/core/_order/order.types';
 import { OrderService } from 'app/core/_order/order.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
@@ -46,16 +46,11 @@ export class OrderDetailsComponent implements OnInit
 
     orderId: string;
     orderDetails: OrderDetails;
-    
-    rider: any;
-    deliveryOrderStatus: any;
-
-    timezoneString: any;
-    dateCreated: Date;
-    dateUpdated: Date;
-
     _orderCountSummary: any;
-  
+    
+    deliveryRiderDetails: DeliveryRiderDetails;
+    deliveryOrderStatuses: DeliveryOrderStatus[];
+
     customerAuthenticate: CustomerAuthenticate;
 
     /**
@@ -102,41 +97,19 @@ export class OrderDetailsComponent implements OnInit
         // getOrderById
         this._orderService.getOrderById(this.orderId)
             .subscribe((orderByIdResponse)=>{                        
-                this.orderDetails = orderByIdResponse
-                var TimezoneName = this.orderDetails.store.regionCountry.timezone;
-                        
-                // Generating the formatted text
-                var options : any = {timeZone: TimezoneName, timeZoneName: "short"};
-                var dateText = Intl.DateTimeFormat([], options).format(new Date);
-                
-                // Scraping the numbers we want from the text
-                this.timezoneString = dateText.split(" ")[1].slice(3);
-                
-                // Getting the offset
-                var timezoneOffset = parseInt(this.timezoneString.split(':')[0])*60;
-    
-                // Checking for a minutes offset and adding if appropriate
-                if (this.timezoneString.includes(":")) {
-                    var timezoneOffset = timezoneOffset + parseInt(this.timezoneString.split(':')[1]);
-                }
-    
-                this.dateCreated = new Date(this.orderDetails.created);
-                this.dateUpdated = new Date(this.orderDetails.updated);
-    
-                this.dateCreated.setHours(this.dateCreated.getHours() - (-timezoneOffset) / 60);
-                this.dateUpdated.setHours(this.dateUpdated.getHours() - (-timezoneOffset) / 60);
+                this.orderDetails = orderByIdResponse;
             });
         
         // getDeliveryRiderDetails
         this._orderService.getDeliveryRiderDetails(this.orderId)
-            .subscribe((rider: DeliveryRiderDetails) => {
-                this.rider = rider            
+            .subscribe((deliveryRiderDetails: DeliveryRiderDetails) => {
+                this.deliveryRiderDetails = deliveryRiderDetails;
             });
 
         // getDeliveryDetails
         this._deliveryService.getDeliveryOrderStatusList(this.orderId)
-            .subscribe((response)=>{
-                this.deliveryOrderStatus = response;
+            .subscribe((DeliveryOrderStatuses: DeliveryOrderStatus[])=>{
+                this.deliveryOrderStatuses = DeliveryOrderStatuses;                
             });
     }
 
@@ -166,6 +139,35 @@ export class OrderDetailsComponent implements OnInit
     displayStatus(completionStatus: string) {
         let index = this._orderCountSummary.findIndex(item => item.id !== 'ALL' && item.completionStatus.includes(completionStatus));
         return index > -1 ? this._orderCountSummary[index] : null;
+    }
+
+    convertDate(date: string, storeTimezone: string) {
+
+        let timezoneString: any;
+        let dateConverted: Date;
+
+        let timezoneName = storeTimezone;
+
+        // Generating the formatted text
+        let options : any = {timeZone: timezoneName, timeZoneName: "short"};
+        let dateText = Intl.DateTimeFormat([], options).format(new Date);
+
+        // Scraping the numbers we want from the text
+        timezoneString = dateText.split(" ")[1].slice(3);
+
+        // Getting the offset
+        let timezoneOffset = parseInt(timezoneString.split(':')[0])*60;
+
+        // Checking for a minutes offset and adding if appropriate
+        if (timezoneString.includes(":")) {
+            timezoneOffset = timezoneOffset + parseInt(timezoneString.split(':')[1]);
+        }
+
+        dateConverted = new Date(date);
+
+        dateConverted.setHours(dateConverted.getHours() - (-timezoneOffset) / 60);
+
+        return dateConverted;
     }
 
 }

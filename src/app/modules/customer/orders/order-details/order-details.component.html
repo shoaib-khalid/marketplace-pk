@@ -36,7 +36,7 @@
                                 <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                 <div class="flex flex-col pl-2">
                                     <h3 class="font-bold cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
-                                    <h3 class="font-medium text-gray-400 text-xs sm:text-sm">Order Placed : {{dateCreated | date:'MMM dd yyyy, h:mm a' }}</h3>
+                                    <h3 class="font-medium text-gray-400 text-xs sm:text-sm">Order Placed : {{convertDate(orderDetails.created, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyyy, h:mm a' }}</h3>
                                 </div>
                             </div>
                             <div class="flex flex-row pt-2">
@@ -58,75 +58,81 @@
                                     <h3 class="font-medium pt-2 text-md">{{orderDetails.orderShipmentDetail.deliveryPeriodDetails?orderDetails.orderShipmentDetail.deliveryPeriodDetails.id:'-'}}</h3>
                                 </div>
                             </div>
-                            <!-- <div class="flex flex-row pt-4">
+                            
+                            <div class="flex flex-row pt-4">
                                 <svg class="h-6 w-6 text-primary"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" 
                                     stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" 
                                     d="M0 0h24v24H0z"/>  <circle cx="7" cy="17" r="2" />  <circle cx="17" cy="17" r="2" />  <path 
                                     d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v6h-5l2 2m0 -4l-2 2" />  <path d="M9 17h6" />  <path d="M13 6h5l3 5v6h-2" /></svg>
                                 <div class="flex flex-col pl-2">
-                                    <h3 class="font-semibold text-primary text-lg">Tracking Number</h3>
-                                    <h3 class="font-medium pt-2 text-md">{{orderDetails.orderShipmentDetail.trackingNumber}}</h3>
+                                    <h3 class="font-semibold text-primary">Tracking Number</h3>
+                                    <h3 *ngIf="deliveryRiderDetails && deliveryRiderDetails.trackingUrl" class="font-medium pt-2 text-md">{{deliveryRiderDetails.trackingUrl}}</h3>
                                 </div>
-                            </div> -->
+                            </div>
                             
-                            <!-- <div class="mt-2 pl-6 mb-4">
+                            <div class="mt-2 pl-2 sm:pl-6 mb-4">
                                 <ol>
-                                    <ng-container *ngFor="let activity of activities; let i = index; let first = first; let last = last; trackBy: trackByFn">
-        
-                                        <li class="relative flex py-7">
-                                            <ng-container *ngIf="true">
-                                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-500"></div>
-                                            </ng-container>
-        
+                                    <ng-container *ngFor="let deliveryOrderStatus of deliveryOrderStatuses; let i = index; let first = first; let last = last; trackBy: trackByFn">
+                                        <li *ngIf="first" class="relative flex py-2">
+                                            <div *ngIf="first" class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-500"></div>
                                             <div class="relative flex flex-auto">
-                                                <ng-container *ngIf="true">
-                                                    <div class="flex flex-shrink-0 items-center justify-center w-7 h-7 ml-1.5 mr-4 rounded-full bg-green-500">
-                                                        <mat-icon
-                                                            class="icon-size-5 text-white"
-                                                            [svgIcon]="'heroicons_solid:badge-check'">
-                                                        </mat-icon>
-                                                    </div>
-                                                </ng-container>
-        
+                                                <div class="flex flex-shrink-0 items-center justify-center w-7 h-7 ml-1.5 mr-4 rounded-full bg-green-500">
+                                                    <mat-icon
+                                                        class="icon-size-5 text-white"
+                                                        [svgIcon]="'heroicons_solid:badge-check'">
+                                                    </mat-icon>
+                                                </div>
                                                 <div class="flex flex-col flex-auto items-start">
                                                     <div class="text-secondary">
-                                                        {{orderDetails.created | date:'MMM dd yyy, h:mm a'}}
+                                                        {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
                                                     </div>
-                                                    <span class="font-semibold pt-2">Order created from store {{orderDetails.store.name}}</span>
+                                                    <span *ngIf="first" class="font-semibold">Order created from store {{orderDetails.store.name}}</span>
+                                                    <!-- <span *ngIf="last" class="font-semibold">Order completed</span> -->
                                                 </div>
                                             </div>
                                         </li>
 
-                                        <li class="relative flex py-7">
-                                            <ng-container *ngIf="true">
-                                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-500"></div>
-                                            </ng-container>
-        
+                                        <li *ngIf="!first && !last" class="relative flex py-2">
+                                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-500"></div>        
                                             <div class="relative flex flex-auto">
-                                                <ng-container *ngIf="true">
-                                                    <div class="flex flex-shrink-0 items-center justify-center w-7 h-7 ml-1.5 mr-4 rounded-full bg-green-500">
-                                                        <mat-icon
-                                                            class="icon-size-5 text-white"
-                                                            [svgIcon]="'heroicons_solid:badge-check'">
-                                                        </mat-icon>
-                                                    </div>
-                                                </ng-container>
-        
+                                                <div class="flex flex-shrink-0 items-center justify-center w-7 h-7 ml-1.5 mr-4 rounded-full bg-green-500">
+                                                    <mat-icon
+                                                        class="icon-size-5 text-white"
+                                                        [svgIcon]="'heroicons_solid:badge-check'">
+                                                    </mat-icon>
+                                                </div>
                                                 <div class="flex flex-col flex-auto items-start">
                                                     <div class="text-secondary">
-                                                        {{orderDetails.created | date:'MMM dd yyy, h:mm a'}}
+                                                        {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
                                                     </div>
-                                                    <ng-container *ngIf="true">
-                                                        <div
-                                                            class="mt-4 py-4 px-5 rounded-lg bg-gray-200 dark:bg-gray-800"
-                                                            >Order Created from {{orderDetails.store.name}}</div>
-                                                    </ng-container>
+                                                    <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
+                                                        {{deliveryOrderStatus.status}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li *ngIf="last" class="relative flex py-2">
+                                            <div class="relative flex flex-auto">
+                                                <div class="flex flex-shrink-0 items-center justify-center w-7 h-7 ml-1.5 mr-4 rounded-full bg-green-500">
+                                                    <mat-icon
+                                                        class="icon-size-5 text-white"
+                                                        [svgIcon]="'heroicons_solid:badge-check'">
+                                                    </mat-icon>
+                                                </div>
+                                                <div class="flex flex-col flex-auto items-start">
+                                                    <div class="text-secondary">
+                                                        {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
+                                                    </div>
+                                                    <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
+                                                        {{deliveryOrderStatus.status}}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </li>
                                     </ng-container>
                                 </ol>
-                            </div> -->
+                            </div>
                         </div>
 
                         <!-- Border -->

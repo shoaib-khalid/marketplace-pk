@@ -1330,7 +1330,7 @@ export class CartListComponent implements OnInit, OnDestroy
                         let closeTime = new Date();
                         closeTime.setHours(Number(item.closeTime.split(":")[0]), Number(item.closeTime.split(":")[1]), 0);
 
-                        if(storeSnooze && todayDate >= openTime && todayDate < closeTime ) {
+                        if(todayDate >= openTime && todayDate < closeTime ) {
 
                             // --------------------
                             // Check store snooze
