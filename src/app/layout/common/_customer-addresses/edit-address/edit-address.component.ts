@@ -235,7 +235,6 @@ export class EditAddressDialog implements OnInit {
             locateButton.addEventListener('click',(e)=> {
 
                 let address= this.addressForm.get('address').value + ' ' + this.addressForm.get('city').value +' '+ this.addressForm.get('postCode').value +' '+ this.addressForm.get('state').value +' '+ this.addressForm.get('country').value;
-                console.log("address", address);
                 
                 geocoder.geocode({ address: address})
                 .then((result) => {

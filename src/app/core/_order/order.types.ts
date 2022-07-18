@@ -99,6 +99,7 @@ export interface Order
     totalDataObject             : null,
     orderShipmentDetail         : OrderShipmentDetail;
     orderPaymentDetail          : OrderPaymentDetail;
+    orderItemWithDetails        : OrderItemWithDetails[];
     store                       : Store;
     customer                    : Customer,
     orderRefund                 : []
@@ -180,7 +181,7 @@ export interface OrderDetails
     store                       : Store;
     customer                    : Customer;
     orderRefund                 : String;
-    orderItemWithDetails        : OrderItemWithDetails;
+    orderItemWithDetails        : OrderItemWithDetails[];
     voucherDetail               : Voucher
 }
 

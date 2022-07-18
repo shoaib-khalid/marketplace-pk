@@ -72,17 +72,7 @@ s
             username: ['', Validators.required],
             email   : ['', [Validators.required, Validators.email]],
         
-        });        
-
-        // // Customer Details
-        // this._userService.get(this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid)
-        //     .subscribe((response)=>{
-        //         console.log("response", response);
-                
-        //         this.accountForm.patchValue(response);
-
-        //         this.accountForm.get
-        //     })
+        });
 
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -134,14 +124,7 @@ s
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
-            });        
-        
-        // this.url.valueChanges
-        //     .pipe(takeUntil(this._onDestroy))
-        //     .subscribe((result) => {
-        //         console.log("result1111", result);
-                  
-        //     });
+            });
 
     }
 

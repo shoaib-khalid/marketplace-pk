@@ -63,6 +63,9 @@ export class OrderListComponent implements OnInit
 
     currentScreenSize: string[] = [];
     isLoading: boolean = false;
+
+    displayAllGroup: { orderGroupId: string, orderList: { orderId: string; orderItemsId: {orderItemId: string; isDisplay: boolean}[], isDisplayAll: boolean}[]}[];
+    displayAll: { orderId: string; orderItemsId: {orderItemId: string; isDisplay: boolean}[], isDisplayAll: boolean}[];
     
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -107,6 +110,53 @@ export class OrderListComponent implements OnInit
         
         this.ordersDetails$ = this._orderService.ordersDetails$;
         this.ordersGroups$ = this._orderService.orderGroups$;
+
+        this._orderService.ordersDetails$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: OrderDetails[])=>{
+                if (response) {                    
+                    this.displayAll = response.map(item => {
+                        return {
+                            orderId: item.id,
+                            orderItemsId: item.orderItemWithDetails.map((element, index) => {
+                                return {
+                                    orderItemId: element.id,
+                                    isDisplay: index > 2 ? false : true
+                                };
+                            }),
+                            isDisplayAll: item.orderItemWithDetails.length > 3 ? true : false
+                        };
+                    });
+                }
+                // Mark for change
+                this._changeDetectorRef.markForCheck();
+            });
+
+            this._orderService.orderGroups$
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((response: OrderGroup[])=>{
+                    if (response) {        
+                        this.displayAllGroup = response.map(item => {
+                            return {
+                                orderGroupId: item.id,
+                                orderList: item.orderList.map((element => {
+                                    return {
+                                        orderId: element.id,
+                                        orderItemsId: element.orderItemWithDetails.map((object, index) => {
+                                            return {
+                                                orderItemId: object.id,
+                                                isDisplay: index > 2 ? false : true
+                                            };
+                                        }),
+                                        isDisplayAll: element.orderItemWithDetails.length > 3 ? true : false
+                                    }
+                                }))
+                            };
+                        });
+                    }
+                    // Mark for change
+                    this._changeDetectorRef.markForCheck();
+                });
 
         // Get the orders details pagination
         this._orderService.ordersDetailsPagination$
@@ -338,6 +388,32 @@ export class OrderListComponent implements OnInit
         dateConverted.setHours(dateConverted.getHours() - (-timezoneOffset) / 60);
 
         return dateConverted;
+    }
+
+    showAllOrderItems(orderId: string) {
+        let index = this.displayAll.findIndex(item => item.orderId === orderId);
+        if (index > -1) {            
+            this.displayAll[index].orderItemsId.forEach(item => {
+                item.isDisplay = true;
+            });
+            this.displayAll[index].isDisplayAll = false;
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        }
+    }
+
+    showAllGroupOrderItems(orderGroupId: string, orderId: string) {
+        let groupOrderIndex = this.displayAllGroup.findIndex(item => item.orderGroupId === orderGroupId);
+        let orderIndex = (groupOrderIndex > -1) ? this.displayAllGroup[groupOrderIndex].orderList.findIndex(item => item.orderId === orderId) : -1;
+
+        if (orderIndex > -1) {            
+            this.displayAllGroup[groupOrderIndex].orderList[orderIndex].orderItemsId.forEach(item => {
+                item.isDisplay = true;
+            });
+            this.displayAllGroup[groupOrderIndex].orderList[orderIndex].isDisplayAll = false;            
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        }
     }
     
 }
