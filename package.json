@@ -1,6 +1,6 @@
 {
   "name": "marketplace",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Online Marketplace",
   "author": "https://themeforest.net/user/srcn",
   "license": "https://themeforest.net/licenses/standard",
@@ -41,7 +41,7 @@
     "jw-angular-pagination": "^1.2.0",
     "jw-paginate": "^1.0.4",
     "lodash-es": "4.17.21",
-    "moment": "2.29.1",
+    "moment": "2.29.4",
     "ng-apexcharts": "1.7.0",
     "ngx-cookie-service": "^13.1.2",
     "ngx-device-detector": "^3.0.0",
