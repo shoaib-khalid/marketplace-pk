@@ -106,7 +106,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     //      Store Timing
     //------------------------
 
-    checkStoreTiming(store: Store) : { notificationMessage: string, isStoreOpenToday: boolean }
+    checkStoreTiming(store: Store) : { notificationMessage: string, isStoreOpenToday: boolean, messageTitle: string }
     {
         let storeTiming = store.storeTiming;
         let storeId = store.id;
@@ -118,13 +118,15 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
         let storesOpening: { 
             storeId: string,
             isOpen : boolean,
-            message: string
+            message: string,
+            messageTitle :string,
         }[] = [];
 
         storesOpening.push({
             storeId: storeId,
             isOpen : true,
-            message: ''
+            message: '',
+            messageTitle:'',
         })
 
         let storeOpeningIndex = storesOpening.findIndex(i => i.storeId === storeId)
@@ -190,14 +192,14 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
 
                                             if(todayDate >= nextOpenTime){
                                                 let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
-                                                notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
-                                                nextStoreOpeningTime = "Store will open " + nextOpen;
+                                                notificationMessage = "Please come back " + nextOpen;
+                                                nextStoreOpeningTime = "Please come back " + nextOpen;
                                                 array.length = iteration + 1;
                                             }
                                         } else {
                                             // console.warn("Store currently snooze. Store close on " + object.day);
                                             
-                                            storesOpening[storeOpeningIndex].storeId = storeId;
+                                            storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                             storesOpening[storeOpeningIndex].isOpen = false;
                                             storesOpening[storeOpeningIndex].message = notificationMessage;
                                         }
@@ -208,16 +210,16 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                 }                                
 
                                 if (store.storeSnooze.snoozeReason && store.storeSnooze.snoozeReason !== null) {
-                                    notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
-                                    
-                                    storesOpening[storeOpeningIndex].storeId = storeId;
+                                    // notificationMessage = "Store is closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
+                                    notificationMessage = nextStoreOpeningTime;
+                                    storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                     storesOpening[storeOpeningIndex].isOpen = false;
                                     storesOpening[storeOpeningIndex].message = notificationMessage;
 
                                 } else {
-                                    notificationMessage = "Sorry for the inconvenience, Store is currently closed due to unexpected reason. " + nextStoreOpeningTime;
+                                    notificationMessage = '';
                                     
-                                    storesOpening[storeOpeningIndex].storeId = storeId;
+                                    storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
                                     storesOpening[storeOpeningIndex].isOpen = false;
                                     storesOpening[storeOpeningIndex].message = notificationMessage;
                                 }
@@ -240,9 +242,9 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                             // }
                         } else if (todayDate < openTime) {
                             // this mean it's open today but it's before store opening hour (store not open yet)
-                            notificationMessage = "Sorry for the inconvenience, We are closed! We will open at " + item.openTime;
+                            notificationMessage = "Please come back at " + item.openTime;
                             
-                            storesOpening[storeOpeningIndex].storeId = storeId;
+                            storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                             storesOpening[storeOpeningIndex].isOpen = false;
                             storesOpening[storeOpeningIndex].message = notificationMessage;
 
@@ -270,9 +272,9 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                     if(todayDate >= nextOpenTime){
                                         let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
                                         // console.info("We will open " + nextOpen);
-                                        notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
+                                        notificationMessage = "Please come back " + nextOpen;
                                         
-                                        storesOpening[storeOpeningIndex].storeId = storeId;
+                                        storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                         storesOpening[storeOpeningIndex].isOpen = false;
                                         storesOpening[storeOpeningIndex].message = notificationMessage;
 
@@ -309,9 +311,9 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                 if(todayDate >= nextOpenTime){
                                     let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
                                     // console.info("We will open " + nextOpen);
-                                    notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
+                                    notificationMessage = "Please come back " + nextOpen;
                                     
-                                    storesOpening[storeOpeningIndex].storeId = storeId;
+                                    storesOpening[storeOpeningIndex].messageTitle =  'Sorry! We\'re';
                                     storesOpening[storeOpeningIndex].isOpen = false;
                                     storesOpening[storeOpeningIndex].message = notificationMessage;
 
@@ -327,9 +329,9 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
             
         } else {
             // this indicate that store closed for all days
-            notificationMessage = "Sorry for the inconvenience, We are closed!";
+            notificationMessage = '';
 
-            storesOpening[storeOpeningIndex].storeId = storeId;
+            storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
             storesOpening[storeOpeningIndex].isOpen = false;
             storesOpening[storeOpeningIndex].message = notificationMessage;
 
@@ -337,10 +339,11 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
         // check if store open today
         isStoreOpenToday = storesOpening[storeOpeningIndex].isOpen;
                 
-        if(notificationMessage !== ''){
+        if(!isStoreOpenToday){
             return {
                 notificationMessage: notificationMessage,
-                isStoreOpenToday: isStoreOpenToday
+                isStoreOpenToday: isStoreOpenToday,
+                messageTitle: storesOpening[storeOpeningIndex].messageTitle
             }
         } else {
             return null
