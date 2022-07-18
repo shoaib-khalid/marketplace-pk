@@ -334,7 +334,9 @@ export class CartListComponent implements OnInit, OnDestroy
                         // set all selected cart to false for every changes
                         this.selectedCart.selected = false;
 
-                        this.carts.forEach(item => {                            
+                        this.carts.forEach(item => {     
+
+                            let storeIsClosed = this.isStoreClose(item.storeId);                    
 
                             // check if the selectedCart cartId already exists
                             let cartIdIndex = this.selectedCart.carts.findIndex(element => element.id === item.id);
@@ -342,6 +344,9 @@ export class CartListComponent implements OnInit, OnDestroy
                             if (cartIdIndex > -1) {
                                 // set all seleted in cart to false first, later check for true again
                                 this.selectedCart.carts[cartIdIndex].selected = false;
+
+                                // disable if store is closed
+                                this.selectedCart.carts[cartIdIndex].disabled = storeIsClosed ? true : false;
 
                                 // get all selected boolean from cartItems
                                 allSelected = this.selectedCart.carts[cartIdIndex].cartItem.map(element => element.selected);
@@ -359,6 +364,9 @@ export class CartListComponent implements OnInit, OnDestroy
                                         if ((cartItem.quantity > cartItem.productInventory.quantity) && (cartItem.productInventory.product.allowOutOfStockPurchases === false)) {
                                             this.selectedCart.carts[cartIdIndex].cartItem[selectedCartItemIndex].disabled = true;
                                         }
+                                        else if (storeIsClosed) {
+                                            this.selectedCart.carts[cartIdIndex].cartItem[selectedCartItemIndex].disabled = true;
+                                        }
                                         else {
                                             this.selectedCart.carts[cartIdIndex].cartItem[selectedCartItemIndex].disabled = false;
                                         }
@@ -374,9 +382,12 @@ export class CartListComponent implements OnInit, OnDestroy
                                             selected: false,
                                             disabled: false
                                         }
-                                        // Disable the item if quantity is invalid
+                                        // Disable the item if quantity is invalid or store is closed
                                         if ((element.quantity > element.productInventory.quantity) && (element.productInventory.product.allowOutOfStockPurchases === false)) {
                                             obj.disabled = true
+                                        }
+                                        else if (storeIsClosed) {
+                                            obj.disabled = true;
                                         }
                                         else {
                                             obj.disabled = false
@@ -391,7 +402,7 @@ export class CartListComponent implements OnInit, OnDestroy
                                     deliveryQuotationId: null,
                                     deliveryType: null,
                                     deliveryProviderId: null,
-                                    disabled: false,
+                                    disabled: storeIsClosed ? true : false,
                                     deliveryQuotations: null,
                                     deliveryProviderImg: null,
                                     deliveryProviderName: null,
@@ -426,8 +437,8 @@ export class CartListComponent implements OnInit, OnDestroy
                                         deliveryContactEmail: this.customerAddress.email,
                                         deliveryContactName : this.customerAddress.name,
                                         deliveryContactPhone: this.customerAddress.phoneNumber,
-                                        latitude            : null,
-                                        longitude           : null
+                                        latitude            : this.customerAddress.latitude,
+                                        longitude           : this.customerAddress.longitude
                                     },
                                     deliveryProviderId: null,
                                     storeId: element.storeId
@@ -442,6 +453,8 @@ export class CartListComponent implements OnInit, OnDestroy
                     } else {
                         this.selectedCart = {
                             carts:  this.carts.map(item => {
+                                let storeIsClosed = this.isStoreClose(item.storeId); 
+
                                 return {
                                     id: item.id,
                                     storeId: item.storeId,
@@ -451,18 +464,21 @@ export class CartListComponent implements OnInit, OnDestroy
                                             selected: false,
                                             disabled: false
                                         }
-                                        // Disable the item if quantity is invalid
+                                        // Disable the item if quantity is invalid or store is closed
                                         if ((element.quantity > element.productInventory.quantity) && (element.productInventory.product.allowOutOfStockPurchases === false)) {
-                                            obj.disabled = true
+                                            obj.disabled = true;
+                                        }
+                                        else if (storeIsClosed) {
+                                            obj.disabled = true;
                                         }
                                         else {
-                                            obj.disabled = false
+                                            obj.disabled = false;
                                         }
                                         return obj
 
                                     }),
                                     selected: false,
-                                    disabled: false,
+                                    disabled: storeIsClosed ? true : false,
                                     description: {
                                         value: '',
                                         isOpen: false
@@ -509,8 +525,8 @@ export class CartListComponent implements OnInit, OnDestroy
                                             deliveryContactEmail: this.customerAddress.email,
                                             deliveryContactName : this.customerAddress.name,
                                             deliveryContactPhone: this.customerAddress.phoneNumber,
-                                            latitude            : null,
-                                            longitude           : null
+                                            latitude            : this.customerAddress.latitude,
+                                            longitude           : this.customerAddress.longitude
                                         },
                                         deliveryProviderId: null,
                                         storeId: element.storeId
@@ -722,36 +738,57 @@ export class CartListComponent implements OnInit, OnDestroy
 
     deleteCart(cartId: string) {
 
-        const confirmation = this._fuseConfirmationService.open({
-                title  : 'Delete Cart',
-                message: 'Are you sure you want to delete this cart?',
+        // This section is to get this.selectedCart.carts index
+        let cartIndex = this.selectedCart.carts.findIndex(cart => cart.id === cartId);
+        
+        // This section is to get this.carts index
+        let thisCartIndex = this.carts.findIndex(cart => cart.id === cartId);
+                
+        // If selected, show popup to say unable to delete
+        let isSelected = this.selectedCart.carts[cartIndex].cartItem.some(item => item.selected) || this.selectedCart.carts[cartIndex].selected;
+        if (isSelected) {
+
+            const confirmation = this._fuseConfirmationService.open({
+                title  : 'Unable To Delete Cart',
+                message: 'Cannot delete selected cart. If you wish to delete the cart, unselect it first.',
                 icon:{
-                    name:"mat_outline:delete_forever",
-                    color:"primary"
+                    name:"heroicons_outline:exclamation",
+                    color:"warn"
                 },
                 actions: {
                     confirm: {
-                        label: 'Delete',
-                        color: 'warn'
-                    }
+                        label: 'OK',
+                        color: 'primary'
+                    },
+                    cancel: {
+                        show: false,
+                    },
                 }
             });
+
+            return;
+        }
+
+        let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId: null }});
         // Subscribe to the confirmation dialog closed action
-        confirmation.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe((result) => {
     
             // If the confirm button pressed...
-            if ( result === 'confirmed' )
+            if ( result && result.action === 'OK' )
             {
-
-                this.carts.findIndex
+                this.selectedCart.carts.splice(cartIndex, 1);
+                this.carts.splice(thisCartIndex, 1);
                 
-                // this._cartService.deleteCart(cartId)
-                //     .subscribe(response => {
+                this._cartService.deleteCart(cartId)
+                .subscribe((response)=>{
 
-
-                //         this._cartService.getCartsByCustomerId(this.customerId)
-                //             .subscribe()
-                //     })
+                    // Resolve cart after deletion
+                    this._cartService.cartResolver().subscribe();
+                    this._cartService.cartResolver(true).subscribe();
+                });
+        
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             }
         });    
         
@@ -934,7 +971,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
         // To make custom pop up, and we pass the details in paramter data
         // Deletion will occur at service level, here we'll only call the resolver
-        let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId:cartItem.id }});
+        let dialogRef = this._dialog.open(ModalConfirmationDeleteItemComponent, { disableClose: true, data:{ cartId: cartId, itemId: cartItem.id }});
         dialogRef.afterClosed().subscribe((result) => {    
             if (result && result.action === 'OK') {
                 

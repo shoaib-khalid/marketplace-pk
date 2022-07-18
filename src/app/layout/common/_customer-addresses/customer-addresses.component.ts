@@ -14,6 +14,7 @@ import { UserService } from "app/core/user/user.service";
 
 import { CustomerAddress, User } from "app/core/user/user.types";
 import { EditAddressDialog } from './edit-address/edit-address.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector       : 'customer-addresses',
@@ -43,6 +44,7 @@ s
 
     longitude: any;
     latitude: any
+    originUrl: string;
 
     /**
     * Constructor
@@ -58,11 +60,19 @@ s
         private _jwtService: JwtService,
         private _authService: AuthService,
         private _userService: UserService,
+        private _activatedRoute: ActivatedRoute,
+        private _router: Router,
+
     )
     {
     }
 
     ngOnInit(): void {
+
+        // Get searches from url parameter 
+        this._activatedRoute.queryParams.subscribe(params => {
+            this.originUrl = params['origin'];
+        });
 
         this.customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
 
@@ -255,7 +265,7 @@ s
             // let guestAddresses: CustomerAddress[] = this._userService.guestAddress$ ? JSON.parse(this._userService.guestAddress$) : [];
             
             if (result) {
-    
+                
                 if (this.customerId) {
                     //Customer Addresses
                     this._userService.createCustomerAddress(result)
@@ -404,6 +414,6 @@ s
     }
 
     backClicked() {
-        this._location.back();
+        this._router.navigate(['/' + this.originUrl]);
     }
 }

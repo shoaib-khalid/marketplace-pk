@@ -8,7 +8,7 @@ import { CartService } from 'app/core/cart/cart.service';
 })
 export class ModalConfirmationDeleteItemComponent implements OnInit {
 
-	cartId :string ='';
+	cartId : string = '';
 	itemId : string = '';
 
 	constructor(
