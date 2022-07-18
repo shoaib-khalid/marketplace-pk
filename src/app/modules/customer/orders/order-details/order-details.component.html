@@ -60,15 +60,22 @@
                             </div>
                             
                             <!-- Tracking Number -->
-                            <ng-container *ngIf="deliveryRiderDetails && deliveryRiderDetails.trackingUrl">
+                            <ng-container *ngIf="deliveryRiderDetails && (deliveryRiderDetails.trackingUrl || deliveryRiderDetails.orderNumber)">
                                 <div class="flex flex-row pt-4">
                                     <svg class="h-6 w-6 text-primary"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" 
                                         stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" 
                                         d="M0 0h24v24H0z"/>  <circle cx="7" cy="17" r="2" />  <circle cx="17" cy="17" r="2" />  <path 
                                         d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v6h-5l2 2m0 -4l-2 2" />  <path d="M9 17h6" />  <path d="M13 6h5l3 5v6h-2" /></svg>
                                     <div class="flex flex-col pl-2">
-                                        <h3 class="font-semibold text-primary">Tracking Number</h3>
-                                        <h3 class="font-medium pt-2 text-md cursor-pointer hover:text-primary" (click)="goToExternalUrl(deliveryRiderDetails.trackingUrl, true)">{{deliveryRiderDetails.orderNumber}}</h3>
+                                        <span class="font-semibold text-primary">Tracking Number</span>
+                                        <div class="flex flex-row w-full pt-2">
+                                            <span *ngIf="deliveryRiderDetails.provider" class="font-medium text-md">{{deliveryRiderDetails.provider.name}} : &nbsp;</span>
+                                            <span class="font-medium text-md"
+                                                [ngClass]="deliveryRiderDetails.trackingUrl ? 'cursor-pointer hover:text-primary' : ''" 
+                                                (click)="deliveryRiderDetails.trackingUrl ? goToExternalUrl(deliveryRiderDetails.trackingUrl, true) : ''">
+                                                {{deliveryRiderDetails.orderNumber}}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </ng-container>
