@@ -148,11 +148,13 @@ export class LandingProductDetailsComponent implements OnInit
     pagination: ProductPagination;
 
     notificationMessage: string;
+    notificationMessageTitle: string = '';
     daysArray = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
     storesOpening: { 
         storeId: string,
         isOpen : boolean,
+        messageTitle : string,
         message: string
     }[] = [];
 
@@ -981,11 +983,13 @@ export class LandingProductDetailsComponent implements OnInit
     checkStoreTiming(store: Store): void
     {
         let storeTiming = store.storeTiming;
+
         let storeId = store.id;
 
         this.storesOpening.push({
             storeId: storeId,
             isOpen : true,
+            messageTitle: '',
             message: ''
         })
 
@@ -1054,34 +1058,37 @@ export class LandingProductDetailsComponent implements OnInit
 
                                             if(todayDate >= nextOpenTime){
                                                 let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
-                                                this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
-                                                nextStoreOpeningTime = "Store will open " + nextOpen;
+                                                this.notificationMessage = "Please come back " + nextOpen;
+                                                nextStoreOpeningTime = "Please come back " + nextOpen;
                                                 array.length = iteration + 1;
                                             }
                                         } else {
                                             // console.warn("Store currently snooze. Store close on " + object.day);
                                             
-                                            this.storesOpening[storeOpeningIndex].storeId = storeId;
+                                            this.storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                             this.storesOpening[storeOpeningIndex].isOpen = false;
                                             this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
                                         }
                                     });
 
                                 } else {
-                                    nextStoreOpeningTime = "Store will open at " + this._datePipe.transform(store.storeSnooze.snoozeEndTime,'EEEE, h:mm a');
+                                    nextStoreOpeningTime = "Please come back on " + this._datePipe.transform(store.storeSnooze.snoozeEndTime,'EEEE, h:mm a');
                                 }                                
 
                                 if (store.storeSnooze.snoozeReason && store.storeSnooze.snoozeReason !== null) {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
+                                    // this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to " + store.storeSnooze.snoozeReason + ". " + nextStoreOpeningTime;
                                     
-                                    this.storesOpening[storeOpeningIndex].storeId = storeId;
+                                    this.notificationMessage = nextStoreOpeningTime;
+
+                                    this.storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                     this.storesOpening[storeOpeningIndex].isOpen = false;
                                     this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
 
                                 } else {
-                                    this.notificationMessage = "Sorry for the inconvenience, Store is currently closed due to unexpected reason. " + nextStoreOpeningTime;
+
+                                    this.notificationMessage = '';
                                     
-                                    this.storesOpening[storeOpeningIndex].storeId = storeId;
+                                    this.storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
                                     this.storesOpening[storeOpeningIndex].isOpen = false;
                                     this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
                                 }
@@ -1104,9 +1111,9 @@ export class LandingProductDetailsComponent implements OnInit
                             // }
                         } else if (todayDate < openTime) {
                             // this mean it's open today but it's before store opening hour (store not open yet)
-                            this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open at " + item.openTime;
+                            this.notificationMessage = "Please come back at " + item.openTime;
                             
-                            this.storesOpening[storeOpeningIndex].storeId = storeId;
+                            this.storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                             this.storesOpening[storeOpeningIndex].isOpen = false;
                             this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
 
@@ -1134,9 +1141,9 @@ export class LandingProductDetailsComponent implements OnInit
                                     if(todayDate >= nextOpenTime){
                                         let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
                                         // console.info("We will open " + nextOpen);
-                                        this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
+                                        this.notificationMessage = "Please come back " + nextOpen;
                                         
-                                        this.storesOpening[storeOpeningIndex].storeId = storeId;
+                                        this.storesOpening[storeOpeningIndex].messageTitle = 'Sorry! We\'re';
                                         this.storesOpening[storeOpeningIndex].isOpen = false;
                                         this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
 
@@ -1173,9 +1180,9 @@ export class LandingProductDetailsComponent implements OnInit
                                 if(todayDate >= nextOpenTime){
                                     let nextOpen = (iteration === 0) ? ("tomorrow at " + object.openTime) : ("on " + object.day + " " + object.openTime);
                                     // console.info("We will open " + nextOpen);
-                                    this.notificationMessage = "Sorry for the inconvenience, We are closed! We will open " + nextOpen;
+                                    this.notificationMessage = "Please come back " + nextOpen;
                                     
-                                    this.storesOpening[storeOpeningIndex].storeId = storeId;
+                                    this.storesOpening[storeOpeningIndex].messageTitle =  'Sorry! We\'re';
                                     this.storesOpening[storeOpeningIndex].isOpen = false;
                                     this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
 
@@ -1190,12 +1197,14 @@ export class LandingProductDetailsComponent implements OnInit
             });
         } else {
             // this indicate that store closed for all days
-            this.notificationMessage = "Sorry for the inconvenience, We are closed!";
+            this.notificationMessage = '';
 
-            this.storesOpening[storeOpeningIndex].storeId = storeId;
+            this.storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
             this.storesOpening[storeOpeningIndex].isOpen = false;
             this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
         }
+
+        this.notificationMessageTitle = this.storesOpening[storeOpeningIndex].messageTitle;
       
     }
 
