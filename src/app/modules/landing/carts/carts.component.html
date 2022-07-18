@@ -153,12 +153,12 @@
                             <div class="px-2 lg:px-0">
                                 <!-- Store timing MOBILE -->
                                 <div *ngIf="isStoreClose(cart.storeId)" 
-                                    class="lg:hidden flex flex-row items-center gap-2 border-b h-14 lg:h-16">
+                                    class="lg:hidden px-1 flex flex-row items-center gap-2 border-b h-14 lg:h-16">
                                     <div class="flex flex-col rounded-md bg-primary text-white items-center p-2 leading-none uppercase">
                                         <span class="text-white text-xs font-medium tracking-tight">{{storesOpening[i].messageTitle}}</span>
                                         <span class="text-white text-xl font-semibold tracking-tighter">CLOSED</span>
                                     </div>
-                                    <span class="text-center text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
+                                    <span class="text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
                                 </div>
                                 <!-- Cart Header -->
                                 <div class="cart-title-grid grid w-full sticky border-b h-14 lg:h-16 items-center">
@@ -179,7 +179,7 @@
                                                         <span class="text-white text-[8px] lg:text-xs font-medium tracking-tight">{{storesOpening[i].messageTitle}}</span>
                                                         <span class="text-white text-[10px] lg:text-xl font-semibold tracking-tighter">CLOSED</span>
                                                     </div>
-                                                    <span class="text-center text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
+                                                    <span class="text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
                                                 </div>
                                                 <!-- Required Info  -->
                                                 <div *ngIf="selectedCart.carts[i + pagination.startIndex].showRequiredInfo"
