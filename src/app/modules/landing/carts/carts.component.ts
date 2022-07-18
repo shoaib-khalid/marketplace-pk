@@ -2192,7 +2192,7 @@ export class CartListComponent implements OnInit, OnDestroy
             }
             // if delivery, navigate to self address
             else {
-                this._router.navigate(['/address']);
+                this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
             }
 
         }
@@ -2202,7 +2202,7 @@ export class CartListComponent implements OnInit, OnDestroy
             
             // For delivery, navigate to add address
             if (isAllDelivery) {
-                this._router.navigate(['/address']);
+                this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
     
             }
             // For self pickup
