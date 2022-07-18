@@ -68,7 +68,7 @@
                                         d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v6h-5l2 2m0 -4l-2 2" />  <path d="M9 17h6" />  <path d="M13 6h5l3 5v6h-2" /></svg>
                                     <div class="flex flex-col pl-2">
                                         <h3 class="font-semibold text-primary">Tracking Number</h3>
-                                        <h3 class="font-medium pt-2 text-md">{{deliveryRiderDetails.trackingUrl}}</h3>
+                                        <h3 class="font-medium pt-2 text-md cursor-pointer hover:text-primary" (click)="goToExternalUrl(deliveryRiderDetails.trackingUrl, true)">{{deliveryRiderDetails.orderNumber}}</h3>
                                     </div>
                                 </div>
                             </ng-container>

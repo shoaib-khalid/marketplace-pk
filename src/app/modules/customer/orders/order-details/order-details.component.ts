@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DeliveryOrderStatus, DeliveryRiderDetails, OrderDetails } from 'app/core/_order/order.types';
@@ -7,6 +7,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { Store } from 'app/core/store/store.types';
 import { DeliveryService } from 'app/core/_delivery/delivery.service';
+import { DOCUMENT } from '@angular/common';
 
 
 @Component({
@@ -41,22 +42,23 @@ import { DeliveryService } from 'app/core/_delivery/delivery.service';
     ]
 })
 export class OrderDetailsComponent implements OnInit
-{ 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
-
+{  
     orderId: string;
     orderDetails: OrderDetails;
     _orderCountSummary: any;
     
     deliveryRiderDetails: DeliveryRiderDetails;
     deliveryOrderStatuses: DeliveryOrderStatus[];
-
+    
     customerAuthenticate: CustomerAuthenticate;
+    
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
     constructor(
+        @Inject(DOCUMENT) private _document: Document,
         private _orderService: OrderService,
         private _route: ActivatedRoute,
         private _router: Router,
@@ -168,6 +170,14 @@ export class OrderDetailsComponent implements OnInit
         dateConverted.setHours(dateConverted.getHours() - (-timezoneOffset) / 60);
 
         return dateConverted;
+    }
+
+    goToExternalUrl(url: string, isOpenNewTab: boolean = false) {
+        if (isOpenNewTab) {
+            window.open(url,'_blank');
+        } else {
+            this._document.location.href = url;
+        }
     }
 
 }
