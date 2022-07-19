@@ -444,7 +444,6 @@ export class UserService
 
                     // Update the address
                     address[index] = { ...address[index], ...updatedAddress.data};
-
                     this._customerAddresses.next(address); 
             
                     // Return the updated address
@@ -454,12 +453,11 @@ export class UserService
                     take(1),
                     filter(item => item && item.id === customerAddressBody.id),
                     tap(() => {
-
                         // Update the address if it's selected
-                        this._customerAddress.next(updatedAddress["data"]);
+                        this._customerAddress.next(updatedAddress);
 
                         // Return the updated address
-                        return updatedAddress["data"];
+                        return updatedAddress;
                     })
                 ))
             ))
