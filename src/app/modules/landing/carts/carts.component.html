@@ -153,12 +153,16 @@
                             <div class="px-2 lg:px-0">
                                 <!-- Store timing MOBILE -->
                                 <div *ngIf="isStoreClose(cart.storeId)" 
-                                    class="lg:hidden px-1 flex flex-row items-center gap-2 border-b h-14 lg:h-16">
-                                    <div class="flex flex-col rounded-md bg-primary text-white items-center p-2 leading-none uppercase">
-                                        <span class="text-white text-xs font-medium tracking-tight">{{storesOpening[i].messageTitle}}</span>
-                                        <span class="text-white text-xl font-semibold tracking-tighter">CLOSED</span>
+                                    class="lg:hidden px-1 flex flex-row justify-end items-center border-b h-14 lg:h-16 w-full">
+                                    <div class="flex flex-row max-w-1/2 gap-x-1">
+                                        <div class="flex flex-col rounded-md bg-red-500 text-white items-center p-2 leading-none uppercase">
+                                            <span class="text-white text-xs font-medium tracking-tight">{{storesOpening[i].messageTitle}}</span>
+                                            <span class="text-white text-xl font-semibold tracking-tighter">CLOSED</span>
+                                        </div>
+                                        <div class="flex items-center ml-1">
+                                            <span class="text-black text-xs lg:text-sm font-medium tracking-tight leading-snug">{{storesOpening[i].message}}</span>
+                                        </div>
                                     </div>
-                                    <span class="text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
                                 </div>
                                 <!-- Cart Header -->
                                 <div class="cart-title-grid grid w-full sticky border-b h-14 lg:h-16 items-center">
@@ -175,14 +179,14 @@
                                                 <!-- Store timing DESKTOP -->
                                                 <div *ngIf="isStoreClose(cart.storeId)" 
                                                     class="hidden lg:flex flex-row items-center justify-center gap-2">
-                                                    <div class="flex flex-col rounded-md bg-primary text-white items-center p-2 leading-none uppercase">
+                                                    <div class="flex flex-col rounded-md bg-red-500 text-white items-center p-2 leading-none uppercase">
                                                         <span class="text-white text-[8px] lg:text-xs font-medium tracking-tight">{{storesOpening[i].messageTitle}}</span>
                                                         <span class="text-white text-[10px] lg:text-xl font-semibold tracking-tighter">CLOSED</span>
                                                     </div>
                                                     <span class="text-black text-xs lg:text-sm font-medium tracking-tight max-w-[120px]">{{storesOpening[i].message}}</span>
                                                 </div>
                                                 <!-- Required Info  -->
-                                                <div *ngIf="selectedCart.carts[i + pagination.startIndex].showRequiredInfo"
+                                                <div *ngIf="selectedCart.carts[i + pagination.startIndex].showRequiredInfo && !selectedCart.carts[i + pagination.startIndex].disabled"
                                                     class="flex flex-col justify-center items-center text-center mr-3">
                                                     <span class="flex tracking-tight justify-center items-center text-sm">Required Info
                                                     </span>
@@ -402,9 +406,9 @@
                                         <div class="flex flex-row justify-between items-center my-2 w-auto">
                                             <!-- Shipping Info  -->
                                             <div class="flex flex-row justify-between items-center w-auto gap-x-4">
-                                                <div class="flex flex-row justify-between items-center w-[200px]">
-                                                    <ng-container *ngIf="true">
-                                                        <div class="flex flex-row w-full">
+                                                <ng-container *ngIf="!selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage && selectedCart.carts[i + pagination.startIndex].deliveryQuotationId; else deliveryErrorDesktop">
+                                                    <div class="flex flex-row justify-between items-center w-[200px]">
+                                                        <div *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryType !== 'SELF'" class="flex flex-row w-full">
                                                             <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
                                                                 <mat-select
                                                                     placeholder="Select a delivery provider"
@@ -442,32 +446,42 @@
                                                                 </mat-select>
                                                             </mat-form-field>
                                                         </div>
-                                                    </ng-container>
-                                                </div>
-                                                <div class="flex flex-col sm:flex-row sm:min-w-44 gap-x-1">
-                                                    <span class="text-sm">Shipping Fee:</span>
-                                                    <!-- <span class="font-semibold text-xs sm:text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
-                                                    <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
-                                                        <div class="flex flex-col">
-                                                            <div class="flex flex-row gap-1">
-                                                                <!-- Ori Price  -->
-                                                                <span 
-                                                                    [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
-                                                                        'line-through font-normal' : 'font-semibold'"
-                                                                    class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                                <!-- Discounted price  -->
-                                                                <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
-                                                                    class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                            </div>
-                                                            <!-- Off  -->
-                                                            <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
-                                                                class="-mt-[0.15rem] text-xs tracking-tight">(save {{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                                        <div *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryType === 'SELF'" 
+                                                            class="flex flex-row w-full items-center">
+                                                            <mat-label class="flex w-full px-4 items-center h-10 rounded-md border border-gray-300 text-sm">
+                                                                Self Delivery</mat-label>
                                                         </div>
-                                                    </ng-container>
-                                                </div>
+                                                    </div>
+                                                    <div class="flex flex-col sm:flex-row sm:min-w-44 gap-x-1">
+                                                        <span class="text-sm">Shipping Fee:</span>
+                                                        <!-- <span class="font-semibold text-xs sm:text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
+                                                        <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
+                                                            <div class="flex flex-col">
+                                                                <div class="flex flex-row gap-1">
+                                                                    <!-- Ori Price  -->
+                                                                    <span 
+                                                                        [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
+                                                                            'line-through font-normal' : 'font-semibold'"
+                                                                        class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                    <!-- Discounted price  -->
+                                                                    <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
+                                                                        class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                </div>
+                                                                <!-- Off  -->
+                                                                <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
+                                                                    class="-mt-[0.15rem] text-xs tracking-tight">(save {{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #deliveryErrorDesktop>
+                                                    <div>
+                                                        <span class="font-semibold text-sm" >{{selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage ? selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage : 'NO_PROVIDER_AVAILABLE'}}</span>
+                                                    </div>
+                                                </ng-template>
                                             </div>
                                             <!-- Total Items  -->
-                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
+                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-1">
                                                 <span class="text-sm">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
                                                 <span class="font-semibold text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                             </div>
@@ -475,9 +489,9 @@
                                     </ng-container>
                                     <!-- Select Delivery Provider for MOBILE-->
                                     <div *ngIf="!currentScreenSize.includes('lg') && selectedCart.carts[i + pagination.startIndex].isSelfPickup === false" class="mt-2 flex flex-col gap-y-2">
-                                        <div class="flex flex-row justify-between items-center w-full">
-                                            <ng-container *ngIf="true">
-                                                <div class="flex flex-row w-full">
+                                        <ng-container *ngIf="!selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage && selectedCart.carts[i + pagination.startIndex].deliveryQuotationId">
+                                            <div class="flex flex-row justify-between items-center w-full">
+                                                <div *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryType !== 'SELF'" class="flex flex-row w-full">
                                                     <mat-form-field class="w-full rounded text-sm fuse-mat-no-subscript fuse-mat-dense">
                                                         <mat-select
                                                             placeholder="Select a delivery provider"
@@ -515,40 +529,50 @@
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
-                                            </ng-container>
-                                        </div>
-                                        <div class="flex flex-row justify-between items-center">
-                                            <div class="flex flex-col sm:min-w-44 gap-x-1">
-                                                <span class="text-sm">Shipping Fee:</span>
-                                                <!-- <span class="font-semibold text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
-                                                <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
-                                                    <div class="flex flex-col">
-                                                        <div class="flex flex-row gap-1">
-                                                            <!-- Ori Price  -->
-                                                            <span 
-                                                                [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
-                                                                    'line-through font-normal' : 'font-semibold'"
-                                                                class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                            <!-- Discounted price  -->
-                                                            <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
-                                                                class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                        </div>
-                                                        <!-- Off  -->
-                                                        <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
-                                                            class="-mt-[0.15rem] text-xs tracking-tight">(save {{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount | currency: cart.store.regionCountry.currencySymbol}})</span>
-                                                    </div>
-                                                </ng-container>
-                                                <!-- <div class="flex flex-row gap-1">
-                                                    <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount === null"
-                                                        class="font-semibold text-sm tracking-tight">{{ selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol }}</span>
-                                                    <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
-                                                        class="text-sm line-through tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                    <span class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
-                                                </div> -->
-
+                                                <div *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryType === 'SELF'" class="flex flex-row w-full">
+                                                    <mat-label class="flex w-full px-4 items-center h-10 rounded-md border border-gray-300 text-sm">
+                                                        Self Delivery</mat-label>
+                                                </div>
                                             </div>
-                                            <div class="flex flex-col sm:flex-row items-center sm:min-w-auto gap-1 sm:gap-x-2">
-                                                <span class="text-sm">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
+                                        </ng-container>
+                                        <div class="flex flex-row justify-between items-center">
+                                            <div class="flex flex-col sm:min-w-44">
+                                                <ng-container *ngIf="!selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage && selectedCart.carts[i + pagination.startIndex].deliveryQuotationId; else deliveryErrorMobile">
+                                                    <span class="text-sm">Shipping Fee:</span>
+                                                    <!-- <span class="font-semibold text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
+                                                    <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
+                                                        <div class="flex flex-col">
+                                                            <div class="flex flex-row gap-1">
+                                                                <!-- Ori Price  -->
+                                                                <span 
+                                                                    [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
+                                                                        'line-through font-normal' : 'font-semibold'"
+                                                                    class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                <!-- Discounted price  -->
+                                                                <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
+                                                                    class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                            </div>
+                                                            <!-- Off  -->
+                                                            <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
+                                                                class="-mt-[0.15rem] text-xs tracking-tight">(save {{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount | currency: cart.store.regionCountry.currencySymbol}})</span>
+                                                        </div>
+                                                    </ng-container>
+                                                    <!-- <div class="flex flex-row gap-1">
+                                                        <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount === null"
+                                                            class="font-semibold text-sm tracking-tight">{{ selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol }}</span>
+                                                        <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
+                                                            class="text-sm line-through tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                        <span class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                    </div> -->
+                                                </ng-container>
+                                                <ng-template #deliveryErrorMobile>
+                                                    <div class="">
+                                                        <span class="text-sm font-semibold" >{{selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage ? selectedCart.carts[i + pagination.startIndex].deliveryErrorMessage : 'NO_PROVIDER_AVAILABLE'}}</span>
+                                                    </div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm mr-1">Total Items ({{cart.cartItems ? cart.cartItems.length : 0}}):</span>
                                                 <span class="font-semibold text-sm">{{ getCartItemsTotal(cart.cartItems) | currency: cart.store.regionCountry.currencySymbol }}</span>
                                             </div>
                                         </div>
@@ -557,7 +581,12 @@
                                     <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].isSelfPickup">
                                         <div class="flex flex-col gap-1 w-full mt-1">
                                             <div class="rounded border w-full flex flex-col p-3 gap-1 bg-primary-100">
-                                                <span class="font-medium text-base">Store Address</span>
+                                                <div class="flex flex-row items-center gap-2">
+                                                    <mat-icon 
+                                                        class="icon-size-5 text-primary" 
+                                                        [svgIcon]="'mat_solid:storefront'"></mat-icon>
+                                                    <span class="font-medium text-base">Store Address</span>
+                                                </div>
                                                 <div class="flex flex-row font-base gap-1 items-center justify-between w-full">
                                                     <!-- Address  -->
                                                     <div class="flex flex-col text-sm gap-1">
