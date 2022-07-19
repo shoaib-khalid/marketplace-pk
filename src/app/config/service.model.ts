@@ -12,7 +12,7 @@ export interface IAppConfig {
         paymentService      : string;
         locationService     : string;
         analyticService     : string;
-
+        assetsService       : string;
     };
     storeFrontDomain        : string;
     marketplaceDomain       : string,

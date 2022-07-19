@@ -16,6 +16,7 @@ import { CartService } from 'app/core/cart/cart.service';
 import { JwtService } from 'app/core/jwt/jwt.service';
 import { AuthService } from 'app/core/auth/auth.service';
 import { Cart, CartItem, CustomerCart } from 'app/core/cart/cart.types';
+import { AppConfig } from 'app/config/service.config';
 
 @Component({
     selector     : 'landing-product-details',
@@ -163,6 +164,7 @@ export class LandingProductDetailsComponent implements OnInit
      */
     constructor(
         @Inject(DOCUMENT) private _document: Document,
+        private _apiServer: AppConfig,
         private _storesService: StoresService,
         private _productsService: ProductsService,
         private _platformService: PlatformService,
@@ -301,9 +303,9 @@ export class LandingProductDetailsComponent implements OnInit
                                         this.store.storeAssets.forEach(item => {                            
                                             if(item.assetType === "LogoUrl") {
                                                 this.galleryImages = [{
-                                                    small   : '' + item.assetUrl,
-                                                    medium  : '' + item.assetUrl,
-                                                    big     : '' + item.assetUrl + '?original=true'
+                                                    small   : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg',
+                                                    medium  : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg',
+                                                    big     : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg' + '?original=true'
                                                 }];
                                             }
                                         });

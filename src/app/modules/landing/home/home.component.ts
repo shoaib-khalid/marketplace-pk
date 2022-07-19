@@ -123,7 +123,7 @@ export class LandingHomeComponent implements OnInit
                         });
 
                     // Get featured products
-                    this._locationService.getFeaturedProducts({ page: this.oldFeaturedProductsPaginationIndex, pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({ page: this.oldFeaturedProductsPaginationIndex, pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true })
                         .subscribe((products : ProductDetails[]) => {
                         });
                 }
@@ -261,7 +261,7 @@ export class LandingHomeComponent implements OnInit
                 merge(this._productsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
+                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -297,7 +297,7 @@ export class LandingHomeComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
+                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true})
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;

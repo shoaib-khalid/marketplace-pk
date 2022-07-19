@@ -11,7 +11,8 @@
         "deliveryService"       : "https://api.symplified.biz/delivery-service/v1",
         "paymentService"        : "https://api.symplified.biz/payment-service/v1",
         "locationService"       : "https://api.symplified.biz/location-service/v1",
-        "analyticService"       : "https://api.symplified.biz/analytic-service/v1" 
+        "analyticService"       : "https://api.symplified.biz/analytic-service/v1",
+        "assetsService"         : "https://assets.symplified.biz"
     },
     "storeFrontDomain"          : ".deliverin.my",
     "marketplaceDomain"         : "deliverin.my",

@@ -11,8 +11,14 @@
                         (click)="redirectToProduct(product.seoName)">
                         <!-- Product Header -->
                         <div class="relative flex flex-col p-2 h-60 bg-white bg-no-repeat bg-cover bg-center" 
-                            [style]="product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + displayStoreLogo(store.storeAssets) + '\');' + 'background-size: cover;'"
+                        [style]="(product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + product.storeCategory.parentCategory.parentThumbnailUrl + '\');') + 'background-size: cover;'"
                         >
+                            <ng-container *ngIf="!product.thumbnailUrl" >
+                                <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
+                                    <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                                    <span class="text-white text-center opacity-100">Product image not available</span>
+                                </div>
+                            </ng-container>
                             <ng-container *ngIf="product.productInventories.length > 0">
                                 <div *ngIf="product.productInventories[0].itemDiscount" class="flex items-center justify-start">
                                     <!-- Product discount -->
@@ -71,8 +77,14 @@
                         >
                             <!-- Image Thumbnail -->
                             <div class="relative h-full w-32 sm:w-72 rounded-l-lg p-2 bg-white bg-no-repeat shadow bg-cover bg-center" 
-                                [style]="product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + displayStoreLogo(store.storeAssets) + '\');' + 'background-size: cover;'"
+                                [style]="(product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + product.storeCategory.parentCategory.parentThumbnailUrl + '\');') + 'background-size: cover;'"
                             >
+                                <ng-container *ngIf="!product.thumbnailUrl" >
+                                    <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
+                                        <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                                        <span class="text-white text-center opacity-100">Product image not available</span>
+                                    </div>
+                                </ng-container>
                                 <ng-container *ngIf="product.productInventories.length > 0">
                                     <div *ngIf="product.productInventories[0].itemDiscount" class="flex items-center justify-between">
                                         <!-- Product Discount -->
