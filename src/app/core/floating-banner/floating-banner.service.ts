@@ -145,6 +145,10 @@ export class FloatingBannerService
                     this.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
                     this.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl);
                 }
+                else {
+                    this._promoSmall.next(null);
+                    this._promoBig.next(null);
+                }
             })
         );
     }
