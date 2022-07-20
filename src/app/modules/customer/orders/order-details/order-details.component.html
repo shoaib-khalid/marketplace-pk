@@ -36,7 +36,7 @@
                                 <mat-icon class="text-primary" svgIcon="mat_solid:storefront"></mat-icon>
                                 <div class="flex flex-col pl-2">
                                     <h3 class="font-bold cursor-pointer" (click)="redirectToStore(orderDetails.store.domain)">{{orderDetails.store.name}}</h3>
-                                    <h3 class="font-medium text-gray-400 text-xs sm:text-sm">Order Placed : {{convertDate(orderDetails.created, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyyy, h:mm a' }}</h3>
+                                    <h3 class="font-medium text-gray-400 text-xs sm:text-sm">Order Placed : {{convertDate(orderDetails.orderTimeConverted) | date:'MMM dd yyyy, h:mm a' }}</h3>
                                 </div>
                             </div>
                             <div class="flex flex-row pt-2">
@@ -96,7 +96,7 @@
                                                     </div>
                                                     <div class="flex flex-col flex-auto items-start">
                                                         <div class="text-secondary">
-                                                            {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
+                                                            {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
                                                         <span *ngIf="first" class="font-semibold">Order created from store {{orderDetails.store.name}}</span>
                                                         <!-- <span *ngIf="last" class="font-semibold">Order completed</span> -->
@@ -115,7 +115,7 @@
                                                     </div>
                                                     <div class="flex flex-col flex-auto items-start">
                                                         <div class="text-secondary">
-                                                            {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
+                                                            {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
                                                         <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
                                                             {{deliveryOrderStatus.status}}
@@ -134,7 +134,7 @@
                                                     </div>
                                                     <div class="flex flex-col flex-auto items-start">
                                                         <div class="text-secondary">
-                                                            {{convertDate(deliveryOrderStatus.updated, orderDetails.customer.regionCountry.timezone) | date:'MMM dd yyy, h:mm a'}}
+                                                            {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
                                                         <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
                                                             {{deliveryOrderStatus.status}}
