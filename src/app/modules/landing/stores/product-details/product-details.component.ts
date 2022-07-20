@@ -906,9 +906,9 @@ export class LandingProductDetailsComponent implements OnInit
                 this.galleryImages = this.imageCollection
                 if (this.galleryImages.length < 1) {
                     this.galleryImages = [{
-                        small   : '' + this.store.storeAsset.logoUrl,
-                        medium  : '' + this.store.storeAsset.logoUrl,
-                        big     : '' + this.store.storeAsset.logoUrl + '?original=true'
+                        small   : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg',
+                        medium  : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg',
+                        big     : '' + this._apiServer.settings.apiServer.assetsService + '/product-assets/No-Image-Available-Product-Cover-Image.jpg' + '?original=true'
                     }];
                 }
                 // end of reorder image collection
