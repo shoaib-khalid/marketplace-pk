@@ -14,6 +14,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { OrderListComponent } from './order-list/order-list.component';
 import { OrderDetailsComponent } from './order-details/order-details.component';
 import { ordersRoutes } from './orders.routing';
+// import { DatePipe } from '@angular/common';
 import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 
 
@@ -37,7 +38,10 @@ import { ErrorBackgroundModule } from 'app/shared/error-background/error-backgro
         ErrorBackgroundModule
     ],
     bootstrap   : [
-    ]
+    ],
+    // providers: [
+    //     DatePipe
+    // ],
 })
 export class OrdersModule
 {

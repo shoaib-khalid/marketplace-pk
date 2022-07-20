@@ -143,32 +143,8 @@ export class OrderDetailsComponent implements OnInit
         return index > -1 ? this._orderCountSummary[index] : null;
     }
 
-    convertDate(date: string, storeTimezone: string) {
-
-        let timezoneString: any;
-        let dateConverted: Date;
-
-        let timezoneName = storeTimezone;
-
-        // Generating the formatted text
-        let options : any = {timeZone: timezoneName, timeZoneName: "short"};
-        let dateText = Intl.DateTimeFormat([], options).format(new Date);
-
-        // Scraping the numbers we want from the text
-        timezoneString = dateText.split(" ")[1].slice(3);
-
-        // Getting the offset
-        let timezoneOffset = parseInt(timezoneString.split(':')[0])*60;
-
-        // Checking for a minutes offset and adding if appropriate
-        if (timezoneString.includes(":")) {
-            timezoneOffset = timezoneOffset + parseInt(timezoneString.split(':')[1]);
-        }
-
-        dateConverted = new Date(date);
-
-        dateConverted.setHours(dateConverted.getHours() - (-timezoneOffset) / 60);
-
+    convertDate(date: string) {
+        let dateConverted = new Date(date.replace(/-/g, "/")).toISOString();
         return dateConverted;
     }
 
