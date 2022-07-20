@@ -169,7 +169,7 @@ export class FooterComponent implements OnInit
             top: 0, 
             left: 0, 
             behavior: 'smooth' 
-     });
+        });
     }
 
     // scrollToTop(el) {

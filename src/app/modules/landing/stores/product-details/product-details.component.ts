@@ -1218,4 +1218,12 @@ export class LandingProductDetailsComponent implements OnInit
         else 
             return false;
     }
+
+    scrollToTop(){
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+        });
+    }
 }
