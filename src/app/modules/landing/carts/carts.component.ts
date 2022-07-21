@@ -268,6 +268,7 @@ export class CartListComponent implements OnInit, OnDestroy
         state: string,
     }[] = [];
     hasSelfPickup: boolean;
+    isGettingDeliveryPrices: boolean = false;
 
     /**
      * Constructor
@@ -1001,7 +1002,7 @@ export class CartListComponent implements OnInit, OnDestroy
     {
 
         if (!this.customerAddress) return;
-    
+        this.isGettingDeliveryPrices = true;
         this._checkoutService.postToRetrieveDeliveriesCharges(deliveryChargesBody)
             .subscribe((deliveryProviderResponse: DeliveryProviders[])=>{     
                            
@@ -1047,6 +1048,7 @@ export class CartListComponent implements OnInit, OnDestroy
                         this.selectedCart.carts[cartIndex].deliveryQuotations = item.quotation;
                     }
                 });
+                this.isGettingDeliveryPrices = false;
             });
     }
 

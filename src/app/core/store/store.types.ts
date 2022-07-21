@@ -48,6 +48,7 @@ export interface Store
     // snoozeEndTime: string;
     // snoozeReason: boolean;
     storeSnooze: StoreSnooze;
+    storeDeliveryDetail :StoreDeliveryDetails;
 }
 
 export interface CreateStore
