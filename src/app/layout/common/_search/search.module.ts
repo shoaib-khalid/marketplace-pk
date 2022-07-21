@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 // import { RouterModule } from '@angular/router';
-import { BlockScrollStrategy, Overlay } from '@angular/cdk/overlay';
+import { BlockScrollStrategy, Overlay, RepositionScrollStrategy } from '@angular/cdk/overlay';
 import { MAT_AUTOCOMPLETE_SCROLL_STRATEGY, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,7 +28,7 @@ import { _SearchComponent } from 'app/layout/common/_search/search.component';
     providers   : [
         {
             provide   : MAT_AUTOCOMPLETE_SCROLL_STRATEGY,
-            useFactory: (overlay: Overlay) => (): BlockScrollStrategy => overlay.scrollStrategies.block(),
+            useFactory: (overlay: Overlay) => (): RepositionScrollStrategy => overlay.scrollStrategies.reposition(),
             deps      : [Overlay]
         }
     ]

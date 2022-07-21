@@ -325,6 +325,8 @@ export class BuyerCheckoutComponent implements OnInit
                             if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
 
+                                console.log('customerAddress', customerAddress);
+                                
                                 this.carts.forEach(item => {                        
                                     // get delivery charges of every carts
                                     // this.getDeliveryCharges(item.id,item.storeId);
@@ -453,7 +455,20 @@ export class BuyerCheckoutComponent implements OnInit
         // this.isLoading = true;
         
         let orderBodies = [];
-        let platformVoucherCode = null
+        let platformVoucherCode = null;
+
+        let customerInfo = {
+            address: this.customerAddress ? this.customerAddress.address : '',
+            city: this.customerAddress ? this.customerAddress.city : '',
+            country: this.customerAddress ? this.customerAddress.country : '',
+            state: this.customerAddress ? this.customerAddress.state : '',
+            postCode: this.customerAddress ? this.customerAddress.postCode : '',
+
+            email: this.customerAddress ? this.customerAddress.email : this.selfPickupInfo.email,
+            phoneNumber: this.customerAddress ? this.customerAddress.phoneNumber : this.selfPickupInfo.phoneNumber,
+            name: this.customerAddress ? this.customerAddress.name : this.selfPickupInfo.name
+        }
+
         this.checkoutItems.forEach(checkout => {
 
             const orderBody = {
@@ -467,19 +482,19 @@ export class BuyerCheckoutComponent implements OnInit
                 customerNotes: checkout.orderNotes,
                 // voucherCode: checkout.platformVoucherCode,
                 orderPaymentDetails: {
-                    accountName: this.user ? this.user.name : this.customerAddress.name,
+                    accountName: this.user ? this.user.name : customerInfo.name,
                     deliveryQuotationReferenceId: checkout.deliveryQuotationId ? checkout.deliveryQuotationId : null
                 },
                 orderShipmentDetails: {
-                    address:  this.customerAddress.address,
-                    city: this.customerAddress.city,
-                    country: this.customerAddress.country,
-                    email: this.customerAddress.email,
-                    phoneNumber: this.customerAddress.phoneNumber,
-                    receiverName: this.customerAddress.name,
-                    state: this.customerAddress.state,
+                    address:  customerInfo.address,
+                    city: customerInfo.city,
+                    country: customerInfo.country,
+                    email: customerInfo.email,
+                    phoneNumber: customerInfo.phoneNumber,
+                    receiverName: customerInfo.name,
+                    state: customerInfo.state,
                     storePickup: checkout.deliveryType === 'PICKUP' ? true : false,
-                    zipcode: this.customerAddress.postCode,
+                    zipcode: customerInfo.postCode,
                     deliveryProviderId: checkout.deliveryProviderId,
                     deliveryType: checkout.deliveryType ? checkout.deliveryType : null
                 }
@@ -503,7 +518,7 @@ export class BuyerCheckoutComponent implements OnInit
                 const paymentBody = {
                     // callbackUrl: "https://bon-appetit.symplified.ai/thankyou",
                     customerId: this.user ? this.user.id : null,
-                    customerName: this.user ? this.user.name : this.customerAddress.name,
+                    customerName: this.user ? this.user.name : customerInfo.name,
                     productCode: "parcel", // 
                     // storeName: this.store.name,
                     systemTransactionId: transactionId,
