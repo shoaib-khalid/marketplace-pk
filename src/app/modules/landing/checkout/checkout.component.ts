@@ -324,8 +324,6 @@ export class BuyerCheckoutComponent implements OnInit
                         .subscribe((customerAddress : CustomerAddress) => {
                             if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
-
-                                console.log('customerAddress', customerAddress);
                                 
                                 this.carts.forEach(item => {                        
                                     // get delivery charges of every carts
