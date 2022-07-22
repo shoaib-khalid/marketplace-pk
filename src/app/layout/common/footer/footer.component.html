@@ -181,9 +181,9 @@
             <div class="flex flex-row w-full">
                 <!-- Category -->
                 <div class="flex flex-col w-full md:w-auto">
-                    <div class="flex flex-row justify-between">
+                    <div class="flex flex-row justify-between items-center">
                         <span class="font-bold">Popular Categories</span>
-                        <div class="md:hidden">
+                        <div class="flex md:hidden items-center">
                             <mat-icon class="text-black" *ngIf="!opened" (click)="open()" svgIcon="mat_solid:keyboard_arrow_down"></mat-icon>
                             <mat-icon class="text-black" *ngIf="opened" (click)="close()" svgIcon="mat_solid:keyboard_arrow_up"></mat-icon>
                         </div>
@@ -318,7 +318,7 @@
                 <div class="flex flex-col justify-between gap-y-2 text-white w-full md:w-3/5 mt-5">
                     <div class="flex flex-row">
                         <mat-icon class="text-white" svgIcon="mat_solid:location_on"></mat-icon>
-                        <span class="text-white">{{ marketplaceInfo.address }}</span>
+                        <address class="text-white">{{ marketplaceInfo.address }}</address>
                     </div>
                     <div class="flex flex-row">
                         <div class="flex flex-row">
