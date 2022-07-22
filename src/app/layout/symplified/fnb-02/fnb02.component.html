@@ -90,6 +90,12 @@
                  Otherwise, layout changes won't be registered and the view won't be updated! -->
             <router-outlet *ngIf="true"></router-outlet>
         </div>
+
+        <!-- Upper Footer -->
+        <div class="flex w-full bg-slate-100 justify-center">
+            <footer [footerType]="'upper-footer-02'" class="w-full max-w-300"></footer>
+        </div>
+        
         <!-- Footer -->
         <div class="flex w-full bg-primary justify-center">
             <footer [footerType]="'footer-02'" class="w-full max-w-300"></footer>

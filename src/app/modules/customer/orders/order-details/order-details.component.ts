@@ -8,6 +8,8 @@ import { CustomerAuthenticate } from 'app/core/auth/auth.types';
 import { Store } from 'app/core/store/store.types';
 import { DeliveryService } from 'app/core/_delivery/delivery.service';
 import { DOCUMENT } from '@angular/common';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 
 
 @Component({
@@ -43,6 +45,8 @@ import { DOCUMENT } from '@angular/common';
 })
 export class OrderDetailsComponent implements OnInit
 {  
+    platform: Platform;
+
     orderId: string;
     orderDetails: OrderDetails;
     _orderCountSummary: any;
@@ -64,6 +68,7 @@ export class OrderDetailsComponent implements OnInit
         private _router: Router,
         private _deliveryService: DeliveryService,
         private _authService: AuthService,
+        private _platformService: PlatformService,
         private _changeDetectorRef: ChangeDetectorRef
     )
     {
@@ -113,6 +118,18 @@ export class OrderDetailsComponent implements OnInit
             .subscribe((DeliveryOrderStatuses: DeliveryOrderStatus[])=>{
                 this.deliveryOrderStatuses = DeliveryOrderStatuses;                
             });
+        
+        this._platformService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => {
+            if (platform) {
+                this.platform = platform;
+
+            }
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------

@@ -7,16 +7,22 @@ import { NavigationEnd, Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { ParentCategory } from 'app/core/location/location.types';
+import { LocationService } from 'app/core/location/location.service';
+import { fuseAnimations } from '@fuse/animations';
+import { AppConfig } from 'app/config/service.config';
 
 @Component({
     selector       : 'footer',
     templateUrl    : './footer.component.html',
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    exportAs       : 'footer'
+    exportAs       : 'footer',
+    animations   : fuseAnimations
 })
 export class FooterComponent implements OnInit
 {
+    opened: boolean = false;
 
     platform: Platform;
     store: Store;
@@ -31,6 +37,8 @@ export class FooterComponent implements OnInit
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     providerLogos: string[] = [];
 
+    categories: ParentCategory[] = [];
+
     /**
      * Constructor
      */
@@ -39,7 +47,9 @@ export class FooterComponent implements OnInit
         private _platformService: PlatformService,
         private _storesService: StoresService,
         private _router: Router,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _locationService: LocationService,
+        private _apiServer: AppConfig,
     )
     {
     }
@@ -70,10 +80,31 @@ export class FooterComponent implements OnInit
             .subscribe((platform: Platform) => {
                 if (platform) {
                     this.platform = platform;
+                    
+                    // Get categories
+                    this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
+                    .subscribe((category : ParentCategory[]) => {
+                    });
                 }
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Get all parentCategories
+        this._locationService.parentCategories$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((categories: ParentCategory[]) => {
+            if (categories) {
+                // to show only 8
+                // this.categories = (categories.length >= 8) ? categories.slice(0, 8) : categories;
+                // if (categories.length >= 8) this.categoriesViewAll = true;
+                this.categories = categories;                
+
+            }
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
 
         this.marketplaceInfo = {
             email: "hello@deliverin.my",
@@ -82,18 +113,18 @@ export class FooterComponent implements OnInit
         };
 
         this.paymentLogos = [
-            'assets/images/logo/payments/tng-ewallet.png',
-            'assets/images/logo/payments/grabpay.png',
-            'assets/images/logo/payments/fpx.png',
-            'assets/images/logo/payments/visa-mastercard.png',
-            'assets/images/logo/payments/boost.png'
+            this._apiServer.settings.apiServer.assetsService + '/store-assets/tng-ewallet.png',
+            this._apiServer.settings.apiServer.assetsService + '/store-assets/grabpay.png',
+            this._apiServer.settings.apiServer.assetsService + '/store-assets/fpx.png',
+            this._apiServer.settings.apiServer.assetsService + '/store-assets/visa-mastercard.png',
+            this._apiServer.settings.apiServer.assetsService + '/store-assets/boost.png'
         ]
 
         this.providerLogos = [
-            'https://symplified.it/delivery-assets/provider-logo/borzo.png',
-            'https://symplified.it/delivery-assets/provider-logo/jnt.png',
-            'https://symplified.it/delivery-assets/provider-logo/lalamove.png',
-            'https://symplified.it/delivery-assets/provider-logo/pickupp.png',
+            this._apiServer.settings.apiServer.assetsService + '/delivery-assets/provider-logo/borzo.png',
+            this._apiServer.settings.apiServer.assetsService +'/delivery-assets/provider-logo/jnt.png',
+            this._apiServer.settings.apiServer.assetsService + '/delivery-assets/provider-logo/lalamove.png',
+            this._apiServer.settings.apiServer.assetsService + '/delivery-assets/provider-logo/pickupp.png',
             // 'https://symplified.it/delivery-assets/provider-logo/tcs.png'
         ]
                 
@@ -200,5 +231,44 @@ export class FooterComponent implements OnInit
     //     }
     //     animateScroll();    
     // }
+
+    chooseCategory(parentCategoryId: string, locationId: string) {
+        if (locationId) {
+            this._router.navigate(['/location/' + locationId + '/' + parentCategoryId]);
+        } else {
+            this._router.navigate(['/category/' + parentCategoryId]);
+        }
+    }
+    
+    /**
+     * Open the search
+     * Used in 'bar'
+     */
+    open(): void
+    {
+        // Return if it's already opened
+        if ( this.opened )
+        {
+            return;
+        }
+
+        // Open the search
+        this.opened = true;
+    }
+
+    /**
+     * Close the search
+     * * Used in 'bar'
+     */
+    close(): void
+    {
+        // Return if it's already closed
+        if ( !this.opened )
+        {
+            return;
+        }
+        // Close the search
+        this.opened = false;
+    }
     
 }

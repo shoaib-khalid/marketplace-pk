@@ -10,6 +10,7 @@ import SwiperCore, { Pagination, Navigation, Autoplay } from "swiper";
 import { SwiperComponent } from 'swiper/angular';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Banner } from 'app/core/ads/ads.types';
+import { AppConfig } from 'app/config/service.config';
 
 SwiperCore.use([Pagination, Navigation, Autoplay]);
 
@@ -127,7 +128,8 @@ export class _SwiperBannerComponent
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
-        private _adsService: AdsService
+        private _adsService: AdsService,
+        private _apiServer: AppConfig,
     )
     {
         
@@ -159,7 +161,7 @@ export class _SwiperBannerComponent
                 this.galleryImages = [
                     {
                         id: 1,
-                        bannerUrl: 'https://symplified.it/store-assets/Landing-Page-Banner_1440X370.png',
+                        bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_1440X370.png',
                         regionCountryId: '',
                         type: 'DESKTOP'
                     }
@@ -181,7 +183,7 @@ export class _SwiperBannerComponent
                     this.mobileGalleryImages = [
                         {
                             id: 1,
-                            bannerUrl: 'https://symplified.it/store-assets/Landing-Page-Banner_304X224.png',
+                            bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_304X224.png',
                             regionCountryId: '',
                             type: 'MOBILE'
                         }
