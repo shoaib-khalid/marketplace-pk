@@ -8,7 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { LogService } from 'app/core/logging/log.service';
 import { FormControl } from '@angular/forms';
 import { PlatformLocation } from '@angular/common';
-import { Platform } from './platform.types';
+import { PlatformTag, Platform } from './platform.types';
 import { AuthService } from '../auth/auth.service';
 import { StoresService } from 'app/core/store/store.service';
 import { AdsService } from '../ads/ads.service';
@@ -393,5 +393,37 @@ export class PlatformService
                 })
             ))
         );
+    }
+
+    getTag(platformId: string): Observable<PlatformTag[]>
+    {
+        let productService = this._apiServer.settings.apiServer.productService;
+        let accessToken = this._authService.publicToken;
+
+        const headers = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+            params: {
+                platformId
+            }
+        };
+
+        // Delete empty value
+        Object.keys(headers.params).forEach(key => {
+            if (headers.params[key] === null) {
+                delete headers.params[key];
+            }
+        });
+
+        return this._httpClient.get<PlatformTag[]>(productService + '/platform-og-tag', headers)
+            .pipe(
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                map((response: PlatformTag[]) => {
+                    this._logging.debug("Response from PlatformService (getTag)", response);
+                    return response["data"];
+                })
+            );
     }
 }

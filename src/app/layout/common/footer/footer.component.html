@@ -269,18 +269,18 @@
                     <div class="flex flex-row">
                         <div class="flex flex-row">
                             <mat-icon class="text-white" svgIcon="heroicons_solid:phone"></mat-icon>
-                            <span (click)="goToUrl()" class="cursor-pointer">{{ marketplaceInfo.phonenumber }}</span>
+                            <a [href]="'tel:' + marketplaceInfo.phonenumber">{{ marketplaceInfo.phonenumber }}</a>
                         </div>
                         &nbsp; &nbsp;
                         <div class="flex flex-row gap-1 md:gap-2 tracking-tight">
                             <mat-icon class="text-white" svgIcon="heroicons_solid:mail"></mat-icon>
-                            <span class="text-white">{{ marketplaceInfo.email }}</span>
+                            <a [href]="'mailto:' + marketplaceInfo.email">{{ marketplaceInfo.email }}</a>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Payment methods  -->
             <div class="mt-6 md:mt-0 flex flex-row md:flex-col justify-between md:justify-self-auto">
-                <!-- Payment methods  -->
                 <div>
                     <span class="text-white font-semibold">PAYMENT METHODS</span>
                     <div class="flex flex-row flex-wrap gap-1 mt-2">
@@ -307,6 +307,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
         <!-- Border -->
         <div class="border-0 border-t border-white mt-4"></div>

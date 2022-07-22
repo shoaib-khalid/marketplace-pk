@@ -13,3 +13,12 @@ export interface Platform
     gacode?     : string;
     currency?   : string;
 }
+
+export interface PlatformTag
+{
+id          : string;
+property    : string;
+content     : string;
+name        : string;
+platformId  : string;
+}

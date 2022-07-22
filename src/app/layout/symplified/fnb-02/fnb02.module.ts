@@ -21,6 +21,7 @@ import { FooterModule } from 'app/layout/common/footer/footer.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { FloatingMessageModule } from 'app/layout/common/_floating-message/floating-message.module';
 import { DisplayErrorModule } from 'app/layout/common/_display-error/display-error.module';
+import { BreadcrumbModule } from 'app/layout/common/breadcrumb/breadcrumb.module';
 
 @NgModule({
     declarations: [
@@ -47,7 +48,8 @@ import { DisplayErrorModule } from 'app/layout/common/_display-error/display-err
         CartModule,
         FooterModule,
         _SearchModule,
-        FloatingMessageModule
+        FloatingMessageModule,
+        BreadcrumbModule
     ],
     exports     : [
         Fnb2LayoutComponent

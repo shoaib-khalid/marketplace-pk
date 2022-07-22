@@ -14,7 +14,8 @@ export const landingStoresRoutes: Route[] = [
     {
         path     : 'store-list',
         data: {
-            headerTitle: 'All Stores'
+            headerTitle: 'All Stores',
+            breadcrumb: ''
         },
         // resolve  : {
         //     stores: StoresResolver,
@@ -23,6 +24,9 @@ export const landingStoresRoutes: Route[] = [
     },
     {
         path     : ':store-slug',
+        data     : {
+            breadcrumb: ''
+        },
         children   : [
             {
                 path     : '',
@@ -31,6 +35,9 @@ export const landingStoresRoutes: Route[] = [
             },
             {
                 path: ':catalogue-slug',
+                data     : {
+                    breadcrumb: ''
+                },
                 children: [
                     {
                         path: '',
@@ -39,6 +46,9 @@ export const landingStoresRoutes: Route[] = [
                     },
                     {
                         path: ':product-slug',
+                        data     : {
+                            breadcrumb: ''
+                        },
                         component: LandingProductDetailsComponent,
                         resolve  : {
                             product: ProductResolver,
