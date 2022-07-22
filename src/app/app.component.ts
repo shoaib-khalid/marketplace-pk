@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RoutesRecognized } from '@angular/router';
-import { Platform } from 'app/core/platform/platform.types';
+import { Platform, PlatformTag } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { IpAddressService } from './core/ip-address/ip-address.service';
@@ -28,6 +28,10 @@ export class AppComponent
 
     favIcon16: HTMLLinkElement = document.querySelector('#appIcon16');
     favIcon32: HTMLLinkElement = document.querySelector('#appIcon32');
+
+    metaDescription: HTMLMetaElement = document.querySelector('meta[name="description"]');
+    metaKeyword: HTMLMetaElement = document.querySelector('meta[name="keywords"]');
+    h1Title: HTMLLinkElement = document.querySelector('#body-title');
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -66,7 +70,27 @@ export class AppComponent
                     this.platform = platform;
                     
                     let googleAnalyticId = null;
-    
+
+                    this._platformsService.getTag(platform.id)
+                    .subscribe((tags: PlatformTag[]) => {
+                        if (tags) {
+
+                            let descIndex = tags.findIndex(tag => tag.property === 'og:description');
+                            let keywordsIndex = tags.findIndex(tag => tag.name === 'keywords');
+                            let h1Index = tags.findIndex(tag => tag.property === 'og:title');
+
+                            if (descIndex > -1) {
+                                this.metaDescription.content = tags[descIndex].content;
+                            }
+                            if (keywordsIndex > -1) {
+                                this.metaKeyword.content = tags[keywordsIndex].content;
+                            }
+                            if (h1Index > -1) {
+                                this.h1Title.innerText = tags[h1Index].content;
+                            }
+                        }
+                    })
+
                     // set title
                     this._titleService.setTitle("Welcome to " + this.platform.name + " Marketplace");
      

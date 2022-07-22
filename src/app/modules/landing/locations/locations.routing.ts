@@ -11,40 +11,48 @@ export const landingLocationsRoutes: Route[] = [
     {
         path     : 'location-list',
         data: {
-            headerTitle: 'Locations'
+            headerTitle: 'Locations',
+            breadcrumb: ''
         },
         component: LandingLocationsComponent
     },
     {
         path     : ':location-id',
+        data     : {
+            breadcrumb: ''
+        },
         children   : [
             {
                 path: '',
                 data: {
-                    headerTitle: 'Location Details'
+                    headerTitle: 'Location Details',
+                    breadcrumb: ''
                 },
                 component: LocationComponent,
-            }
-            
-        ],
-    },
-    {
-        path     : ':location-id/:category-id',
-        children   : [
+            },
             {
-                path: '',
+                path     : ':category-id',
                 data: {
-                    headerTitle: 'Category Details'
+                    headerTitle: 'Category Details',
+                    breadcrumb: ''
                 },
                 component: LocationComponent,
-            }
+
+            },  
             
         ],
     },
     // {
-    //     path      : '**/location-list',
-    //     pathMatch : 'full',
-    //     redirectTo: 'location-list'
-    // },
-    
+    //     path     : ':location-id/:category-id',
+    //     children   : [
+    //         {
+    //             path: '',
+    //             data: {
+    //                 headerTitle: 'Category Details'
+    //             },
+    //             component: LocationComponent,
+    //         }
+            
+    //     ],
+    // },    
 ];

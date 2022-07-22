@@ -4,7 +4,6 @@ import { distinctUntilChanged, filter, map, Subject, switchMap, takeUntil } from
 import { fuseAnimations } from '@fuse/animations/public-api';
 import { NavigationEnd, Router } from '@angular/router';
 import { SearchService } from './search.service';
-import { MatInput } from '@angular/material/input';
 import { Store, StoreAssets } from 'app/core/store/store.types';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
@@ -12,6 +11,9 @@ import { CustomerSearch, StoreDetails } from './search.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { PlatformLocation } from '@angular/common';
 import { StoresService } from 'app/core/store/store.service';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
+
 
 @Component({
     selector     : 'search',
@@ -47,6 +49,9 @@ export class _SearchComponent implements OnInit, OnDestroy
     currentScreenSize: string[] = [];
     route: string;
 
+    platform: Platform;
+
+
     /**
      * Constructor
      */
@@ -56,6 +61,7 @@ export class _SearchComponent implements OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _platformService: PlatformService,
         private _storesService: StoresService
     )
     {
@@ -110,6 +116,16 @@ export class _SearchComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        this._platformService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => {
+            if (platform) {
+                this.platform = platform;
+            }
+            // Mark for change
+            this._changeDetectorRef.markForCheck();
+        });
 
         // ----------------------
         // Fuse Media Watcher

@@ -108,7 +108,7 @@ export class AdsService
                 this._logging.debug("Response from AdsService (Set)", response);
                 const message = encodeURI('Tell me more about joining Deliverin platform!')
                 const ads = {
-                    bannerUrl: "https://symplified.biz/store-assets/Join-Us-Banner_1366X700.png",
+                    bannerUrl: this._apiServer.settings.apiServer.assetsService + "/store-assets/Join-Us-Banner_1366X700.png",
                     redirectUrl: "https://wa.me/60125033299" + '?text=' + message
                 };
                 this._ads.next([ads]);

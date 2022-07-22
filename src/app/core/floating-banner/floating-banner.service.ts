@@ -142,8 +142,8 @@ export class FloatingBannerService
                     let redirectUrl = 'https://' + this._apiServer.settings.marketplaceDomain + '/sign-up' +
                             '?redirectURL=' + encodeURI('https://' + sanatiseUrl  + this._router.url) 
             
-                    this.setSmallBanner('assets/gif/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
-                    this.setBigBanner('assets/promo/Sign-Up-PopUp-Banner_400x500.png', redirectUrl);
+                    this.setSmallBanner(this._apiServer.settings.apiServer.assetsService + '/store-assets/SignUp_Now_Button_Click_GIF.gif', redirectUrl);
+                    this.setBigBanner(this._apiServer.settings.apiServer.assetsService + '/store-assets/Sign-Up-PopUp-Banner_600x750.jpg', redirectUrl);
                 }
                 else {
                     this._promoSmall.next(null);

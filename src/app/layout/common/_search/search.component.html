@@ -74,8 +74,8 @@
                         [src]="result.image">
                     <img
                         class="p-0.5"
-                        *ngIf="!result.image"
-                        [src]="'https://symplified.it/store-assets/deliverin-logo.png'">
+                        *ngIf="!result.image && platform"
+                        [src]="platform.logoSquare">
                 </div>
                 <div class="ml-6 truncate">
                     <span [innerHTML]="result.searchText"></span>

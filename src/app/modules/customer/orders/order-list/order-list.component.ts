@@ -15,6 +15,8 @@ import { merge, Observable, Subject } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 import { OrderService } from 'app/core/_order/order.service';
 import { OrderDetails, OrderGroup, OrderItemWithDetails, OrderPagination, OrdersCountSummary } from 'app/core/_order/order.types';
+import { PlatformService } from 'app/core/platform/platform.service';
+import { Platform } from 'app/core/platform/platform.types';
 
 @Component({
     selector     : 'order-list',
@@ -43,6 +45,8 @@ export class OrderListComponent implements OnInit
     @ViewChild("ordersDetailsPaginator", {read: MatPaginator}) private _ordersDetailsPaginator: MatPaginator;
     @ViewChild("ordersGroupsPaginator", {read: MatPaginator}) private _ordersGroupsPaginator: MatPaginator;
     
+    platform: Platform;
+
     // Orders 
     ordersDetails$: Observable<OrderDetails[]>;    
     ordersDetailsPagination: OrderPagination;
@@ -79,6 +83,7 @@ export class OrderListComponent implements OnInit
         private _router: Router,
         private _authService: AuthService,
         public _dialog: MatDialog,
+        private _platformService: PlatformService,
         private _storesService: StoresService
     )
     {
@@ -86,6 +91,18 @@ export class OrderListComponent implements OnInit
 
     ngOnInit() :void {
         // this._httpstatService.get(503).subscribe((response) =>{});
+        this._platformService.platform$
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((platform: Platform) => {
+            if (platform) {
+                this.platform = platform;
+
+            }
+
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        });
+
 
         // Get Customer
         this._authService.customerAuthenticate$

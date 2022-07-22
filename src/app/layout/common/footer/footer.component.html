@@ -164,21 +164,75 @@
     </div>
 </ng-container>
 
+<ng-container *ngIf="footerType ==='upper-footer-02'">
+    <div class="w-full sm:max-h-120 p-2 sm:px-4 lg:px-0 justify-center md:mb-2">
+        <div class="flex flex-col w-full">
+            <!-- Logo -->
+            <ng-container *ngIf="platform">
+                <div class="flex flex-wrap w-full md:justify-start justify-center">
+                    <img
+                        class="w-36"
+                        [src]="platform.logo + '?original=true'"
+                        [alt]="platform.name + 'logo image'">
+                </div>
+            </ng-container>
+            <!-- Divider -->
+            <div class="border-0 border-t border-gray-300 my-2"></div>
+            <div class="flex flex-row w-full">
+                <!-- Category -->
+                <div class="flex flex-col w-full md:w-auto">
+                    <div class="flex flex-row justify-between">
+                        <span class="font-bold">Popular Categories</span>
+                        <div class="md:hidden">
+                            <mat-icon class="text-black" *ngIf="!opened" (click)="open()" svgIcon="mat_solid:keyboard_arrow_down"></mat-icon>
+                            <mat-icon class="text-black" *ngIf="opened" (click)="close()" svgIcon="mat_solid:keyboard_arrow_up"></mat-icon>
+                        </div>
+                    </div>
+                    <div @expandCollapse *ngIf="opened" class="grid grid-cols-2 gap-y-2 gap-x-3 md:hidden">
+                        <ng-container *ngFor="let category of categories">
+                            <span 
+                                (click)="chooseCategory(category.parentId, location)" 
+                                class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-gray-400">
+                                {{category.parentName}}
+                            </span>
+                        </ng-container>
+                    </div>
+                    <div class="hidden md:grid grid-cols-3 gap-y-2 gap-x-3 mt-4">
+                        <ng-container *ngFor="let category of categories">
+                            <span 
+                                (click)="chooseCategory(category.parentId, location)" 
+                                class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-gray-400">
+                                {{category.parentName}}
+                            </span>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Contact Us -->
+                <!-- <div class="flex flex-col">
+                    <span class="font-bold">Contact Us</span>
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+</ng-container>
+
 <ng-container *ngIf="footerType ==='footer-02'">
+    <!-- Lower Footer -->
     <div class="w-full sm:max-h-120 px-2 sm:px-4 lg:px-0 py-4 bg-primary justify-center">
+        <!-- <div class="flex flex-row w-full h-full">
+            <div class="w-full">
+                <ng-container *ngFor="let category of categories">
+                    <span class="text-white font-semibold pr-4">
+                        {{category.parentName}}
+                    </span>
+                </ng-container>
+            </div>
+        </div> -->
         <div class="flex flex-col md:flex-row justify-between">
             <div class="flex flex-col md:max-w-100 w-full">
-                <!-- Logo -->
-                <ng-container *ngIf="platform">
-                    <div class="flex flex-wrap w-full md:justify-start justify-center">
-                        <img
-                            class="w-36"
-                            [src]="platform.logoDark + '?original=true'"
-                            [alt]="platform.name + 'logo image'">
-                    </div>
-                </ng-container>
                 <!-- Legal -->
-                <div class="w-full hidden md:grid grid-cols-12 items-center justify-center sm:gap-x-2 gap-y-2 mt-4">
+                <div class="w-full hidden md:grid grid-cols-12 items-center justify-center sm:gap-x-2 gap-y-2">
                     <!-- <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
                         About Us
                     </span>
@@ -216,7 +270,7 @@
                 </div>
             </div>
             <!-- Social Media asal mt-6 -->
-            <div class="flex flex-col mt-4 md:mt-0">
+            <div class="flex flex-col">
                 <!-- asal w-max-100 -->
                 <div class="flex justify-between items-center md:justify-start w-full">
                     <div class="flex flex-row">
@@ -269,18 +323,18 @@
                     <div class="flex flex-row">
                         <div class="flex flex-row">
                             <mat-icon class="text-white" svgIcon="heroicons_solid:phone"></mat-icon>
-                            <span (click)="goToUrl()" class="cursor-pointer">{{ marketplaceInfo.phonenumber }}</span>
+                            <a [href]="'tel:' + marketplaceInfo.phonenumber">{{ marketplaceInfo.phonenumber }}</a>
                         </div>
                         &nbsp; &nbsp;
                         <div class="flex flex-row gap-1 md:gap-2 tracking-tight">
                             <mat-icon class="text-white" svgIcon="heroicons_solid:mail"></mat-icon>
-                            <span class="text-white">{{ marketplaceInfo.email }}</span>
+                            <a [href]="'mailto:' + marketplaceInfo.email">{{ marketplaceInfo.email }}</a>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Payment methods  -->
             <div class="mt-6 md:mt-0 flex flex-row md:flex-col justify-between md:justify-self-auto">
-                <!-- Payment methods  -->
                 <div>
                     <span class="text-white font-semibold">PAYMENT METHODS</span>
                     <div class="flex flex-row flex-wrap gap-1 mt-2">
@@ -307,6 +361,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
         <!-- Border -->
         <div class="border-0 border-t border-white mt-4"></div>

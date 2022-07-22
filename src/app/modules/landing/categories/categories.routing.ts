@@ -11,11 +11,15 @@ export const landingCategoriesRoutes: Route[] = [
     },
     {
         path     : 'category-list',
+        data     : {
+            breadcrumb: ''
+        },
         children   : [
             {
                 path : '',
                 data: {
-                    headerTitle: 'Category List'
+                    headerTitle: 'Category List',
+                    breadcrumb: ''
                 },
                 component: LandingCategoriesComponent
             }
@@ -23,27 +27,26 @@ export const landingCategoriesRoutes: Route[] = [
     },
     {
         path        : ':category-id',
+        data     : {
+            breadcrumb: ''
+        },
         children    : [
             {
                 path: '',
                 data: {
-                    headerTitle: 'Category Details'
+                    headerTitle: 'Category Details',
+                    breadcrumb: ''
                 },
                 component: CategoryComponent,
-            }
-        ],
-    },
-    {
-        path        : ':category-id/:location-id',
-        children    : [
+            },
             {
-                path: '',
-                data: {
-                    headerTitle: 'Location Details'
+                path        : ':location-id',
+                data     : {
+                    headerTitle: 'Location Details',
+                    breadcrumb: ''
                 },
                 component: CategoryComponent,
-            }
-            
+            },
         ],
     },
 ];

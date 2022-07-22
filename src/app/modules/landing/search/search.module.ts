@@ -7,7 +7,6 @@ import { LandingSearchComponent } from 'app/modules/landing/search/search.compon
 import { landingSearchRoutes } from 'app/modules/landing/search/search.routing';
 import { MatInputModule } from '@angular/material/input';
 import { FuseCardModule } from '@fuse/components/card';
-import { BannerModule } from 'app/layout/common/banner/banner.module';
 import { _SwiperBannerModule } from 'app/layout/common/_swiper-banner/swiper-banner.module';
 import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { _FeaturedStoresModule } from 'app/layout/common/_featured-stores/featured-stores.module';
@@ -28,7 +27,6 @@ import { ErrorBackgroundModule } from 'app/shared/error-background/error-backgro
         SharedModule,
         MatInputModule,
         FuseCardModule,
-        BannerModule,
         _SearchModule,
         _FeaturedStoresModule,
         _FeaturedProductsModule,
