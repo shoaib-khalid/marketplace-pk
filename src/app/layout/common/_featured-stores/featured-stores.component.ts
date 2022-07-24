@@ -320,6 +320,10 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
+                                notificationMessage = "We are closed today";
+                                storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
+                                storesOpening[storeOpeningIndex].isOpen = false;
+                                storesOpening[storeOpeningIndex].message = notificationMessage;
                                 // console.warn("Store close on this " + object.day);
                             }
                         });
