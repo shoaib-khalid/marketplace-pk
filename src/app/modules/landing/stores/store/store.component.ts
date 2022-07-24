@@ -650,6 +650,10 @@ export class LandingStoreComponent implements OnInit
                                     array.length = iteration + 1;
                                 }
                             } else {
+                                this.notificationMessage = "We are closed today";
+                                this.storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
+                                this.storesOpening[storeOpeningIndex].isOpen = false;
+                                this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
                                 // console.warn("Store close on this " + object.day);
                             }
                         });

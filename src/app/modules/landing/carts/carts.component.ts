@@ -1536,6 +1536,10 @@ export class CartListComponent implements OnInit, OnDestroy
                                     array.length = iteration + 1;
                                 }
                             } else {
+                                this.notificationMessage = "We are closed today";
+                                this.storesOpening[storeOpeningIndex].messageTitle = 'Temporarily';
+                                this.storesOpening[storeOpeningIndex].isOpen = false;
+                                this.storesOpening[storeOpeningIndex].message = this.notificationMessage;
                                 // console.warn("Store close on this " + object.day);
                             }
                         });
