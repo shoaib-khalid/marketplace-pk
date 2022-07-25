@@ -232,12 +232,14 @@ export class FooterComponent implements OnInit
     //     animateScroll();    
     // }
 
-    chooseCategory(parentCategoryId: string, locationId: string) {
-        if (locationId) {
-            this._router.navigate(['/location/' + locationId + '/' + parentCategoryId]);
-        } else {
-            this._router.navigate(['/category/' + parentCategoryId]);
-        }
+    chooseCategory(parentCategoryId: string) {
+        this._router.navigate(['/category/' + parentCategoryId]);
+        this.reload();
+    }
+
+    reload(){
+        this._router.routeReuseStrategy.shouldReuseRoute = () => false;
+        this._router.onSameUrlNavigation = 'reload';
     }
     
     /**
