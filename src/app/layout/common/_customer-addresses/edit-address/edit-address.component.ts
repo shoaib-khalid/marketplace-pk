@@ -71,6 +71,7 @@ export class EditAddressDialog implements OnInit {
     displayToogleNotDefault: boolean = false;
 
     dialingCode: string;
+    isAddressValid: boolean = true;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -243,7 +244,7 @@ export class EditAddressDialog implements OnInit {
                     // this.resultSets = results;                
                     // this.autoCompleteList = results;  
 
-                    let address = results[0].address_components
+                    let address = results[0].address_components                    
                     
                     // Find state
                     let stateIndex = address.findIndex(item => item.types.includes("administrative_area_level_1"));
@@ -252,13 +253,18 @@ export class EditAddressDialog implements OnInit {
 
                     // Find city
                     let cityIndex = address.findIndex(item => item.types.includes("locality"));
-                    let city = address[cityIndex] ? address[cityIndex].long_name : ''
+                    let city = address[cityIndex] ? address[cityIndex].long_name : ''   
+                                        
                 
                     if(state && state !== '') {  
                         this._storesService.getStoreRegionCountryStateCity(state, city, false )
                         .subscribe((response)=>{
-                            if(response && response.length) {
-                                this.addressForm.get('city').patchValue(response[0].id)
+
+                            let responseIndex = response.findIndex(item => item.name === city)
+                            let newResponse = response[responseIndex]                            
+
+                            if(response && response.length) {                      
+                                this.addressForm.get('city').patchValue(newResponse.id)
                             } else {
                                 this.addressForm.get('city').patchValue('')
                             }
@@ -455,7 +461,20 @@ export class EditAddressDialog implements OnInit {
         }
 
     }
-    
+
+    checkAddress(address){
+        let addressLowerCase = address.toLowerCase();
+
+        let stateIndex = this.addressForm.get('state').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('state').value.toLowerCase()) : -1;
+        let cityIndex = this.addressForm.get('city').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('city').value.toLowerCase()) : -1;
+        let postcodeIndex = this.addressForm.get('postCode').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('postCode').value) : -1;
+
+        if (stateIndex > -1 || cityIndex > -1 || postcodeIndex > -1) {
+            this.isAddressValid = false;
+        } else {
+            this.isAddressValid = true;
+        }
+    }    
 
     /**
     * Track by function for ngFor loops
