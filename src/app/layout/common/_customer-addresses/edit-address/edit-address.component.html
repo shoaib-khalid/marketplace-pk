@@ -158,13 +158,14 @@
                             [color]="'primary'">Find
                         </button>
                     </div>
-                    <fuse-alert
-                        *ngIf="isAddressValid === false"
-                        [appearance]="'outline'"
-                        [type]="'info'">
-                        Make sure you don't put state, city and postcode in address form.
-                    </fuse-alert>
                 </div>
+                <fuse-alert
+                    class="w-full"
+                    *ngIf="isAddressValid === false"
+                    [appearance]="'outline'"
+                    [type]="'info'">
+                    Make sure you don't put state, city and postcode in address form.
+                </fuse-alert>
 
                 <!-- map display -->
                 <div class="relative w-full pb-2 mt-3">
