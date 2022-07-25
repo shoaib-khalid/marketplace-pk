@@ -1,6 +1,6 @@
 <div class="flex flex-col max-h-[90vh] max-w-120 sm:min-w-160 overflow-y-auto">
     <div class="flex flex-col flex-auto overflow-y-auto w-full">
-        <!-- Header new adrdress -->
+        <!-- Header new address -->
         <div class="flex items-center justify-center flex-auto pb-2 w-full">
             <span class="text-center text-2xl font-bold text-primary">Delivery Address</span> <br>
         </div>
@@ -129,10 +129,9 @@
                             </mat-error>
                     </mat-form-field>
                 </div>
-
                 
                 <!-- Address -->
-                <div class="w-full flex flex-col sm:flex-row sm:mb-0">
+                <div class="w-full items-center flex flex-col sm:flex-row sm:mb-0">
                     <!-- Address -->
                     <mat-form-field
                         class="w-full" 
@@ -141,6 +140,7 @@
                         <mat-label>Address</mat-label>
                         <input
                             matInput
+                            (input)="checkAddress($event.target.value)"
                             [formControlName]="'address'"
                             placeholder="Enter your address"
                             autocomplete="disabled"
@@ -149,6 +149,21 @@
                             Address information is required
                         </mat-error>
                     </mat-form-field>
+                    <div class="py-2  sm:pl-2 w-full sm:w-auto">
+                        <button
+                            id="locate-button"
+                            mat-flat-button
+                            type="button"
+                            class="text-white items-center w-full"
+                            [color]="'primary'">Find
+                        </button>
+                    </div>
+                    <fuse-alert
+                        *ngIf="isAddressValid === false"
+                        [appearance]="'outline'"
+                        [type]="'info'">
+                        Make sure you don't put state, city and postcode in address form.
+                    </fuse-alert>
                 </div>
 
                 <!-- map display -->
@@ -234,14 +249,7 @@
                     </div>
                 </ng-template>
                 
-                <div class="w-full justify-between flex flex-row items-center mt-2">
-                    <button
-                        id="locate-button"
-                        mat-flat-button
-                        type="button"
-                        class="text-white items-center"
-                        [color]="'primary'">Relocate
-                    </button>
+                <div class="w-full justify-end flex flex-row items-center mt-2">
                     <!-- Actions -->
                     <div class="flex sm:flex-row items-end">
                         <button
