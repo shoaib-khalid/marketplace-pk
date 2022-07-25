@@ -4,17 +4,17 @@
         <div class="flex items-center">
             <!-- <a [routerLink]="['']" class="whitespace-nowrap text-white font-semibold cursor-pointer">Home</a> -->
             <mat-icon  
-            class="icon-size-3 text-gray-300 cursor-pointer"
+            class="icon-size-3 text-gray-400 cursor-pointer"
             [routerLink]="['']"  
             svgIcon="heroicons_solid:home"></mat-icon>
         </div>
         <ng-container *ngFor="let breadcrumb of breadcrumbs; let i = index;">
             <div class="flex items-center ml-1 whitespace-nowrap">
                 <mat-icon
-                    class="icon-size-4 text-secondary text-gray-300"
+                    class="icon-size-4 text-secondary text-gray-400"
                     [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
                 <span [routerLink]="breadcrumb.url" routerLinkActive="router-link-active" 
-                   [ngClass]="breadcrumbs.length === (i + 1) ? 'text-gray-400' : 'text-gray-300'" class="ml-1 font-base cursor-pointer">{{ breadcrumb.label | titlecase }}</span>
+                   [ngClass]="breadcrumbs.length === (i + 1) ? 'text-primary' : 'text-gray-400'" class="ml-1 font-base cursor-pointer">{{ breadcrumb.label | titlecase }}</span>
             </div>
         </ng-container>
     </div>
