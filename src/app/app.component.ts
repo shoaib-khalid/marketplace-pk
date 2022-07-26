@@ -75,9 +75,9 @@ export class AppComponent
                     .subscribe((tags: PlatformTag[]) => {
                         if (tags) {
 
+                            let titleIndex = tags.findIndex(tag => tag.property === 'og:title');
                             let descIndex = tags.findIndex(tag => tag.property === 'og:description');
                             let keywordsIndex = tags.findIndex(tag => tag.name === 'keywords');
-                            let h1Index = tags.findIndex(tag => tag.property === 'og:title');
 
                             if (descIndex > -1) {
                                 this.metaDescription.content = tags[descIndex].content;
@@ -85,17 +85,19 @@ export class AppComponent
                             if (keywordsIndex > -1) {
                                 this.metaKeyword.content = tags[keywordsIndex].content;
                             }
-                            if (h1Index > -1) {
-                                this.h1Title.innerText = tags[h1Index].content;
+                            if (titleIndex > -1) {
+                                // set title
+                                this._titleService.setTitle(tags[titleIndex].content);
+                                // set h1
+                                this.h1Title.innerText = tags[titleIndex].content;
                             }
                         }
                     })
-
-                    // set title
-                    this._titleService.setTitle("Welcome to " + this.platform.name + " Marketplace");
      
                     // set GA code
                     googleAnalyticId = this.platform.gacode;
+
+                    // set favicon
                     this.favIcon16.href = this.platform.favicon16 + '?original=true';
                     this.favIcon32.href = this.platform.favicon32 + '?original=true';
 
