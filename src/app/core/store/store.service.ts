@@ -809,20 +809,35 @@ export class StoresService
             );
     }
 
-    getStoreRegionCountryStateCity(stateId: string, cityId: string = null, isResolved: boolean = true): Observable<any>
+    getStoreRegionCountryStateCity(
+    params: {
+        stateId     : string,
+        cityId?     : string, 
+        city?       : string
+    } = {
+        stateId     : null, 
+        cityId      : null, 
+        city        : null
+    }, isResolved: boolean = true): Observable<any>
     {
         let productService = this._apiServer.settings.apiServer.productService;
         let accessToken = "accessToken";
 
         const header = {
             headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: {
-                "stateId": stateId,
-                "cityId" : cityId
-            }
+            params: params
         };
 
-        if (!cityId) {delete header.params.cityId}
+        // Delete empty value
+        Object.keys(header.params).forEach(key => {
+
+            if (Array.isArray(header.params[key])) {
+                header.params[key] = header.params[key].filter(element => element !== null)
+            }
+            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+                delete header.params[key];
+            }
+        });
 
         return this.cities$.pipe(
             take(1),
@@ -833,7 +848,7 @@ export class StoresService
                     // ---------------
                     // Update Store
                     // ---------------
-                    if(isResolved) {
+                    if (isResolved) {
                         this._cities.next(response.data);
                     }
 

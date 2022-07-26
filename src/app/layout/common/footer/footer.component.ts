@@ -252,10 +252,7 @@ export class FooterComponent implements OnInit
         if (this.footerDetails[type])
         {
             return;
-        }
-
-        console.log("this.footerDetails[type]", this.footerDetails[type]);
-        
+        }        
 
         // Open the search
         this.footerDetails[type] = true;

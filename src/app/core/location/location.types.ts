@@ -125,7 +125,8 @@ export interface RegionCountryState
 {
     id              : string;
     name            : string;
-    regionCountryId : string
+    regionCountryId : string;
+    sequence        : string;
 }
 
 export interface LocationArea

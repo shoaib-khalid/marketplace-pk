@@ -14,6 +14,7 @@ import { User } from 'app/core/user/user.types';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { environment } from 'environments/environment';
+import { CityDetails, RegionCountryState } from 'app/core/location/location.types';
 // import { UserProfileValidationService } from '../../user-profile.validation.service';
 
 @Component({
@@ -58,12 +59,12 @@ export class EditAddressDialog implements OnInit {
     // resultSets: any[];
     // autoCompleteList: any[]
 
-    storeStateCities: string[] = [];
+    storeStateCities: CityDetails[] = [];
     storeStateCities$: Observable<City[]>;
 
     platform: Platform;
     addressForm: FormGroup;
-    storeStates: string[] = [];
+    storeStates: RegionCountryState[] = [];
 
     countryName: string = '';
     countryCode: string = '';
@@ -145,11 +146,13 @@ export class EditAddressDialog implements OnInit {
 
         this.regionCountryStateCities.valueChanges
             .pipe(takeUntil(this._onDestroy))
-            .subscribe((result) => {                
+            .subscribe((result) => {                                
                 // Get states by country Z(using symplified backend)
-                this._storesService.getStoreRegionCountryStateCity(this.addressForm.get('state').value, result )
+                this._storesService.getStoreRegionCountryStateCity({ stateId: this.addressForm.get('state').value, city: result})
                 .subscribe((response)=>{
-                    // Get the products
+                    this.storeStateCities = response;
+
+                    // Get state cities (observable)
                     this.storeStateCities$ = this._storesService.cities$;                    
 
                     // Mark for check
@@ -162,7 +165,7 @@ export class EditAddressDialog implements OnInit {
             .subscribe((result) => {
                 
                 // Get states by country Z(using symplified backend)
-                this._storesService.getStoreRegionCountryStateCity(result)
+                this._storesService.getStoreRegionCountryStateCity({ stateId: result})
                 .subscribe((response)=>{
                     // Get the products
                     this.storeStateCities$ = this._storesService.cities$;                    
@@ -257,7 +260,7 @@ export class EditAddressDialog implements OnInit {
                                         
                 
                     if(state && state !== '') {  
-                        this._storesService.getStoreRegionCountryStateCity(state, city, false )
+                        this._storesService.getStoreRegionCountryStateCity({ stateId: state, cityId: city },false)
                         .subscribe((response)=>{
 
                             let responseIndex = response.findIndex(item => item.name === city)
@@ -398,7 +401,7 @@ export class EditAddressDialog implements OnInit {
                 let symplifiedCountryStateId = this.addressForm.get('state').value;
 
                 // Get city by state
-                this._storesService.getStoreRegionCountryStateCity(symplifiedCountryStateId)
+                this._storesService.getStoreRegionCountryStateCity({stateId: symplifiedCountryStateId})
                 .subscribe((response)=>{
                     // Get the products
                     this.storeStateCities$ = this._storesService.cities$;                        
@@ -465,11 +468,21 @@ export class EditAddressDialog implements OnInit {
     checkAddress(address){
         let addressLowerCase = address.toLowerCase();
 
-        let stateIndex = this.addressForm.get('state').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('state').value.toLowerCase()) : -1;
-        let cityIndex = this.addressForm.get('city').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('city').value.toLowerCase()) : -1;
+        let indexOfState =  -1;
+        if (this.addressForm.get('state').value !== "") {
+            let stateIndex =  this.storeStates.findIndex(item => item.id === this.addressForm.get('state').value);
+            indexOfState = addressLowerCase.indexOf(this.storeStates[stateIndex].name.toLowerCase());
+        }
+
+        let indexOfCity =  -1;
+        if (this.addressForm.get('city').value !== "") {
+            let cityIndex =  this.storeStateCities.findIndex(item => item.id === this.addressForm.get('city').value);            
+            indexOfCity = cityIndex > -1 ? addressLowerCase.indexOf(this.storeStateCities[cityIndex].name.toLowerCase()) : -1;
+        }
+
         let postcodeIndex = this.addressForm.get('postCode').value !== "" ? addressLowerCase.indexOf(this.addressForm.get('postCode').value) : -1;
 
-        if (stateIndex > -1 || cityIndex > -1 || postcodeIndex > -1) {
+        if (indexOfState > -1 || indexOfCity > -1 || postcodeIndex > -1) {
             this.isAddressValid = false;
         } else {
             this.isAddressValid = true;
