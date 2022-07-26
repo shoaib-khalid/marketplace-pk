@@ -22,7 +22,7 @@ import { AppConfig } from 'app/config/service.config';
 })
 export class FooterComponent implements OnInit
 {
-    opened: boolean = false;
+    footerDetails: { about: boolean, categories: boolean } = { about: false, categories: false };
 
     platform: Platform;
     store: Store;
@@ -246,31 +246,35 @@ export class FooterComponent implements OnInit
      * Open the search
      * Used in 'bar'
      */
-    open(): void
+    open(type: string): void
     {
         // Return if it's already opened
-        if ( this.opened )
+        if (this.footerDetails[type])
         {
             return;
         }
 
+        console.log("this.footerDetails[type]", this.footerDetails[type]);
+        
+
         // Open the search
-        this.opened = true;
+        this.footerDetails[type] = true;
     }
 
     /**
      * Close the search
      * * Used in 'bar'
      */
-    close(): void
+    close(type: string): void
     {
         // Return if it's already closed
-        if ( !this.opened )
+        if ( !this.footerDetails[type] )
         {
             return;
         }
+        
         // Close the search
-        this.opened = false;
+        this.footerDetails[type] = false;
     }
     
 }

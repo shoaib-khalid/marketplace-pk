@@ -218,92 +218,141 @@
 </ng-container>
 
 <ng-container *ngIf="footerType ==='footer-02'">
-    <div class="w-full bg-primary justify-center py-2 sm:py-4 px-4 lg:px-0">
-        <div class="w-full flex flex-col md:flex-row justify-between">
-            <div class="w-full flex flex-col md:max-w-50">
-                <!-- Logo -->
-                <ng-container *ngIf="platform">
-                    <div class="flex flex-wrap w-full md:justify-start justify-center">
-                        <img
-                            class="w-36"
-                            [src]="platform.logoDark + '?original=true'"
-                            [alt]="platform.name + 'logo image'">
+    <div class="w-full bg-primary justify-center py-4 px-4 lg:px-0">
+        <div class="w-full flex flex-col">
+            <!-- Logo -->
+            <ng-container *ngIf="platform">
+                <div class="flex flex-wrap w-full md:justify-start justify-center">
+                    <img
+                        class="w-36"
+                        [src]="platform.logoDark + '?original=true'"
+                        [alt]="platform.name + 'logo image'">
+                </div>
+            </ng-container>
+            <div class="flex flex-col md:flex-row w-full mt-2">
+                <!-- About {{platform.name}} -->
+                <div class="w-full md:w-1/3 flex-col md:px-2">
+                    <div class="flex flex-row justify-between items-center">
+                        <span class="font-bold text-white">ABOUT {{ platform.name | uppercase }}</span>
+                        <div class="flex md:hidden items-center">
+                            <mat-icon class="text-gray-200" *ngIf="!footerDetails.about" (click)="open('about')" svgIcon="mat_solid:keyboard_arrow_down"></mat-icon>
+                            <mat-icon class="text-gray-200" *ngIf="footerDetails.about" (click)="close('about')" svgIcon="mat_solid:keyboard_arrow_up"></mat-icon>
+                        </div>
                     </div>
-                </ng-container>
-                <!-- Legal -->
-                <div class="w-full hidden md:grid grid-cols-12 items-center justify-center sm:gap-x-2 gap-y-2">
-                    <!-- <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
-                        About Us
-                    </span>
-                    <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
-                        Contact Us
-                    </span>
-                    <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
-                        Support
-                    </span>
-                    <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
-                        (click)="navigate('refund-policy')">
-                        Return Policy
-                    </span>
-                    <span class="col-span-6 md:col-span-4 justify-center md:justify-start flex w-full font-medium text-white cursor-pointer" 
-                        (click)="navigate('privacy-policy')">
-                        Privacy Policy
-                    </span>
-                    <span class="col-span-6 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
-                        (click)="navigate('terms-conditions')">
-                        Terms & Conditions
-                    </span> -->
-                    <!-- temporary -->
-                    <span class="col-span-12 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                        (click)="navigate('refund-policy')">
-                        Return Policy
-                    </span>
-                    <span class="col-span-12 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                        (click)="navigate('privacy-policy')">
-                        Privacy Policy
-                    </span>
-                    <span class="col-span-12 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                        (click)="navigate('terms-conditions')">
-                        Terms & Conditions
-                    </span>
-                </div>
-            </div>
-            <!-- Category -->
-            <div class="flex flex-col w-full mt-4 md:mt-0">
-                <div class="flex flex-row justify-between items-center">
-                    <span class="font-bold text-white">POPULAR CATEGORIES</span>
-                    <div class="flex md:hidden items-center">
-                        <mat-icon class="text-gray-200" *ngIf="!opened" (click)="open()" svgIcon="mat_solid:keyboard_arrow_down"></mat-icon>
-                        <mat-icon class="text-gray-200" *ngIf="opened" (click)="close()" svgIcon="mat_solid:keyboard_arrow_up"></mat-icon>
+                    <!-- Divider -->
+                    <div class="border-0 border-t md:hidden border-gray-300 my-1"></div>
+                    <div class="grid grid-cols-1 gap-y-2 gap-x-3 py-2" @expandCollapse *ngIf="footerDetails.about">
+                        <!-- <span class="col-span-1 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            About Us
+                        </span>
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            Contact Us
+                        </span>
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            Support
+                        </span>
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('refund-policy')">
+                            Return Policy
+                        </span>
+                        <span class="col-span-6 md:col-span-4 justify-center md:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('privacy-policy')">
+                            Privacy Policy
+                        </span>
+                        <span class="col-span-6 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('terms-conditions')">
+                            Terms & Conditions
+                        </span> -->
+                        <!-- temporary -->
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('refund-policy')">
+                            Return Policy
+                        </span>
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('privacy-policy')">
+                            Privacy Policy
+                        </span>
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('terms-conditions')">
+                            Terms & Conditions
+                        </span>
                     </div>
-                </div>
-                <!-- Divider -->
-                <div class="border-0 border-t md:hidden border-gray-300 mt-2"></div>
-                <!-- Collapseble category for small view -->
-                <div @expandCollapse *ngIf="opened" class="grid grid-cols-2 gap-y-2 gap-x-3 md:hidden mt-2">
-                    <ng-container *ngFor="let category of categories">
-                        <span 
-                            (click)="chooseCategory(category.parentId)" 
-                            class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-white">
-                            {{category.parentName}}
+                    <div class="hidden md:grid grid-cols-1 gap-y-2 gap-x-3 py-2">
+                        <!-- <span class="col-span-1 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            About Us
                         </span>
-                    </ng-container>
-                </div>
-                <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-y-2 gap-x-3 mt-4">
-                    <ng-container *ngFor="let category of categories">
-                        <span 
-                            (click)="chooseCategory(category.parentId)" 
-                            class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-white">
-                            {{category.parentName}}
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            Contact Us
                         </span>
-                    </ng-container>
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white">
+                            Support
+                        </span>
+                        <span class="col-span-3 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('refund-policy')">
+                            Return Policy
+                        </span>
+                        <span class="col-span-6 md:col-span-4 justify-center md:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('privacy-policy')">
+                            Privacy Policy
+                        </span>
+                        <span class="col-span-6 md:col-span-4 justify-center sm:justify-start flex w-full font-medium text-white cursor-pointer" 
+                            (click)="navigate('terms-conditions')">
+                            Terms & Conditions
+                        </span> -->
+                        <!-- temporary -->
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('refund-policy')">
+                            Return Policy
+                        </span>
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('privacy-policy')">
+                            Privacy Policy
+                        </span>
+                        <span class="col-span-1 justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
+                            (click)="navigate('terms-conditions')">
+                            Terms & Conditions
+                        </span>
+                    </div>
+                    <!-- Divider -->
+                    <div *ngIf="footerDetails.about" class="border-0 border-t md:hidden border-gray-300 my-1"></div>
                 </div>
-            </div>
-            <!-- Social Media-->
-            <div class="flex flex-col w-full mt-2 md:mt-0">
-                <div class="flex justify-between items-center md:justify-start w-full">
-                    <div class="flex flex-row">
-                        <div class="pr-6">
+                <!-- Category -->
+                <div class="flex flex-col w-full md:px-2">
+                    <div class="flex flex-row justify-between items-center">
+                        <span class="font-bold text-white">POPULAR CATEGORIES</span>
+                        <div class="flex md:hidden items-center">
+                            <mat-icon class="text-gray-200" *ngIf="!footerDetails.categories" (click)="open('categories')" svgIcon="mat_solid:keyboard_arrow_down"></mat-icon>
+                            <mat-icon class="text-gray-200" *ngIf="footerDetails.categories" (click)="close('categories')" svgIcon="mat_solid:keyboard_arrow_up"></mat-icon>
+                        </div>
+                    </div>
+                    <!-- Divider -->
+                    <div class="border-0 border-t md:hidden border-gray-300 my-1"></div>
+                    <!-- Collapseble category for small view -->
+                    <div @expandCollapse *ngIf="footerDetails.categories" class="grid grid-cols-2 gap-y-2 gap-x-3 md:hidden py-2">
+                        <ng-container *ngFor="let category of categories">
+                            <span 
+                                (click)="chooseCategory(category.parentId)" 
+                                class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-white">
+                                {{category.parentName}}
+                            </span>
+                        </ng-container>
+                    </div>
+                    <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-y-2 gap-x-3 mt-2">
+                        <ng-container *ngFor="let category of categories">
+                            <span 
+                                (click)="chooseCategory(category.parentId)" 
+                                class="pr-4 col-span-1 text-sm cursor-pointer hover:font-semibold text-white">
+                                {{category.parentName}}
+                            </span>
+                        </ng-container>
+                    </div>
+                    <!-- Divider -->
+                    <div *ngIf="footerDetails.categories" class="border-0 border-t md:hidden border-gray-300 my-1"></div>
+                </div>
+                <!-- Social Media-->
+                <div class="flex flex-col w-full md:w-1/2 md:px-2">
+                    <div class="flex flex-row justify-between items-center md:justify-start w-full">
+                        <div class="w-1/2">
                             <span class="text-white font-semibold">FOLLOW US</span>
                             <div class="flex flex-row justify-between mt-2">
                                 <div class="w-10 h-10 bg-opacity-50 rounded-md bg-default">
@@ -318,7 +367,7 @@
                                 </div> -->
                             </div>
                         </div>
-                        <div>
+                        <div class="w-1/2">
                             <span class="text-white font-semibold">CHAT WITH US</span>
                             <div class="w-10 h-10 bg-opacity-50 rounded-md bg-default mt-2">
                                 <div class="w-full items-center justify-center flex p-2 cursor-pointer" (click)="goToUrl()">
@@ -327,66 +376,51 @@
                             </div>
                         </div>
                     </div>
-                    <!-- temporary eleen nak-->
-                    <div class="md:hidden flex flex-col items-center justify-end sm:gap-x-2 gap-y-2">
-                        <span class=" justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                            (click)="navigate('refund-policy')">
-                            Return Policy
-                        </span>
-                        <span class=" justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                            (click)="navigate('privacy-policy')">
-                            Privacy Policy
-                        </span>
-                        <span class=" justify-start flex w-full font-medium text-white cursor-pointer text-sm" 
-                            (click)="navigate('terms-conditions')">
-                            Terms & Conditions
-                        </span>
-                    </div>
-                </div>
-                <!-- Address  -->
-                <div class="flex flex-col justify-between gap-y-2 text-white w-full md:w-3/5 mt-5">
-                    <div class="flex flex-row">
-                        <mat-icon class="text-white" svgIcon="mat_solid:location_on"></mat-icon>
-                        <address class="text-white text-sm">{{ marketplaceInfo.address }}</address>
-                    </div>
-                    <div class="flex flex-row">
+                    <!-- Address  -->
+                    <div class="flex flex-col justify-between gap-y-2 text-white w-full mt-5">
                         <div class="flex flex-row">
-                            <mat-icon class="text-white" svgIcon="heroicons_solid:phone"></mat-icon>
-                            <a class="text-sm" [href]="'tel:' + marketplaceInfo.phonenumber">{{ marketplaceInfo.phonenumber }}</a>
+                            <mat-icon class="text-white" svgIcon="mat_solid:location_on"></mat-icon>
+                            <address class="text-white text-sm">{{ marketplaceInfo.address }}</address>
                         </div>
-                        &nbsp; &nbsp;
-                        <div class="flex flex-row gap-1 md:gap-2 tracking-tight">
-                            <mat-icon class="text-white" svgIcon="heroicons_solid:mail"></mat-icon>
-                            <a class="text-sm" [href]="'mailto:' + marketplaceInfo.email">{{ marketplaceInfo.email }}</a>
+                        <div class="flex flex-row">
+                            <div class="flex flex-row">
+                                <mat-icon class="text-white" svgIcon="heroicons_solid:phone"></mat-icon>
+                                <a class="text-sm" [href]="'tel:' + marketplaceInfo.phonenumber">{{ marketplaceInfo.phonenumber }}</a>
+                            </div>
+                            &nbsp; &nbsp;
+                            <div class="flex flex-row gap-1 md:gap-2 tracking-tight">
+                                <mat-icon class="text-white" svgIcon="heroicons_solid:mail"></mat-icon>
+                                <a class="text-sm" [href]="'mailto:' + marketplaceInfo.email">{{ marketplaceInfo.email }}</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Payment methods  -->
-            <div class="w-full flex flex-row justify-between md:justify-start md:flex-col md:items-end md:max-w-50 mt-4 md:mt-0">
-                <div class="flex flex-col">
-                    <span class="text-white font-semibold">PAYMENT METHODS</span>
-                    <div class="flex flex-row flex-wrap gap-1 mt-2">
-                        <ng-container *ngFor="let logo of paymentLogos">
-                            <div class="flex items-center justify-center w-8 bg-white rounded p-1">
-                                <img
-                                    class="w-full"
-                                    [src]="logo">
-                            </div>
-                        </ng-container>
+                <!-- Payment methods  -->
+                <div class="w-full flex flex-row justify-between md:justify-start md:flex-col md:items-end md:max-w-50 mt-2 md:mt-0 md:px-2">
+                    <div class="flex flex-col w-1/2 md:w-full">
+                        <span class="text-white font-semibold">PAYMENT METHODS</span>
+                        <div class="flex flex-row flex-wrap gap-1 mt-2">
+                            <ng-container *ngFor="let logo of paymentLogos">
+                                <div class="flex items-center justify-center w-8 bg-white rounded p-1">
+                                    <img
+                                        class="w-full"
+                                        [src]="logo">
+                                </div>
+                            </ng-container>
+                        </div>
                     </div>
-                </div>
-                <!-- Delivery partners -->
-                <div class="md:mt-4">
-                    <span class="text-white font-semibold">DELIVERY PARTNERS</span>
-                    <div class="flex flex-row flex-wrap gap-1 mt-2">
-                        <ng-container *ngFor="let logo of providerLogos">
-                            <div class="flex items-center justify-center w-10 bg-white rounded p-1">
-                                <img
-                                    class="w-full"
-                                    [src]="logo">
-                            </div>
-                        </ng-container>
+                    <!-- Delivery partners -->
+                    <div class="w-1/2 md:w-full md:mt-2">
+                        <span class="text-white font-semibold">DELIVERY PARTNERS</span>
+                        <div class="flex flex-row flex-wrap gap-1 mt-2">
+                            <ng-container *ngFor="let logo of providerLogos">
+                                <div class="flex items-center justify-center w-10 bg-white rounded p-1">
+                                    <img
+                                        class="w-full"
+                                        [src]="logo">
+                                </div>
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
             </div>
