@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { StoresService } from 'app/core/store/store.service';
 import { Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
@@ -11,6 +11,7 @@ import { SwiperComponent } from 'swiper/angular';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Banner } from 'app/core/ads/ads.types';
 import { AppConfig } from 'app/config/service.config';
+import { DOCUMENT } from '@angular/common';
 
 SwiperCore.use([Pagination, Navigation, Autoplay]);
 
@@ -124,12 +125,13 @@ export class _SwiperBannerComponent
      * Constructor
      */
     constructor(
-        private _storesService: StoresService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router,
         private _adsService: AdsService,
         private _apiServer: AppConfig,
+        @Inject(DOCUMENT) private _document: Document,
+
     )
     {
         
@@ -163,7 +165,10 @@ export class _SwiperBannerComponent
                         id: 1,
                         bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_1440X370.png',
                         regionCountryId: '',
-                        type: 'DESKTOP'
+                        type: 'DESKTOP',
+                        actionUrl: '',
+                        sequence: 1,
+                        delayDisplay: 10
                     }
                 ]
             }
@@ -185,7 +190,10 @@ export class _SwiperBannerComponent
                             id: 1,
                             bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_304X224.png',
                             regionCountryId: '',
-                            type: 'MOBILE'
+                            type: 'MOBILE',
+                            actionUrl: '',
+                            sequence: 1,
+                            delayDisplay: 10
                         }
                     ]
                 }
@@ -224,6 +232,23 @@ export class _SwiperBannerComponent
     }
     swipeNext() {
         this.swiper.swiperRef.slideNext();
+    }
+
+    onSlideChange(swiper: any) {
+        if (this.currentScreenSize.includes('sm')) {
+            const delayInMs = this.galleryImages[swiper[0].realIndex].delayDisplay * 1000;
+            swiper[0].params.autoplay.delay = delayInMs;
+        }
+        else {
+            const delayInMs = this.mobileGalleryImages[swiper[0].realIndex].delayDisplay * 1000;
+            swiper[0].params.autoplay.delay = delayInMs;
+        }
+    }
+
+    actionOnClick(url: string) {
+        if (url) {
+            this._document.location.href = url;
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------

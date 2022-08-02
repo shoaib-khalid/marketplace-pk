@@ -22,10 +22,11 @@
                 }"
             [loop]="true"
             class="mySwiper"
+            (slideChange)="onSlideChange($event)"
             >
             <ng-container *ngIf="currentScreenSize.includes('sm'); else mobileImages">
                 <ng-template swiperSlide *ngFor="let image of galleryImages">
-                    <div class="flex flex-col items-center justify-center cursor-pointer md:h-96 h-56 w-full">
+                    <div class="flex flex-col items-center justify-center cursor-pointer md:h-96 h-56 w-full" (click)="actionOnClick(image.actionUrl)">
                         <img
                             class=""
                             [src]="image.bannerUrl"
@@ -35,7 +36,7 @@
             </ng-container>
             <ng-template #mobileImages>
                 <ng-template swiperSlide *ngFor="let image of mobileGalleryImages">
-                    <div class="flex flex-col items-center justify-center cursor-pointer md:h-96 h-56 w-full">
+                    <div class="flex flex-col items-center justify-center cursor-pointer md:h-96 h-56 w-full" (click)="actionOnClick(image.actionUrl)">
                         <img
                             class=""
                             [src]="image.bannerUrl"

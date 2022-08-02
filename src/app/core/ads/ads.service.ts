@@ -136,12 +136,13 @@ export class AdsService
 
         return this._httpClient.get<Banner[]>(productService + '/banner-config', header).pipe(
             tap((response) => {
-                this._logging.debug("Response from AdsService (getBanner)", response);
+                
                 const data = response['data'];
 
                 let desktop = data.filter(element => element.type === 'DESKTOP')
                 let mobile = data.filter(element => element.type === 'MOBILE')
-
+                this._logging.debug("Response from AdsService (getBanner -Mobile)", mobile);
+                this._logging.debug("Response from AdsService (getBanner -Desktop)", desktop);
                 this._bannersDesktop.next(desktop);
                 this._bannersMobile.next(mobile);
 

@@ -6,8 +6,11 @@ export interface Ad
 
 export interface Banner 
 {
-    id          : number;
-    bannerUrl   : string;
-    regionCountryId: string;
-    type?       : string;
+    id              : number;
+    bannerUrl       : string;
+    regionCountryId : string;
+    type?           : string;
+    actionUrl       : string;
+    delayDisplay    : number;
+    sequence        : number;
 }
