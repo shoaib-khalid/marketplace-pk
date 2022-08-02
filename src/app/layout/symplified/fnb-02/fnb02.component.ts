@@ -25,7 +25,7 @@ import { SearchService } from 'app/layout/common/_search/search.service';
 })
 export class Fnb2LayoutComponent implements OnInit, OnDestroy
 {
-    opened: boolean = false;
+    isSearchOpened: boolean = true;
     platform: Platform;
     user: User;
 
@@ -173,28 +173,21 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
      * Open the search
      * Used in 'bar'
      */
-    open(): void
+    toggleSearch(): void
     {
-        // Return if it's already opened
-        if ( this.opened )
-        {
-            return;
-        }
-
-        // Open the search
-        this.opened = true;
+        this.isSearchOpened = !this.isSearchOpened;
     }
 
-    close(): void
+    closeSearch(): void
     {
         // Return if it's already closed
-        if ( !this.opened )
+        if ( !this.isSearchOpened )
         {
             return;
         }
 
         // Close the search
-        this.opened = false;
+        this.isSearchOpened = false;
     }
 
     /**

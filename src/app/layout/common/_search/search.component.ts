@@ -44,7 +44,7 @@ export class _SearchComponent implements OnInit, OnDestroy
     customer: User;
     custSearchResults: any[];
 
-    placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
+    placeholder = 'Search for food or restaurant'
 
     currentScreenSize: string[] = [];
     route: string;
@@ -93,7 +93,7 @@ export class _SearchComponent implements OnInit, OnDestroy
                             this._changeDetectorRef.markForCheck();
                         });
                 } else {
-                    this.placeholder = 'Search for your favorite food, categories or merchants e.g: ikan bakar'
+                    this.placeholder = 'Search for food or restaurant'
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
