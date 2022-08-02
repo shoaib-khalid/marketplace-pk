@@ -5,7 +5,7 @@
                 <h2 class="font-semibold text-xl">{{title}}</h2>
                 <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 md:gap-3 items-start w-full justify-between mt-1 sm:mt-2">
+            <div class="grid grid-cols-4 gap-2 md:gap-3 items-start w-full justify-between mt-2 sm:mt-4">
                 <ng-container *ngFor="let category of categories">
                     <div class="flex flex-col w-full items-center cursor-pointer group" 
                         (click)="chooseCategory(category.parentId, location)">
@@ -23,13 +23,13 @@
 <!-- Swiper  -->
 <ng-container *ngIf="swiper">
     <ng-container *ngIf="categories && categories.length">
-        <div class="flex flex-col w-full mt-2 sm:mt-4 gap-1">
+        <div class="flex flex-col w-full">
             <div class="flex flex-row w-full items-center justify-between">
                 <h2 class="font-semibold text-xl">{{title}}</h2>
                 <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
             </div>
 
-            <div class="relative cursor-pointer">
+            <div class="relative cursor-pointer mt-2 sm:mt-4">
                 <!-- Navigation left -->
                 <ng-container *ngIf="categories.length > numberOfCols">
                     <div 

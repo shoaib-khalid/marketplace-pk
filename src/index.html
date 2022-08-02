@@ -29,6 +29,7 @@
 
         <link rel="manifest" href="manifest.webmanifest">
         <meta name="theme-color" content="#1976d2">
+        <style>noscript{background-color: red; color: white; font-size: 24px;}</style>
 </head>
 
     <body>
@@ -49,7 +50,10 @@
         <!-- App root -->
         <app-root></app-root>
 
-      <noscript>Please enable JavaScript to continue using this application.</noscript>
+        <!-- noscript for older browser -->
+        <noscript>Please enable JavaScript to continue using this application.</noscript>
+        <div id="noscript"> Please enable JavaScript to continue using this application...</div>
+        <script>document.querySelector('#noscript').style.display="none";</script>
 </body>
 
 </html>

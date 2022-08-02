@@ -25,7 +25,8 @@ export class LandingSearchComponent implements OnInit
     locations   : LandingLocation[] = [];
     categories  : ParentCategory[] = [];
     
-    searchValue: string;
+    searchValue : string;
+    tagValue    : string;
     
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
@@ -39,6 +40,9 @@ export class LandingSearchComponent implements OnInit
     productPageOfItems: Array<any>;
     
     isLoading: boolean;
+
+    currentLat  : number = null;
+    currentLong : number = null;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -71,16 +75,31 @@ export class LandingSearchComponent implements OnInit
                     // Get searches from url parameter 
                     this._activatedRoute.queryParams.subscribe(params => {
                         this.searchValue = params['keyword'];
+                        this.tagValue = params['tag'];
 
-                        if (this.searchValue) {
-                            // Get stores
-                            this._locationService.getStoresDetails({ storeName: this.searchValue, pageSize: 15, regionCountryId: this.platform.country })
-                                .subscribe(()=>{});
+                        this.currentLat = params['lat'];
+                        this.currentLong = params['lng'];
 
-                            // Get products
-                            this._locationService.getProductsDetails({ name: this.searchValue, pageSize: 15, regionCountryId: this.platform.country })
-                                .subscribe(()=>{});
-                        }
+                        this._locationService.getStoresDetails({ 
+                                storeName       : this.searchValue, 
+                                pageSize        : 15, 
+                                regionCountryId : this.platform.country, 
+                                tagKeyword      : this.tagValue, 
+                                latitude        : this.currentLat, 
+                                longitude       : this.currentLong 
+                            })
+                            .subscribe(()=>{});
+
+                        // Get products
+                        this._locationService.getProductsDetails({ 
+                                name            : this.searchValue, 
+                                pageSize        : 15, 
+                                regionCountryId : this.platform.country, 
+                                latitude        : this.currentLat, 
+                                longitude       : this.currentLong, 
+                                storeTagKeyword : this.tagValue 
+                            })
+                            .subscribe(()=>{});
                     });
                 }
 

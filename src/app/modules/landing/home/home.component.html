@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center bg-card w-full h-full">
     <!-- Search -->
     <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full"></search> -->
-    <!-- <search class="w-full"></search> -->
+    <search class="w-full mb-2 sm:mt-2 sm:mb-4"></search>
     <!-- Promotion Banner -->
     <div class="w-full">
         <!-- Banner  -->
@@ -10,12 +10,12 @@
         </div>
     </div>
     <!-- Locations -->
-    <featured-locations class="w-full" [locations]="locations" [showViewAll]="false" [title]="'Locations'"></featured-locations>
+    <featured-locations class="w-full mt-4" [locations]="locations" [showViewAll]="false" [title]="'Locations'"></featured-locations>
     <!-- Categories -->
-    <featured-categories class="w-full" [categories]="categories" [showViewAll]="false" [title]="'Categories'"></featured-categories>
+    <featured-categories class="w-full mt-4 sm:mt-8" [categories]="categories" [showViewAll]="false" [title]="'Categories'"></featured-categories>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products id="featuredProductsContainer" class="w-full" [products]="featuredProducts" [showViewAll]="false" [title]="'Featured Products'"></featured-products>
+        <featured-products id="featuredProductsContainer" class="w-full mt-4 sm:mt-8" [products]="featuredProducts" [showViewAll]="false" [title]="'Featured Products'"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductPageSize ">
             <div class="flex w-full my-4 items-center justify-center">
@@ -31,7 +31,7 @@
     </ng-container>
     <!-- Featured Stores -->
     <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores id="featuredStoresContainer" class="w-full" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Stores'"></featured-stores>
+        <featured-stores id="featuredStoresContainer" class="w-full mt-4 sm:mt-8" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Stores'"></featured-stores>
         <!-- Pagination -->
         <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
             <div class="flex w-full my-4 items-center justify-center">
@@ -46,5 +46,5 @@
         </ng-container>
     </ng-container>
     <!-- Ads Banner -->
-    <ads-banner class="w-full" [banners]="ads"></ads-banner>
+    <ads-banner class="w-full sm:mb-2" [banners]="ads"></ads-banner>
 </div>

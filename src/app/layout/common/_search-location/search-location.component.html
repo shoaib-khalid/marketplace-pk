@@ -1,0 +1,47 @@
+<div class="flex flex-col w-full">
+    <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-emphasized-affix w-full" #autocompleteField>
+        <mat-icon class="text-primary" [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+        <span class="ml-2 w-full text-gray-400 max-w-16">Deliver to</span>
+        <input
+            id="inputElement"
+            class="pl-4 w-full grow"
+            matInput
+            [formControl]="searchControl"
+            [autocomplete]="'off'"
+            [matAutocomplete]="matAutocomplete"
+            [placeholder]="'Please type your location'"
+            (keydown.enter)="selectFirstResult()"
+            #searchInput>
+        <mat-icon class="cursor-pointer text-primary mr-2" (click)="locateMe()" [svgIcon]="'mat_outline:my_location'"></mat-icon>
+        <ng-container *ngIf="currentScreenSize.includes('md')" matSuffix>
+            <button class="p-2.5 font-bold text-white" (click)="selectFirstResult()">Go</button>
+        </ng-container>
+        <ng-container *ngIf="!currentScreenSize.includes('md')">
+            <button class="py-1 px-2 text-primary font-semibold border border-primary rounded" (click)="selectFirstResult()">Go</button>
+        </ng-container>
+    </mat-form-field>
+    <mat-autocomplete
+        class="max-h-128 mt-1 rounded"
+        [disableRipple]="true"
+        #matAutocomplete="matAutocomplete">
+        <ng-container *ngFor="let result of autoCompleteList; trackBy: trackByFn">
+            <mat-option class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                <ng-container *ngTemplateOutlet="locationResult; context: {$implicit: result}"></ng-container>
+            </mat-option>
+        </ng-container>
+    </mat-autocomplete>
+</div>
+
+<!-- Contact result template -->
+<ng-template
+    #locationResult
+    let-result>
+        <div class="flex flex-row w-full" (click)="selectResult(result.location); blurInput()">
+            <ng-container>
+                <div class="flex flex-col w-full leading-4">
+                    <span class="font-semibold"> {{ result.location }} </span>
+                    <span class="text-sm"> {{ result.description }} </span>
+                </div>
+            </ng-container>
+        </div>
+</ng-template>

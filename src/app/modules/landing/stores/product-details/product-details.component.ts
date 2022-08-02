@@ -47,25 +47,13 @@ import { AppConfig } from 'app/config/service.config';
             border-radius:15px !important;
             z-index: 30;
 
-            @screen sm {
-                position: relative;
-                z-index: 50;
-                border-radius:15px !important;
-            }
+            // Open this if layout want to disable overlay (refer layout)
+            // @screen sm {
+            //     position: relative;
+            //     z-index: 50;
+            //     border-radius:15px !important;
+            // }
         }
-
-        // Xjd gop
-        // :host ::ng-deep .ngx-gallery-preview-wrapper {
-        //     z-index: 999 !important;
-        // }
-
-        // :host ::ng-deep .ngx-gallery-preview-img-wrapper {
-        //     z-index: 999 !important;
-        // }
-
-        // :host ::ng-deep .ngx-gallery-preview-img {
-        //     z-index: 999 !important;
-        // }
 
         :host ::ng-deep .ngx-gallery-image {
             border-radius:15px !important;
@@ -145,13 +133,12 @@ export class LandingProductDetailsComponent implements OnInit
 
     currentScreenSize: string[] = [];
 
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
     pagination: ProductPagination;
-
+    
     notificationMessage: string;
     notificationMessageTitle: string = '';
     daysArray = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-
+    
     storesOpening: { 
         storeId: string,
         isOpen : boolean,
@@ -159,6 +146,10 @@ export class LandingProductDetailsComponent implements OnInit
         message: string
     }[] = [];
 
+    openPreview: boolean = false;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    
     /**
      * Constructor
      */

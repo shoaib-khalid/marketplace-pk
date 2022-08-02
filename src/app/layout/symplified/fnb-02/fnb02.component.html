@@ -12,8 +12,8 @@
     <!-- <floating-message-small></floating-message-small> -->
     <!-- Wrapper -->
     <div class="flex flex-col flex-auto w-full min-w-0 bg-card lg:items-center">
-        <!-- Header -->
-        <div class="md:relative flex flex-col flex-0 justify-center lg:items-center w-full h-auto overflow-hidden z-40 shadow dark:shadow-none print:hidden sticky top-0">
+        <!-- Header --> <!-- Add md:relative to disable header floating-->
+        <div class="flex flex-col flex-0 justify-center lg:items-center w-full h-auto overflow-hidden z-40 shadow dark:shadow-none print:hidden sticky top-0">
             <!-- Top Header bar -->
             <div class="flex flex-auto w-full justify-center items-center px-3 sm:px-4 lg:px-0 lg:max-w-300 bg-card z-40 dark:bg-gray-700">
                 <div class="relative flex items-center justify-between w-full h-16">
@@ -28,22 +28,17 @@
                             <!-- <span class="block md:hidden">{{headerTitle}}</span> -->
                         </div>
                     </ng-container>
-                    <search class="w-1/2 hidden sm:block"></search>
+                    <!-- <search class="w-1/2 hidden sm:block"></search> -->
+                    <search-location class="w-1/2 hidden md:block"></search-location>
                     <div class="flex items-center flex-row">
-    
-                        <button class="sm:hidden" mat-icon-button (click)="open()">
+                        <button class="md:hidden" mat-icon-button (click)="open()">
                             <mat-icon class="text-primary" [svgIcon]="'heroicons_outline:search'"></mat-icon>
                         </button>
-    
                         <!-- <notifications></notifications> -->
-    
                         <!-- <span class="text-gray-300 hidden sm:block"> &nbsp; | &nbsp; </span> -->
-    
                         <!-- cart -->
                         <cart></cart>
-    
                         <span class="text-gray-300 items-center w-full hidden sm:block">|</span>
-    
                         <!-- Components -->
                         <div class="flex w-full items-center">
                             <!-- <search [appearance]="'bar'"></search> -->
@@ -67,13 +62,14 @@
                     <span class="text-white">&nbsp;></span>
                 </div>
             </div> -->
-            <div class="sm:hidden w-full flex flex-auto items-center px-2 pb-2 z-20 bg-primary"
+            <div class="md:hidden w-full flex flex-auto items-center p-2 pb-2 z-20 bg-primary"
                 *ngIf="opened" 
                 @expandCollapse
                 >
-                <search class=" w-full"></search>
+                <!-- <search class="w-full"></search> -->
+                <search-location class="w-full"></search-location>
                 <button
-                    class="flex items-center mt-2"
+                    class="flex items-center ml-1"
                     mat-icon-button
                     (click)="close()">
                     <mat-icon class="text-white" [svgIcon]="'heroicons_outline:x'"></mat-icon>
@@ -85,7 +81,7 @@
             </div>
         </div>
         <!-- Content -->
-        <div class="flex flex-col flex-auto w-full px-2 py-4 sm:px-4 lg:px-0 lg:max-w-300">
+        <div class="flex flex-col flex-auto w-full p-2 sm:px-4 lg:px-0 lg:max-w-300">
             <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
                  Otherwise, layout changes won't be registered and the view won't be updated! -->
             <router-outlet *ngIf="true"></router-outlet>

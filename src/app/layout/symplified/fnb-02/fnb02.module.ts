@@ -22,6 +22,7 @@ import { _SearchModule } from 'app/layout/common/_search/search.module';
 import { FloatingMessageModule } from 'app/layout/common/_floating-message/floating-message.module';
 import { DisplayErrorModule } from 'app/layout/common/_display-error/display-error.module';
 import { BreadcrumbModule } from 'app/layout/common/breadcrumb/breadcrumb.module';
+import { _SearchLocationModule } from 'app/layout/common/_search-location/search-location.module';
 
 @NgModule({
     declarations: [
@@ -48,6 +49,7 @@ import { BreadcrumbModule } from 'app/layout/common/breadcrumb/breadcrumb.module
         CartModule,
         FooterModule,
         _SearchModule,
+        _SearchLocationModule,
         FloatingMessageModule,
         BreadcrumbModule
     ],

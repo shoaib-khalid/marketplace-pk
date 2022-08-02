@@ -527,19 +527,22 @@ export class LocationService
      * @returns 
      */
     getStoresDetails(params: {
-        storeName?      : string,
-        parentCategoryId?: string,
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string | string[],
-        city?           : string, 
-        postcode?       : string
+        storeName?          : string,
+        parentCategoryId?   : string,
+        page?               : number, 
+        pageSize?           : number, 
+        sortByCol?          : string, 
+        sortingOrder?       : 'ASC' | 'DESC' | '',
+        regionCountryId?    : string,
+        country?            : string, 
+        stateId?            : string, 
+        state?              : string, 
+        cityId?             : string | string[],
+        city?               : string, 
+        postcode?           : string,
+        latitude?           : number,
+        longitude?          : number,
+        tagKeyword?         : string
     } = {
         storeName       : null,
         parentCategoryId: null,
@@ -553,7 +556,10 @@ export class LocationService
         state           : null, 
         cityId          : null, 
         city            : null, 
-        postcode        : null
+        postcode        : null,
+        latitude        : 0,
+        longitude       : 0,
+        tagKeyword      : null
     }) 
         : Observable<StoresDetails[]>
     {
@@ -570,7 +576,8 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+            
+            if (!header.params[key] || (Array.isArray(header.params[key]) && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -607,21 +614,24 @@ export class LocationService
      * @returns 
      */
     getProductsDetails(params: {
-        name?           : string,
-        parentCategoryId?: string,
-        storeName?      : string,
-        page?           : number, 
-        pageSize?       : number, 
-        sortByCol?      : string, 
-        sortingOrder?   : 'ASC' | 'DESC' | '',
-        regionCountryId?: string, 
-        country?        : string, 
-        stateId?        : string, 
-        state?          : string, 
-        cityId?         : string | string[],
-        city?           : string, 
-        postcode?       : string,
-        status?         : string[]
+        name?               : string,
+        parentCategoryId?   : string,
+        storeName?          : string,
+        page?               : number, 
+        pageSize?           : number, 
+        sortByCol?          : string, 
+        sortingOrder?       : 'ASC' | 'DESC' | '',
+        regionCountryId?    : string, 
+        country?            : string, 
+        stateId?            : string, 
+        state?              : string, 
+        cityId?             : string | string[],
+        city?               : string, 
+        postcode?           : string,
+        latitude?           : number,
+        longitude?          : number,
+        status?             : string[],
+        storeTagKeyword?    : string
     } = {
         name            : null,
         parentCategoryId: null,
@@ -637,7 +647,10 @@ export class LocationService
         cityId          : null, 
         city            : null, 
         postcode        : null,
-        status          : ['ACTIVE', 'OUTOFSTOCK']
+        latitude        : 0,
+        longitude       : 0,
+        status          : ['ACTIVE', 'OUTOFSTOCK'],
+        storeTagKeyword : null
     }) 
         : Observable<ProductDetails[]>
     {
@@ -654,7 +667,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+            if (!header.params[key] || (Array.isArray(header.params[key]) && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
