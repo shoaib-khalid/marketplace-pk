@@ -34,12 +34,17 @@
             </div>
         </div>
         <!-- Content  -->
-        <div class="flex flex-col bg-card w-full px-2 sm:px-4 pb-4">
+        <div class="flex flex-col bg-card w-full pb-4">
             <!-- Featured Locations -->
-            <featured-locations class="w-full" [locations]="locations" [category]="category.parentId" [showViewAll]="locationsViewAll" [title]="'Locations'"></featured-locations>
+            <featured-locations class="w-full mt-2 sm:mt-4" [locations]="locations" [category]="category.parentId" [showViewAll]="locationsViewAll" [title]="'Locations'"></featured-locations>
             <!-- Featured Products -->
             <ng-container *ngIf="products && products.length">
-                <featured-products class="w-full" [products]="products" [showViewAll]="productsViewAll" [redirectURL]="redirectUrl" [title]="'Products'"></featured-products>
+                <featured-products 
+                    class="w-full mt-4 sm:mt-8" 
+                    [products]="products" 
+                    [showViewAll]="(featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination) ? true : false" 
+                    [redirectURL]="redirectUrl" 
+                    [title]="'Products'"></featured-products>
                 <!-- Pagination -->
                 <!-- <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination">
                     <div class="flex w-full mt-4 items-center justify-center">
@@ -70,7 +75,12 @@
 
             <!-- Stores -->
             <ng-container *ngIf="stores && stores.length">
-                <featured-stores class="w-full" [stores]="stores" [showViewAll]="storesViewAll" [redirectURL]="redirectUrl" [title]="'Stores'"></featured-stores>
+                <featured-stores 
+                    class="w-full mt-4 sm:mt-8" 
+                    [stores]="stores" 
+                    [showViewAll]="(featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize) ? true : false" 
+                    [redirectURL]="redirectUrl" 
+                    [title]="'Stores'"></featured-stores>
                 <!-- Stores Pagination -->
                 <!-- <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
                     <div class="flex w-full mt-4 items-center justify-center">

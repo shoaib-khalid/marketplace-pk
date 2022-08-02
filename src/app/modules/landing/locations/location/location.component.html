@@ -34,12 +34,17 @@
             </div>
         </div>
         <!-- Content -->
-        <div class="flex flex-col bg-card w-full px-2 sm:px-4 pb-4">
+        <div class="flex flex-col bg-card w-full pb-4">
             <!-- Featured Categories -->
-            <featured-categories class="w-full" [selectedCategoryId]="categoryId" [categories]="categories" [showViewAll]="false" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Categories'" [swiper]="true"></featured-categories>
+            <featured-categories class="w-full mt-2 sm:mt-4" [selectedCategoryId]="categoryId" [categories]="categories" [showViewAll]="false" [location]="locationId" [redirectURL]="redirectUrl" [title]="'Categories'" [swiper]="true"></featured-categories>
             <!-- Featured Products -->
             <ng-container *ngIf="(featuredProducts && featuredProducts.length) && !categoryId">
-                <featured-products class="w-full" [products]="featuredProducts" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Featured Products'"></featured-products>
+                <featured-products 
+                    class="w-full mt-4 sm:mt-8" 
+                    [products]="featuredProducts" 
+                    [showViewAll]="(featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination) ? true : false" 
+                    [redirectURL]="redirectUrl" 
+                    [title]="'Featured Products'"></featured-products>
                 <!-- Featured Products Pagination -->
                 <!-- <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination">
                     <div class="flex w-full mt-4 items-center justify-center">
@@ -54,7 +59,12 @@
             </ng-container>
             <!-- Products -->
             <ng-container *ngIf="(products && products.length) && categoryId">
-                <featured-products class="w-full" [products]="products" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Products'"></featured-products>
+                <featured-products 
+                    class="w-full mt-4 sm:mt-8" 
+                    [products]="products" 
+                    [showViewAll]="(featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination) ? true : false" 
+                    [redirectURL]="redirectUrl" 
+                    [title]="'Products'"></featured-products>
                 <!-- Products Pagination -->
                 <!-- <ng-container *ngIf="productsPagination && productsPagination.length > productsPagination">
                     <div class="flex w-full mt-4 items-center justify-center">
@@ -70,7 +80,12 @@
 
             <!-- Featured Stores -->
             <ng-container *ngIf="(featuredStores && featuredStores.length) && !categoryId">
-                <featured-stores class="w-full" [stores]="featuredStores" [showViewAll]="true" [redirectURL]="redirectUrl" [title]="'Featured Stores'"></featured-stores>
+                <featured-stores 
+                    class="w-full mt-4 sm:mt-8" 
+                    [stores]="featuredStores" 
+                    [showViewAll]="(featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize) ? true : false" 
+                    [redirectURL]="redirectUrl" 
+                    [title]="'Featured Stores'"></featured-stores>
                 <!-- Featured Stores Pagination -->
                 <!-- <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
                     <div class="flex w-full mt-4 items-center justify-center">

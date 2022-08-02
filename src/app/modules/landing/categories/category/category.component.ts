@@ -45,8 +45,6 @@ export class CategoryComponent implements OnInit
     maxLocationsDisplay: number = 50;
     
     redirectUrl: { categoryId?: string, locationId?: string }
-    storesViewAll: boolean = false;
-    productsViewAll: boolean = false;
     locationsViewAll: boolean = false;
 
     isLoading: boolean = true;
@@ -165,11 +163,11 @@ export class CategoryComponent implements OnInit
                                 .subscribe((locations : LandingLocation[]) => {});
 
                             // Get featured stores with adjacent Locations
-                            this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                            this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                                 .subscribe((stores : StoresDetails[]) => {});
 
                             // Get stores with adjacent Locations
-                            this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                            this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                                 .subscribe((stores : StoresDetails[]) => {});
 
                             // Get products with adjacent Locations
@@ -268,7 +266,6 @@ export class CategoryComponent implements OnInit
             .subscribe((pagination: StorePagination) => { 
                 if (pagination) {               
                     this.storesPagination =  pagination;
-                    this.storesViewAll = (pagination.length > pagination.size) ? true : false;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -314,7 +311,6 @@ export class CategoryComponent implements OnInit
             .subscribe((pagination) => { 
                 if (pagination) {
                     this.productsPagination = pagination;    
-                    this.productsViewAll = (pagination.length > pagination.size) ? true : false;         
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
