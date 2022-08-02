@@ -118,7 +118,7 @@ export class LocationComponent implements OnInit
                             .subscribe((stores: StoreDetails[])=>{});
 
                         // Get Stores
-                        this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                        this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             .subscribe((stores: StoreDetails[])=>{});
 
                         // Get Featured Products
@@ -126,7 +126,7 @@ export class LocationComponent implements OnInit
                             .subscribe((products : ProductDetails[]) => {});
 
                         // Get Products
-                        this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                        this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             .subscribe((products : ProductDetails[]) => {});
                     });
             }
@@ -170,7 +170,7 @@ export class LocationComponent implements OnInit
                                 .subscribe((stores : StoresDetails[]) => {});
 
                             // Get Stores
-                            this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                            this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                                 .subscribe((stores: StoreDetails[])=>{});
         
                             // Get Featured Products
@@ -178,7 +178,7 @@ export class LocationComponent implements OnInit
                                 .subscribe((products : ProductDetails[]) => {});
 
                             // Get Products
-                            this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                            this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                                 .subscribe((products : ProductDetails[]) => {});
                         });
                 }
