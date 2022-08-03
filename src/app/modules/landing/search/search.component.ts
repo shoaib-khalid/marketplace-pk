@@ -97,7 +97,8 @@ export class LandingSearchComponent implements OnInit
                                 regionCountryId : this.platform.country, 
                                 latitude        : this.currentLat, 
                                 longitude       : this.currentLong, 
-                                storeTagKeyword : this.tagValue 
+                                storeTagKeyword : this.tagValue,
+                                status          : ['ACTIVE', 'OUTOFSTOCK']
                             })
                             .subscribe(()=>{});
                     });
@@ -221,7 +222,7 @@ export class LandingSearchComponent implements OnInit
                 merge(this._productsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country});
+                        return this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country, status: ['ACTIVE', 'OUTOFSTOCK']});
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -257,7 +258,7 @@ export class LandingSearchComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country})
+                    this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country, status: ['ACTIVE', 'OUTOFSTOCK']})
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;

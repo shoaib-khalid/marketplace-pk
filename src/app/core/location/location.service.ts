@@ -377,8 +377,9 @@ export class LocationService
         cityId?             : string | string[],
         city?               : string, 
         postcode?           : string,
-        isDisplay?          : boolean
-        isMainLevel?        : boolean
+        isDisplay?          : boolean,
+        isMainLevel?        : boolean,
+        status?             : string[],
     } = {
         storeName       : null,
         parentCategoryId: null,
@@ -394,7 +395,8 @@ export class LocationService
         city            : null, 
         postcode        : null,
         isDisplay       : false,
-        isMainLevel     : false
+        isMainLevel     : false,
+        status          : ['ACTIVE', 'OUTOFSTOCK'],
     }): Observable<ProductDetails[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;

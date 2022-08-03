@@ -171,7 +171,7 @@ export class CategoryComponent implements OnInit
                                 .subscribe((stores : StoresDetails[]) => {});
 
                             // Get products with adjacent Locations
-                            this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                            this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
                                 .subscribe((products : ProductDetails[]) => {});
 
                         });
