@@ -166,7 +166,7 @@ export class _SwiperBannerComponent
                         bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_1440X370.png',
                         regionCountryId: '',
                         type: 'DESKTOP',
-                        actionUrl: '',
+                        actionUrl: null,
                         sequence: 1,
                         delayDisplay: 10
                     }
@@ -191,7 +191,7 @@ export class _SwiperBannerComponent
                             bannerUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Landing-Page-Banner_304X224.png',
                             regionCountryId: '',
                             type: 'MOBILE',
-                            actionUrl: '',
+                            actionUrl: null,
                             sequence: 1,
                             delayDisplay: 10
                         }
@@ -247,6 +247,7 @@ export class _SwiperBannerComponent
 
     actionOnClick(url: string) {
         if (url) {
+            // this._router.navigate(['/promotion/' + url])
             this._document.location.href = url;
         }
     }

@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, In
 import { FormControl } from '@angular/forms';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Loader } from '@googlemaps/js-api-loader';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -38,21 +38,23 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
     country: string;
     resultSets: any[];
     autoCompleteList: { type: string, location: string, description?: string }[] = [];
+    placeholderText: string = "Enter your location";
     
-    currentScreenSize: string[] = [];
-
+    // Google
     loader: any;
-
-    //get current location (hardcoded to KL first)
     currentLat  : number = null;
     currentLong : number = null;
     
+    // screen size
+    currentScreenSize: string[] = [];
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
     constructor(
+        private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _fuseLoadingService: FuseLoadingService,
         private _storesService: StoresService,
@@ -76,6 +78,24 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+        // implement google maps
+        this.loader = new Loader({
+            apiKey: environment.googleMapsAPIKey,
+            libraries: ['places']
+        });
+
+        // Get searches from url parameter 
+        this._activatedRoute.queryParams.subscribe(params => {
+            this.currentLat = params['lat'];
+            this.currentLong = params['lng'];
+
+            if (this.currentLat && this.currentLong) {
+                this.placeholderText = "Latitude: " + this.currentLat + ", Longitude: " + this.currentLong;
+            } else {
+                this.placeholderText = "Enter your location";
+            }
+        });
 
         this._platformService.platform$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -114,12 +134,6 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             ).subscribe(userInput => {                
                 this.autoCompleteSetList(userInput + " " + this.country);
             });
-
-        // implement google maps
-        this.loader = new Loader({
-            apiKey: environment.googleMapsAPIKey,
-            libraries: ['places']
-        });
     }
 
     /**
@@ -227,7 +241,6 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                 lat: this.currentLat,
                 lng: this.currentLong,  
             };
-
             this.loader.load().then(() => {
                 let geocoder: google.maps.Geocoder = new google.maps.Geocoder();
                 geocoder.geocode({ location: location})
@@ -256,10 +269,12 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
      * Select address from adress list
      * @param address 
      */
-    selectResult(address: string) {
+    selectResult(address: string) {        
 
         // show loading
         this._fuseLoadingService.show();
+
+        this.searchControl.patchValue(address);
 
         // GoogleMap API        
         this.loader.load().then(() => {
@@ -273,8 +288,6 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                         lat: response.results[0].geometry.location.lat(),
                         lng: response.results[0].geometry.location.lng(),
                     }
-
-                    this.searchControl.patchValue(address);
 
                     this._router.navigate(['/search'], {queryParams: location});
 

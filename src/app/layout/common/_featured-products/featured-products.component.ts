@@ -7,6 +7,7 @@ import { DOCUMENT } from '@angular/common';
 import { StoreAssets } from 'app/core/store/store.types';
 import { ProductDetails } from 'app/core/location/location.types';
 import { StoresService } from 'app/core/store/store.service';
+import { Product } from 'app/core/product/product.types';
 
 @Component({
     selector     : 'featured-products',
@@ -17,7 +18,7 @@ export class _FeaturedProductsComponent implements OnInit, OnDestroy
 {
 
     platform: Platform;
-    @Input() products: any;
+    @Input() products: Product[] | ProductDetails[];
     @Input() title: string = "Product";
     @Input() showViewAll: boolean = false;
     @Input() redirectURL: { categoryId?: string, locationId?: string } = null;

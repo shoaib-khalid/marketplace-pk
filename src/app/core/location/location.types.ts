@@ -57,12 +57,68 @@ export interface CategoryPagination
 
 export interface StoreDetails
 {
+    city                : string;
+    distanceInMeter     : number;
+    domain              : string;
+    id                  : string;
+    isSnooze            : boolean
+    latitude            : number;
+    longitude           : number;
+    name                : string;
+    postcode            : string;
+    regionCityDetails   : RegionCityDetails;
+    regionCountryId     : string;
+    snoozeEndTime       : string;
+    snoozeReason        : string;
+    snoozeStartTime     : string;
+    state               : string;
+    storeAssets         : StoreAssets[];
+    storeDescription    : string;
+    storeSnooze         : StoreSnooze;
+    storeTag            : string[];
+    storeTiming         : StoreTiming[];
+}
+
+export interface RegionCityDetails 
+{
+    id                  : string;
+    name                : string;
+    regionCountryState  : RegionCountryState;
+}
+
+export interface RegionCountryState
+{
     id              : string;
     name            : string;
-    city            : string;
-    state           : string;
-    postcode        : string;
     regionCountryId : string;
+}
+
+export interface StoreTiming
+{
+    closeTime       : string;
+    day             : string;
+    isOff           : boolean;
+    openTime        : string;
+    breakStartTime  : string;
+    breakEndTime    : string;
+}
+
+export interface StoreSnooze
+{
+    isSnooze: boolean;
+    snoozeEndTime: string;
+    snoozeReason: string;
+    snoozeStartTime: string;
+}
+
+export interface StoreAssets
+{
+    assetDescription: string;
+    assetFile: string;
+    assetType: string;
+    assetUrl: string;
+    id: string;
+    storeId: string;
 }
 
 export interface ProductDetails

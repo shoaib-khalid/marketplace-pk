@@ -3,12 +3,8 @@
         <!-- Search -->
         <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full" [storeId]="store.id" [store]="storeDetails"></search> -->
         <search class="w-full mb-2 sm:mt-2 sm:mb-4" [storeId]="store.id" [store]="storeDetails"></search>
-        <!-- Selected Store -->
+        <!-- Store Header -->
         <fuse-card class="relative flex flex-row h-30 sm:h-40 w-full border border-primary rounded-lg filter-article">
-            <!-- <div *ngIf="isStoreClose(store.id)" class="absolute bg-zinc-700 bg-opacity-60 z-10 w-full h-full flex flex-col items-center justify-center rounded-lg lg:rounded">
-                <span class="text-white text-3xl font-medium text-stroke-2 text-stroke-black tracking-tight">Store is Closed</span>
-                <span class="w-3/4 text-center text-white text-md lg:text-lg font-medium tracking-tight">{{notificationMessage}}</span>
-            </div> -->
             <div *ngIf="isStoreClose(store.id)" 
                 class="absolute bg-black bg-opacity-60 z-10 w-full h-full flex flex-col items-center justify-center rounded-lg lg:rounded gap-2">
                 <div class="flex flex-col rounded-lg bg-red-500 text-white items-center p-3 leading-none uppercase">
@@ -17,6 +13,7 @@
                 </div>
                 <span class="w-3/4 text-center text-white text-md lg:text-lg font-medium tracking-tight">{{notificationMessage}}</span>
             </div>
+            <!-- Store Image -->
             <div class="flex-0 w-30 sm:w-44 h-full">
                 <img
                     class="w-full h-full shadow object-cover"
@@ -31,9 +28,9 @@
                     <!-- Store Description -->
                     <p class="flex flex-row text-black overflow-hidden text-ellipsis text-xs sm:text-sm md:text-base break-all line-clamp-2" [innerHTML]="store.storeDescription"></p>
                 </div>
-
+                <!-- Saparator -->
                 <div class="w-full border-t border-primary-200"></div>
-                
+                <!-- Contact -->
                 <div class="flex flex-col">
                     <!-- Address  -->
                     <div class="w-full flex flex-row gap-x-1">
@@ -46,7 +43,7 @@
                         <div class="flex flex-row gap-x-1">
                             <mat-icon class="block sm:hidden icon-size-3 text-primary" [svgIcon]="'mat_solid:phone'"></mat-icon>
                             <span class="hidden sm:block text-xs sm:text-sm md:text-base">Contact Us:</span>
-                            <span class="text-xs sm:text-sm md:text-base font-medium">{{store.phoneNumber}}</span>
+                            <a [href]="'tel:' + store.phoneNumber" class="text-xs sm:text-sm md:text-base font-medium">{{store.phoneNumber}}</a>
                         </div>
                         <div class="flex flex-row gap-x-1">
                             <mat-icon class="block sm:hidden icon-size-3 text-primary" [svgIcon]="'mat_solid:shopping_bag'"></mat-icon>
