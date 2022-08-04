@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
-import { InitialDataResolver, PlatformSetupResolver } from 'app/app.resolvers';
+import { InitialDataResolver, PlatformSetupResolver, BrowserCompatibilityResolver } from 'app/app.resolvers';
 import { UserRole } from 'app/core/user/user.roles';
 import { CartsResolver } from './modules/landing/carts/carts.resolver';
 
@@ -22,9 +22,10 @@ export const appRoutes: Route[] = [
             // roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
-            initialData: InitialDataResolver,
-            platformSetup: PlatformSetupResolver,
-            carts: CartsResolver
+            browserCompatibility    : BrowserCompatibilityResolver,
+            initialData             : InitialDataResolver,
+            platformSetup           : PlatformSetupResolver,
+            carts                   : CartsResolver
         },
         children   : [
             { path: '', loadChildren: () => import('app/modules/landing/landing.module').then(m => m.LandingModule) },

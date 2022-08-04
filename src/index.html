@@ -29,7 +29,7 @@
 
         <link rel="manifest" href="manifest.webmanifest">
         <meta name="theme-color" content="#1976d2">
-        <style>noscript{background-color: red; color: white; font-size: 24px;}</style>
+        <!-- <style>noscript{background-color: red; color: white; font-size: 24px;}</style> -->
 </head>
 
     <body>
@@ -52,8 +52,10 @@
 
         <!-- noscript for older browser -->
         <noscript>Please enable JavaScript to continue using this application.</noscript>
-        <div id="noscript"> Please enable JavaScript to continue using this application...</div>
-        <script>document.querySelector('#noscript').style.display="none";</script>
+        <div id="noscript" style="display: none;">Sorry, Your web browser is not supported, Please try with other web browser</div>
+        <script>
+            setTimeout(function() { document.querySelector('#noscript').style.display="block"; }, 2000);
+        </script> 
 </body>
 
 </html>
