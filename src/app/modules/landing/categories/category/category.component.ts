@@ -120,11 +120,11 @@ export class CategoryComponent implements OnInit
                         // category level display normal product & stores
                         
                         // // Get featured stores with adjacent Locations
-                        // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                        // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                         //     .subscribe((stores : StoresDetails[]) => {});
 
                         // // Get featured products with adjacent Locations
-                        // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                        // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                         //     .subscribe((products : ProductDetails[]) => {});
 
                         // Get stores with adjacent Locations
@@ -177,11 +177,11 @@ export class CategoryComponent implements OnInit
                             // category level display normal product & stores
 
                             // Get featured stores with adjacent Locations
-                            // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                            // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             //     .subscribe((stores : StoresDetails[]) => {});
 
                             // Get featured products with adjacent Locations
-                            // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                            // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             // .subscribe((stores : ProductDetails[]) => {});
 
                             // Get stores with adjacent Locations
