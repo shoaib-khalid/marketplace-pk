@@ -50,9 +50,13 @@
         <!-- App root -->
         <app-root></app-root>
 
-        <!-- noscript for older browser -->
+        <!-- Need to enable javascript -->
         <noscript>Please enable JavaScript to continue using this application.</noscript>
-        <div id="noscript" style="display: none;">Sorry, Your web browser is not supported, Please try with other web browser</div>
+
+        <!-- noscript for older browser (typescript not supported) -->
+        <div id="noscript" style="display: none;">
+            Sorry your web browser is not supported. Please use Google Chrome, Microsoft Edge or Mozzila
+        </div>
         <script>
             setTimeout(function() { document.querySelector('#noscript').style.display="block"; }, 2000);
         </script> 
