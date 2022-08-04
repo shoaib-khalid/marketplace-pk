@@ -108,10 +108,8 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
     //------------------------
 
     checkStoreTiming(store: Store) : { notificationMessage: string, isStoreOpenToday: boolean, messageTitle: string }
-    {
-        // console.log("store", store);
+    {        
         
-
         let storeTiming = store.storeTiming;
         let storeId = store.id;
         let notificationMessage : string = ''
