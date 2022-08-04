@@ -29,15 +29,15 @@ export class CategoryComponent implements OnInit
     // Featured Stores
     featuredStores: StoresDetails[] = [];
     featuredStoresPagination: StorePagination;
-    // Stores
-    stores: StoresDetails[] = [];
+    // Normal Stores
+    storesDetails: StoresDetails[] = [];
     storesPagination: StorePagination;
     
     // Featured Products
     featuredProducts: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
-    // Products
-    products: ProductDetails[] = [];
+    // Normal Products
+    productsDetails: ProductDetails[] = [];
     productsPagination: ProductPagination;
 
     maxStoresDisplay: number = 5;
@@ -116,12 +116,23 @@ export class CategoryComponent implements OnInit
                         this._locationService.getFeaturedLocations({pageSize: this.maxLocationsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds,  sortByCol: 'sequence', sortingOrder: 'ASC' })
                             .subscribe((locations : LandingLocation[]) => {});
 
-                        // Get featured stores with adjacent Locations
-                        this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                        // We disable featured stores & featured products at category level,
+                        // category level display normal product & stores
+                        
+                        // // Get featured stores with adjacent Locations
+                        // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                        //     .subscribe((stores : StoresDetails[]) => {});
+
+                        // // Get featured products with adjacent Locations
+                        // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                        //     .subscribe((products : ProductDetails[]) => {});
+
+                        // Get stores with adjacent Locations
+                        this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
                             .subscribe((stores : StoresDetails[]) => {});
 
-                        // Get featured products with adjacent Locations
-                        this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
+                        // Get products with adjacent Locations
+                        this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
                             .subscribe((products : ProductDetails[]) => {});
 
                     });
@@ -162,9 +173,16 @@ export class CategoryComponent implements OnInit
                             this._locationService.getFeaturedLocations({pageSize: this.maxLocationsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds,  sortByCol: 'sequence', sortingOrder: 'ASC' })
                                 .subscribe((locations : LandingLocation[]) => {});
 
+                            // We disable featured stores & featured products at category level,
+                            // category level display normal product & stores
+
                             // Get featured stores with adjacent Locations
-                            this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
-                                .subscribe((stores : StoresDetails[]) => {});
+                            // this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                            //     .subscribe((stores : StoresDetails[]) => {});
+
+                            // Get featured products with adjacent Locations
+                            // this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, isMainLevel: false })
+                            // .subscribe((stores : ProductDetails[]) => {});
 
                             // Get stores with adjacent Locations
                             this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
@@ -254,7 +272,7 @@ export class CategoryComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
                 if (stores) {
-                    this.stores = stores;
+                    this.storesDetails = stores;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -276,7 +294,7 @@ export class CategoryComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
                 if (products) {
-                    this.products = products;
+                    this.productsDetails = products;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -299,7 +317,7 @@ export class CategoryComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
                 if (products) {
-                    this.products = products;
+                    this.productsDetails = products;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -316,26 +334,15 @@ export class CategoryComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
         
-        // once selectCart() is triggered, it will set isLoading to true
         // this function will wait for both featuredStores$ & featuredProducts$ result first
         // then is isLoading to false
         combineLatest([
-            this._locationService.featuredStores$,
-            this._locationService.featuredProducts$
+            this._locationService.storesDetails$,
+            this._locationService.productsDetails$
         ]).pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(([featuredStores, featuredProducts ] : [StoresDetails[], ProductDetails[]])=>{
-            if (featuredStores && featuredProducts) {
+        .subscribe(([storesDetails, productsDetails ] : [StoresDetails[], ProductDetails[]])=>{
+            if (storesDetails && productsDetails) {
                 this.isLoading = false;
-
-                if (featuredStores.length === 0) {
-                    // Get stores
-                    this.featuredStores = this.stores;
-                }
-    
-                if (featuredProducts.length === 0) {
-                    // Get products
-                    this.featuredProducts = this.products;
-                }
             }            
 
             // Mark for check

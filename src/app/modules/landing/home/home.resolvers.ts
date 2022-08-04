@@ -53,7 +53,7 @@ export class HomeResolver implements Resolve<any>
                                 if (platform) {
                                     // this._locationService.getFeaturedLocations({ pageSize: 10, regionCountryId: platform.country}).subscribe(()=>{});
                                     // this._locationService.getFeaturedStores({ pageSize: 10, regionCountryId: platform.country}).subscribe(()=>{});
-                                    // // this._locationService.getFeaturedProducts({ pageSize: 10, regionCountryId: platform.country}).subscribe(()=>{});
+                                    // this._locationService.getFeaturedProducts({ pageSize: 10, regionCountryId: platform.country}).subscribe(()=>{});
                                     
                                     // this._locationService.getParentCategories({ pageSize: 8, regionCountryId: platform.country}).subscribe(()=>{});
                                     // this._locationService.getStoresDetails({ pageSize: 5, regionCountryId: platform.country}).subscribe(()=>{});

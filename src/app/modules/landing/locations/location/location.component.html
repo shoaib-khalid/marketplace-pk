@@ -58,10 +58,10 @@
                 </ng-container> -->
             </ng-container>
             <!-- Products -->
-            <ng-container *ngIf="(featuredProducts && featuredProducts.length) && categoryId">
+            <ng-container *ngIf="(productsDetails && productsDetails.length) && categoryId">
                 <featured-products 
                     class="w-full mt-4 sm:mt-8" 
-                    [products]="products" 
+                    [products]="productsDetails" 
                     [showViewAll]="(productDetailPagination && productDetailPagination.length > productDetailPagination.size) ? true : false" 
                     [redirectURL]="redirectUrl" 
                     [title]="'Products'"></featured-products>
@@ -100,9 +100,9 @@
             </ng-container>
 
             <!-- Stores -->
-            <ng-container *ngIf="(featuredStores && featuredStores.length) && categoryId">
+            <ng-container *ngIf="(storesDetails && storesDetails.length) && categoryId">
                 <featured-stores 
-                    class="w-full" 
+                    class="w-full mt-4 sm:mt-8" 
                     [stores]="featuredStores" 
                     [showViewAll]="(storesPagination && storesPagination.length > storesPagination.size) ? true : false" 
                     [redirectURL]="redirectUrl" 

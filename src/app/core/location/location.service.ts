@@ -298,6 +298,7 @@ export class LocationService
         city?               : string,
         postcode?           : string,
         isDisplay?          : boolean,
+        isMainLevel?        : boolean,
         latitude?           : number,
         longitude?          : number
     } = {
@@ -315,6 +316,7 @@ export class LocationService
         city            : null, 
         postcode        : null,
         isDisplay       : false,
+        isMainLevel     : false,
         latitude        : 0,
         longitude       : 0
     }): Observable<StoresDetails[]>

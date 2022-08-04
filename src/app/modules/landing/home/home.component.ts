@@ -226,8 +226,9 @@ export class LandingHomeComponent implements OnInit
                             sortByCol       : 'sequence', 
                             sortingOrder    : 'ASC', 
                             regionCountryId : this.platform.country,
+                            isMainLevel     : true,
                             latitude        : this.currentLat,
-                            longitude       : this.currentLong
+                            longitude       : this.currentLong,
                         });
                     }),
                     map(() => {
@@ -296,6 +297,7 @@ export class LandingHomeComponent implements OnInit
                         sortByCol       : 'sequence', 
                         sortingOrder    : 'ASC', 
                         regionCountryId : this.platform.country,
+                        isMainLevel     : true,
                         latitude        : latitude,
                         longitude       : longitude
                     })
@@ -338,6 +340,7 @@ export class LandingHomeComponent implements OnInit
                         sortByCol       : 'sequence', 
                         sortingOrder    : 'ASC', 
                         regionCountryId : this.platform.country,
+                        isMainLevel     : true,
                         latitude        : this.currentLat,
                         longitude       : this.currentLong
                     })
