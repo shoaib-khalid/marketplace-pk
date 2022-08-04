@@ -5,6 +5,7 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { switchMap } from 'rxjs/operators';
 import { CartService } from 'app/core/cart/cart.service';
 import { CustomerAuthenticate } from '../auth.types';
+import { CartItem } from 'app/core/cart/cart.types';
 
 @Injectable({
     providedIn: 'root'
@@ -89,6 +90,19 @@ export class NoAuthGuard implements CanActivate, CanActivateChild, CanLoad
 
                             this.customerAuthenticate = response;
 
+                            // merge multiple guests carts
+                            let cartIds: { id: string, storeId: string, cartItems: CartItem[]}[] = this._cartsService.cartIds$ ? JSON.parse(this._cartsService.cartIds$) : [];
+                                
+                            if (cartIds.length > 0) {
+
+                                this._cartsService.mergeMultipleCarts(this.customerAuthenticate.session.ownerId, cartIds.map(cart => cart.id))
+                                .subscribe(()=> {
+                                    // Resolve cart after merge
+                                    this._cartsService.cartResolver().subscribe();
+                                    this._cartsService.cartResolver(true).subscribe();
+                                })
+
+                            }
                             // MERGE CART
                             if (guestCartId && storeId) {  
                             
