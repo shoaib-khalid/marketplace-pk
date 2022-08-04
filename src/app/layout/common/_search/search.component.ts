@@ -1,16 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { distinctUntilChanged, filter, map, Subject, switchMap, takeUntil } from 'rxjs';
+import { map, Subject, switchMap, takeUntil } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SearchService } from './search.service';
-import { Store, StoreAssets } from 'app/core/store/store.types';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
-import { CustomerSearch, StoreDetails } from './search.types';
+import { StoreDetails } from './search.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { PlatformLocation } from '@angular/common';
-import { StoresService } from 'app/core/store/store.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 
@@ -36,21 +33,22 @@ export class _SearchComponent implements OnInit, OnDestroy
     @ViewChild('searchInput') public searchElement: ElementRef;
     @Input() storeId: string;
     @Input() store: StoreDetails;
+
+    platform: Platform;
     searchControl: FormControl = new FormControl();
     resultSets: any[];
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
     autoCompleteList: any[]
     minLength: number = 2;
     customer: User;
     custSearchResults: any[];
-
-    placeholder = 'Search for food or restaurant'
-
+    placeholder = 'Search for food or restaurant';
     currentScreenSize: string[] = [];
     route: string;
 
-    platform: Platform;
+    currentLat  : number = null;
+    currentLong : number = null;
 
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -62,7 +60,7 @@ export class _SearchComponent implements OnInit, OnDestroy
         private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _platformService: PlatformService,
-        private _storesService: StoresService
+        private _activatedRoute: ActivatedRoute
     )
     {
     }
@@ -93,11 +91,17 @@ export class _SearchComponent implements OnInit, OnDestroy
                             this._changeDetectorRef.markForCheck();
                         });
                 } else {
-                    this.placeholder = 'Search for food or restaurant'
+                    this.placeholder = 'Search for food or restaurant';
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Get searches from url parameter 
+        this._activatedRoute.queryParams.subscribe(params => {
+            this.currentLat = params['lat'];
+            this.currentLong = params['lng'];
+        });
         
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -118,14 +122,14 @@ export class _SearchComponent implements OnInit, OnDestroy
             });
 
         this._platformService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => {
-            if (platform) {
-                this.platform = platform;
-            }
-            // Mark for change
-            this._changeDetectorRef.markForCheck();
-        });
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => {
+                if (platform) {
+                    this.platform = platform;
+                }
+                // Mark for change
+                this._changeDetectorRef.markForCheck();
+            });
 
         // ----------------------
         // Fuse Media Watcher
@@ -310,12 +314,27 @@ export class _SearchComponent implements OnInit, OnDestroy
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
+        let queryParams = {
+            keyword : value,
+            lat     : this.currentLat,
+            lng     : this.currentLong
+        }
+
+        // Delete empty value
+        Object.keys(queryParams).forEach(key => {
+            if (Array.isArray(queryParams[key])) {
+                queryParams[key] = queryParams[key].filter(element => element !== null)
+            }
+            if (queryParams[key] === null || (Array.isArray(queryParams[key]) && queryParams[key].length === 0)) {
+                delete queryParams[key];
+            }
+        });
+
         // Route to respective page
         if (this.store) {
-            this._router.navigate(['/store/' + this.store.domain], {queryParams: {keyword: value}});
-        }
-        else {
-            this._router.navigate(['/search'], {queryParams: {keyword: value}});
+            this._router.navigate(['/store/' + this.store.domain], {queryParams: queryParams });
+        } else {
+            this._router.navigate(['/search'], {queryParams: queryParams });
         }
 
     }
@@ -327,11 +346,27 @@ export class _SearchComponent implements OnInit, OnDestroy
         // Mark for check
         this._changeDetectorRef.markForCheck();
 
+        let queryParams = {
+            keyword : result.searchText,
+            lat     : this.currentLat,
+            lng     : this.currentLong
+        }
+        
+        // Delete empty value
+        Object.keys(queryParams).forEach(key => {
+            if (Array.isArray(queryParams[key])) {
+                queryParams[key] = queryParams[key].filter(element => element !== null)
+            }
+            if (queryParams[key] === null || (Array.isArray(queryParams[key]) && queryParams[key].length === 0)) {
+                delete queryParams[key];
+            }
+        });
+
         if (result.domain) {
-            this._router.navigate(['/store/' + result.domain], {queryParams: {keyword: result.searchText}});
+            this._router.navigate(['/store/' + result.domain], { queryParams: queryParams });
         }
         else {
-            this._router.navigate(['/search'], {queryParams: {keyword: result.searchText}});
+            this._router.navigate(['/search'], { queryParams: queryParams });
         }
         
     }
@@ -465,7 +500,6 @@ export class _SearchComponent implements OnInit, OnDestroy
             this._searchService.localSearch = localDataSearch;
             this.resultSets = localDataSearch; 
         }
-
-        
     }
+
 }

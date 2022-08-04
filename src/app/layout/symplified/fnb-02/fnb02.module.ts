@@ -23,6 +23,7 @@ import { FloatingMessageModule } from 'app/layout/common/_floating-message/float
 import { DisplayErrorModule } from 'app/layout/common/_display-error/display-error.module';
 import { BreadcrumbModule } from 'app/layout/common/breadcrumb/breadcrumb.module';
 import { _SearchLocationModule } from 'app/layout/common/_search-location/search-location.module';
+import { _VerticalModeModule } from 'app/layout/common/_vertical-mode/vertical-mode.module';
 
 @NgModule({
     declarations: [
@@ -50,6 +51,7 @@ import { _SearchLocationModule } from 'app/layout/common/_search-location/search
         FooterModule,
         _SearchModule,
         _SearchLocationModule,
+        _VerticalModeModule,
         FloatingMessageModule,
         BreadcrumbModule
     ],

@@ -38,7 +38,7 @@
                             class="icon-size-4 text-gray-400 mr-1"
                             [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
                         <span class="text-gray-600 font-normal text-sm">{{store.storeDetails.regionCityDetails.name}}</span> &nbsp;
-                        <span class="text-sm text-gray-600 font-normal">({{store.storeDetails.distanceInMeter/1000 | number : '1.1-2'}}KM)</span>
+                        <span *ngIf="store.storeDetails.distanceInMeter/1000 > 0" class="text-sm text-gray-600 font-normal">({{store.storeDetails.distanceInMeter/1000 | number : '1.1-2'}}KM)</span>
                     </div>
                     <span class="w-full border-b py-0.5"></span>
                     <span class="flex flex-row text-gray-400 font-normal text-sm line-clamp-3 mt-1" [innerHTML]="store.storeDetails.storeDescription"></span>

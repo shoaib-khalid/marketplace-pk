@@ -38,7 +38,6 @@ export class LandingHomeComponent implements OnInit
     featuredStorePageSize = 10;
     oldFeaturedStoresPaginationIndex: number = 0;
 
-
     featuredProducts: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
@@ -49,6 +48,10 @@ export class LandingHomeComponent implements OnInit
     isLoading: boolean = false;
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
+
+    currentLat  : number = null;
+    currentLong : number = null;
+
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -68,6 +71,17 @@ export class LandingHomeComponent implements OnInit
     }
 
     ngOnInit(): void {
+
+        // Get current location
+        navigator.geolocation.getCurrentPosition((position) => {
+            var crd = position.coords;
+            this.currentLat = crd.latitude;
+            this.currentLong = crd.longitude;
+
+            this.resolveHome(this.currentLat, this.currentLong);
+        }, error => {
+            this.resolveHome(null,null);
+        });  
 
         // Get featured product pagination
         this._locationService.featuredProductPagination$
@@ -89,45 +103,6 @@ export class LandingHomeComponent implements OnInit
                     this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
                     this.featuredStoresPagination = storesPagination;  
                 }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get platform data
-        this._platformsService.platform$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => { 
-                if (platform) {
-                    this.platform = platform;
-
-                    // get back the previous pagination page
-                    // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
-                    if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
-                        this.oldFeaturedStoresPaginationIndex = this.featuredStoresPagination ? this.featuredStoresPagination.page : 0;
-                        this.oldFeaturedProductsPaginationIndex = this.featuredProductsPagination ? this.featuredProductsPagination.page : 0;
-                    }
-
-                    // Get categories
-                    this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
-                        .subscribe((category : ParentCategory[]) => {
-                        });
-
-                    // Get locations
-                    this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                        .subscribe((location : LandingLocation[]) => {
-                        });
-
-                    // Get featured stores
-                    this._locationService.getFeaturedStores({ page: this.oldFeaturedStoresPaginationIndex, pageSize: this.featuredStorePageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                        .subscribe((stores : StoresDetails[]) => {
-                        });
-
-                    // Get featured products
-                    this._locationService.getFeaturedProducts({ page: this.oldFeaturedProductsPaginationIndex, pageSize: this.featuredProductPageSize, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true })
-                        .subscribe((products : ProductDetails[]) => {
-                        });
-                }
-                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -245,7 +220,15 @@ export class LandingHomeComponent implements OnInit
                 merge(this._storesPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country});
+                        return this._locationService.getFeaturedStores({ 
+                            page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.featuredStoresPageOfItems['pageSize'], 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC', 
+                            regionCountryId : this.platform.country,
+                            latitude        : this.currentLat,
+                            longitude       : this.currentLong
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -261,7 +244,16 @@ export class LandingHomeComponent implements OnInit
                 merge(this._productsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true});
+                        return this._locationService.getFeaturedProducts({ 
+                            page            : this.featuredProductsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.featuredProductsPageOfItems['pageSize'], 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC', 
+                            regionCountryId : this.platform.country,
+                            isMainLevel     : true,
+                            latitude        : this.currentLat,
+                            longitude       : this.currentLong
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -269,6 +261,65 @@ export class LandingHomeComponent implements OnInit
                 ).subscribe();
             }
         }, 0);
+    }
+
+    resolveHome(latitude: number, longitude: number) {
+
+        // Get platform data
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                if (platform) {
+                    this.platform = platform;
+
+                    // get back the previous pagination page
+                    // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                    if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
+                        this.oldFeaturedStoresPaginationIndex = this.featuredStoresPagination ? this.featuredStoresPagination.page : 0;
+                        this.oldFeaturedProductsPaginationIndex = this.featuredProductsPagination ? this.featuredProductsPagination.page : 0;
+                    }
+
+                    // Get categories
+                    this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
+                        .subscribe((category : ParentCategory[]) => {
+                        });
+
+                    // Get locations
+                    this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                        .subscribe((location : LandingLocation[]) => {
+                        });
+
+                    // Get featured stores
+                    this._locationService.getFeaturedStores({ 
+                        page            : this.oldFeaturedStoresPaginationIndex, 
+                        pageSize        : this.featuredStorePageSize, 
+                        sortByCol       : 'sequence', 
+                        sortingOrder    : 'ASC', 
+                        regionCountryId : this.platform.country,
+                        latitude        : latitude,
+                        longitude       : longitude
+                    })
+                    .subscribe((stores : StoresDetails[]) => {
+                    });
+
+                    // Get featured products
+                    this._locationService.getFeaturedProducts({ 
+                        page            : this.oldFeaturedProductsPaginationIndex, 
+                        pageSize        : this.featuredProductPageSize, 
+                        sortByCol       : 'sequence', 
+                        sortingOrder    : 'ASC', 
+                        regionCountryId : this.platform.country, 
+                        isMainLevel     : true,
+                        latitude        : latitude,
+                        longitude       : longitude
+                    })
+                    .subscribe((products : ProductDetails[]) => {
+                    });
+                }
+                
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
  
     onChangePage(pageOfItems: Array<any>, type: string) {
@@ -281,11 +332,19 @@ export class LandingHomeComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country})
-                        .subscribe(()=>{
-                            // set loading to false
-                            this.isLoading = false;
-                        });
+                    this._locationService.getFeaturedStores({ 
+                        page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
+                        pageSize        : this.featuredStoresPageOfItems['pageSize'], 
+                        sortByCol       : 'sequence', 
+                        sortingOrder    : 'ASC', 
+                        regionCountryId : this.platform.country,
+                        latitude        : this.currentLat,
+                        longitude       : this.currentLong
+                    })
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
                 }
             }        
         }
@@ -297,11 +356,20 @@ export class LandingHomeComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: true})
-                        .subscribe(()=>{
-                            // set loading to false
-                            this.isLoading = false;
-                        });
+                    this._locationService.getFeaturedProducts({ 
+                        page            : this.featuredProductsPageOfItems['currentPage'] - 1, 
+                        pageSize        : this.featuredProductsPageOfItems['pageSize'], 
+                        sortByCol       : 'sequence', 
+                        sortingOrder    : 'ASC', 
+                        regionCountryId : this.platform.country, 
+                        isMainLevel     : true,
+                        latitude        : this.currentLat,
+                        longitude       : this.currentLong
+                    })
+                    .subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
                 }
             }
         }

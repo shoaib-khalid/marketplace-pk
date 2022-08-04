@@ -42,11 +42,11 @@
                 <featured-products 
                     class="w-full mt-4 sm:mt-8" 
                     [products]="products" 
-                    [showViewAll]="(featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination) ? true : false" 
+                    [showViewAll]="(productsPagination && productsPagination.length > productsPagination.size) ? true : false" 
                     [redirectURL]="redirectUrl" 
                     [title]="'Products'"></featured-products>
                 <!-- Pagination -->
-                <!-- <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination">
+                <!-- <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination.size">
                     <div class="flex w-full mt-4 items-center justify-center">
                         <pagination 
                             [itemLength]="featuredProductsPagination.length" 
@@ -76,18 +76,18 @@
             <!-- Stores -->
             <ng-container *ngIf="stores && stores.length">
                 <featured-stores 
-                    class="w-full mt-4 sm:mt-8" 
+                    class="w-full mt-4 sm:mt-8"
                     [stores]="stores" 
-                    [showViewAll]="(featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize) ? true : false" 
+                    [showViewAll]="(storesPagination && storesPagination.length > storesPagination.size) ? true : false" 
                     [redirectURL]="redirectUrl" 
                     [title]="'Stores'"></featured-stores>
                 <!-- Stores Pagination -->
-                <!-- <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStorePageSize">
+                <!-- <ng-container *ngIf="storesPagination && storesPagination.length > storesPagination.sizw">
                     <div class="flex w-full mt-4 items-center justify-center">
                         <pagination 
-                            [itemLength]="featuredStoresPagination.length" 
-                            [initialPage]="featuredStoresPagination.page + 1"
-                            [pageSize]="featuredStoresPagination.size"
+                            [itemLength]="storesPagination.length" 
+                            [initialPage]="storesPagination.page + 1"
+                            [pageSize]="storesPagination.size"
                             (changePage)="onChangePage($event, 'store')"
                             #storesPaginator></pagination>
                     </div>

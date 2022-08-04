@@ -40,18 +40,20 @@
                 <span class="text-base md:text-lg font-semibold line-clamp-1">{{product.name}}</span>
                 <div class="flex flex-row items-center">
                     <mat-icon
-                        class="icon-size-4 text-primary-400 mr-1"
+                        class="icon-size-4 text-primary mr-1"
                         [svgIcon]="'mat_outline:storefront'"></mat-icon>
-                    <span class="text-sm md:text-base text-primary-400 line-clamp-1">{{product.storeDetails.name}}</span>
+                    <span class="text-sm md:text-base line-clamp-1">{{product.storeDetails.name}}</span>
                 </div>
-                <div class="flex flex-row items-center">
-                    <mat-icon
-                        class="icon-size-4 text-gray-400 mr-1"
-                        [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
-                    <span span class="text-sm text-gray-400">
-                        {{ product.storeDetails.distanceInMeter/1000 | number : '1.1-2' }} KM
-                    </span>
-                </div>
+                <ng-container *ngIf="product.storeDetails.distanceInMeter/1000 > 0">
+                    <div class="flex flex-row items-center">
+                        <mat-icon
+                            class="icon-size-4 text-gray-400 mr-1"
+                            [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+                        <span class="text-sm text-gray-400">
+                            {{ product.storeDetails.distanceInMeter/1000 | number : '1.1-2' }} KM
+                        </span>
+                    </div>
+                </ng-container>
             </div>
             <div class="flex flex-row items-end justify-between">
                 <ng-container *ngIf="product.productInventories[0] && product.productInventories[0].itemDiscount">

@@ -297,7 +297,9 @@ export class LocationService
         cityId?             : string | string[],
         city?               : string,
         postcode?           : string,
-        isDisplay?          : boolean
+        isDisplay?          : boolean,
+        latitude?           : number,
+        longitude?          : number
     } = {
         storeName       : null,
         parentCategoryId: null,
@@ -312,7 +314,9 @@ export class LocationService
         cityId          : null, 
         city            : null, 
         postcode        : null,
-        isDisplay       : false
+        isDisplay       : false,
+        latitude        : 0,
+        longitude       : 0
     }): Observable<StoresDetails[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;
@@ -380,6 +384,8 @@ export class LocationService
         isDisplay?          : boolean,
         isMainLevel?        : boolean,
         status?             : string[],
+        latitude?           : number,
+        longitude?          : number
     } = {
         storeName       : null,
         parentCategoryId: null,
@@ -397,6 +403,8 @@ export class LocationService
         isDisplay       : false,
         isMainLevel     : false,
         status          : ['ACTIVE', 'OUTOFSTOCK'],
+        latitude        : 0,
+        longitude       : 0
     }): Observable<ProductDetails[]>
     {
         let locationService = this._apiServer.settings.apiServer.locationService;
@@ -434,6 +442,7 @@ export class LocationService
                         startIndex: response["data"].pageable.offset,
                         endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
                     }
+                    
                     this._featuredProductPagination.next(_pagination);
                     this._featuredProducts.next(response["data"].content);
 

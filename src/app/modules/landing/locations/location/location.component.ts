@@ -35,7 +35,7 @@ export class LocationComponent implements OnInit
     featuredStoresPagination: StorePagination;
     featuredStoresPageOfItems: Array<any>;
     // Stores
-    stores: StoresDetails[] = [];
+    storesDetails: StoresDetails[] = [];
     storesPagination: StorePagination;
     storesPageOfItems: Array<any>;
 
@@ -44,7 +44,7 @@ export class LocationComponent implements OnInit
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
     // Products
-    products: ProductDetails[] = [];
+    productsDetails: ProductDetails[] = [];
     productsPagination: ProductPagination;
     productsPageOfItems: Array<any>;
     
@@ -262,7 +262,7 @@ export class LocationComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
                 if (stores) {
-                    this.stores = stores;                     
+                    this.storesDetails = stores;                     
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -307,7 +307,7 @@ export class LocationComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
                 if (products) {
-                    this.products = products;
+                    this.productsDetails = products;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -324,7 +324,6 @@ export class LocationComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
             });
 
-        // once selectCart() is triggered, it will set isLoading to true
         // this function will wait for both featuredStores$ & featuredProducts$ result first
         // then is isLoading to false
         combineLatest([
@@ -336,13 +335,13 @@ export class LocationComponent implements OnInit
                 this.isLoading = false;
 
                 if (featuredStores.length === 0) {
-                    // Get stores
-                    this.featuredStores = this.stores;
+                    // Get featuredStores
+                    this.featuredStores = featuredStores;
                 }
 
                 if (featuredProducts.length === 0) {
-                    // Get products
-                    this.featuredProducts = this.products;
+                    // Get featuredProducts
+                    this.featuredProducts = featuredProducts;
                 }
             }            
             // Mark for check

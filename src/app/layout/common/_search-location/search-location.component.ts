@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Subject, takeUntil, debounceTime } from 'rxjs';
+import { Subject, takeUntil, debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations/public-api';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Loader } from '@googlemaps/js-api-loader';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -40,8 +40,10 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
     autoCompleteList: { type: string, location: string, description?: string }[] = [];
     placeholderText: string = "Enter your location";
     
+    keyword     : string;
+
     // Google
-    loader: any;
+    loader: Loader;
     currentLat  : number = null;
     currentLong : number = null;
     
@@ -89,11 +91,21 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
         this._activatedRoute.queryParams.subscribe(params => {
             this.currentLat = params['lat'];
             this.currentLong = params['lng'];
+            this.keyword = params['keyword'];
 
             if (this.currentLat && this.currentLong) {
                 this.placeholderText = "Latitude: " + this.currentLat + ", Longitude: " + this.currentLong;
             } else {
                 this.placeholderText = "Enter your location";
+            }
+        });
+
+        this._router.events.pipe(
+            filter((event) => event instanceof NavigationEnd),
+            distinctUntilChanged(),
+        ).subscribe((event: NavigationEnd) => {
+            if (event.url === "/") {
+                this.searchControl.patchValue("");
             }
         });
 
@@ -238,8 +250,9 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             this.currentLong = crd.longitude;
 
             let location = {
-                lat: this.currentLat,
-                lng: this.currentLong,  
+                lat     : this.currentLat,
+                lng     : this.currentLong,
+                keyword : this.keyword
             };
             this.loader.load().then(() => {
                 let geocoder: google.maps.Geocoder = new google.maps.Geocoder();
@@ -285,8 +298,9 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             .then((response: google.maps.GeocoderResponse) => {
                 if (response.results && response.results.length > 0) {
                     let location = {
-                        lat: response.results[0].geometry.location.lat(),
-                        lng: response.results[0].geometry.location.lng(),
+                        lat     : response.results[0].geometry.location.lat(),
+                        lng     : response.results[0].geometry.location.lng(),
+                        keyword : this.keyword
                     }
 
                     this._router.navigate(['/search'], {queryParams: location});
@@ -314,8 +328,9 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                 .then((response: google.maps.GeocoderResponse) => {
                     if (response.results && response.results.length > 0) {
                         let location = {
-                            lat: response.results[0].geometry.location.lat(),
-                            lng: response.results[0].geometry.location.lng(),
+                            lat     : response.results[0].geometry.location.lat(),
+                            lng     : response.results[0].geometry.location.lng(),
+                            keyword : this.keyword
                         }
                         this._router.navigate(['/search'], {queryParams: location});
 
@@ -325,6 +340,11 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                 });
             });
         }
+    }
+
+    resetLocation() {
+        this.searchControl.patchValue("");
+        this._router.navigate(['/search'], {queryParams: { keyword: this.keyword }});
     }
 
     blurInput() {

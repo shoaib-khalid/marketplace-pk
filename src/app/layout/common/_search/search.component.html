@@ -12,28 +12,10 @@
             [matAutocomplete]="matAutocomplete"
             (keypress)="onKeypress($event)"
             (keydown.enter)="goToSearch($event.target.value)">
+        <!-- Search button -->
         <div *ngIf="currentScreenSize.includes('sm')" class="text-white font-semibold" matSuffix>
-            <!-- <input mat-button id="search-btn" type="button">
-            <label for="search-btn" (click)="goToSearch(searchControl.value)">
-                <span>Search</span>
-            </label> -->
             <button class="p-2.5 font-bold" (click)="goToSearch(searchControl.value);">Search</button>
         </div>
-        <!-- </ng-container> -->
-        <!-- <div class="w-15 py-1">
-            <input
-                id="add-voucher-button"
-                type="button"
-                class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                mat-button
-                >
-            <label 
-                class="flex items-center justify-center h-9 rounded-lg bg-primary hover:bg-primary-700 cursor-pointer"
-                for="add-voucher-button"
-                matRipple>
-                <mat-icon class="icon-size-5 items-center text-white" svgIcon="heroicons_solid:adjustments"></mat-icon>
-            </label>
-        </div> -->
     </mat-form-field>
     <mat-autocomplete
         class="max-h-128 mt-1 rounded"
