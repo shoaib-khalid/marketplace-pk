@@ -7,6 +7,7 @@ import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { Store, StoreAssets } from 'app/core/store/store.types';
 import { DatePipe } from '@angular/common';
+import { StoreDetails } from '../_search/search.types';
 
 @Component({
     selector     : 'featured-stores',
@@ -17,7 +18,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
 {
 
     platform: Platform;
-    @Input() stores: any;
+    @Input() stores: Store[] | StoreDetails[];
     @Input() title: string = "Store";
     @Input() showViewAll: boolean = false;
     @Input() redirectURL: { categoryId?: string, locationId?: string } = null;
@@ -108,6 +109,9 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
 
     checkStoreTiming(store: Store) : { notificationMessage: string, isStoreOpenToday: boolean, messageTitle: string }
     {
+        // console.log("store", store);
+        
+
         let storeTiming = store.storeTiming;
         let storeId = store.id;
         let notificationMessage : string = ''
