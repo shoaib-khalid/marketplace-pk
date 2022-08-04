@@ -64,6 +64,7 @@ export const appRoutes: Route[] = [
             layout: 'empty'
         },
         resolve    : {
+            browserCompatibility    : BrowserCompatibilityResolver,
             platformSetup: PlatformSetupResolver
         },
         children: [
@@ -84,6 +85,7 @@ export const appRoutes: Route[] = [
         canActivateChild: [AuthGuard],
         component: LayoutComponent,
         resolve    : {
+            browserCompatibility    : BrowserCompatibilityResolver,
             platformSetup: PlatformSetupResolver
         },
         data: {
@@ -106,6 +108,7 @@ export const appRoutes: Route[] = [
             roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
+            browserCompatibility    : BrowserCompatibilityResolver,
             initialData: InitialDataResolver,
             platformSetup: PlatformSetupResolver
         },
@@ -115,19 +118,19 @@ export const appRoutes: Route[] = [
     }, 
 
     // Admin routes
-    {
-        path       : '',
-        canActivate: [AuthGuard],
-        canActivateChild: [AuthGuard], 
-        component  : LayoutComponent,
-        resolve    : {
-            initialData: InitialDataResolver,
-        },
-        children   : [
-            { path: 'example', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
-            // {path: 'buyer', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
-        ]
-    },
+    // {
+    //     path       : '',
+    //     canActivate: [AuthGuard],
+    //     canActivateChild: [AuthGuard], 
+    //     component  : LayoutComponent,
+    //     resolve    : {
+    //         initialData: InitialDataResolver,
+    //     },
+    //     children   : [
+    //         { path: 'example', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
+    //         // {path: 'buyer', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
+    //     ]
+    // },
     // Documentation
     {
         path: 'docs',
