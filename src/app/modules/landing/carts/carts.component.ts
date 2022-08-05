@@ -507,7 +507,8 @@ export class CartListComponent implements OnInit, OnDestroy
                     this._userService.customerAddress$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((customerAddress : CustomerAddress) => {
-                            if (customerAddress) {                                
+                            if (customerAddress) { 
+                                                               
                                 this.customerAddress = customerAddress;
                                 // use for self pickup
                                 this.selfPickupInfo = customerAddress;
@@ -1711,6 +1712,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
                     // Update the address
                     this._userService.customersAddresses = guestAddresses;
+                    this._userService.customersAddress = null;
 
                     // Set to local
                     this._userService.guestAddress = JSON.stringify(guestAddresses);

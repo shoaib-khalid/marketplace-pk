@@ -66,7 +66,7 @@
                         <mat-icon 
                             class="icon-size-5 text-primary" 
                             [svgIcon]="'mat_solid:contact_phone'"></mat-icon>
-                        <span class="ml-2 font-bold">Contact Info for Self Pick-up</span>
+                        <span class="ml-2 font-bold">Contact Info for Self Collect</span>
                     </div>
                     <ng-container *ngIf="selfPickupInfo; else noSelfPickupInfo">
                         <div class="w-full flex flex-col rounded">
@@ -391,7 +391,7 @@
                                                 <mat-radio-button
                                                     class=""
                                                     [value]="true">
-                                                    Self Pick-Up
+                                                    Self Collect
                                                 </mat-radio-button>
                                             </mat-radio-group>
                                             <!-- Total Items  -->
@@ -933,7 +933,7 @@
                             <mat-icon 
                                 class="icon-size-5 text-primary" 
                                 [svgIcon]="'mat_solid:contact_phone'"></mat-icon>
-                            <span class="ml-2 font-bold">Contact Info for Self Pick-up</span>
+                            <span class="ml-2 font-bold">Contact Info for Self Collect</span>
                         </div>
                         <ng-container *ngIf="selfPickupInfo; else noSelfPickupInfo">
                             <div class="w-full flex flex-col rounded">
@@ -985,8 +985,8 @@
                             <mat-icon 
                                 class="icon-size-5 text-primary" 
                                 [svgIcon]="'mat_outline:storefront'"></mat-icon>
-                            <span *ngIf="storesAddresses.length === 1" class="ml-2 font-bold">Store for Self Pick-up</span>
-                            <span *ngIf="storesAddresses.length > 1" class="ml-2 font-bold">Stores for Self Pick-up</span>
+                            <span *ngIf="storesAddresses.length === 1" class="ml-2 font-bold">Store for Self Collect</span>
+                            <span *ngIf="storesAddresses.length > 1" class="ml-2 font-bold">Stores for Self Collect</span>
                         </div>
                         <ng-container *ngFor="let storeAddress of storesAddresses">
                             <fuse-card class="rounded mt-2 w-full">
