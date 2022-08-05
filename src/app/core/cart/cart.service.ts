@@ -138,6 +138,12 @@ export class CartService
                             }
                         });
                 }
+                else {
+                    // Set cart to null
+                    this._cartsHeaderWithDetails.next(null);
+                    this._cartsWithDetails.next(null);
+
+                }
             })
         );
     }
@@ -358,6 +364,33 @@ export class CartService
                 switchMap(async (response: any) => {
                                 
                     this._logging.debug("Response from CartService (mergeCart)", response);
+                
+                    return response;
+                })
+            );
+
+    }
+
+    mergeMultipleCarts(customerId : string, guestCartIdList : string[]):  Observable<Cart>
+    {
+        let orderService = this._apiServer.settings.apiServer.orderService;
+        //let accessToken = this._jwt.getJwtPayload(this.accessToken).act;
+        let accessToken = "accessToken";
+
+        const header = {  
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.put<any>(orderService + '/carts/merge/' + customerId, guestCartIdList, header)
+            .pipe(
+                take(1),
+                catchError(() =>
+                    // Return false
+                    of(false)
+                ),
+                switchMap(async (response: any) => {
+                                
+                    this._logging.debug("Response from CartService (mergeMultipleCarts)", response);
                 
                     return response;
                 })

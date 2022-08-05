@@ -10,7 +10,7 @@ import { ValidateOauthRequest } from 'app/core/auth/auth.types';
 import { AppConfig } from 'app/config/service.config';
 import { AppleLoginService } from './apple-login.service';
 import { CartService } from 'app/core/cart/cart.service';
-import { Cart } from 'app/core/cart/cart.types';
+import { Cart, CartItem } from 'app/core/cart/cart.types';
 
 
 
@@ -88,6 +88,20 @@ export class AppleLoginComponent
                                 const redirectURL = this._appleLoginService.sfUrl$ ? this._appleLoginService.sfUrl$ : null;
                                 const guestCartId = this._appleLoginService.guestCartId$ ? this._appleLoginService.guestCartId$ : null;
                                 const storeId = this._appleLoginService.storeId$ ? this._appleLoginService.storeId$ : null;
+
+                                // merge multiple guests carts
+                                let cartIds: { id: string, storeId: string, cartItems: CartItem[]}[] = this._cartsService.cartIds$ ? JSON.parse(this._cartsService.cartIds$) : [];
+                                
+                                if (cartIds.length > 0) {
+
+                                    this._cartsService.mergeMultipleCarts(loginOauthResponse['session'].ownerId, cartIds.map(cart => cart.id))
+                                    .subscribe(()=> {
+                                        // Resolve cart after merge
+                                        this._cartsService.cartResolver().subscribe();
+                                        this._cartsService.cartResolver(true).subscribe();
+                                    })
+
+                                }
 
                                 // Merge cart
                                 if (guestCartId && storeId) {  
