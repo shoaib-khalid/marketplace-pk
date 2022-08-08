@@ -20,9 +20,9 @@
                                 ) + 'background-size: cover;'"
                         >
                             <ng-container *ngIf="!product.thumbnailUrl" >
-                                <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
-                                    <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory && product.storeCategory.parentCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
-                                    <span class="text-white text-center opacity-100">Product image not available</span>
+                                <div class="leading-tight tracking-tight absolute flex flex-col gap-1 w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
+                                    <span class="text-white font-semibold text-sm md:text-lg text-center opacity-100">{{product.storeCategory && product.storeCategory.parentCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                                    <span class="text-white text-center text-sm md:text-base opacity-100">Product image not available</span>
                                 </div>
                             </ng-container>
                             <ng-container *ngIf="product.productInventories.length > 0">
@@ -86,9 +86,9 @@
                                 [style]="(product.thumbnailUrl ? 'background-image: url(\'' + product.thumbnailUrl + '\');' : 'background-image: url(\'' + product.storeCategory.parentCategory.parentThumbnailUrl + '\');') + 'background-size: cover;'"
                             >
                                 <ng-container *ngIf="!product.thumbnailUrl" >
-                                    <div class="absolute flex flex-col w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
-                                        <span class="text-white font-semibold text-lg opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
-                                        <span class="text-white text-center opacity-100">Product image not available</span>
+                                    <div class="leading-tight tracking-tight absolute flex flex-col gap-1 w-full justify-center items-center left-0 right-0 top-0 bottom-0 bg-black bg-opacity-40 rounded-t-lg">
+                                        <span class="text-white font-semibold text-sm md:text-lg text-center opacity-100">{{product.storeCategory ? product.storeCategory.parentCategory.parentName : "Product category not available"}}</span>
+                                        <span class="text-white text-center text-sm md:text-base opacity-100">Product image not available</span>
                                     </div>
                                 </ng-container>
                                 <ng-container *ngIf="product.productInventories.length > 0">
