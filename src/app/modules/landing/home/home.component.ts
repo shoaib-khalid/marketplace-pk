@@ -139,8 +139,9 @@ export class LandingHomeComponent implements OnInit
                         this._locationService.getProductsDetails({ 
                             page            : this.oldProductsDetailsPaginationIndex, 
                             pageSize        : this.productsDetailsPageSize, 
-                            sortByCol       : 'name', 
+                            sortByCol       : 'created', 
                             sortingOrder    : 'ASC', 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country, 
                             latitude        : this.currentLat,
                             longitude       : this.currentLong
@@ -197,6 +198,7 @@ export class LandingHomeComponent implements OnInit
                             pageSize        : this.featuredProductPageSize, 
                             sortByCol       : 'sequence', 
                             sortingOrder    : 'ASC', 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country, 
                             isMainLevel     : true
                         })
@@ -421,6 +423,7 @@ export class LandingHomeComponent implements OnInit
                             pageSize        : this.featuredProductsPageOfItems['pageSize'], 
                             sortByCol       : 'sequence', 
                             sortingOrder    : 'ASC', 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country,
                             isMainLevel     : true,
                             latitude        : this.currentLat,
@@ -468,8 +471,9 @@ export class LandingHomeComponent implements OnInit
                         return this._locationService.getProductsDetails({ 
                             page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
                             pageSize        : this.productsDetailsPageOfItems['pageSize'], 
-                            sortByCol       : 'sequence', 
+                            sortByCol       : 'created', 
                             sortingOrder    : 'ASC', 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country,
                             latitude        : this.currentLat,
                             longitude       : this.currentLong
@@ -522,6 +526,7 @@ export class LandingHomeComponent implements OnInit
                         pageSize        : this.featuredProductsPageOfItems['pageSize'], 
                         sortByCol       : 'sequence', 
                         sortingOrder    : 'ASC', 
+                        status          : ['ACTIVE', 'OUTOFSTOCK'],
                         regionCountryId : this.platform.country, 
                         isMainLevel     : true,
                         latitude        : this.currentLat,
@@ -568,8 +573,9 @@ export class LandingHomeComponent implements OnInit
                     this._locationService.getProductsDetails({ 
                         page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
                         pageSize        : this.productsDetailsPageOfItems['pageSize'], 
-                        sortByCol       : 'name', 
+                        sortByCol       : 'created', 
                         sortingOrder    : 'ASC', 
+                        status          : ['ACTIVE', 'OUTOFSTOCK'],
                         regionCountryId : this.platform.country, 
                         latitude        : this.currentLat,
                         longitude       : this.currentLong
