@@ -783,7 +783,11 @@ export class LandingProductDetailsComponent implements OnInit
                     "dismissible": true
                   });
                 resolve(response);
-                this.specialInstructionForm.get('specialInstructionValue').setValue('')
+                
+                // clear special instruction field
+                this.specialInstructionForm.get('specialInstructionValue').setValue('');
+                this.specialInstructionForm.get('specialInstructionValue').markAsUntouched();
+
             }, (error) => {
                 const confirmation = this._fuseConfirmationService.open({
                     "title": "Out of Stock!",
