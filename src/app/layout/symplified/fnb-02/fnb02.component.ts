@@ -83,6 +83,10 @@ export class Fnb2LayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        // set route and storeDetails to null first
+        this._searchService.route = '';
+        this._searchService.storeDetails = null;
+
         this._router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
             distinctUntilChanged(),

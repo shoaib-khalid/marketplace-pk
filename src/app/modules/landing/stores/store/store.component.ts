@@ -201,6 +201,9 @@ export class LandingStoreComponent implements OnInit
                                     
                                     let index = this.storeCategories.findIndex(item => item.name.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '') === this.catalogueSlug);
                                     this.storeCategory = (index > -1) ? this.storeCategories[index] : null;
+
+                                    // move selected category to the front
+                                    this.storeCategories = this.moveArray(this.storeCategories, index, 0)
                                 }
                             
                                 // get back the previous pagination page
@@ -685,5 +688,16 @@ export class LandingStoreComponent implements OnInit
     scroll(id) {
         this._scroller.scrollToAnchor(id)
     }
+
+    moveArray(arr, old_index, new_index) {
+        if (new_index >= arr.length) {
+            var k = new_index - arr.length + 1;
+            while (k--) {
+                arr.push(undefined);
+            }
+        }
+        arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        return arr; 
+    };
 
 }
