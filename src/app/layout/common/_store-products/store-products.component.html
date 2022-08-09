@@ -44,10 +44,9 @@
                             </ng-container>
                         </div>
                         <!-- Product Footer -->
-                        <div class="flex flex-col px-4 mb-4 h-60 w-full">
+                        <div class="flex flex-col px-4 mb-4 h-60 w-full justify-between">
                             <!-- min-h-[48px] -->
-                            <div class="mt-4 sm:text-xl font-bold line-clamp-2 pb-2">{{product.name}}</div>
-                            <div class="relative h-40">
+                            <!-- <div class="relative h-40">
                                 <div 
                                     class="mt-2 mb-4 text-ellipsis overflow-hidden"
                                     [ngClass]="( ( displaySeeMore(product.description) ) && !( product.productInventories.length > 0 && product.productInventories[0].itemDiscount ) ) ? 'h-26' : 
@@ -57,14 +56,26 @@
                                     <span class="text-gray-500" [innerHtml]="product.description"></span>
                                 </div>
                                 <span class="absolute text-gray-500 bottom-0 left-0" [ngClass]="displaySeeMore(product.description) ? 'block' : 'hidden'">...more</span>
+                            </div> -->
+                            <div class="mt-4 mb-2">
+                                <!-- Product name  -->
+                                <span class=" line-clamp-2 font-bold sm:text-xl">{{product.name}}</span>
+                                <!-- Description -->
+                                <div class="h-auto">
+                                    <div class="mt-2 mb-4 text-ellipsis overflow-hidden">
+                                        <span class="text-gray-500 line-clamp-4" [innerHtml]="product.description"></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div *ngIf="product.productInventories.length > 0 && product.productInventories[0].itemDiscount;else noItemDiscountGrid">
-                                <p class="line-through text-sm">{{product.productInventories[0].price | currency: platform.currency}}</p>
-                                <p class="font-semibold text-black text-2xl" [ngClass]="isProductOutOfStock(product) === false ? 'group-hover:text-black' : 'group-hover:text-primary'">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</p>
+                            <div class="flex flex-row justify-between">
+                                <div *ngIf="product.productInventories.length > 0 && product.productInventories[0].itemDiscount;else noItemDiscountGrid">
+                                    <p class="line-through text-sm">{{product.productInventories[0].price | currency: platform.currency}}</p>
+                                    <p class="font-semibold text-black text-2xl" [ngClass]="isProductOutOfStock(product) === false ? 'group-hover:text-black' : 'group-hover:text-primary'">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</p>
+                                </div>
+                                <ng-template #noItemDiscountGrid>
+                                    <p class="font-semibold text-black text-2xl" [ngClass]="isProductOutOfStock(product) === false ? 'group-hover:text-black' : 'group-hover:text-primary'">{{ (product.productInventories.length > 0 ? product.productInventories[0].price : 0) | currency: platform.currency}}</p>
+                                </ng-template>
                             </div>
-                            <ng-template #noItemDiscountGrid>
-                                <p class="font-semibold text-black text-2xl" [ngClass]="isProductOutOfStock(product) === false ? 'group-hover:text-black' : 'group-hover:text-primary'">{{ (product.productInventories.length > 0 ? product.productInventories[0].price : 0) | currency: platform.currency}}</p>
-                            </ng-template>
                         </div>
                     </div>
                 </ng-container>
@@ -129,7 +140,7 @@
                                         </span>
                                         <span class="text-gray-500 text-xs sm:text-sm md:text-md line-clamp-2 md:line-clamp-4" [innerHtml]="product.description"></span>
                                     </div>
-                                    <span class="text-gray-500 bottom-0 left-0 text-xs sm:text-sm md:text-md" [ngClass]="displaySeeMore(product.description) ? 'block' : 'hidden'">...more</span>
+                                    <!-- <span class="text-gray-500 bottom-0 left-0 text-xs sm:text-sm md:text-md" [ngClass]="displaySeeMore(product.description) ? 'block' : 'hidden'">...more</span> -->
                                     <div class="flex flex-row">
                                         <!-- <p class="font-semibold line-through">{{product.productInventories[0].price | currency: platform.currency}}</p> -->
                                         <div class="flex flex-row items-center gap-1" *ngIf="product.productInventories.length > 0 && product.productInventories[0].itemDiscount; else noItemDiscountList">
