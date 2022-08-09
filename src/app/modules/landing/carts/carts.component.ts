@@ -1587,14 +1587,14 @@ export class CartListComponent implements OnInit, OnDestroy
         // Hardcode for now
         let verticalCodes = [];
         if (this.platform.country === 'MYS') {
-            verticalCodes = ['Fnb', 'E-Commerce'];
+            verticalCodes = ['FnB', 'E-Commerce'];
         }
         else
         {
             verticalCodes = ['FnB_PK', 'ECommerce_PK'];
         }
 
-        let index = voucher.voucher.voucherVerticalList.findIndex(item => (item.verticalCode === verticalCodes[0]) || (item.verticalCode === verticalCodes[1]));
+        let index = voucher.voucher.voucherVerticalList.findIndex(item => (verticalCodes.includes(item.verticalCode)));
         if (index > -1) {
             return true;
         }
