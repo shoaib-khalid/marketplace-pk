@@ -42,7 +42,7 @@
     </ng-container>
     <!-- Products -->
     <ng-container *ngIf="productsDetails && productsDetails.length">
-        <featured-products class="w-full" [products]="productsDetails" [title]="'Products'"></featured-products>
+        <featured-products id="productsDetailsContainer" class="w-full" [products]="productsDetails" [title]="'Items'"></featured-products>
         <!-- Products Pagination -->
         <div class="flex w-full mt-4 items-center justify-center">
             <pagination 
@@ -51,12 +51,13 @@
                 [initialPage]="productsDetailsPagination.page + 1"
                 [pageSize]="productsDetailsPagination.size"
                 (changePage)="onChangePage($event, 'productsDetails')"
+                (click)="scroll('productsDetailsContainer')"
                 #productDetailsPaginator></pagination>
         </div>
     </ng-container>
     <!-- Stores -->
     <ng-container *ngIf="storesDetails && storesDetails.length">
-        <featured-stores class="w-full mt-2 sm:mt-4" [stores]="storesDetails" [title]="'Stores'"></featured-stores>
+        <featured-stores id="storesDetailsContainer" class="w-full mt-2 sm:mt-4" [stores]="storesDetails" [title]="'Shops'"></featured-stores>
         <!-- Stores Pagination -->
         <pagination 
             *ngIf="storesDetailsPagination.length > storesDetailsPagination.size"
@@ -65,6 +66,7 @@
             [initialPage]="storesDetailsPagination.page + 1"
             [pageSize]="storesDetailsPagination.size"
             (changePage)="onChangePage($event, 'storesDetails')"
+            (click)="scroll('storesDetailsContainer')"
             #storesDetailsPaginator></pagination>
     </ng-container>
     <!-- Ads Banner -->

@@ -1,3 +1,4 @@
+import { ViewportScroller } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -61,7 +62,9 @@ export class LandingSearchComponent implements OnInit
         private _locationService: LocationService,
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _navigate: NavigateService
+        private _navigate: NavigateService,
+        private _scroller: ViewportScroller,
+
     )
     {
     }
@@ -228,7 +231,10 @@ export class LandingSearchComponent implements OnInit
                             pageSize        : this.storesDetailsPageOfItems['pageSize'], 
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC',
-                            regionCountryId : this.platform.country
+                            regionCountryId : this.platform.country, 
+                            tagKeyword      : this.tagValue, 
+                            latitude        : this.currentLat, 
+                            longitude       : this.currentLong 
                         });
                     }),
                     map(() => {
@@ -252,7 +258,10 @@ export class LandingSearchComponent implements OnInit
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC',
                             regionCountryId : this.platform.country, 
-                            status          : ['ACTIVE', 'OUTOFSTOCK']
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
+                            latitude        : this.currentLat, 
+                            longitude       : this.currentLong, 
+                            storeTagKeyword : this.tagValue
                         });
                     }),
                     map(() => {
@@ -279,7 +288,10 @@ export class LandingSearchComponent implements OnInit
                             pageSize        : this.storesDetailsPageOfItems['pageSize'],
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC', 
-                            regionCountryId : this.platform.country
+                            regionCountryId : this.platform.country, 
+                            tagKeyword      : this.tagValue, 
+                            latitude        : this.currentLat, 
+                            longitude       : this.currentLong 
                         })
                         .subscribe(()=>{
                             // set loading to false
@@ -303,7 +315,10 @@ export class LandingSearchComponent implements OnInit
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC',
                             regionCountryId : this.platform.country, 
-                            status          : ['ACTIVE', 'OUTOFSTOCK']
+                            status          : ['ACTIVE', 'OUTOFSTOCK'],
+                            latitude        : this.currentLat, 
+                            longitude       : this.currentLong, 
+                            storeTagKeyword : this.tagValue
                         })
                         .subscribe(()=>{
                             // set loading to false
@@ -314,5 +329,9 @@ export class LandingSearchComponent implements OnInit
         }
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+    scroll(id) {
+        this._scroller.scrollToAnchor(id)
     }
 }
