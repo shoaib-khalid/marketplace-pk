@@ -344,6 +344,9 @@ export class LocationComponent implements OnInit
      */
     ngOnDestroy(): void
     {
+        this._locationService.featuredStores = null;
+        this._locationService.featuredProducts = null;
+
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
