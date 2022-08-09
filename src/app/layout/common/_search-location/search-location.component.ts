@@ -276,7 +276,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             this.autoCompleteList = [{
                 type: "error",
                 location: "Unable to detect current address",
-                description: "Enable your browser location access OR enter street address/city"
+                description: "Enable location access OR enter street address/city"
             }]
         });
     }
