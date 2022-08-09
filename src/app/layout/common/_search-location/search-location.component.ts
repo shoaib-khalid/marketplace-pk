@@ -96,7 +96,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             if (this.currentLat && this.currentLong) {
                 this.placeholderText = "Latitude: " + this.currentLat + ", Longitude: " + this.currentLong;
             } else {
-                this.placeholderText = "Enter your location";
+                this.placeholderText = "Enter your street address or city";
             }
         });
 
@@ -270,10 +270,13 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             });
 
         }, error => {
+            // hide loading
+            this._fuseLoadingService.hide();
+
             this.autoCompleteList = [{
                 type: "error",
-                location: "Please allow location",
-                description: "Unable to locate current address"
+                location: "Unable to detect current address",
+                description: "Enable your browser location access OR enter street address/city"
             }]
         });
     }
