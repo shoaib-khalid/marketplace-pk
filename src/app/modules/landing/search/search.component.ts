@@ -6,6 +6,7 @@ import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { LocationService } from 'app/core/location/location.service';
 import { ParentCategory, LandingLocation, StoresDetails, ProductDetails, ProductDetailPagination, StoresDetailPagination } from 'app/core/location/location.types';
+import { NavigateService } from 'app/core/navigate-url/navigate.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
@@ -17,8 +18,8 @@ import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
 })
 export class LandingSearchComponent implements OnInit
 {
-    @ViewChild("storesPaginator", {read: MatPaginator}) private _storesPaginator: MatPaginator;
-    @ViewChild("productsPaginator", {read: MatPaginator}) private _productsPaginator: MatPaginator;
+    @ViewChild("storesDetailsPaginator", {read: MatPaginator}) private _storesDetailsPaginator: MatPaginator;
+    @ViewChild("productsDetailsPaginator", {read: MatPaginator}) private _productsDetailsPaginator: MatPaginator;
 
 
     platform    : Platform;
@@ -31,14 +32,18 @@ export class LandingSearchComponent implements OnInit
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
     
-    stores      : StoresDetails[] = [];
-    storePagination: StoresDetailPagination;
-    storePageOfItems: Array<any>;
+    storesDetails: StoresDetails[] = [];
+    storesDetailsPagination: StoresDetailPagination;
+    storesDetailsPageOfItems: Array<any>;
+    storesDetailsPageSize: number = 10;
+    oldStoresDetailsPaginationIndex: number = 0;
     
-    products    : ProductDetails[] = [];
-    productPagination: ProductDetailPagination;
-    productPageOfItems: Array<any>;
-    
+    productsDetails: ProductDetails[] = [];
+    productsDetailsPagination: ProductDetailPagination;
+    productsDetailsPageOfItems: Array<any>;
+    productsDetailsPageSize: number = 30;
+    oldProductsDetailsPaginationIndex: number = 0;
+
     isLoading: boolean;
 
     currentLat  : number = null;
@@ -56,14 +61,58 @@ export class LandingSearchComponent implements OnInit
         private _locationService: LocationService,
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _navigate: NavigateService
     )
     {
     }
 
     ngOnInit(): void {
 
-        this.storePagination = null;
-        this.productPagination = null;
+        // Get Stores
+        this._locationService.storesDetails$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((stores: StoresDetails[]) => {
+                if (stores){
+                    this.storesDetails = stores;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+            
+        // Get the store pagination
+        this._locationService.storesDetailPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: StoresDetailPagination) => {
+                if (pagination) {
+                    // Update the pagination
+                    this.storesDetailsPagination = pagination;                   
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+          
+        // Get Products
+        this._locationService.productsDetails$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((products : ProductDetails[]) => {
+                if (products) {
+                    this.productsDetails = products;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get the product pagination
+        this._locationService.productDetailPagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: ProductDetailPagination) => {
+                if (pagination) {
+                    // Update the pagination
+                    this.productsDetailsPagination = pagination;                   
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Get platform
         this._platformsService.platform$
@@ -79,10 +128,20 @@ export class LandingSearchComponent implements OnInit
 
                         this.currentLat = params['lat'];
                         this.currentLong = params['lng'];
+                        
+                        // get back the previous pagination page
+                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
+                            this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
+                            this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
+                        }
 
                         this._locationService.getStoresDetails({ 
                                 storeName       : this.searchValue, 
-                                pageSize        : 15, 
+                                page            : this.oldStoresDetailsPaginationIndex,
+                                pageSize        : this.storesDetailsPageSize, 
+                                sortByCol       : 'created', 
+                                sortingOrder    : 'DESC', 
                                 regionCountryId : this.platform.country, 
                                 tagKeyword      : this.tagValue, 
                                 latitude        : this.currentLat, 
@@ -93,7 +152,10 @@ export class LandingSearchComponent implements OnInit
                         // Get products
                         this._locationService.getProductsDetails({ 
                                 name            : this.searchValue, 
-                                pageSize        : 15, 
+                                page            : this.oldProductsDetailsPaginationIndex,
+                                pageSize        : this.productsDetailsPageSize, 
+                                sortByCol       : 'created', 
+                                sortingOrder    : 'DESC', 
                                 regionCountryId : this.platform.country, 
                                 latitude        : this.currentLat, 
                                 longitude       : this.currentLong, 
@@ -104,52 +166,6 @@ export class LandingSearchComponent implements OnInit
                     });
                 }
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get Stores
-        this._locationService.storesDetails$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((stores: StoresDetails[]) => {
-                if (stores){
-                    this.stores = stores;
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-            
-        // Get the store pagination
-        this._locationService.storesDetailPagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: StoresDetailPagination) => {
-                if (pagination) {
-                    // Update the pagination
-                    this.storePagination = pagination;                   
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-          
-        // Get Products
-        this._locationService.productsDetails$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((products : ProductDetails[]) => {
-                if (products) {
-                    this.products = products;
-                }
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get the product pagination
-        this._locationService.productDetailPagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: ProductDetailPagination) => {
-                if (pagination) {
-                    // Update the pagination
-                    this.productPagination = pagination;                   
-                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -197,32 +213,47 @@ export class LandingSearchComponent implements OnInit
     ngAfterViewInit(): void
     {
         setTimeout(() => {
-            if (this._storesPaginator )
+            if (this._storesDetailsPaginator )
             {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
 
                 // Get products if sort or page changes
-                merge(this._storesPaginator.page).pipe(
+                merge(this._storesDetailsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getStoresDetails({ storeName: this.searchValue, page: this.storePageOfItems['currentPage'] - 1, pageSize: this.storePageOfItems['pageSize'], regionCountryId: this.platform.country});
+                        return this._locationService.getStoresDetails({ 
+                            storeName       : this.searchValue, 
+                            page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.storesDetailsPageOfItems['pageSize'], 
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC',
+                            regionCountryId : this.platform.country
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
                     })
                 ).subscribe();
             }
-            if (this._productsPaginator )
+            if (this._productsDetailsPaginator )
             {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
 
                 // Get products if sort or page changes
-                merge(this._productsPaginator.page).pipe(
+                merge(this._productsDetailsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country, status: ['ACTIVE', 'OUTOFSTOCK']});
+                        return this._locationService.getProductsDetails({ 
+                            name            : this.searchValue, 
+                            page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.productsDetailsPageOfItems['pageSize'], 
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC',
+                            regionCountryId : this.platform.country, 
+                            status          : ['ACTIVE', 'OUTOFSTOCK']
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -235,14 +266,21 @@ export class LandingSearchComponent implements OnInit
     onChangePage(pageOfItems: Array<any>, type: string) {
         
         // update current page of items
-        if (type === 'store') {
-            this.storePageOfItems = pageOfItems;
-            if( this.storePagination && this.storePageOfItems['currentPage']) {
-                if (this.storePageOfItems['currentPage'] - 1 !== this.storePagination.page) {
+        if (type === 'storesDetails') {
+            this.storesDetailsPageOfItems = pageOfItems;
+            if( this.storesDetailsPagination && this.storesDetailsPageOfItems['currentPage']) {
+                if (this.storesDetailsPageOfItems['currentPage'] - 1 !== this.storesDetailsPagination.page) {
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getStoresDetails({ storeName: this.searchValue, page: this.storePageOfItems['currentPage'] - 1, pageSize: this.storePageOfItems['pageSize'], regionCountryId: this.platform.country})
+                    this._locationService.getStoresDetails({ 
+                            storeName       : this.searchValue, 
+                            page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.storesDetailsPageOfItems['pageSize'],
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC', 
+                            regionCountryId : this.platform.country
+                        })
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;
@@ -250,15 +288,23 @@ export class LandingSearchComponent implements OnInit
                 }
             }        
         }
-        if (type === 'product') {
+        if (type === 'productsDetails') {
             // update current page of items
-            this.productPageOfItems = pageOfItems;
-            if( this.productPagination && this.productPageOfItems['currentPage']) {
-                if (this.productPageOfItems['currentPage'] - 1 !== this.productPagination.page) {
+            this.productsDetailsPageOfItems = pageOfItems;
+            if( this.productsDetailsPagination && this.productsDetailsPageOfItems['currentPage']) {
+                if (this.productsDetailsPageOfItems['currentPage'] - 1 !== this.productsDetailsPagination.page) {
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getProductsDetails({ name: this.searchValue, page: this.productPageOfItems['currentPage'] - 1, pageSize: this.productPageOfItems['pageSize'], regionCountryId: this.platform.country, status: ['ACTIVE', 'OUTOFSTOCK']})
+                    this._locationService.getProductsDetails({ 
+                            name            : this.searchValue, 
+                            page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.productsDetailsPageOfItems['pageSize'], 
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC',
+                            regionCountryId : this.platform.country, 
+                            status          : ['ACTIVE', 'OUTOFSTOCK']
+                        })
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;

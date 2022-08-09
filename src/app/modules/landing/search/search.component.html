@@ -3,13 +3,12 @@
     <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full sm:mt-4"></search> -->
     <search class="w-full mb-2 sm:mt-2 sm:mb-4"></search>
     <!-- No Results -->
-    <ng-container *ngIf="stores.length === 0 && products.length === 0">
+    <ng-container *ngIf="storesDetails.length === 0 && productsDetails.length === 0">
         <div class="relative flex flex-col items-center justify-center w-full h-56 md:h-96 border-gray-300 dark:bg-transparent">
             <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
                 <svg class="z-10" version="1.0" xmlns="http://www.w3.org/2000/svg"
                     width="100px" height="100px" viewBox="0 0 535.000000 480.000000"
                     preserveAspectRatio="xMidYMid meet">
-
                     <g transform="translate(0.000000,480.000000) scale(0.100000,-0.100000)" fill="var(--fuse-primary-800)" stroke="none">
                         <path d="M638 4152 l-618 -617 0 -1717 0 -1716 26 -31 26 -31 1788 0 1788 0
                         26 31 26 31 0 514 0 514 -100 0 -100 0 0 -450 0 -450 -1640 0 -1640 0 0 1585
@@ -42,31 +41,31 @@
         </div>
     </ng-container>
     <!-- Products -->
-    <ng-container *ngIf="products && products.length">
-        <featured-products class="w-full" [products]="products" [title]="'Products'"></featured-products>
+    <ng-container *ngIf="productsDetails && productsDetails.length">
+        <featured-products class="w-full" [products]="productsDetails" [title]="'Products'"></featured-products>
         <!-- Products Pagination -->
         <div class="flex w-full mt-4 items-center justify-center">
             <pagination 
-                *ngIf="productPagination.length > productPagination.size"
-                [itemLength]="productPagination.length" 
-                [initialPage]="productPagination.page + 1"
-                [pageSize]="productPagination.size"
-                (changePage)="onChangePage($event, 'product')"
-                #productsPaginator></pagination>
+                *ngIf="productsDetailsPagination.length > productsDetailsPagination.size"
+                [itemLength]="productsDetailsPagination.length" 
+                [initialPage]="productsDetailsPagination.page + 1"
+                [pageSize]="productsDetailsPagination.size"
+                (changePage)="onChangePage($event, 'productsDetails')"
+                #productDetailsPaginator></pagination>
         </div>
     </ng-container>
     <!-- Stores -->
-    <ng-container *ngIf="stores && stores.length">
-        <featured-stores class="w-full mt-2 sm:mt-4" [stores]="stores" [title]="'Stores'"></featured-stores>
+    <ng-container *ngIf="storesDetails && storesDetails.length">
+        <featured-stores class="w-full mt-2 sm:mt-4" [stores]="storesDetails" [title]="'Stores'"></featured-stores>
         <!-- Stores Pagination -->
         <pagination 
-            *ngIf="storePagination.length > storePagination.size"
+            *ngIf="storesDetailsPagination.length > storesDetailsPagination.size"
             class="flex w-full my-4 items-center justify-center"
-            [itemLength]="storePagination.length" 
-            [initialPage]="storePagination.page + 1"
-            [pageSize]="storePagination.size"
-            (changePage)="onChangePage($event, 'store')"
-            #storesPaginator></pagination>
+            [itemLength]="storesDetailsPagination.length" 
+            [initialPage]="storesDetailsPagination.page + 1"
+            [pageSize]="storesDetailsPagination.size"
+            (changePage)="onChangePage($event, 'storesDetails')"
+            #storesDetailsPaginator></pagination>
     </ng-container>
     <!-- Ads Banner -->
     <ads-banner class="w-full sm:mb-2" [banners]="ads"></ads-banner>
