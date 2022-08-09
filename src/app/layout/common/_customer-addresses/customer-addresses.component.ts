@@ -355,7 +355,11 @@ s
                 if (this.customerId) {
                     // Delete the customer on the server
                     this._userService.deleteCustomerAddressById(customerAddressId)
-                    .subscribe(() => {});
+                    .subscribe(() => {
+                        if (this.selectedAddress.id === customerAddressId) {
+                            this._userService.customersAddress = null;
+                        }
+                    });
 
                 }
                 else {
