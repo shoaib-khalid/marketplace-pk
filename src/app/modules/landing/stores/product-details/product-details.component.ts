@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ProductsService } from 'app/core/product/product.service';
 import { Product } from 'app/core/product/product.types';
 import { StoresService } from 'app/core/store/store.service';
 import { ProductPagination, Store, StoreAssets, StoreCategory } from 'app/core/store/store.types';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery-9';
-import { take, of, switchMap, takeUntil, Subject } from 'rxjs';
+import { take, of, distinctUntilChanged, takeUntil, Subject, filter } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Platform } from 'app/core/platform/platform.types';
@@ -792,9 +792,10 @@ export class LandingProductDetailsComponent implements OnInit
                 confirmation.afterClosed().subscribe((result) => {
                     // If the confirm button pressed...
                     if ( result === 'confirmed' )
-                    {                
+                    {          
                         // redirect back to product list
-                        this.chooseStore(this.store.domain);
+                        history.back();
+                        // this.chooseStore(this.store.domain);
                     }
                 });
 
