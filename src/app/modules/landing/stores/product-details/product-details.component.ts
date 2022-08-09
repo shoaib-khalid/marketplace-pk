@@ -788,6 +788,16 @@ export class LandingProductDetailsComponent implements OnInit
                 this.specialInstructionForm.get('specialInstructionValue').setValue('');
                 this.specialInstructionForm.get('specialInstructionValue').markAsUntouched();
 
+                // Subscribe to the confirmation dialog closed action
+                confirmation.afterClosed().subscribe((result) => {
+                    // If the confirm button pressed...
+                    if ( result === 'confirmed' )
+                    {                
+                        // redirect back to product list
+                        this.chooseStore(this.store.domain);
+                    }
+                });
+
             }, (error) => {
                 const confirmation = this._fuseConfirmationService.open({
                     "title": "Out of Stock!",
