@@ -191,6 +191,22 @@ export interface LocationArea
     userLocationCityId  : string;
 }
 
+export interface Tag
+{
+    id      : string;
+    keyword : string;
+}
+
+export interface TagPagination
+{
+    length      : number;
+    size        : number;
+    page        : number;
+    lastPage    : number;
+    startIndex  : number;
+    endIndex    : number;
+}
+
 // export interface ProductOnLocationPagination
 // {
 //     totalElements  : number;

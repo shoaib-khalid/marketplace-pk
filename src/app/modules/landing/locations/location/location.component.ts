@@ -53,8 +53,8 @@ export class LocationComponent implements OnInit
     productsViewAll: boolean = false;
     categoriesViewAll: boolean = false;
 
-    maxStoresDisplay: number = 5;
-    maxProductsDisplay: number = 30;
+    maxStoresDisplay: number = 9;
+    maxProductsDisplay: number = 19;
     maxCategoriesDisplay: number = 50;
     
     isLoading: boolean = true;
@@ -114,20 +114,52 @@ export class LocationComponent implements OnInit
                         });
                         this.adjacentLocationIds.unshift(this.locationId);
                         // Get Featured Stores
-                        this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
-                            .subscribe((stores: StoreDetails[])=>{});
+                        this._locationService.getFeaturedStores({
+                            pageSize        : this.maxStoresDisplay, 
+                            cityId          : this.adjacentLocationIds, 
+                            regionCountryId : this.platform.country, 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC', 
+                            parentCategoryId: this.categoryId, 
+                            isMainLevel     : false 
+                        })
+                        .subscribe((stores: StoreDetails[])=>{});
 
                         // Get Stores
-                        this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
-                            .subscribe((stores: StoreDetails[])=>{});
+                        this._locationService.getStoresDetails({
+                            pageSize: this.maxStoresDisplay, 
+                            cityId: this.adjacentLocationIds, 
+                            regionCountryId: this.platform.country, 
+                            sortByCol: 'created', 
+                            sortingOrder: 'DESC', 
+                            parentCategoryId: this.categoryId 
+                        })
+                        .subscribe((stores: StoreDetails[])=>{});
 
                         // Get Featured Products
-                        this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                            .subscribe((products : ProductDetails[]) => {});
+                        this._locationService.getFeaturedProducts({
+                            pageSize        : this.maxProductsDisplay, 
+                            regionCountryId : this.platform.country, 
+                            cityId          : this.adjacentLocationIds, 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC', 
+                            parentCategoryId: this.categoryId, 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'], 
+                            isMainLevel     : false 
+                        })
+                        .subscribe((products : ProductDetails[]) => {});
 
                         // Get Products
-                        this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                            .subscribe((products : ProductDetails[]) => {});
+                        this._locationService.getProductsDetails({
+                            pageSize        : this.maxProductsDisplay, 
+                            regionCountryId : this.platform.country, 
+                            cityId          : this.adjacentLocationIds, 
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC', 
+                            parentCategoryId: this.categoryId, 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'] 
+                        })
+                        .subscribe((products : ProductDetails[]) => {});
                     });
             }
         });
@@ -166,20 +198,52 @@ export class LocationComponent implements OnInit
                                 .subscribe((category : ParentCategory[]) => {});
         
                             // Get Featured Stores
-                            this._locationService.getFeaturedStores({pageSize: this.maxStoresDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
-                                .subscribe((stores : StoresDetails[]) => {});
+                            this._locationService.getFeaturedStores({
+                                pageSize        : this.maxStoresDisplay, 
+                                regionCountryId : this.platform.country, 
+                                cityId          : this.adjacentLocationIds, 
+                                sortByCol       : 'sequence', 
+                                sortingOrder    : 'ASC', 
+                                parentCategoryId: this.categoryId, 
+                                isMainLevel     : false 
+                            })
+                            .subscribe((stores : StoresDetails[]) => {});
 
                             // Get Stores
-                            this._locationService.getStoresDetails({pageSize: this.maxStoresDisplay, cityId: this.adjacentLocationIds, regionCountryId: this.platform.country, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId })
-                                .subscribe((stores: StoreDetails[])=>{});
+                            this._locationService.getStoresDetails({
+                                pageSize        : this.maxStoresDisplay, 
+                                cityId          : this.adjacentLocationIds, 
+                                regionCountryId : this.platform.country, 
+                                sortByCol       : 'created', 
+                                sortingOrder    : 'DESC', 
+                                parentCategoryId: this.categoryId 
+                            })
+                            .subscribe((stores: StoreDetails[])=>{});
         
                             // Get Featured Products
-                            this._locationService.getFeaturedProducts({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'sequence', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                                .subscribe((products : ProductDetails[]) => {});
+                            this._locationService.getFeaturedProducts({
+                                pageSize        : this.maxProductsDisplay, 
+                                regionCountryId : this.platform.country, 
+                                cityId          : this.adjacentLocationIds, 
+                                sortByCol       : 'sequence', 
+                                sortingOrder    : 'ASC', 
+                                parentCategoryId: this.categoryId, 
+                                status          : ['ACTIVE', 'OUTOFSTOCK'], 
+                                isMainLevel     : false 
+                            })
+                            .subscribe((products : ProductDetails[]) => {});
 
                             // Get Products
-                            this._locationService.getProductsDetails({pageSize: this.maxProductsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, sortByCol: 'name', sortingOrder: 'ASC', parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                                .subscribe((products : ProductDetails[]) => {});
+                            this._locationService.getProductsDetails({
+                                pageSize        : this.maxProductsDisplay, 
+                                regionCountryId : this.platform.country, 
+                                cityId          : this.adjacentLocationIds, 
+                                sortByCol       : 'created', 
+                                sortingOrder    : 'DESC', 
+                                parentCategoryId: this.categoryId, 
+                                status          : ['ACTIVE', 'OUTOFSTOCK'] 
+                            })
+                            .subscribe((products : ProductDetails[]) => {});
                         });
                 }
 
@@ -246,7 +310,7 @@ export class LocationComponent implements OnInit
             });
 
         // Get Featured Stores Pagination
-        this._locationService.featuredStorePagination$
+        this._locationService.featuredStoresPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination) => { 
                 if (pagination) {               
@@ -291,7 +355,7 @@ export class LocationComponent implements OnInit
             });
 
         // Get Featured Products pagination
-        this._locationService.featuredProductPagination$
+        this._locationService.featuredProductsPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination) => { 
                 if (pagination) {
@@ -367,7 +431,14 @@ export class LocationComponent implements OnInit
                 merge(this._storesPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country });
+                        return this._locationService.getFeaturedStores({ 
+                            page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.featuredStoresPageOfItems['pageSize'], 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC', 
+                            regionCountryId : this.platform.country, 
+                            isMainLevel     : false
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -383,7 +454,7 @@ export class LocationComponent implements OnInit
                 merge(this._productsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country });
+                        return this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: false });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -403,11 +474,17 @@ export class LocationComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedStores({ page: this.featuredStoresPageOfItems['currentPage'] - 1, pageSize: this.featuredStoresPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                        .subscribe(()=>{
-                            // set loading to false
-                            this.isLoading = false;
-                        });
+                    this._locationService.getFeaturedStores({ 
+                        page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
+                        pageSize        : this.featuredStoresPageOfItems['pageSize'], 
+                        sortByCol       : 'sequence', 
+                        sortingOrder    : 'ASC', 
+                        regionCountryId : this.platform.country, 
+                        isMainLevel     : false 
+                    }).subscribe(()=>{
+                        // set loading to false
+                        this.isLoading = false;
+                    });
                 }
             }        
         }
@@ -419,7 +496,7 @@ export class LocationComponent implements OnInit
                     // set loading to true
                     this.isLoading = true;
         
-                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    this._locationService.getFeaturedProducts({ page: this.featuredProductsPageOfItems['currentPage'] - 1, pageSize: this.featuredProductsPageOfItems['pageSize'], sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country, isMainLevel: false })
                         .subscribe(()=>{
                             // set loading to false
                             this.isLoading = false;

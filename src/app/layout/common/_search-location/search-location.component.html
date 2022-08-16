@@ -18,10 +18,10 @@
             [placeholder]="placeholderText"
             (keydown.enter)="selectFirstResult()"
             #searchInput>
-        <!-- Detect my current location -->
+        <!-- Detect my query location -->
         <mat-icon class="cursor-pointer text-primary mr-2" (click)="locateMe()" [svgIcon]="'mat_outline:my_location'"></mat-icon>
         <!-- Reset location -->
-        <mat-icon *ngIf="currentLat || currentLong" class="cursor-pointer text-primary mr-2" (click)="resetLocation()" [svgIcon]="'heroicons_solid:x'"></mat-icon>
+        <mat-icon *ngIf="queryLat || queryLong || searchControl.value" class="cursor-pointer text-primary mr-2" (click)="resetLocation()" [svgIcon]="'heroicons_solid:x'"></mat-icon>
         <!-- Go Button -->
         <ng-container *ngIf="currentScreenSize.includes('md')" matSuffix>
             <button class="p-2.5 font-bold text-white" (click)="selectFirstResult()">Go</button>

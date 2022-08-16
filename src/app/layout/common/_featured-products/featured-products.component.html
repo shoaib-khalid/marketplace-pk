@@ -2,7 +2,6 @@
 <ng-container *ngIf="products && products.length">
     <div class="flex flex-row items-center justify-between w-full">
         <h2 class="font-semibold text-xl">{{title}}</h2>
-        <span *ngIf="showViewAll" (click)="viewAll()" class="font-semibold text-primary cursor-pointer hover:text-primary-600">View All</span>
     </div>
 </ng-container>
 
@@ -13,6 +12,11 @@
             <!-- need to do this because featuredProducts and productDetails have different response -->
             <ng-container *ngTemplateOutlet="productResult; context: {$implicit: product.productDetails ? product.productDetails : product}">
             </ng-container>
+        </ng-container>
+        <ng-container *ngIf="showViewAll">
+            <div (click)="viewAll()" class="flex flex-col justify-center items-center rounded-lg border border-gray-300 h-[210px] md:h-[220px] cursor-pointer filter-article">
+                <span class="font-semibold text-primary cursor-pointer hover:text-primary-600">View More</span>
+            </div>
         </ng-container>
     </div>
 </ng-container>
@@ -55,8 +59,8 @@
                     </div>
                 </ng-container>
             </div>
-            <div class="flex flex-row items-end justify-between">
-                <ng-container *ngIf="product.productInventories[0] && product.productInventories[0].itemDiscount; else noDiscount">
+            <div *ngIf="product.productInventories[0]" class="flex flex-row items-end justify-between">
+                <ng-container *ngIf="product.productInventories[0].itemDiscount; else noDiscount">
                     <span class="line-through text-sm font-semibold">{{product.productInventories[0].itemDiscount.normalPrice | currency: platform.currency}}</span>
                     <span class="text-lg font-semibold">{{product.productInventories[0].itemDiscount.discountedPrice | currency: platform.currency}}</span>
                 </ng-container>

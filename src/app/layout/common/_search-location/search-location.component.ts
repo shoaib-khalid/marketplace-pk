@@ -10,6 +10,8 @@ import { Platform } from 'app/core/platform/platform.types';
 import { environment } from 'environments/environment';
 import { StoresService } from 'app/core/store/store.service';
 import { FuseLoadingService } from '@fuse/services/loading';
+import { CurrentLocationService } from 'app/core/_current-location/current-location.service';
+import { CurrentLocation } from 'app/core/_current-location/current-location.types';
 
 
 
@@ -30,7 +32,6 @@ import { FuseLoadingService } from '@fuse/services/loading';
 })
 export class _SearchLocationComponent implements OnInit, OnDestroy
 {
-    @Output() search: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('searchInput') public searchElement: ElementRef;
     searchControl: FormControl = new FormControl();
 
@@ -44,8 +45,10 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
 
     // Google
     loader: Loader;
-    currentLat  : number = null;
-    currentLong : number = null;
+    queryLat  : number = null;
+    queryLong : number = null;
+
+    currentLocation: CurrentLocation;
     
     // screen size
     currentScreenSize: string[] = [];
@@ -63,6 +66,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _platformService: PlatformService,
+        private _currentLocationService: CurrentLocationService
     )
     {
     }
@@ -80,21 +84,34 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-
+        
         // implement google maps
         this.loader = new Loader({
             apiKey: environment.googleMapsAPIKey,
             libraries: ['places']
         });
 
+        this._currentLocationService.currentLocation$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CurrentLocation)=>{
+                if (response) {
+                    this.currentLocation = response;
+                    if (this.currentLocation.isAllowed) {
+                        this.autoCompleteSetList({location: {lat: this.currentLocation.location.lat, lng: this.currentLocation.location.lng}});
+                    }
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         // Get searches from url parameter 
         this._activatedRoute.queryParams.subscribe(params => {
-            this.currentLat = params['lat'];
-            this.currentLong = params['lng'];
+            this.queryLat = params['lat'];
+            this.queryLong = params['lng'];
             this.keyword = params['keyword'];
 
-            if (this.currentLat && this.currentLong) {
-                this.placeholderText = "Latitude: " + this.currentLat + ", Longitude: " + this.currentLong;
+            if (this.queryLat && this.queryLong) {
+                this.placeholderText = "Latitude: " + this.queryLat + ", Longitude: " + this.queryLong;
             } else {
                 this.placeholderText = "Enter your street address or city";
             }
@@ -144,7 +161,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                 debounceTime(1000),
                 takeUntil(this._unsubscribeAll)
             ).subscribe(userInput => {                
-                this.autoCompleteSetList(userInput + " " + this.country);
+                this.autoCompleteSetList({ address: userInput + " " + this.country});
             });
     }
 
@@ -167,7 +184,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
      * 
      * @param input 
      */
-    autoCompleteSetList(input: string) {
+    autoCompleteSetList(searchParams: { address?: string, location?: {lat: number, lng: number}}) {
 
         // --------------------------
         // GoogleMap API
@@ -176,26 +193,31 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
         this.loader.load().then(() => {
 
             let geocoder: google.maps.Geocoder = new google.maps.Geocoder();
-            let address = input;
 
-            geocoder.geocode({ address: address})
+            geocoder.geocode(searchParams)
             .catch(error => {
-                this.autoCompleteList = [{
-                    type: "error",
-                    location: "Location not found",
-                    description: "Sorry we were unable to find your location"
-                }]
+                if (searchParams.address) {
+                    this.autoCompleteList = [{
+                        type: "error",
+                        location: "Location not found",
+                        description: "Sorry we were unable to find your location"
+                    }]
+                }
             })
-            .then((response: google.maps.GeocoderResponse) => {
-                if (response && response.results.length > 0) {                    
-                    this.autoCompleteList = response.results.map(item => {
-                        if (!item.types.includes('country')) {
-                            return {
-                                type: "location",
-                                location: item.formatted_address
-                            }
-                        }
-                    }).filter(n => n);
+            .then((response: google.maps.GeocoderResponse) => {                
+                if (response && response.results.length > 0) {                          
+                    if (searchParams.address) {
+                        this.autoCompleteList = response.results.map(item => {
+                            if (!item.types.includes('country')) {
+                                return {
+                                    type: "location",
+                                    location: item.formatted_address
+                                }
+                            }                        
+                        }).filter(n => n);
+                    } else {
+                        this.searchControl.patchValue(response.results[0].formatted_address);
+                    }
                 }             
             });
         });
@@ -246,12 +268,12 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
         // GoogleMap API
         navigator.geolocation.getCurrentPosition((position) => {
             var crd = position.coords;
-            this.currentLat = crd.latitude;
-            this.currentLong = crd.longitude;
+            this.queryLat = crd.latitude;
+            this.queryLong = crd.longitude;
 
             let location = {
-                lat     : this.currentLat,
-                lng     : this.currentLong,
+                lat     : this.queryLat,
+                lng     : this.queryLong,
                 keyword : this.keyword
             };
             this.loader.load().then(() => {
@@ -342,6 +364,16 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                     }
                 });
             });
+        }
+
+        // we'll assume , we already have currentLat, currentLong
+        // we should have
+        if (this.searchControl.value && this.currentLocation.isAllowed) {
+            let location = {
+                lat     : this.currentLocation.location.lat,
+                lng     : this.currentLocation.location.lng
+            }
+            this._router.navigate(['/search'], {queryParams: location});
         }
     }
 

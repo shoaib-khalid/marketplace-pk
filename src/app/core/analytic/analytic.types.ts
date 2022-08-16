@@ -1,19 +1,19 @@
 export interface CustomerActivity
 {
-    browserType : string;
+    browserType?: string;
     created?    : string;
-    customerId  : string;
-    deviceModel : string;
-    errorOccur  : string;
-    errorType   : string;
+    customerId? : string;
+    deviceModel?: string;
+    errorOccur? : string;
+    errorType?  : string;
     id?         : string;
-    ip          : string;
-    os          : string;
-    pageVisited : string;
-    sessionId   : string;
-    storeId     : string;
-    latitude    : string;
-    longitude   : string;
+    ip?         : string;
+    os?         : string;
+    pageVisited?: string;
+    sessionId?  : string;
+    storeId?    : string;
+    latitude?   : string;
+    longitude?  : string;
     // address     : string;
     // postcode    : string;
     // city        : string;

@@ -3,9 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AppConfig } from 'app/config/service.config';
-import { JwtService } from '../jwt/jwt.service';
 import { LogService } from '../logging/log.service';
-import { CategoryPagination, ChildCategory, LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetailPagination, ProductDetails, StoresDetailPagination, StoresDetails } from './location.types';
+import { CategoryPagination, ChildCategory, LandingLocation, LocationArea, LocationPagination, ParentCategory, ProductDetailPagination, ProductDetails, StoresDetailPagination, StoresDetails, Tag, TagPagination } from './location.types';
 import { ProductPagination, StorePagination } from '../store/store.types';
 
 @Injectable({
@@ -17,7 +16,7 @@ export class LocationService
     // Featured Stores
     private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
     private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
-    private _featuredStorePagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+    private _featuredStoresPagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
 
     // Stores
     private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
@@ -26,7 +25,7 @@ export class LocationService
     // Featured Products
     private _featuredProduct: BehaviorSubject<ProductDetails | null> = new BehaviorSubject(null);
     private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
-    private _featuredProductPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
+    private _featuredProductsPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
 
     // Products
     private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
@@ -45,6 +44,10 @@ export class LocationService
     private _childCategories: BehaviorSubject<ChildCategory[] | null> = new BehaviorSubject<ChildCategory[]>(null);
     private _childCategoriesPagination: BehaviorSubject<CategoryPagination | null> = new BehaviorSubject(null);
 
+    // Tags
+    private _tags: BehaviorSubject<Tag[] | null> = new BehaviorSubject<Tag[]>(null);
+    private _tagsPagination: BehaviorSubject<TagPagination | null> = new BehaviorSubject(null);
+
     /**
      * Constructor
      */
@@ -52,9 +55,8 @@ export class LocationService
         private _httpClient: HttpClient,
         private _authService: AuthService,
         private _apiServer: AppConfig,
-        private _jwt: JwtService,
         private _logging: LogService
-)
+    )
     {
     }
 
@@ -62,221 +64,118 @@ export class LocationService
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Getter for parent categories
-     */
-    get storesDetails$(): Observable<StoresDetails[]>
-    {
-        return this._storesDetails.asObservable();
-    }
+    /**  Getter for parentCategory */
+    get parentCategory$(): Observable<ParentCategory> { return this._parentCategory.asObservable(); }
 
-    /**
-     * Getter for parent categories
-     */
-    get storesDetailPagination$(): Observable<StoresDetailPagination>
-    {
-    return this._storesDetailPagination.asObservable();
-    }
+    /** Getter for parentCategory */
+    set parentCategory(value: ParentCategory) { this._parentCategory.next(value); }
 
-    /**
-     * Getter for parent categories
-     */
-    get productsDetails$(): Observable<ProductDetails[]>
-    {
-        return this._productsDetails.asObservable();
-    }
+    /** Getter for parent categories */
+    get parentCategories$(): Observable<ParentCategory[]> { return this._parentCategories.asObservable(); }
 
-    /**
-     * Getter for parent categories
-     */
-    get productDetailPagination$(): Observable<ProductDetailPagination>
-    {
-    return this._productDetailPagination.asObservable();
-    }
-    /**
-     * Getter for parentCategory
-     */
-    get parentCategory$(): Observable<ParentCategory>
-    {
-        return this._parentCategory.asObservable();
-    }
+    /**  Getter for parent categories */
+    get parentCategoriesPagination$(): Observable<CategoryPagination> { return this._parentCategoriesPagination.asObservable(); }  
 
-    /**
-     * Getter for parentCategory
-     */
-    set parentCategory(value: ParentCategory)
-    {
-        this._parentCategory.next(value);
-    }
-
-    /**
-     * Getter for parent categories
-     */
-    get parentCategories$(): Observable<ParentCategory[]>
-    {
-        return this._parentCategories.asObservable();
-    }
-
-    /**
-     * Getter for parent categories
-     */
-    get parentCategoriesPagination$(): Observable<CategoryPagination>
-    {
-        return this._parentCategoriesPagination.asObservable();
-    }  
-
-    /**
-     * Getter for childCategory
-     */
-    get childCategory$(): Observable<ChildCategory>
-    {
-        return this._childCategory.asObservable();
-    }
+    /** Getter for childCategory */
+    get childCategory$(): Observable<ChildCategory> { return this._childCategory.asObservable(); }
 
     // ----------------------
     // Featured Location
     //----------------------- 
 
-    /**
-     * Getter for locations
-     */
-    get featuredLocations$(): Observable<LandingLocation[]>
-    {
-        return this._featuredLocations.asObservable();
-    }
+    /** Getter for locations */
+    get featuredLocations$(): Observable<LandingLocation[]> { return this._featuredLocations.asObservable(); }
 
-    /**
-     * Getter for location
-     */
-    get featuredLocation$(): Observable<LandingLocation>
-    {
-        return this._featuredLocation.asObservable();
-    }
+    /** Getter for location */
+    get featuredLocation$(): Observable<LandingLocation> { return this._featuredLocation.asObservable(); }
 
-    /**
-     * Setter for location
-     */
-    set featuredLocation(value: LandingLocation)
-    {
-        this._featuredLocation.next(value);
-    }
+    /** Setter for location */
+    set featuredLocation(value: LandingLocation) { this._featuredLocation.next(value); }
 
-    /**
-     * Getter for locationProducts pagination
-     */
-    get featuredLocationPagination$(): Observable<LocationPagination>
-    {
-        return this._featuredLocationPagination.asObservable();
-    }
+    /**  Getter for locationProducts pagination */
+    get featuredLocationPagination$(): Observable<LocationPagination> { return this._featuredLocationPagination.asObservable(); }
+
+
+    // ----------------------
+    // Stores Details
+    //----------------------- 
+
+    /** Getter for storesDetails */
+    get storesDetails$(): Observable<StoresDetails[]> { return this._storesDetails.asObservable(); }
+
+     /** Setter for storesDetails */
+    set storesDetails(value: StoresDetails[]) { this._storesDetails.next(value); }
+
+    /** Getter for storesDetailPagination */
+    get storesDetailPagination$(): Observable<StoresDetailPagination> { return this._storesDetailPagination.asObservable(); }
+ 
+    // ----------------------
+    // Products Details
+    //----------------------- 
+
+    /** Getter for productsDetails */
+    get productsDetails$(): Observable<ProductDetails[]> { return this._productsDetails.asObservable(); }
+
+    /** Setter for productsDetails */
+    set productsDetails(value: ProductDetails[]) { this._productsDetails.next(value); }
+ 
+    /** Getter for productDetailPagination */
+    get productDetailPagination$(): Observable<ProductDetailPagination> { return this._productDetailPagination.asObservable(); }
 
     // ----------------------
     // Featured Product
     //----------------------- 
 
-    /**
-    * Getter for store
-    *
-    */
-    get featuredProduct$(): Observable<ProductDetails>
-    {
-        return this._featuredProduct.asObservable();
-    }
+    /** Getter for featuredProduct */
+    get featuredProduct$(): Observable<ProductDetails> { return this._featuredProduct.asObservable(); }
  
-     /**
-     * Setter for stores
-     *
-     * @param value
-     */
-    set featuredProduct(value: ProductDetails)
-    {
-        // Store the value
-        this._featuredProduct.next(value);
-    }
+    /** Setter for featuredProduct */
+    set featuredProduct(value: ProductDetails) { this._featuredProduct.next(value); }
  
-     /**
-      * Getter for stores
-      *
-     */
-    get featuredProducts$(): Observable<ProductDetails[]>
-    {
-        return this._featuredProducts.asObservable();
-    }
+    /** Getter for featuredProducts */
+    get featuredProducts$(): Observable<ProductDetails[]> { return this._featuredProducts.asObservable(); }
      
-     /**
-      * Setter for stores
-      *
-      * @param value
-      */
-    set featuredProducts(value: ProductDetails[])
-    {
-        // Store the value
-        this._featuredProducts.next(value);
-    }
+    /** Setter for featuredProducts */
+    set featuredProducts(value: ProductDetails[]){ this._featuredProducts.next(value); }
  
-     /**
-     * Getter for stores pagination
-     */
-    get featuredProductPagination$(): Observable<ProductPagination>
-    {
-        return this._featuredProductPagination.asObservable();
-    }
+    /** Getter for featuredProductPagination pagination */
+    get featuredProductsPagination$(): Observable<ProductPagination> { return this._featuredProductsPagination.asObservable(); }
 
     // ----------------------
-    //    Featured Store
+    // Featured Store
     //----------------------- 
 
-    /**
-    * Getter for store
-    *
-    */
-    get featuredStore$(): Observable<StoresDetails>
-    {
-        return this._featuredStore.asObservable();
-    }
+    /** Getter for featuredStore */
+    get featuredStore$(): Observable<StoresDetails> { return this._featuredStore.asObservable(); }
  
-     /**
-     * Setter for stores
-     *
-     * @param value
-     */
-    set featuredStore(value: StoresDetails)
-    {
-        // Store the value
-        this._featuredStore.next(value);
-    }
+    /** Setter for featuredStore */
+    set featuredStore(value: StoresDetails) { this._featuredStore.next(value); }
  
-     /**
-      * Getter for stores
-      *
-     */
-    get featuredStores$(): Observable<StoresDetails[]>
-    {
-        return this._featuredStores.asObservable();
-    }
+    /** Getter for featuredStores */
+    get featuredStores$(): Observable<StoresDetails[]> { return this._featuredStores.asObservable(); }
      
-     /**
-      * Setter for stores
-      *
-      * @param value
-      */
-    set featuredStores(value: StoresDetails[])
-    {
-        // Store the value
-        this._featuredStores.next(value);
-    }
+    /** Setter for featuredStores */
+    set featuredStores(value: StoresDetails[]) { this._featuredStores.next(value); }
  
-     /**
-     * Getter for stores pagination
-     */
-    get featuredStorePagination$(): Observable<StorePagination>
-    {
-        return this._featuredStorePagination.asObservable();
-    }
+    /** Getter for featuredStoresPagination pagination */
+    get featuredStoresPagination$(): Observable<StorePagination> { return this._featuredStoresPagination.asObservable(); }
+
+    // ----------------------
+    // Tag
+    //----------------------- 
+
+    /** Getter for tags */
+    get tags$(): Observable<Tag[]> { return this._tags.asObservable(); }
+
+    /** Setter for tags */
+    set tags(value: Tag[]) { this._tags.next(value); }
+
+    /** Getter for tagsPagination pagination */
+    get tagsPagination$(): Observable<TagPagination> { return this._tagsPagination.asObservable(); }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
 
     /**
      * 
@@ -335,7 +234,7 @@ export class LocationService
             if (Array.isArray(header.params[key])) {
                 header.params[key] = header.params[key].filter(element => element !== null)
             }
-            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+            if (!header.params[key] || (Array.isArray(header.params[key]) && header.params[key].length === 0)) {
                 delete header.params[key];
             }
         });
@@ -356,7 +255,7 @@ export class LocationService
                         startIndex: response["data"].pageable.offset,
                         endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
                     }
-                    this._featuredStorePagination.next(_pagination);
+                    this._featuredStoresPagination.next(_pagination);
                     this._featuredStores.next(response["data"].content);
 
                     return response["data"].content;
@@ -445,7 +344,7 @@ export class LocationService
                         endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
                     }
                     
-                    this._featuredProductPagination.next(_pagination);
+                    this._featuredProductsPagination.next(_pagination);
                     this._featuredProducts.next(response["data"].content);
 
                     return response["data"].content;
@@ -889,6 +788,39 @@ export class LocationService
                 map((response: LocationArea[]) => {
                     this._logging.debug("Response from LocationService (getLocationArea)", response);
                     return response["data"];
+                })
+            );
+    }
+
+    getTags(params: {
+        page            : number, 
+        pageSize        : number, 
+        sortByCol       : string, 
+        sortingOrder    : 'ASC' | 'DESC' | ''
+    } = {
+        page            : 0, 
+        pageSize        : 0, 
+        sortByCol       : "keyword", 
+        sortingOrder    : 'ASC'
+    }): Observable<Tag[]> 
+    {        
+        let locationService = this._apiServer.settings.apiServer.locationService;
+        let accessToken = this._authService.publicToken;
+
+        const headers = {
+            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`)
+        };
+
+        return this._httpClient.get<Tag[]>(locationService + '/tags', headers)
+            .pipe(
+                catchError(() =>
+                    of(false)
+                ),
+                switchMap(async (response) => {
+                    this._logging.debug("Response from LocationService (getTags)", response);
+
+                    this._tags.next(response["data"].content);
+                    return response["data"].content;
                 })
             );
     }

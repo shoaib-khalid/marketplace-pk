@@ -12,6 +12,10 @@ import { AppConfig } from './config/service.config';
 import { SwUpdate } from '@angular/service-worker';
 import { UserService } from './core/user/user.service';
 import { UserSession } from './core/user/user.types';
+import { CustomerActivity } from './core/analytic/analytic.types';
+import { CurrentLocationService } from './core/_current-location/current-location.service';
+import { CurrentLocation } from './core/_current-location/current-location.types';
+import { StoresService } from './core/store/store.service';
 
 declare let gtag: Function;
 
@@ -25,6 +29,7 @@ export class AppComponent
     platform: Platform;
     ipAddress  : string;
     userSession : UserSession;
+    customerActivity: CustomerActivity = {};
 
     favIcon16: HTMLLinkElement = document.querySelector('#appIcon16');
     favIcon32: HTMLLinkElement = document.querySelector('#appIcon32');
@@ -42,16 +47,15 @@ export class AppComponent
         private _titleService: Title,
         private _router: Router,
         private _platformsService: PlatformService,
-        private _ipAddressService: IpAddressService,
+        private _storeService: StoresService,
         private _analyticService: AnalyticService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _jwtService: JwtService,
-        private _authService: AuthService,
+        private _currentLocationService: CurrentLocationService,
         private _apiServer: AppConfig,
         private _userService: UserService,
         private _swUpdate: SwUpdate
     )
-    {
+    {        
         // reload if there are any update for PWA
         _swUpdate.available.subscribe(event => {
             _swUpdate.activateUpdate().then(()=>document.location.reload());
@@ -59,8 +63,6 @@ export class AppComponent
     }
 
     ngOnInit() {
-        
-        console.log("navigator",navigator.userAgent);
 
         // Subscribe to platform data
         this._platformsService.platform$
@@ -72,27 +74,27 @@ export class AppComponent
                     let googleAnalyticId = null;
 
                     this._platformsService.getTag(platform.id)
-                    .subscribe((tags: PlatformTag[]) => {
-                        if (tags) {
+                        .subscribe((tags: PlatformTag[]) => {
+                            if (tags) {
 
-                            let titleIndex = tags.findIndex(tag => tag.property === 'og:title');
-                            let descIndex = tags.findIndex(tag => tag.property === 'og:description');
-                            let keywordsIndex = tags.findIndex(tag => tag.name === 'keywords');
+                                let titleIndex = tags.findIndex(tag => tag.property === 'og:title');
+                                let descIndex = tags.findIndex(tag => tag.property === 'og:description');
+                                let keywordsIndex = tags.findIndex(tag => tag.name === 'keywords');
 
-                            if (descIndex > -1) {
-                                this.metaDescription.content = tags[descIndex].content;
+                                if (descIndex > -1) {
+                                    this.metaDescription.content = tags[descIndex].content;
+                                }
+                                if (keywordsIndex > -1) {
+                                    this.metaKeyword.content = tags[keywordsIndex].content;
+                                }
+                                if (titleIndex > -1) {
+                                    // set title
+                                    this._titleService.setTitle(tags[titleIndex].content);
+                                    // set h1
+                                    this.h1Title.innerText = tags[titleIndex].content;
+                                }
                             }
-                            if (keywordsIndex > -1) {
-                                this.metaKeyword.content = tags[keywordsIndex].content;
-                            }
-                            if (titleIndex > -1) {
-                                // set title
-                                this._titleService.setTitle(tags[titleIndex].content);
-                                // set h1
-                                this.h1Title.innerText = tags[titleIndex].content;
-                            }
-                        }
-                    })
+                        });
      
                     // set GA code
                     googleAnalyticId = this.platform.gacode;
@@ -141,64 +143,43 @@ export class AppComponent
             });
 
         this._userService.userSession$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((userSession: UserSession)=>{
-            if (userSession) {
-                this.userSession = userSession;
-            }
-            // Mark for Check
-            this._changeDetectorRef.markForCheck();
-        });
-
-        // Get User IP Address
-        this._ipAddressService.ipAdressInfo$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((response:any)=>{
-                if (response) {
-                    
-                    this.ipAddress = response.ip_addr;
+            .subscribe((userSession: UserSession)=>{
+                if (userSession) {
+                    this.userSession = userSession                    
+
+                    // Set customer activiry
+                    this.customerActivity.customerId  = this.userSession.id;
+                    this.customerActivity.browserType = this.userSession.browser;
+                    this.customerActivity.deviceModel = this.userSession.device;
+                    this.customerActivity.ip          = this.userSession.ip;
+                    this.customerActivity.os          = this.userSession.os;
+                    this.customerActivity.sessionId   = this.userSession.id;
+                }
+                // Mark for Check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._currentLocationService.currentLocation$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: CurrentLocation)=>{
+                if (response && response.isAllowed) {                    
+                    this.customerActivity.latitude = response.location.lat + "";
+                    this.customerActivity.latitude = response.location.lng + "";
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
+        
         this._router.events.forEach((event) => {   
-                        
-            // if customerId null means guest
-            let _customerId = this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid ? this._jwtService.getJwtPayload(this._authService.jwtAccessToken).uid : null
-            
-            //get domain
-            var domain = this._apiServer.settings.marketplaceDomain;
-            //get ip address info
-            var _IpActivity = this.ipAddress;            
-            
-            //get session id by get cart id
-            var _sessionId = null // this._cartService.cartId$ 
-
-            const activityBody = 
-            {
-                browserType : this.userSession ? this.userSession.browser : null,
-                deviceModel : this.userSession ? this.userSession.device : null,
-                ip          : this.userSession ? this.userSession.ip : null,
-                os          : this.userSession ? this.userSession.os : null,
-                sessionId   : this.userSession ? this.userSession.id : null,
-                storeId     : null,
-                customerId  : null,
-                errorOccur  : null,
-                errorType   : null,
-                pageVisited : 'https://' + domain + event["urlAfterRedirects"],
-                latitude    : null,
-                longitude   : null
-            }
-
             if(event instanceof RoutesRecognized) {
-                this._analyticService.postActivity(activityBody).subscribe((response) => {
-                });           
-            }
-            // NavigationEnd
-            // NavigationCancel
-            // NavigationError
-            // RoutesRecognized            
+                // set store id
+                if (this._storeService.storeId$ !== "") this.customerActivity.storeId = this._storeService.storeId$;
+                // set page visited
+                this.customerActivity.pageVisited = 'https://' + this._apiServer.settings.marketplaceDomain + event["urlAfterRedirects"];
+                
+                this._analyticService.postActivity(this.customerActivity).subscribe();           
+            }        
         });
     }
 }

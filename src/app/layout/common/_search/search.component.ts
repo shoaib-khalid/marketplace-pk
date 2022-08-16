@@ -10,6 +10,8 @@ import { StoreDetails } from './search.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
+import { LocationService } from 'app/core/location/location.service';
+import { Tag } from 'app/core/location/location.types';
 
 
 @Component({
@@ -35,6 +37,7 @@ export class _SearchComponent implements OnInit, OnDestroy
     @Input() store: StoreDetails;
 
     platform: Platform;
+    tags: Tag[];
     searchControl: FormControl = new FormControl();
     resultSets: any[];
     autoCompleteList: any[]
@@ -60,6 +63,7 @@ export class _SearchComponent implements OnInit, OnDestroy
         private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _platformService: PlatformService,
+        private _locationService: LocationService,
         private _activatedRoute: ActivatedRoute
     )
     {
@@ -78,6 +82,16 @@ export class _SearchComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this._locationService.tags$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response: Tag[]) => {
+                if (response) {
+                    this.tags = response;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            })
+
         this._searchService.route$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(response => {
@@ -500,6 +514,10 @@ export class _SearchComponent implements OnInit, OnDestroy
             this._searchService.localSearch = localDataSearch;
             this.resultSets = localDataSearch; 
         }
+    }
+
+    goToTags(tag: string) {
+        this._router.navigate(['/search'], {queryParams: {tag: tag}})
     }
 
 }

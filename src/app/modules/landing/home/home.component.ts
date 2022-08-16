@@ -5,13 +5,14 @@ import { ParentCategory, LandingLocation, StoresDetails, ProductDetails } from '
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { ProductPagination, StorePagination } from 'app/core/store/store.types';
-import { AppConfig } from 'app/config/service.config';
-import { map, merge, Subject, switchMap, takeUntil } from 'rxjs';
+import { map, merge, Subject, switchMap, takeUntil, combineLatest } from 'rxjs';
 import { AdsService } from 'app/core/ads/ads.service';
 import { Ad } from 'app/core/ads/ads.types';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { ViewportScroller } from '@angular/common';
 import { NavigateService } from 'app/core/navigate-url/navigate.service';
+import { CurrentLocationService } from 'app/core/_current-location/current-location.service';
+import { CurrentLocation } from 'app/core/_current-location/current-location.types';
 
 @Component({
     selector     : 'landing-home',
@@ -31,46 +32,45 @@ export class LandingHomeComponent implements OnInit
     locationsViewAll : boolean = false;
 
     categories: ParentCategory[] = [];
-    categoriesViewAll : boolean = false;
+    categoriesViewAll: boolean = false;
 
     // featured stores
+    featuredStoresTitle: string = "Featured Shops";
     featuredStores: StoresDetails[] = [];
     featuredStoresPagination: StorePagination;
     featuredStoresPageOfItems: Array<any>;
-    featuredStorePageSize = 10;
+    featuredStorePageSize: number = 9;
     oldFeaturedStoresPaginationIndex: number = 0;
 
     // store details
+    storesDetailsTitle: string = "Shops";
     storesDetails: StoresDetails[] = [];
     storesDetailsPagination: StorePagination;
     storesDetailsPageOfItems: Array<any>;
-    storesDetailsPageSize = 10;
+    storesDetailsPageSize: number = 9;
     oldStoresDetailsPaginationIndex: number = 0;
 
-    storesViewAll : boolean = false;
-
     // featured products
+    featuredProductsTitle: string = "Featured Items";
     featuredProducts: ProductDetails[] = [];
     featuredProductsPagination: ProductPagination;
     featuredProductsPageOfItems: Array<any>;
-    featuredProductPageSize = 30;
+    featuredProductPageSize = 19;
     oldFeaturedProductsPaginationIndex: number = 0;
 
     // product detauls
+    productsDetailsTitle: string = "Items";
     productsDetails: ProductDetails[] = [];
     productsDetailsPagination: ProductPagination;
     productsDetailsPageOfItems: Array<any>;
-    productsDetailsPageSize = 30;
+    productsDetailsPageSize = 19;
     oldProductsDetailsPaginationIndex: number = 0;
-
-    productsViewAll : boolean = false;
 
     isLoading: boolean = false;
     currentScreenSize: string[] = [];
     ads: Ad[] = [];
 
-    currentLat  : number = null;
-    currentLong : number = null;
+    currentLocation: CurrentLocation;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -83,7 +83,7 @@ export class LandingHomeComponent implements OnInit
         private _locationService: LocationService,
         private _adsService: AdsService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _apiServer: AppConfig,
+        private _currentLocationService: CurrentLocationService,
         private _scroller: ViewportScroller,
         private _navigate: NavigateService
     )
@@ -92,125 +92,102 @@ export class LandingHomeComponent implements OnInit
 
     ngOnInit(): void {
 
-        // Get current location
-        navigator.geolocation.getCurrentPosition((position) => {
-            var crd = position.coords;
-            this.currentLat = crd.latitude;
-            this.currentLong = crd.longitude;
-
-            // Get platform data
+        combineLatest([
+            this._currentLocationService.currentLocation$,
             this._platformsService.platform$
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((platform: Platform) => { 
-                    if (platform) {
-                        this.platform = platform;
+        ]).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(([currentLocation, platform] : [CurrentLocation, Platform])=>{
+            if (currentLocation && platform) {
+                this.platform = platform;
+                this.currentLocation = currentLocation;
 
-                        // get back the previous pagination page
-                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
-                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
-                            this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
-                            this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
+                let currentLat = currentLocation.isAllowed ? currentLocation.location.lat : null;
+                let currentLong = currentLocation.isAllowed ? currentLocation.location.lng : null;
+
+                // get back the previous pagination page
+                // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
+                    this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
+                    this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
+                }
+
+                // Get categories
+                this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
+                    .subscribe((category : ParentCategory[]) => {
+                    });
+
+                // Get locations
+                this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
+                    .subscribe((location : LandingLocation[]) => {
+                    });
+
+                this._locationService.storesDetails = null;
+                this._locationService.featuredStores = null;
+                this._locationService.productsDetails = null;
+                this._locationService.featuredProducts = null;
+
+                if (this.currentLocation.isAllowed === false) {
+                    // Get featured products
+                    this._locationService.getFeaturedProducts({ 
+                        page            : this.oldFeaturedProductsPaginationIndex, 
+                        pageSize        : this.featuredProductPageSize, 
+                        sortByCol       : 'mainLevelSequence', 
+                        sortingOrder    : 'ASC', 
+                        status          : ['ACTIVE', 'OUTOFSTOCK'],
+                        regionCountryId : this.platform.country,
+                        isMainLevel     : true
+                    })
+                    .subscribe((featuredProducts : ProductDetails[]) => {
+                        this.featuredProductsTitle = "Discover Items";
+                        // if featured products not found at backend
+                        if (featuredProducts && featuredProducts.length < 1) {
+                            this._locationService.getProductsDetails({
+                                page            : this.oldProductsDetailsPaginationIndex,
+                                pageSize        : this.productsDetailsPageSize,
+                                sortByCol       : 'created',
+                                sortingOrder    : 'DESC',
+                                status          : ['ACTIVE', 'OUTOFSTOCK'],
+                                regionCountryId : this.platform.country
+                            })
+                            .subscribe((productsDetails: ProductDetails[])=>{
+                                this.productsDetailsTitle = "Discover Items";
+                            });
                         }
+                    });
+                } 
 
-                        // Get categories
-                        this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
-                            .subscribe((category : ParentCategory[]) => {
-                            });
-
-                        // Get locations
-                        this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                            .subscribe((location : LandingLocation[]) => {
-                            });
-
-                        // Get featured stores
-                        this._locationService.getStoresDetails({ 
-                            page            : this.oldStoresDetailsPaginationIndex, 
-                            pageSize        : this.storesDetailsPageSize, 
+                // Get featured stores
+                this._locationService.getFeaturedStores({ 
+                    page            : this.oldFeaturedStoresPaginationIndex, 
+                    pageSize        : this.featuredStorePageSize, 
+                    sortByCol       : 'mainLevelSequence', 
+                    sortingOrder    : 'ASC', 
+                    regionCountryId : this.platform.country,
+                    isMainLevel     : true,
+                    latitude        : currentLat,
+                    longitude       : currentLong
+                })
+                .subscribe((featuredStores : StoresDetails[]) => {
+                    this.featuredStoresTitle = this.currentLocation.isAllowed ? "Discover Shops Near Me" : "Discover Shops";
+                    if (featuredStores && featuredStores.length < 1) {
+                        // if featured stores not found at backend
+                        this._locationService.getStoresDetails({
+                            page            : this.oldStoresDetailsPaginationIndex,
+                            pageSize        : this.storesDetailsPageSize,
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC', 
-                            regionCountryId : this.platform.country,
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong
+                            regionCountryId : this.platform.country
                         })
-                        .subscribe((stores : StoresDetails[]) => {
+                        .subscribe((storesDetails: StoresDetails[])=>{
+                            this.storesDetailsTitle = "Discover Shops";
                         });
-
-                        // Get featured products
-                        this._locationService.getProductsDetails({ 
-                            page            : this.oldProductsDetailsPaginationIndex, 
-                            pageSize        : this.productsDetailsPageSize, 
-                            sortByCol       : 'created', 
-                            sortingOrder    : 'DESC', 
-                            status          : ['ACTIVE', 'OUTOFSTOCK'],
-                            regionCountryId : this.platform.country, 
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong
-                        })
-                        .subscribe((products : ProductDetails[]) => {
-                        });
-
                     }
-                    
-                    // Mark for check
-                    this._changeDetectorRef.markForCheck();
                 });
-        }, error => {
+            }
 
-            // Get platform data
-            this._platformsService.platform$
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((platform: Platform) => { 
-                    if (platform) {
-                        this.platform = platform;
-
-                        // get back the previous pagination page
-                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
-                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
-                            this.oldFeaturedStoresPaginationIndex = this.featuredStoresPagination ? this.featuredStoresPagination.page : 0;
-                            this.oldFeaturedProductsPaginationIndex = this.featuredProductsPagination ? this.featuredProductsPagination.page : 0;
-                        }
-
-                        // Get categories
-                        this._locationService.getParentCategories({ pageSize: 50, regionCountryId: this.platform.country })
-                            .subscribe((category : ParentCategory[]) => {
-                            });
-
-                        // Get locations
-                        this._locationService.getFeaturedLocations({ pageSize: 50, sortByCol: 'sequence', sortingOrder: 'ASC', regionCountryId: this.platform.country })
-                            .subscribe((location : LandingLocation[]) => {
-                            });
-
-                        // Get featured stores
-                        this._locationService.getFeaturedStores({ 
-                            page            : this.oldFeaturedStoresPaginationIndex, 
-                            pageSize        : this.featuredStorePageSize, 
-                            sortByCol       : 'sequence', 
-                            sortingOrder    : 'ASC', 
-                            regionCountryId : this.platform.country,
-                            isMainLevel     : true
-                        })
-                        .subscribe((stores : StoresDetails[]) => {
-                        });
-
-                        // Get featured products
-                        this._locationService.getFeaturedProducts({ 
-                            page            : this.oldFeaturedProductsPaginationIndex, 
-                            pageSize        : this.featuredProductPageSize, 
-                            sortByCol       : 'sequence', 
-                            sortingOrder    : 'ASC', 
-                            status          : ['ACTIVE', 'OUTOFSTOCK'],
-                            regionCountryId : this.platform.country, 
-                            isMainLevel     : true
-                        })
-                        .subscribe((products : ProductDetails[]) => {
-                        });
-
-                    }
-                    
-                    // Mark for check
-                    this._changeDetectorRef.markForCheck();
-                });
-        });
+            // Mark for check
+            this._changeDetectorRef.markForCheck();
+        })
 
         // Get all locations
         this._locationService.featuredLocations$
@@ -253,21 +230,16 @@ export class LandingHomeComponent implements OnInit
         this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products) => {
-                if (products) {
-                    this.featuredProducts = products;  
-                }
+                this.featuredProducts = products;  
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         // Get featured product pagination
-        this._locationService.featuredProductPagination$
+        this._locationService.featuredProductsPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((productsPagination) => {
-                if (productsPagination) {
-                    this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
                     this.featuredProductsPagination = productsPagination; 
-                }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -276,21 +248,16 @@ export class LandingHomeComponent implements OnInit
         this._locationService.featuredStores$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores) => {
-                if (stores) {
-                    this.featuredStores = stores;  
-                }
+                this.featuredStores = stores;  
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
         // Get featured stores pagination
-        this._locationService.featuredStorePagination$
+        this._locationService.featuredStoresPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((storesPagination) => {
-                if (storesPagination) {
-                    this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
-                    this.featuredStoresPagination = storesPagination;  
-                }
+                this.featuredStoresPagination = storesPagination;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -299,9 +266,7 @@ export class LandingHomeComponent implements OnInit
         this._locationService.productsDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products) => {
-                if (products) {
-                    this.productsDetails = products;  
-                }
+                this.productsDetails = products;  
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -310,10 +275,7 @@ export class LandingHomeComponent implements OnInit
         this._locationService.productDetailPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((productsPagination) => {
-                if (productsPagination) {
-                    this.productsViewAll = (productsPagination.length > productsPagination.size) ? true : false;
-                    this.productsDetailsPagination = productsPagination; 
-                }
+                this.productsDetailsPagination = productsPagination; 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -322,9 +284,7 @@ export class LandingHomeComponent implements OnInit
         this._locationService.storesDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores) => {
-                if (stores) {
-                    this.storesDetails = stores;  
-                }
+                this.storesDetails = stores;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -333,10 +293,7 @@ export class LandingHomeComponent implements OnInit
         this._locationService.storesDetailPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((storesPagination) => {
-                if (storesPagination) {
-                    this.storesViewAll = (storesPagination.length > storesPagination.size) ? true : false;
-                    this.storesDetailsPagination = storesPagination;  
-                }
+                this.storesDetailsPagination = storesPagination;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -396,12 +353,12 @@ export class LandingHomeComponent implements OnInit
                         return this._locationService.getFeaturedStores({ 
                             page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
                             pageSize        : this.featuredStoresPageOfItems['pageSize'], 
-                            sortByCol       : 'sequence', 
+                            sortByCol       : 'mainLevelSequence', 
                             sortingOrder    : 'ASC', 
                             regionCountryId : this.platform.country,
                             isMainLevel     : true,
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong,
+                            latitude        : this.currentLocation.isAllowed ? this.currentLocation.location.lat : null,
+                            longitude       : this.currentLocation.isAllowed ? this.currentLocation.location.lng : null,
                         });
                     }),
                     map(() => {
@@ -421,13 +378,13 @@ export class LandingHomeComponent implements OnInit
                         return this._locationService.getFeaturedProducts({ 
                             page            : this.featuredProductsPageOfItems['currentPage'] - 1, 
                             pageSize        : this.featuredProductsPageOfItems['pageSize'], 
-                            sortByCol       : 'sequence', 
+                            sortByCol       : 'mainLevelSequence', 
                             sortingOrder    : 'ASC', 
                             status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country,
                             isMainLevel     : true,
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong
+                            latitude        : this.currentLocation.isAllowed ? this.currentLocation.location.lat : null,
+                            longitude       : this.currentLocation.isAllowed ? this.currentLocation.location.lng : null
                         });
                     }),
                     map(() => {
@@ -444,14 +401,23 @@ export class LandingHomeComponent implements OnInit
                 merge(this._storesDetailsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
+
+                        let latitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lat : null;
+                        let longitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lng : null;
+                        
+                        // this rules is requested by eleen, where if there were not no location available in featured
+                        // but still want to something to customer
+                        latitude = this.featuredStores && this.featuredStores.length > 1 ?  latitude : null;
+                        longitude = this.featuredStores && this.featuredStores.length > 1 ?  longitude : null;
+
                         return this._locationService.getStoresDetails({ 
                             page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
                             pageSize        : this.storesDetailsPageOfItems['pageSize'], 
                             sortByCol       : 'created', 
                             sortingOrder    : 'DESC', 
                             regionCountryId : this.platform.country,
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong,
+                            latitude        : latitude,
+                            longitude       : longitude,
                         });
                     }),
                     map(() => {
@@ -468,6 +434,15 @@ export class LandingHomeComponent implements OnInit
                 merge(this._productsDetailsPaginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
+
+                        let latitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lat : null;
+                        let longitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lng : null;
+                        
+                        // this rules is requested by eleen, where if there were not no location available in featured
+                        // but still want to something to customer
+                        latitude = this.featuredProducts && this.featuredProducts.length > 1 ?  latitude : null;
+                        longitude = this.featuredProducts && this.featuredProducts.length > 1 ?  longitude : null;
+
                         return this._locationService.getProductsDetails({ 
                             page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
                             pageSize        : this.productsDetailsPageOfItems['pageSize'], 
@@ -475,8 +450,8 @@ export class LandingHomeComponent implements OnInit
                             sortingOrder    : 'DESC', 
                             status          : ['ACTIVE', 'OUTOFSTOCK'],
                             regionCountryId : this.platform.country,
-                            latitude        : this.currentLat,
-                            longitude       : this.currentLong
+                            latitude        : latitude,
+                            longitude       : longitude
                         });
                     }),
                     map(() => {
@@ -499,12 +474,12 @@ export class LandingHomeComponent implements OnInit
                     this._locationService.getFeaturedStores({ 
                         page            : this.featuredStoresPageOfItems['currentPage'] - 1, 
                         pageSize        : this.featuredStoresPageOfItems['pageSize'], 
-                        sortByCol       : 'sequence', 
+                        sortByCol       : 'mainLevelSequence', 
                         sortingOrder    : 'ASC', 
                         regionCountryId : this.platform.country,
                         isMainLevel     : true,
-                        latitude        : this.currentLat,
-                        longitude       : this.currentLong
+                        latitude        : this.currentLocation.isAllowed ? this.currentLocation.location.lat : null,
+                        longitude       : this.currentLocation.isAllowed ? this.currentLocation.location.lng : null
                     })
                     .subscribe(()=>{
                         // set loading to false
@@ -524,13 +499,13 @@ export class LandingHomeComponent implements OnInit
                     this._locationService.getFeaturedProducts({ 
                         page            : this.featuredProductsPageOfItems['currentPage'] - 1, 
                         pageSize        : this.featuredProductsPageOfItems['pageSize'], 
-                        sortByCol       : 'sequence', 
+                        sortByCol       : 'mainLevelSequence', 
                         sortingOrder    : 'ASC', 
                         status          : ['ACTIVE', 'OUTOFSTOCK'],
                         regionCountryId : this.platform.country, 
                         isMainLevel     : true,
-                        latitude        : this.currentLat,
-                        longitude       : this.currentLong
+                        latitude        : this.currentLocation.isAllowed ? this.currentLocation.location.lat : null,
+                        longitude       : this.currentLocation.isAllowed ? this.currentLocation.location.lng : null, 
                     })
                     .subscribe(()=>{
                         // set loading to false
@@ -545,6 +520,14 @@ export class LandingHomeComponent implements OnInit
                 if (this.storesDetailsPageOfItems['currentPage'] - 1 !== this.storesDetailsPagination.page) {
                     // set loading to true
                     this.isLoading = true;
+
+                    let latitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lat : null;
+                    let longitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lng : null;
+                    
+                    // this rules is requested by eleen, where if there were not no location available in featured
+                    // but still want to something to customer
+                    latitude = this.featuredStores && this.featuredStores.length > 1 ?  latitude : null;
+                    longitude = this.featuredStores && this.featuredStores.length > 1 ?  longitude : null;
         
                     this._locationService.getStoresDetails({ 
                         page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
@@ -552,8 +535,8 @@ export class LandingHomeComponent implements OnInit
                         sortByCol       : 'created', 
                         sortingOrder    : 'DESC', 
                         regionCountryId : this.platform.country,
-                        latitude        : this.currentLat,
-                        longitude       : this.currentLong
+                        latitude        : latitude,
+                        longitude       : longitude
                     })
                     .subscribe(()=>{
                         // set loading to false
@@ -569,6 +552,14 @@ export class LandingHomeComponent implements OnInit
                 if (this.productsDetailsPageOfItems['currentPage'] - 1 !== this.productsDetailsPagination.page) {
                     // set loading to true
                     this.isLoading = true;
+
+                    let latitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lat : null;
+                    let longitude: number = this.currentLocation.isAllowed ? this.currentLocation.location.lng : null;
+                    
+                    // this rules is requested by eleen, where if there were not no location available in featured
+                    // but still want to something to customer
+                    latitude = this.featuredProducts && this.featuredProducts.length > 1 ?  latitude : null;
+                    longitude = this.featuredProducts && this.featuredProducts.length > 1 ?  longitude : null;
         
                     this._locationService.getProductsDetails({ 
                         page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
@@ -577,8 +568,8 @@ export class LandingHomeComponent implements OnInit
                         sortingOrder    : 'DESC', 
                         status          : ['ACTIVE', 'OUTOFSTOCK'],
                         regionCountryId : this.platform.country, 
-                        latitude        : this.currentLat,
-                        longitude       : this.currentLong
+                        latitude        : latitude,
+                        longitude       : longitude
                     })
                     .subscribe(()=>{
                         // set loading to false

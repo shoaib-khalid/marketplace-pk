@@ -583,9 +583,8 @@ export class UserService
     }
 
     generateSession(body: UserSession): Observable<any>
-    {
+    {        
         let userService = this._apiServer.settings.apiServer.userService;
-        let customerId = this._jwt.getJwtPayload(this._authService.jwtAccessToken).uid;  
 
         const header = {
             headers: new HttpHeaders().set("Authorization", this._authService.publicToken)
@@ -597,7 +596,7 @@ export class UserService
                 this._logging.debug("Response from addressService (generateSession)", response);
 
                 // Resolved
-                this._userSession.next(response["data"]);
+                this._userSession.next(body);
 
                 // Return the deleted status
                 return response["data"];

@@ -15,7 +15,7 @@
     <featured-categories class="w-full mt-4 sm:mt-8" [categories]="categories" [showViewAll]="false" [title]="'Categories'"></featured-categories>
     <!-- Featured Products -->
     <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products id="featuredProductsContainer" class="w-full mt-4 sm:mt-8" [products]="featuredProducts" [showViewAll]="false" [title]="'Featured Items'"></featured-products>
+        <featured-products id="featuredProductsContainer" class="w-full mt-4 sm:mt-8" [products]="featuredProducts" [showViewAll]="false" [title]="featuredProductsTitle"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="featuredProductsPagination && featuredProductsPagination.length > featuredProductsPagination.size">
             <div class="flex w-full my-4 items-center justify-center">
@@ -29,25 +29,9 @@
             </div>
         </ng-container>
     </ng-container>
-    <!-- Featured Stores -->
-    <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores id="featuredStoresContainer" class="w-full mt-4 sm:mt-8" [stores]="featuredStores" [showViewAll]="false" [title]="'Featured Shops'"></featured-stores>
-        <!-- Pagination -->
-        <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStoresPagination.size">
-            <div class="flex w-full my-4 items-center justify-center">
-                <pagination 
-                    [itemLength]="featuredStoresPagination.length" 
-                    [initialPage]="featuredStoresPagination.page + 1"
-                    [pageSize]="featuredStoresPagination.size"
-                    (changePage)="onChangePage($event, 'featuredStore')"
-                    (click)="scroll('featuredStoresContainer')"
-                    #featuredStoresPaginator></pagination>
-            </div>
-        </ng-container>
-    </ng-container>
     <!-- Products Details -->
     <ng-container *ngIf="productsDetails && productsDetails.length">
-        <featured-products id="productsDetailsContainer" class="w-full mt-4 sm:mt-8" [products]="productsDetails" [showViewAll]="false" [title]="'Discover Items'"></featured-products>
+        <featured-products id="productsDetailsContainer" class="w-full mt-4 sm:mt-8" [products]="productsDetails" [showViewAll]="false" [title]="productsDetailsTitle"></featured-products>
         <!-- Pagination -->
         <ng-container *ngIf="productsDetailsPagination && productsDetailsPagination.length > productsDetailsPagination.size ">
             <div class="flex w-full my-4 items-center justify-center">
@@ -61,9 +45,25 @@
             </div>
         </ng-container>
     </ng-container>
+    <!-- Featured Stores -->
+    <ng-container *ngIf="featuredStores && featuredStores.length">
+        <featured-stores id="featuredStoresContainer" class="w-full mt-4 sm:mt-8" [stores]="featuredStores" [showViewAll]="false" [title]="featuredStoresTitle"></featured-stores>
+        <!-- Pagination -->
+        <ng-container *ngIf="featuredStoresPagination && featuredStoresPagination.length > featuredStoresPagination.size">
+            <div class="flex w-full my-4 items-center justify-center">
+                <pagination 
+                    [itemLength]="featuredStoresPagination.length" 
+                    [initialPage]="featuredStoresPagination.page + 1"
+                    [pageSize]="featuredStoresPagination.size"
+                    (changePage)="onChangePage($event, 'featuredStore')"
+                    (click)="scroll('featuredStoresContainer')"
+                    #featuredStoresPaginator></pagination>
+            </div>
+        </ng-container>
+    </ng-container>
     <!-- Stores Details -->
     <ng-container *ngIf="storesDetails && storesDetails.length">
-        <featured-stores id="storesDetailsContainer" class="w-full mt-4 sm:mt-8" [stores]="storesDetails" [showViewAll]="false" [title]="'Discover Shops'"></featured-stores>
+        <featured-stores id="storesDetailsContainer" class="w-full mt-4 sm:mt-8" [stores]="storesDetails" [showViewAll]="false" [title]="storesDetailsTitle"></featured-stores>
         <!-- Pagination -->
         <ng-container *ngIf="storesDetailsPagination && storesDetailsPagination.length > storesDetailsPagination.size">
             <div class="flex w-full my-4 items-center justify-center">

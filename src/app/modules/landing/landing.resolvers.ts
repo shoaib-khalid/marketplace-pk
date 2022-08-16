@@ -43,7 +43,7 @@ export class LandingDataResolver implements Resolve<any>
         return forkJoin([
             this._adsService.set(),
             this._userService.getCustomerAddresses(),
-            this._floatingBannerService.setBanners()
+            this._floatingBannerService.resolveBanners()
             // this._httpstatService.get(500)
         ]);
     }

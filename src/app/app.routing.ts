@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
-import { InitialDataResolver, PlatformSetupResolver, BrowserCompatibilityResolver } from 'app/app.resolvers';
+import { PlatformSetupResolver, BrowserCompatibilityResolver } from 'app/app.resolvers';
 import { UserRole } from 'app/core/user/user.roles';
 import { CartsResolver } from './modules/landing/carts/carts.resolver';
 
@@ -14,16 +14,12 @@ export const appRoutes: Route[] = [
     // Landing routes
     {
         path       : '',
-        // canActivate: [AuthGuard],
-        // canActivateChild: [AuthGuard],
         component  : LayoutComponent,
         data: {
             layout: 'fnb2',
-            // roles: [UserRole.Admin, UserRole.Customer]
         },
         resolve    : {
             browserCompatibility    : BrowserCompatibilityResolver,
-            initialData             : InitialDataResolver,
             platformSetup           : PlatformSetupResolver,
             carts                   : CartsResolver
         },
@@ -32,19 +28,6 @@ export const appRoutes: Route[] = [
         ]
     },
     
-    // {
-    //     path      : '',
-    //     pathMatch : 'full',
-    //     redirectTo: 'sign-in'
-    // },  
-    
-    // Error
-    // {path: 'error', children: [
-    //     {path: '404', loadChildren: () => import('app/shared/error/error-404/error-404.module').then(m => m.Error404Module)},
-    //     {path: '500', loadChildren: () => import('app/shared/error/error-500/error-500.module').then(m => m.Error500Module)}
-    // ]},
-    // {path: 'coming-soon', loadChildren: () => import('app/shared/coming-soon/coming-soon.module').then(m => m.ComingSoonModule)},
-
     { path: 'signed-in-redirect', pathMatch : 'full', redirectTo: '' },
 
     // Redirect signed in user to the '/example'
@@ -109,7 +92,6 @@ export const appRoutes: Route[] = [
         },
         resolve    : {
             browserCompatibility    : BrowserCompatibilityResolver,
-            initialData: InitialDataResolver,
             platformSetup: PlatformSetupResolver
         },
         children   : [
@@ -131,6 +113,7 @@ export const appRoutes: Route[] = [
     //         // {path: 'buyer', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule) },
     //     ]
     // },
+
     // Documentation
     {
         path: 'docs',
@@ -144,5 +127,14 @@ export const appRoutes: Route[] = [
     {
         path: '**', redirectTo: ''
     }
+
+    // Error
+    // {path: 'error', children: [
+    //     {path: '404', loadChildren: () => import('app/shared/error/error-404/error-404.module').then(m => m.Error404Module)},
+    //     {path: '500', loadChildren: () => import('app/shared/error/error-500/error-500.module').then(m => m.Error500Module)}
+    // ]},
+    // Coming Soon
+    // {path: 'coming-soon', loadChildren: () => import('app/shared/coming-soon/coming-soon.module').then(m => m.ComingSoonModule)},
+
 
 ];
