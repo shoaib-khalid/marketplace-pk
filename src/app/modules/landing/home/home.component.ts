@@ -138,7 +138,6 @@ export class LandingHomeComponent implements OnInit
                         isMainLevel     : true
                     })
                     .subscribe((featuredProducts : ProductDetails[]) => {
-                        this.featuredProductsTitle = "Discover Items";
                         // if featured products not found at backend
                         if (featuredProducts && featuredProducts.length < 1) {
                             this._locationService.getProductsDetails({
@@ -150,7 +149,6 @@ export class LandingHomeComponent implements OnInit
                                 regionCountryId : this.platform.country
                             })
                             .subscribe((productsDetails: ProductDetails[])=>{
-                                this.productsDetailsTitle = "Discover Items";
                             });
                         }
                     });
@@ -168,7 +166,7 @@ export class LandingHomeComponent implements OnInit
                     longitude       : currentLong
                 })
                 .subscribe((featuredStores : StoresDetails[]) => {
-                    this.featuredStoresTitle = this.currentLocation.isAllowed ? "Discover Shops Near Me" : "Discover Shops";
+                    if (this.currentLocation.isAllowed) { this.featuredStoresTitle = "Discover Shops Near Me"; this.storesDetailsTitle = "Discover Shops Near Me" };
                     if (featuredStores && featuredStores.length < 1) {
                         // if featured stores not found at backend
                         this._locationService.getStoresDetails({
@@ -179,7 +177,6 @@ export class LandingHomeComponent implements OnInit
                             regionCountryId : this.platform.country
                         })
                         .subscribe((storesDetails: StoresDetails[])=>{
-                            this.storesDetailsTitle = "Discover Shops";
                         });
                     }
                 });

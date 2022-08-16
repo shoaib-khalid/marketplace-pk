@@ -138,13 +138,18 @@ export class CategoryComponent implements OnInit
                             this.adjacentLocationIds = [this.locationId];
                         }
 
-                        this._locationService.getFeaturedLocations({pageSize: this.maxLocationsDisplay, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds,  sortByCol: 'sequence', sortingOrder: 'ASC' })
-                            .subscribe((locations : LandingLocation[]) => {});
+                        this._locationService.getFeaturedLocations({
+                            pageSize        : this.maxLocationsDisplay, 
+                            regionCountryId : this.platform.country, 
+                            sortByCol       : 'sequence', 
+                            sortingOrder    : 'ASC' 
+                        })
+                        .subscribe((locations : LandingLocation[]) => {});
 
-                        this.productsDetails = null;
-                        this.featuredProducts = null;
-                        this.storesDetails = null;
-                        this.featuredStores = null;
+                        this._locationService.productsDetails = null;
+                        this._locationService.featuredProducts = null;
+                        this._locationService.storesDetails = null;
+                        this._locationService.featuredStores = null;
 
                         if (this.currentLocation.isAllowed === false) {
                             // Get featured products
@@ -160,7 +165,6 @@ export class CategoryComponent implements OnInit
                                 isMainLevel     : false
                             })
                             .subscribe((featuredProducts : ProductDetails[]) => {
-                                this.featuredProductsTitle = "Discover Items";
                                 // if featured products not found at backend
                                 if (featuredProducts && featuredProducts.length < 1) {
                                     this._locationService.getProductsDetails({
@@ -169,10 +173,11 @@ export class CategoryComponent implements OnInit
                                         sortByCol       : 'created',
                                         sortingOrder    : 'DESC',
                                         status          : ['ACTIVE', 'OUTOFSTOCK'],
-                                        regionCountryId : this.platform.country
+                                        regionCountryId : this.platform.country,
+                                        cityId          : this.adjacentLocationIds,
+                                        parentCategoryId: this.categoryId
                                     })
                                     .subscribe((productsDetails: ProductDetails[])=>{
-                                        this.productsDetailsTitle = "Discover Items";
                                     });
                                 }
                             });
@@ -190,7 +195,7 @@ export class CategoryComponent implements OnInit
                             isMainLevel     : false
                         })
                         .subscribe((featuredStores : StoresDetails[]) => {
-                            this.featuredStoresTitle = this.currentLocation.isAllowed ? "Discover Shops Near Me" : "Discover Shops";
+                            if (this.currentLocation.isAllowed) { this.featuredStoresTitle = "Discover Shops Near Me"; this.storesDetailsTitle = "Discover Shops Near Me" };
                             if (featuredStores && featuredStores.length < 1) {
                                 // if featured stores not found at backend
                                 this._locationService.getStoresDetails({
@@ -203,7 +208,6 @@ export class CategoryComponent implements OnInit
                                     parentCategoryId: this.categoryId
                                 })
                                 .subscribe((storesDetails: StoresDetails[])=>{
-                                    this.storesDetailsTitle = "Discover Shops";
                                 });
                             }
                         });
@@ -238,6 +242,7 @@ export class CategoryComponent implements OnInit
                 // Set current location to null since we don't have locationId
                 this._locationService.featuredLocation = null;    
 
+                
                 // Get current location with locationId
                 this._locationService.getFeaturedLocations({
                     page            : 0, 
@@ -280,11 +285,12 @@ export class CategoryComponent implements OnInit
                             page            : 0,
                             pageSize        : this.maxLocationsDisplay, 
                             regionCountryId : this.platform.country, 
-                            cityId          : this.adjacentLocationIds, 
                             sortByCol       : 'sequence', 
                             sortingOrder    : 'ASC' 
                         })
-                        .subscribe((locations : LandingLocation[]) => {});
+                        .subscribe((locations : LandingLocation[]) => {
+                            console.log("locations", locations);
+                        });
                         
                         this._locationService.productsDetails = null;
                         this._locationService.featuredProducts = null;
@@ -305,7 +311,6 @@ export class CategoryComponent implements OnInit
                                 isMainLevel     : false
                             })
                             .subscribe((featuredProducts : ProductDetails[]) => {
-                                this.featuredProductsTitle = "Discover Items";
                                 // if featured products not found at backend
                                 if (featuredProducts && featuredProducts.length < 1) {
                                     this._locationService.getProductsDetails({
@@ -319,7 +324,6 @@ export class CategoryComponent implements OnInit
                                         parentCategoryId: this.categoryId
                                     })
                                     .subscribe((productsDetails: ProductDetails[])=>{
-                                        this.productsDetailsTitle = "Discover Items";
                                     });
                                 }
                             });
@@ -339,7 +343,7 @@ export class CategoryComponent implements OnInit
                             isMainLevel     : false
                         })
                         .subscribe((featuredStores : StoresDetails[]) => {
-                            this.featuredStoresTitle = (currentLat && currentLong) ? "Discover Shops Near Me" : "Discover Shops";
+                            if (currentLat && currentLong) { this.featuredStoresTitle = "Discover Shops Near Me"; this.storesDetailsTitle = "Discover Shops Near Me" };
                             if (featuredStores && featuredStores.length < 1) {
                                 // if featured stores not found at backend
                                 this._locationService.getStoresDetails({
@@ -352,7 +356,6 @@ export class CategoryComponent implements OnInit
                                     parentCategoryId: this.categoryId
                                 })
                                 .subscribe((storesDetails: StoresDetails[])=>{
-                                    this.storesDetailsTitle = "Discover Shops";
                                 });
                             }
                         });
@@ -449,7 +452,7 @@ export class CategoryComponent implements OnInit
         this._locationService.featuredProducts$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
-                this.productsDetails = products;
+                this.featuredProducts = products;
                 this.isLoading = false;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

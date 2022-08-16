@@ -151,7 +151,7 @@ export class LandingSearchComponent implements OnInit
                             longitude       : this.currentLong,
                             isMainLevel     : false
                         }).subscribe((featuredStore: StoresDetails[])=>{
-                            this.featuredStoresTitle = this.currentLocation ? "Discover Shops Near Me" : "Shops";
+                            if (this.currentLocation) { this.featuredStoresTitle = "Discover Shops Near Me"; this.storesDetailsTitle = "Discover Shops Near Me" };
                             if (featuredStore && featuredStore.length < 1) {
                                 this._locationService.getStoresDetails({ 
                                     storeName       : this.searchValue, 
@@ -165,7 +165,6 @@ export class LandingSearchComponent implements OnInit
                                     longitude       : this.currentLong 
                                 })
                                 .subscribe((storesDetails: StoresDetails[])=>{
-                                    this.featuredStoresTitle = this.currentLocation ? "Discover Shops Near Me" : "Shops";
                                 });
                             }
                         });
