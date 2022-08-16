@@ -1010,9 +1010,18 @@ export class CartListComponent implements OnInit, OnDestroy
                 deliveryProviderResponse.forEach(item => {
                     let cartIndex = this.selectedCart.carts.findIndex(element => element.id == item.cartId);
                     if (cartIndex > -1) {
+                        // let minDeliveryCharges1 = Math.min(...item.quotation.filter(x => x.isError === false).map(element => element.price));
+                        
                         // Get min/max delivery charges with no error
-                        let minDeliveryCharges = Math.min(...item.quotation.filter(x => x.isError === false).map(element => element.price));
-                        let maxDeliveryCharges = Math.max(...item.quotation.filter(x => x.isError === false).map(element => element.price));
+                        let minDeliveryCharges = Math.min(
+                            ...item.quotation.reduce((previousValue, currentValue) => {
+                                if (currentValue.isError === false) {
+                                    previousValue.push(currentValue.price);
+                                }
+                                return previousValue
+                            }, []))
+
+                        // let maxDeliveryCharges = Math.max(...item.quotation.filter(x => x.isError === false).map(element => element.price));
 
                         // find delivery with no error
                         let indexOfNoError = item.quotation.findIndex(item => item.isError === false);
@@ -1211,6 +1220,10 @@ export class CartListComponent implements OnInit, OnDestroy
                 return n;
             }
         });
+
+        // let checkoutListBody2: CheckoutItems[] = this.selectedCart.carts.reduce((previousValue, currentValue) => {
+        //     if (currentValue.selectedItemId && n.selectedItemId.length > 0)
+        // })
 
         let newCheckoutListBodyArr = checkoutListBody.map(item => {
             let {platformVoucherCode, deliveryPrice, selfPickupInfo, ...newCheckoutListBody} = item;
@@ -2017,6 +2030,25 @@ export class CartListComponent implements OnInit, OnDestroy
                 });
             }
         }
+    }
+
+    checkCombineShipping(index: number) {
+        
+        let refId = this.selectedCart.carts[index].deliveryQuotationId;
+
+        let countObject = this.selectedCart.carts.reduce((
+            count,
+            currentValue
+        ) => {
+            return (
+                count[currentValue.deliveryQuotationId] ? ++count[currentValue.deliveryQuotationId] : (count[currentValue.deliveryQuotationId] = 1),
+                count
+            );
+        },{});
+        
+        if (countObject[refId] > 1) return true;
+        else return false; 
+        
     }
 
 }
