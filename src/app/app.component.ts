@@ -165,7 +165,7 @@ export class AppComponent
             .subscribe((response: CurrentLocation)=>{
                 if (response && response.isAllowed) {                    
                     this.customerActivity.latitude = response.location.lat + "";
-                    this.customerActivity.latitude = response.location.lng + "";
+                    this.customerActivity.longitude = response.location.lng + "";
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

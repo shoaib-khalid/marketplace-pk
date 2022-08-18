@@ -99,6 +99,15 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
+            return null;
+        }
+    }
+
+    displayStoreCover(storeAssets: StoreAssets[]) {
+        let storeCoverIndex = storeAssets.findIndex(item => item.assetType === 'CoverImageUrl');
+        if (storeCoverIndex > -1) {
+            return storeAssets[storeCoverIndex].assetUrl;
+        } else {
             return this.platform.logoSquare;
         }
     }
