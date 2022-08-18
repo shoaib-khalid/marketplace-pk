@@ -204,15 +204,20 @@
                                         <ng-container *ngIf="getDeliveryFee(cart.id)">
                                             <div class="flex flex-col">
                                                 <ng-container *ngIf="getDeliveryFee(cart.id).deliveryType !== 'PICKUP'; else selfPickup">
-                                                    <div class="flex flex-row gap-1">
+                                                    <div class="flex flex-row gap-1 items-end">
                                                         <!-- Ori Price  -->
                                                         <span 
                                                             [ngClass]="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount ? 
-                                                                'line-through font-normal' : 'font-semibold'"
-                                                            class="text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryPrice.deliveryFee) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                'line-through font-normal text-xs' : 'text-sm font-semibold'"
+                                                            class="tracking-tight leading-tight md:leading-normal">{{(getDeliveryFee(cart.id).deliveryPrice.deliveryFee) | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                         <!-- Discounted price  -->
                                                         <span *ngIf="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount"
-                                                            class="font-semibold text-sm tracking-tight">{{(getDeliveryFee(cart.id).deliveryPrice.discountedPrice) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                            class="font-semibold text-sm tracking-tight leading-tight md:leading-normal">{{(getDeliveryFee(cart.id).deliveryPrice.discountedPrice) | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                        <!-- Combined shipping  -->
+                                                        <span *ngIf="checkCombineShipping(cart.id)"
+                                                            class="text-xs md:text-sm tracking-tighter">
+                                                            (Shared for Same Address)
+                                                        </span>
                                                     </div>
                                                     <!-- Off  -->
                                                     <span *ngIf="getDeliveryFee(cart.id).deliveryPrice.discountAmount !== 0 && getDeliveryFee(cart.id).deliveryPrice.discountAmount" 

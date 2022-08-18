@@ -268,7 +268,7 @@ export class BuyerCheckoutComponent implements OnInit
                             
                 if (typeof(cartsWithDetails) !== "boolean" && cartsWithDetails) {
                     this.carts = cartsWithDetails;
-
+                    
                     // Set default deliveryCharges
                     if (this.deliveryCharges) {
                         this.carts.forEach(item => {
@@ -300,7 +300,7 @@ export class BuyerCheckoutComponent implements OnInit
                     this._checkoutService.checkoutItems$
                         .pipe(takeUntil(this._unsubscribeAll))
                         .subscribe((checkoutItems: CheckoutItems[])=>{
-                            if (checkoutItems) {        
+                            if (checkoutItems) { 
                                 
                                 this.checkoutItems = checkoutItems;
                                 let cartsWithDetailsTotalItemsArr = checkoutItems.map(item => item.selectedItemId.length);
@@ -325,10 +325,10 @@ export class BuyerCheckoutComponent implements OnInit
                             if (customerAddress) {                                
                                 this.customerAddress = customerAddress;
                                 
-                                this.carts.forEach(item => {                        
-                                    // get delivery charges of every carts
-                                    // this.getDeliveryCharges(item.id,item.storeId);
-                                });
+                                // this.carts.forEach(item => {                        
+                                //     // get delivery charges of every carts
+                                //     // this.getDeliveryCharges(item.id,item.storeId);
+                                // });
                             }
                             // Mark for check 
                             this._changeDetectorRef.markForCheck();
@@ -502,8 +502,6 @@ export class BuyerCheckoutComponent implements OnInit
             platformVoucherCode = checkout.platformVoucherCode;
         })
         
-        // return
-
         this._checkoutService.postPlaceGroupOrder(orderBodies, true, platformVoucherCode)
             .subscribe((response) => {
 
@@ -889,5 +887,25 @@ export class BuyerCheckoutComponent implements OnInit
 
             this._router.navigate(['store/' + storeSlug + '/all-products/' + productSeo]);
         }
+    }
+
+    checkCombineShipping(cartId: string) {
+        let index = this.checkoutItems.findIndex(item => item.cartId === cartId);
+        let refId = this.checkoutItems[index].deliveryQuotationId;
+
+        let countObject = this.checkoutItems.reduce((
+            count,
+            currentValue
+        ) => {
+            return (
+                count[currentValue.deliveryQuotationId] ? ++count[currentValue.deliveryQuotationId] : (count[currentValue.deliveryQuotationId] = 1),
+                count
+            );
+        },{});
+        
+
+        if (countObject[refId] > 1) return true;
+        else return false; 
+        
     }
 }

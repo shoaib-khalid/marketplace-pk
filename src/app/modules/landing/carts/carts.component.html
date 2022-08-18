@@ -174,7 +174,7 @@
                                     </div>
                                     <div class="flex flex-col justify-start ml-2 md:ml-4">
                                         <div class="flex flex-row justify-between items-center">
-                                            <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer">{{cart.store.name}}</span>
+                                            <span (click)="redirect('store', cart.store, null)" class="text-md sm:text-xl font-semibold hover:cursor-pointer max-w-2/3">{{cart.store.name}}</span>
                                             
                                             <div class="flex flex-row items-center gap-2">
                                                 <!-- Store timing DESKTOP -->
@@ -188,17 +188,17 @@
                                                 </div>
                                                 <!-- Required Info  -->
                                                 <div *ngIf="selectedCart.carts[i + pagination.startIndex].showRequiredInfo && !selectedCart.carts[i + pagination.startIndex].disabled"
-                                                    class="flex flex-col justify-center items-center text-center mr-3">
-                                                    <span class="flex tracking-tight justify-center items-center text-sm">Required Info
+                                                    class="flex flex-col justify-center items-center text-center mr-1 md:mr-3">
+                                                    <span class="flex tracking-tighter justify-center items-center text-xs md:text-sm">Required Info
                                                     </span>
                                                     <mat-icon 
                                                         *ngIf="validateCustomerInfo(i + pagination.startIndex)"
-                                                        class="icon-size-6 text-primary cursor-pointer" 
+                                                        class="icon-size-5 md:icon-size-6 text-primary cursor-pointer" 
                                                         (click)="addRequiredInfo(i + pagination.startIndex)"
                                                         [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
                                                     <mat-icon 
                                                         *ngIf="!validateCustomerInfo(i + pagination.startIndex)"
-                                                        class="icon-size-6 text-red-500 cursor-pointer" 
+                                                        class="icon-size-5 md:icon-size-6 text-red-500 cursor-pointer" 
                                                         (click)="addRequiredInfo(null)"
                                                         [svgIcon]="'heroicons_outline:exclamation-circle'"></mat-icon>
                                                 </div>
@@ -458,15 +458,20 @@
                                                         <!-- <span class="font-semibold text-xs sm:text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
                                                         <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
                                                             <div class="flex flex-col">
-                                                                <div class="flex flex-row gap-1">
+                                                                <div class="flex flex-row gap-1 items-end">
                                                                     <!-- Ori Price  -->
                                                                     <span 
                                                                         [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
-                                                                            'line-through font-normal' : 'font-semibold'"
-                                                                        class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                            'line-through font-normal text-xs' : 'text-sm font-semibold'"
+                                                                        class="tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                                     <!-- Discounted price  -->
                                                                     <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
                                                                         class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                    <!-- Combined shipping  -->
+                                                                    <span *ngIf="checkCombineShipping(i + pagination.startIndex)"
+                                                                        class="text-sm tracking-tighter">
+                                                                        (Shared for Same Address)
+                                                                    </span>
                                                                 </div>
                                                                 <!-- Off  -->
                                                                 <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
@@ -553,15 +558,20 @@
                                                     <!-- <span class="font-semibold text-sm tracking-tight">{{ getDeliveryChargesRange(i + pagination.startIndex) }}</span> -->
                                                     <ng-container *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice">
                                                         <div class="flex flex-col">
-                                                            <div class="flex flex-row gap-1">
+                                                            <div class="flex flex-row gap-1 items-end">
                                                                 <!-- Ori Price  -->
                                                                 <span 
                                                                     [ngClass]="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount ? 
-                                                                        'line-through font-normal' : 'font-semibold'"
-                                                                    class="text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                        'line-through font-normal text-xs' : 'text-sm font-semibold'"
+                                                                    class="tracking-tight leading-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.selectedDeliveryPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
                                                                 <!-- Discounted price  -->
                                                                 <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount"
-                                                                    class="font-semibold text-sm tracking-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                    class="font-semibold text-sm tracking-tight leading-tight">{{selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountedPrice | currency: cart.store.regionCountry.currencySymbol}}</span>
+                                                                <!-- Combined shipping  -->
+                                                                <span *ngIf="checkCombineShipping(i + pagination.startIndex)"
+                                                                    class="text-xs tracking-tighter">
+                                                                    (Shared for Same Address)
+                                                                </span>
                                                             </div>
                                                             <!-- Off  -->
                                                             <span *ngIf="selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount !== 0 && selectedCart.carts[i + pagination.startIndex].deliveryPrice.discountAmount" 
