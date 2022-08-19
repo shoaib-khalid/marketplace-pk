@@ -200,7 +200,7 @@
                                 <div class="flex flex-row justify-between items-center mt-2">
                                     <div class="flex flex-col sm:flex-row sm:min-w-44 gap-0 sm:gap-1">
                                         <!-- <span class="font-semibold text-xs sm:text-sm">{{ (getDeliveryFee(cart.id) ? getDeliveryFee(cart.id).deliveryFee : 0) | currency: cart.store.regionCountry.currencySymbol }}</span> -->
-                                        <span class="text-sm sm:text-md">Shipping Fee:</span>
+                                        <span class="text-sm sm:text-md">Delivery Fee:</span>
                                         <ng-container *ngIf="getDeliveryFee(cart.id)">
                                             <div class="flex flex-col">
                                                 <ng-container *ngIf="getDeliveryFee(cart.id).deliveryType !== 'PICKUP'; else selfPickup">
@@ -318,7 +318,7 @@
                     </ng-container>
                     <!-- Delivery Fee -->
                     <div class="flex flex-row justify-between mt-2">
-                        <span class="text-md text-secondary">Shipping Fee</span>
+                        <span class="text-md text-secondary">Delivery Fee</span>
                         <span class="text-md font-semibold">{{paymentDetails.deliveryCharges | currency: platform.currency}}</span>
                     </div>
                     <!-- Delivery Discount -->
@@ -339,7 +339,7 @@
 
                     <ng-container *ngIf="paymentDetails.deliveryDiscount != 0">
                         <div class="flex flex-row justify-between mt-2">
-                            <span class="text-md text-secondary">Shipping Fee Discount</span>
+                            <span class="text-md text-secondary">Delivery Fee Discount</span>
                             <span class="text-md font-semibold">-{{paymentDetails.deliveryDiscount | currency: platform.currency}}</span>
                         </div>
                     </ng-container>

@@ -14,7 +14,7 @@ import { HttpStatService } from 'app/mock-api/httpstat/httpstat.service';
 import { merge, Observable, Subject } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 import { OrderService } from 'app/core/_order/order.service';
-import { OrderDetails, OrderGroup, OrderItemWithDetails, OrderPagination, OrdersCountSummary } from 'app/core/_order/order.types';
+import { Order, OrderDetails, OrderGroup, OrderItemWithDetails, OrderPagination, OrdersCountSummary } from 'app/core/_order/order.types';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 
@@ -72,6 +72,7 @@ export class OrderListComponent implements OnInit
     displayAll: { orderId: string; orderItemsId: {orderItemId: string; isDisplay: boolean}[], isDisplayAll: boolean}[];
     
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    flattenedPaymentDetails: any[];
 
     /**
     * Constructor
@@ -123,7 +124,8 @@ export class OrderListComponent implements OnInit
         ];
 
         // this._orderService.getOrdersWithDetails(this.customerAuthenticate.session.ownerId, 0, 3, this.orderCountSummary.find(item => item.id === "ALL").completionStatus).subscribe((response) =>{ });
-        this._orderService.getOrderGroups({ page:0, pageSize: 3, customerId: this.customerAuthenticate.session.ownerId}).subscribe();
+        this._orderService.getOrderGroups({ page:0, pageSize: 3, customerId: this.customerAuthenticate.session.ownerId})
+        .subscribe((orders: OrderGroup[]) => {});
         
         this.ordersDetails$ = this._orderService.ordersDetails$;
         this.ordersGroups$ = this._orderService.orderGroups$;
@@ -170,6 +172,13 @@ export class OrderListComponent implements OnInit
                                 }))
                             };
                         });
+                        
+                        this.flattenedPaymentDetails = response.reduce(
+                            (previousValue, currentValue) => previousValue.concat(currentValue.orderList),
+                            [],
+                        ).map((order: Order) => 
+                            order.orderPaymentDetail
+                        );
                     }
                     // Mark for change
                     this._changeDetectorRef.markForCheck();
@@ -407,6 +416,22 @@ export class OrderListComponent implements OnInit
             // Mark for check
             this._changeDetectorRef.markForCheck();
         }
+    }
+
+    checkCombineShipping(value) {
+        
+        let countObject = this.flattenedPaymentDetails.reduce((
+            count,
+            currentValue
+        ) => {
+            return (
+                count[currentValue.deliveryQuotationReferenceId] ? ++count[currentValue.deliveryQuotationReferenceId] : (count[currentValue.deliveryQuotationReferenceId] = 1),
+                count
+            );
+        },{});
+
+        return countObject[value]
+        
     }
     
 }
