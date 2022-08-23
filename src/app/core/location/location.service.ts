@@ -473,7 +473,7 @@ export class LocationService
         latitude        : 0,
         longitude       : 0,
         tagKeyword      : null,
-        isMainLevel     : true
+        isMainLevel     : false
     }) 
         : Observable<StoresDetails[]>
     {
