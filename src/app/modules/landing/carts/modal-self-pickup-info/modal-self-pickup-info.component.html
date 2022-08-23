@@ -15,7 +15,7 @@
                         <mat-label>Name</mat-label>
                         <input
                             [formControlName]="'name'"
-                            placeholder="Enter your name"
+                            placeholder="Enter your name (for payment receipt)"
                             matInput>
                             <mat-error *ngIf="addressForm.get('name').hasError('required')">
                                 Full name is required
@@ -29,7 +29,7 @@
                         <mat-label>Email</mat-label>
                         <input
                             [formControlName]="'email'"
-                            placeholder="Enter your email"
+                            placeholder="Enter your email (for payment receipt)"
                             [required]="true"
                             matInput>
                             <mat-error *ngIf="addressForm.get('email').hasError('required')">
@@ -40,7 +40,7 @@
                         <mat-label>Phone Number</mat-label>
                         <input
                             [formControlName]="'phoneNumber'"
-                            [placeholder]="dialingCode + '123456789'"
+                            [placeholder]="dialingCode + '123456789 (for order update)'"
                             [required]="true"
                             (change)="addressForm.get('phoneNumber').patchValue(sanitizePhoneNumber(addressForm.get('phoneNumber').value))"
                             matInput>
