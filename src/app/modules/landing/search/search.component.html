@@ -1,12 +1,10 @@
 <div class="flex flex-col items-center bg-card w-full h-full">
     <!-- Search Bar -->
     <!-- <search *ngIf="!currentScreenSize.includes('md')" class="w-full sm:mt-4"></search> -->
-    <search class="w-full mb-2 sm:mt-2 sm:mb-4"></search>
+    <search class="w-full sm:mt-2"></search>
     <!-- No Results -->
-    <ng-container *ngIf="(featuredStores && featuredStores.length === 0 && 
-                          featuredProducts && featuredProducts.length === 0 && 
-                          storesDetails && storesDetails.length === 0 && productsDetails && 
-                          productsDetails.length === 0)">
+    <ng-container *ngIf="(storesDetails && storesDetails.length === 0 && 
+                          productsDetails && productsDetails.length === 0)">
         <div class="relative flex flex-col items-center justify-center w-full h-56 md:h-96 border-gray-300 dark:bg-transparent">
             <error-background class="absolute z-0 inset-0 w-full opacity-50"></error-background>
                 <svg class="z-10" version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -43,30 +41,11 @@
             <div class="mt-6 text-2xl font-semibold tracking-tight text-primary-800 z-10">No result found, please try again.</div>
         </div>
     </ng-container>
-    <!-- Featured Products -->
-    <ng-container *ngIf="featuredProducts && featuredProducts.length">
-        <featured-products 
-            id="featuredProductsContainer" 
-            class="w-full" 
-            [products]="featuredProducts" 
-            [title]="featuredProductsTitle"></featured-products>
-        <!-- Products Pagination -->
-        <div class="flex w-full mt-4 items-center justify-center">
-            <pagination 
-                *ngIf="featuredProductsPagination.length > featuredProductsPagination.size"
-                [itemLength]="featuredProductsPagination.length"
-                [initialPage]="featuredProductsPagination.page + 1"
-                [pageSize]="featuredProductsPagination.size"
-                (changePage)="onChangePage($event, 'featuredProducts')"
-                (click)="scroll('featuredProductsContainer')"
-                #featuredProductsPaginator></pagination>
-        </div>
-    </ng-container>
     <!-- Products Details -->
     <ng-container *ngIf="productsDetails && productsDetails.length">
         <featured-products 
             id="productsDetailsContainer" 
-            class="w-full" 
+            class="w-full mt-2 sm:mt-4" 
             [products]="productsDetails" 
             [title]="productsDetailsTitle"></featured-products>
         <!-- Products Pagination -->
@@ -80,24 +59,6 @@
                 (click)="scroll('productsDetailsContainer')"
                 #productsDetailsPaginator></pagination>
         </div>
-    </ng-container>
-    <!-- Featured Stores -->
-    <ng-container *ngIf="featuredStores && featuredStores.length">
-        <featured-stores 
-            id="featuredStoresContainer" 
-            class="w-full mt-2 sm:mt-4" 
-            [stores]="featuredStores" 
-            [title]="featuredStoresTitle"></featured-stores>
-        <!-- Stores Pagination -->
-        <pagination 
-            *ngIf="featuredStoresPagination.length > featuredStoresPagination.size"
-            class="flex w-full my-4 items-center justify-center"
-            [itemLength]="featuredStoresPagination.length" 
-            [initialPage]="featuredStoresPagination.page + 1"
-            [pageSize]="featuredStoresPagination.size"
-            (changePage)="onChangePage($event, 'featuredStores')"
-            (click)="scroll('featuredStoresContainer')"
-            #featuredStoresPaginator></pagination>
     </ng-container>
     <!-- Stores Details -->
     <ng-container *ngIf="storesDetails && storesDetails.length">
