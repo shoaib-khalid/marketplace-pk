@@ -106,7 +106,8 @@ export class LandingHomeComponent implements OnInit
                     sortingOrder    : 'DESC', 
                     regionCountryId : this.platform.country,
                     latitude        : currentLat,
-                    longitude       : currentLong
+                    longitude       : currentLong,
+                    isMainLevel     : true
                 })
                 .subscribe((storesDetails: StoresDetails[])=>{
                 });

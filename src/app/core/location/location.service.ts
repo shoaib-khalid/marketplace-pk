@@ -454,7 +454,8 @@ export class LocationService
         postcode?           : string,
         latitude?           : number,
         longitude?          : number,
-        tagKeyword?         : string
+        tagKeyword?         : string,
+        isMainLevel?        : boolean
     } = {
         storeName       : null,
         parentCategoryId: null,
@@ -471,7 +472,8 @@ export class LocationService
         postcode        : null,
         latitude        : 0,
         longitude       : 0,
-        tagKeyword      : null
+        tagKeyword      : null,
+        isMainLevel     : true
     }) 
         : Observable<StoresDetails[]>
     {
