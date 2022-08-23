@@ -4,7 +4,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { LocationArea, StoresDetailPagination, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, LocationArea, StoresDetailPagination, StoresDetails } from 'app/core/location/location.types';
+import { NavigateService } from 'app/core/navigate-url/navigate.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
 import { StoresService } from 'app/core/store/store.service';
@@ -20,23 +21,26 @@ import { switchMap, debounceTime } from 'rxjs/operators';
 export class LandingStoresComponent implements OnInit
 {
     @ViewChild("storesPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
-   
-    stores: StoresDetails [] = [];
-    pagination: StoresDetailPagination;
-    currentScreenSize: string[] = [];
-    productViewOrientation: string = 'grid';
-    searchInputControl: FormControl = new FormControl();
-    searchName: string = "";
+    
     platform: Platform;
-
-    pageOfItems: Array<any>;
-    isLoading: boolean = false;
-    sortName: string = "created";
-    sortOrder: 'asc' | 'desc' | '' = 'desc';
+    
+    // Stores Details
+    storesDetailsTitle: string = "Shops"
+    storesDetails: StoresDetails[] = [];
+    storesDetailsPagination: StorePagination;
+    storesDetailsPageOfItems: Array<any>;
+    storesDetailsPageSize: number = 30;
+    oldStoresDetailsPaginationIndex: number = 0;
+    
     categoryId: string;
+    
     locationId: string;
+    location: LandingLocation;
     adjacentLocationIds: string[] = [];
+    
+    currentScreenSize: string[] = [];
+    isLoading: boolean = false;
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -45,58 +49,23 @@ export class LandingStoresComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _storesService: StoresService,
-        private _router: Router,
         private _locationService: LocationService,
         private _activatedRoute: ActivatedRoute,
-
+        private _navigate: NavigateService
     )
     {
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
+
     ngOnInit(): void {
 
-        this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => { 
-
-            this.platform = platform;          
-            
-            if (this.platform) {
-                
-                // Get searches from url parameter 
-                this._activatedRoute.queryParams.subscribe(params => {
-                    this.categoryId = params.categoryId ? params.categoryId : null;
-                    this.locationId = params.locationId ? params.locationId : null;
-
-                    // Get adjacent city first
-                    this._locationService.getLocationArea(this.locationId)
-                    .subscribe((response: LocationArea[]) => {
-                        this.adjacentLocationIds = [];
-                        this.adjacentLocationIds = response.map(item => {
-                            return item.storeCityId;
-                        });
-
-                        this.adjacentLocationIds.unshift(this.locationId);
-                
-                        // Get stores
-                        this._locationService.getStoresDetails({pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds })
-                        .subscribe((stores : StoresDetails[]) => {});
-                    });
-
-                    
-
-                });
-            }
-            
-            this._changeDetectorRef.markForCheck();
-
-        });
         this._locationService.storesDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((stores: StoresDetails[]) => { 
-                this.stores = stores;             
-
+                this.storesDetails = stores;             
                 this._changeDetectorRef.markForCheck();
             });
 
@@ -104,58 +73,79 @@ export class LandingStoresComponent implements OnInit
         this._locationService.storesDetailPagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: StoresDetailPagination) => {
-                
                 // Update the pagination
-                this.pagination = pagination;                   
-
+                this.storesDetailsPagination = pagination;                   
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Subscribe to search input field value changes
-        this.searchInputControl.valueChanges
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            debounceTime(300),
-            switchMap((query) => {                    
+        // Get Current Location
+        this._locationService.featuredLocation$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((location: LandingLocation) => {
+                if (location) {
+                    this.location = location;
+                    this.storesDetailsTitle = "Discover Shops Near " + location.cityDetails.name;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
-                this.searchName = query;
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                this.platform = platform;          
                 
-                // set loading to true
-                this.isLoading = true;
-                
-                return this._locationService.getStoresDetails({ pageSize: 25, regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds });
-            }),
-            map(() => {
-                // set loading to false
-                this.isLoading = false;
-            })
-        )
-        .subscribe();
+                if (this.platform) {
+                    // Get searches from url parameter 
+                    this._activatedRoute.queryParams.subscribe(params => {
+                        this.categoryId = params.categoryId ? params.categoryId : null;
+                        this.locationId = params.locationId ? params.locationId : null;
+
+                        // get back the previous pagination page
+                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {                            
+                            this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
+                        }
+
+                        // Get current location with locationId 
+                        this._locationService.getFeaturedLocations({ pageSize: 1, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC' })
+                            .subscribe((location : LandingLocation[]) => {});
+
+                        // Get adjacent city first
+                        this._locationService.getLocationArea(this.locationId)
+                            .subscribe((response: LocationArea[]) => {
+                                this.adjacentLocationIds = [];
+                                this.adjacentLocationIds = response.map(item => {
+                                    return item.storeCityId;
+                                });
+
+                                this.adjacentLocationIds.unshift(this.locationId);
+                        
+                                // Get stores
+                                this._locationService.getStoresDetails({
+                                    page            : this.oldStoresDetailsPaginationIndex,
+                                    pageSize        : this.storesDetailsPageSize, 
+                                    regionCountryId : this.platform.country, 
+                                    parentCategoryId: this.categoryId, 
+                                    cityId          : this.adjacentLocationIds 
+                                })
+                                .subscribe((stores : StoresDetails[]) => {});
+                            });
+                    });
+                }
+                this._changeDetectorRef.markForCheck();
+            });
 
         // collapse category to false if desktop by default, 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
-
                 this.currentScreenSize = matchingAliases;
-
-                // Set the drawerMode and drawerOpened
-                if ( matchingAliases.includes('sm') )
-                {
-                    // this.collapseCategory = false;
-                }
-                else
-                {
-                    // this.collapseCategory = true;
-                    this.productViewOrientation = 'list';
-                }
-
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
     }
 
     /**
@@ -173,7 +163,13 @@ export class LandingStoresComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getStoresDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds });
+                        return this._locationService.getStoresDetails({
+                            page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.storesDetailsPageOfItems['pageSize'], 
+                            regionCountryId : this.platform.country, 
+                            parentCategoryId: this.categoryId, 
+                            cityId          : this.adjacentLocationIds 
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -183,22 +179,40 @@ export class LandingStoresComponent implements OnInit
         }, 0);
     }
 
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Function
+    // -----------------------------------------------------------------------------------------------------
+
     onChangePage(pageOfItems: Array<any>) {
-        
         // update current page of items
-        this.pageOfItems = pageOfItems;
+        this.storesDetailsPageOfItems = pageOfItems;
 
-        if( this.pagination && this.pageOfItems['currentPage']) {
-
-            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+        if(this.storesDetailsPagination && this.storesDetailsPageOfItems['currentPage']) {
+            if (this.storesDetailsPageOfItems['currentPage'] - 1 !== this.storesDetailsPagination.page) {
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getStoresDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds })
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
+                this._locationService.getStoresDetails({
+                    page            : this.storesDetailsPageOfItems['currentPage'] - 1, 
+                    pageSize        : this.storesDetailsPageOfItems['pageSize'], 
+                    regionCountryId : this.platform.country, 
+                    parentCategoryId: this.categoryId, 
+                    cityId          : this.adjacentLocationIds 
+                })
+                .subscribe(()=>{
+                    // set loading to false
+                    this.isLoading = false;
+                });
             }
         }
         
@@ -235,6 +249,6 @@ export class LandingStoresComponent implements OnInit
             top: 0, 
             left: 0, 
             behavior: 'smooth' 
-     });
+        });
     }
 }

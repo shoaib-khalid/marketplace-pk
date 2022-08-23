@@ -75,78 +75,11 @@ export class LandingSearchComponent implements OnInit
     {
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
+
     ngOnInit(): void {
-
-        // Get platform
-        this._platformsService.platform$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((platform: Platform) => { 
-                this.platform = platform;
-
-                if (this.platform) {
-                    // Get searches from url parameter 
-                    this._activatedRoute.queryParams.subscribe(params => {
-                        this.searchValue = params['keyword'];
-                        this.tagValue = params['tag'];
-
-                        this.currentLat = params['lat'];
-                        this.currentLong = params['lng'];
-                        
-                        this.currentLocation = (this.currentLat && this.currentLong) ? {lat: this.currentLat, lng: this.currentLong} : null;
-                        
-                        // get back the previous pagination page
-                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
-                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
-                            this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
-                            this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
-                        }
-
-                        // this._locationService.featuredProducts = null;
-                        this._locationService.productsDetails = null;
-                        // this._locationService.featuredStores = null;
-                        this._locationService.storesDetails = null;
-                        
-                        if (!this.currentLocation || this.searchValue) {
-                            
-                            // Get products
-                            this._locationService.getProductsDetails({ 
-                                name            : this.searchValue, 
-                                page            : this.oldProductsDetailsPaginationIndex,
-                                pageSize        : this.productsDetailsPageSize, 
-                                sortByCol       : 'created', 
-                                sortingOrder    : 'DESC', 
-                                regionCountryId : this.platform.country, 
-                                latitude        : this.currentLat, 
-                                longitude       : this.currentLong, 
-                                storeTagKeyword : this.tagValue,
-                                status          : ['ACTIVE', 'OUTOFSTOCK']
-                            })
-                            .subscribe(()=>{});
-                        }
-
-                        this._locationService.getStoresDetails({ 
-                            storeName       : this.searchValue, 
-                            page            : this.oldStoresDetailsPaginationIndex,
-                            pageSize        : this.storesDetailsPageSize, 
-                            sortByCol       : 'created', 
-                            sortingOrder    : 'DESC', 
-                            regionCountryId : this.platform.country, 
-                            tagKeyword      : this.tagValue, 
-                            latitude        : this.currentLat, 
-                            longitude       : this.currentLong 
-                        })
-                        .subscribe((storesDetails: StoresDetails[])=>{
-                        });
-                            
-
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
-                    });
-                }
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
 
         // Get Stores Details
         this._locationService.storesDetails$
@@ -194,6 +127,75 @@ export class LandingSearchComponent implements OnInit
                     // to show only 8
                     this.ads = ads;
                 }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get platform
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                this.platform = platform;
+
+                if (this.platform) {
+                    // Get searches from url parameter 
+                    this._activatedRoute.queryParams.subscribe(params => {
+                        this.searchValue = params['keyword'];
+                        this.tagValue = params['tag'];
+
+                        this.currentLat = params['lat'];
+                        this.currentLong = params['lng'];
+                        
+                        this.currentLocation = (this.currentLat && this.currentLong) ? {lat: this.currentLat, lng: this.currentLong} : null;
+                        
+                        // get back the previous pagination page
+                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {              
+                            this.oldStoresDetailsPaginationIndex = this.storesDetailsPagination ? this.storesDetailsPagination.page : 0;
+                            this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
+                        }
+
+                        this._locationService.productsDetails = null;
+                        this._locationService.storesDetails = null;
+                        
+                        if (!this.currentLocation || this.searchValue) {
+                            
+                            // Get products
+                            this._locationService.getProductsDetails({ 
+                                name            : this.searchValue, 
+                                page            : this.oldProductsDetailsPaginationIndex,
+                                pageSize        : this.productsDetailsPageSize, 
+                                sortByCol       : 'created', 
+                                sortingOrder    : 'DESC', 
+                                regionCountryId : this.platform.country, 
+                                latitude        : this.currentLat, 
+                                longitude       : this.currentLong, 
+                                storeTagKeyword : this.tagValue,
+                                status          : ['ACTIVE', 'OUTOFSTOCK']
+                            })
+                            .subscribe(()=>{});
+                        }
+
+                        this._locationService.getStoresDetails({ 
+                            storeName       : this.searchValue, 
+                            page            : this.oldStoresDetailsPaginationIndex,
+                            pageSize        : this.storesDetailsPageSize, 
+                            sortByCol       : 'created', 
+                            sortingOrder    : 'DESC', 
+                            regionCountryId : this.platform.country, 
+                            tagKeyword      : this.tagValue, 
+                            latitude        : this.currentLat, 
+                            longitude       : this.currentLong 
+                        })
+                        .subscribe((storesDetails: StoresDetails[])=>{
+                        });
+                            
+
+                        // Mark for check
+                        this._changeDetectorRef.markForCheck();
+                    });
+                }
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -284,6 +286,10 @@ export class LandingSearchComponent implements OnInit
             }
         }, 0);
     }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Function
+    // -----------------------------------------------------------------------------------------------------
  
     onChangePage(pageOfItems: Array<any>, type: string) {
         // update current page of items

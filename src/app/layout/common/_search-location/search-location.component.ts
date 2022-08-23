@@ -160,7 +160,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             .pipe(
                 debounceTime(1000),
                 takeUntil(this._unsubscribeAll)
-            ).subscribe(userInput => {                
+            ).subscribe((userInput) => {                
                 this.autoCompleteSetList({ address: userInput + " " + this.country});
             });
     }
@@ -375,6 +375,8 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             }
             this._router.navigate(['/search'], {queryParams: location});
         }
+
+        this.autoCompleteList = [];
     }
 
     resetLocation() {

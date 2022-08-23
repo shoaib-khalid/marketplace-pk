@@ -269,7 +269,7 @@ export class CategoryComponent implements OnInit
             .subscribe(location => {
                 if (location) {
                     this.location = location;
-                    this.storesDetailsTitle = "Discover Shops Near " + location.cityDetails.name             
+                    this.storesDetailsTitle = "Discover Shops Near " + location.cityDetails.name;            
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

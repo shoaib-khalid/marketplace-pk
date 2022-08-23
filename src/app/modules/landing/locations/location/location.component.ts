@@ -222,7 +222,8 @@ export class LocationComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((location: LandingLocation) => {
                 if (location) {
-                    this.location = location;                    
+                    this.location = location;
+                    this.storesDetailsTitle = "Discover Shops Near " + location.cityDetails.name;
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

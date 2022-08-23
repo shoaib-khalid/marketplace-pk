@@ -1,16 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { LocationService } from 'app/core/location/location.service';
-import { LocationArea, ProductDetailPagination, ProductDetails, StoresDetails } from 'app/core/location/location.types';
+import { LandingLocation, LocationArea, ProductDetailPagination, ProductDetails } from 'app/core/location/location.types';
+import { NavigateService } from 'app/core/navigate-url/navigate.service';
 import { PlatformService } from 'app/core/platform/platform.service';
 import { Platform } from 'app/core/platform/platform.types';
-import { StoresService } from 'app/core/store/store.service';
-import { Store, StoreAssets, StorePagination } from 'app/core/store/store.types';
 import { Subject, takeUntil, map, merge } from 'rxjs';
-import { switchMap, debounceTime } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
     selector     : 'landing-products',
@@ -20,24 +18,27 @@ import { switchMap, debounceTime } from 'rxjs/operators';
 export class LandingProductsComponent implements OnInit
 {
     @ViewChild("productsPaginator", {read: MatPaginator}) private _paginator: MatPaginator;
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
-   
-    pagination: ProductDetailPagination;
-    currentScreenSize: string[] = [];
-    productViewOrientation: string = 'grid';
-    searchInputControl: FormControl = new FormControl();
-    searchName: string = "";
+    
     platform: Platform;
 
-    pageOfItems: Array<any>;
-    isLoading: boolean = false;
-    sortName: string = "created";
-    sortOrder: 'asc' | 'desc' | '' = 'desc';
+    // product detauls
+    productsDetailsTitle: string = "Items";
+    productsDetails: ProductDetails[] = [];
+    productsDetailsPagination: ProductDetailPagination;
+    productsDetailsPageOfItems: Array<any>;
+    productsDetailsPageSize: number = 30;
+    oldProductsDetailsPaginationIndex: number = 0;
+    
     categoryId: string;
+    
     locationId: string;
-    products: ProductDetails[];
+    location: LandingLocation;
     adjacentLocationIds: string[] = [];
-
+    
+    currentScreenSize: string[] = [];
+    isLoading: boolean = false;
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    
     /**
      * Constructor
      */
@@ -45,114 +46,102 @@ export class LandingProductsComponent implements OnInit
         private _changeDetectorRef: ChangeDetectorRef,
         private _platformsService: PlatformService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _storesService: StoresService,
-        private _router: Router,
         private _locationService: LocationService,
         private _activatedRoute: ActivatedRoute,
-
+        private _navigate: NavigateService
     )
     {
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Lifecycle hooks
+    // -----------------------------------------------------------------------------------------------------
+
     ngOnInit(): void {
 
-        this._platformsService.platform$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((platform: Platform) => { 
-
-            this.platform = platform;          
-            
-            if (this.platform) {
-
-                
-                // Get searches from url parameter 
-                this._activatedRoute.queryParams.subscribe(params => {
-                    this.categoryId = params.categoryId ? params.categoryId : null;
-                    this.locationId = params.locationId ? params.locationId : null;
-
-                    // Get adjacent city first
-                    this._locationService.getLocationArea(this.locationId)
-                    .subscribe((response: LocationArea[]) => {
-                        this.adjacentLocationIds = [];
-                        this.adjacentLocationIds = response.map(item => {
-                            return item.storeCityId;
-                        });
-
-                        this.adjacentLocationIds.unshift(this.locationId);
-                
-                        // Get products
-                        this._locationService.getProductsDetails({ pageSize: 50, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                        .subscribe((products : ProductDetails[]) => {});
-                    });
-                    
-                });
-
-            }
-            
-            this._changeDetectorRef.markForCheck();
-
-        });
         this._locationService.productsDetails$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((products: ProductDetails[]) => { 
                 if (products) {
-                    this.products = products;
+                    this.productsDetails = products;
                 }
                 this._changeDetectorRef.markForCheck();
             });
 
         // Get the product pagination
         this._locationService.productDetailPagination$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((pagination: ProductDetailPagination) => {
-            
-            // Update the pagination
-            this.pagination = pagination;                   
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: ProductDetailPagination) => {
+                // Update the pagination
+                this.productsDetailsPagination = pagination;
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+        // Get Current Location
+        this._locationService.featuredLocation$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((location: LandingLocation) => {
+                if (location) {
+                    this.location = location;
+                    this.productsDetailsTitle = "Discover Items Near " + location.cityDetails.name;
+                }
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
-        // Subscribe to search input field value changes
-        this.searchInputControl.valueChanges
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            debounceTime(300),
-            switchMap((query) => {                    
+        this._platformsService.platform$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((platform: Platform) => { 
+                this.platform = platform;
+                if (this.platform) {
+                    // Get searches from url parameter 
+                    this._activatedRoute.queryParams.subscribe(params => {
+                        this.categoryId = params.categoryId ? params.categoryId : null;
+                        this.locationId = params.locationId ? params.locationId : null;
 
-                this.searchName = query;
-                
-                // set loading to true
-                this.isLoading = true;
-                
-                return this._locationService.getProductsDetails({ pageSize: 50, regionCountryId: this.platform.country, cityId: this.adjacentLocationIds, parentCategoryId: this.categoryId, status: ['ACTIVE', 'OUTOFSTOCK'] })
-            }),
-            map(() => {
-                // set loading to false
-                this.isLoading = false;
-            })
-        )
-        .subscribe();
+                        // get back the previous pagination page
+                        // more than 2 means it won't get back the previous pagination page when navigate back from 'carts' page
+                        if (this._navigate.getPreviousUrl() && this._navigate.getPreviousUrl().split("/").length > 2) {                            
+                            this.oldProductsDetailsPaginationIndex = this.productsDetailsPagination ? this.productsDetailsPagination.page : 0;
+                        }
+
+                        // Get current location with locationId 
+                        this._locationService.getFeaturedLocations({ pageSize: 1, regionCountryId: this.platform.country, cityId: this.locationId, sortByCol: 'sequence', sortingOrder: 'ASC' })
+                            .subscribe((location : LandingLocation[]) => {});
+    
+                        // Get adjacent city first
+                        this._locationService.getLocationArea(this.locationId)
+                            .subscribe((response: LocationArea[]) => {
+                                this.adjacentLocationIds = [];
+                                this.adjacentLocationIds = response.map(item => {
+                                    return item.storeCityId;
+                                });
+        
+                                this.adjacentLocationIds.unshift(this.locationId);
+                        
+                                // Get products
+                                this._locationService.getProductsDetails({ 
+                                    page            : this.oldProductsDetailsPaginationIndex,
+                                    pageSize        : this.productsDetailsPageSize, 
+                                    regionCountryId : this.platform.country, 
+                                    cityId          : this.adjacentLocationIds, 
+                                    parentCategoryId: this.categoryId, 
+                                    status          : ['ACTIVE', 'OUTOFSTOCK'] 
+                                })
+                                .subscribe((products : ProductDetails[]) => {});
+                            }); 
+                    });
+                }
+                this._changeDetectorRef.markForCheck();
+            });
 
         // collapse category to false if desktop by default, 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) => {
-
                 this.currentScreenSize = matchingAliases;
-
-                // Set the drawerMode and drawerOpened
-                if ( matchingAliases.includes('sm') )
-                {
-                    // this.collapseCategory = false;
-                }
-                else
-                {
-                    // this.collapseCategory = true;
-                    this.productViewOrientation = 'list';
-                }
-
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -174,7 +163,14 @@ export class LandingProductsComponent implements OnInit
                 merge(this._paginator.page).pipe(
                     switchMap(() => {
                         this.isLoading = true;
-                        return this._locationService.getProductsDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds, status: ['ACTIVE', 'OUTOFSTOCK'] });
+                        return this._locationService.getProductsDetails({
+                            page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
+                            pageSize        : this.productsDetailsPageOfItems['pageSize'], 
+                            regionCountryId : this.platform.country, 
+                            parentCategoryId: this.categoryId, 
+                            cityId          : this.adjacentLocationIds, 
+                            status          : ['ACTIVE', 'OUTOFSTOCK'] 
+                        });
                     }),
                     map(() => {
                         this.isLoading = false;
@@ -184,22 +180,32 @@ export class LandingProductsComponent implements OnInit
         }, 0);
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public Function
+    // -----------------------------------------------------------------------------------------------------
+
     onChangePage(pageOfItems: Array<any>) {
         
         // update current page of items
-        this.pageOfItems = pageOfItems;
+        this.productsDetailsPageOfItems = pageOfItems;
 
-        if( this.pagination && this.pageOfItems['currentPage']) {
-
-            if (this.pageOfItems['currentPage'] - 1 !== this.pagination.page) {
+        if( this.productsDetailsPageOfItems && this.productsDetailsPageOfItems['currentPage']) {
+            if (this.productsDetailsPageOfItems['currentPage'] - 1 !== this.productsDetailsPagination.page) {
                 // set loading to true
                 this.isLoading = true;
     
-                this._locationService.getProductsDetails({page: this.pageOfItems['currentPage'] - 1, pageSize: this.pageOfItems['pageSize'], regionCountryId: this.platform.country, parentCategoryId: this.categoryId, cityId: this.adjacentLocationIds, status: ['ACTIVE', 'OUTOFSTOCK'] })
-                    .subscribe(()=>{
-                        // set loading to false
-                        this.isLoading = false;
-                    });
+                this._locationService.getProductsDetails({
+                    page            : this.productsDetailsPageOfItems['currentPage'] - 1, 
+                    pageSize        : this.productsDetailsPageOfItems['pageSize'], 
+                    regionCountryId : this.platform.country, 
+                    parentCategoryId: this.categoryId, 
+                    cityId          : this.adjacentLocationIds, 
+                    status          : ['ACTIVE', 'OUTOFSTOCK'] 
+                })
+                .subscribe(()=>{
+                    // set loading to false
+                    this.isLoading = false;
+                });
             }
         }
         
