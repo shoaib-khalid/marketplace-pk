@@ -72,6 +72,11 @@ export class LandingHomeComponent implements OnInit
                 this.platform = platform;
                 this.currentLocation = currentLocation;
 
+                // Set title if location is on
+                if (currentLocation.isAllowed) {
+                    this.storesDetailsTitle = 'Discover Shops Near Me';
+                }
+
                 let currentLat = currentLocation.isAllowed ? currentLocation.location.lat : null;
                 let currentLong = currentLocation.isAllowed ? currentLocation.location.lng : null;
 
