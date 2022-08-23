@@ -71,7 +71,7 @@
                                         <div class="flex flex-row w-full pt-2">
                                             <span *ngIf="deliveryRiderDetails.provider" class="font-medium text-md">{{deliveryRiderDetails.provider.name}} : &nbsp;</span>
                                             <span class="font-medium text-md"
-                                                [ngClass]="deliveryRiderDetails.trackingUrl ? 'cursor-pointer hover:text-primary' : ''" 
+                                                [ngClass]="deliveryRiderDetails.trackingUrl ? 'cursor-pointer hover:text-primary underline' : ''" 
                                                 (click)="deliveryRiderDetails.trackingUrl ? goToExternalUrl(deliveryRiderDetails.trackingUrl, true) : ''">
                                                 {{deliveryRiderDetails.orderNumber}}
                                             </span>
@@ -98,7 +98,7 @@
                                                         <div class="text-secondary">
                                                             {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
-                                                        <span *ngIf="first" class="font-semibold">Order created from store {{orderDetails.store.name}}</span>
+                                                        <span *ngIf="first" class="font-semibold text-sm tracking-tight">Order created from store {{orderDetails.store.name}}</span>
                                                         <!-- <span *ngIf="last" class="font-semibold">Order completed</span> -->
                                                     </div>
                                                 </div>
@@ -117,8 +117,8 @@
                                                         <div class="text-secondary">
                                                             {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
-                                                        <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
-                                                            {{deliveryOrderStatus.status}}
+                                                        <div class="mt-1 p-2 text-sm rounded-lg bg-gray-200 dark:bg-gray-800 tracking-tight">
+                                                            {{deliveryOrderStatus.deliverySpStatus.providerStatusDescription}}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -136,8 +136,8 @@
                                                         <div class="text-secondary">
                                                             {{convertDate(deliveryOrderStatus.orderTimeConverted) | date:'MMM dd yyy, h:mm a'}}
                                                         </div>
-                                                        <div class="mt-1 p-2 text-xs rounded-lg bg-gray-200 dark:bg-gray-800">
-                                                            {{deliveryOrderStatus.status}}
+                                                        <div class="mt-1 p-2 text-sm rounded-lg bg-gray-200 dark:bg-gray-800 tracking-tight">
+                                                            {{deliveryOrderStatus.deliverySpStatus.providerStatusDescription}}
                                                         </div>
                                                     </div>
                                                 </div>
