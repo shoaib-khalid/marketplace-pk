@@ -591,16 +591,6 @@ export class CartListComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
-        // this._cartService.selectedCartsObs$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((selectedCarts) => {
-        //         console.log('selectedCarts', selectedCarts);
-        //         if (selectedCarts) {
-        //             this.selectedCart = selectedCarts;
-        //         }
-                
-        //     })
-
         // once selectCart() is triggered, it will set isLoading to true
         // this function will wait for both cartsWithDetails$ & cartSummary$ result first
         // then is isLoading to false

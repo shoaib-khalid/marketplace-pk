@@ -222,15 +222,10 @@ export class CategoryComponent implements OnInit
                             sortingOrder    : 'ASC' 
                         })
                         .subscribe((locations : LandingLocation[]) => {
-                            console.log("locations", locations);
                         });
                         
                         this._locationService.productsDetails = null;
-                        // this._locationService.featuredProducts = null;
                         this._locationService.storesDetails = null;
-                        // this._locationService.featuredStores = null;
-
-
 
                         // Get stores details
                         this._locationService.getStoresDetails({
