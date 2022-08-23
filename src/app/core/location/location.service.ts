@@ -14,18 +14,18 @@ export class LocationService
 {
 
     // Featured Stores
-    private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
-    private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
-    private _featuredStoresPagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
+    // private _featuredStore: BehaviorSubject<StoresDetails | null> = new BehaviorSubject(null);
+    // private _featuredStores: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject(null);
+    // private _featuredStoresPagination: BehaviorSubject<StorePagination | null> = new BehaviorSubject(null);
 
     // Stores
     private _storesDetails: BehaviorSubject<StoresDetails[] | null> = new BehaviorSubject<StoresDetails[]>(null);
     private _storesDetailPagination: BehaviorSubject<StoresDetailPagination | null> = new BehaviorSubject(null);
 
     // Featured Products
-    private _featuredProduct: BehaviorSubject<ProductDetails | null> = new BehaviorSubject(null);
-    private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
-    private _featuredProductsPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
+    // private _featuredProduct: BehaviorSubject<ProductDetails | null> = new BehaviorSubject(null);
+    // private _featuredProducts: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject(null);
+    // private _featuredProductsPagination: BehaviorSubject<ProductPagination | null> = new BehaviorSubject(null);
 
     // Products
     private _productsDetails: BehaviorSubject<ProductDetails[] | null> = new BehaviorSubject<ProductDetails[]>(null);
@@ -126,39 +126,39 @@ export class LocationService
     // Featured Product
     //----------------------- 
 
-    /** Getter for featuredProduct */
-    get featuredProduct$(): Observable<ProductDetails> { return this._featuredProduct.asObservable(); }
+    // /** Getter for featuredProduct */
+    // get featuredProduct$(): Observable<ProductDetails> { return this._featuredProduct.asObservable(); }
  
-    /** Setter for featuredProduct */
-    set featuredProduct(value: ProductDetails) { this._featuredProduct.next(value); }
+    // /** Setter for featuredProduct */
+    // set featuredProduct(value: ProductDetails) { this._featuredProduct.next(value); }
  
-    /** Getter for featuredProducts */
-    get featuredProducts$(): Observable<ProductDetails[]> { return this._featuredProducts.asObservable(); }
+    // /** Getter for featuredProducts */
+    // get featuredProducts$(): Observable<ProductDetails[]> { return this._featuredProducts.asObservable(); }
      
-    /** Setter for featuredProducts */
-    set featuredProducts(value: ProductDetails[]){ this._featuredProducts.next(value); }
+    // /** Setter for featuredProducts */
+    // set featuredProducts(value: ProductDetails[]){ this._featuredProducts.next(value); }
  
-    /** Getter for featuredProductPagination pagination */
-    get featuredProductsPagination$(): Observable<ProductPagination> { return this._featuredProductsPagination.asObservable(); }
+    // /** Getter for featuredProductPagination pagination */
+    // get featuredProductsPagination$(): Observable<ProductPagination> { return this._featuredProductsPagination.asObservable(); }
 
     // ----------------------
     // Featured Store
     //----------------------- 
 
-    /** Getter for featuredStore */
-    get featuredStore$(): Observable<StoresDetails> { return this._featuredStore.asObservable(); }
+    // /** Getter for featuredStore */
+    // get featuredStore$(): Observable<StoresDetails> { return this._featuredStore.asObservable(); }
  
-    /** Setter for featuredStore */
-    set featuredStore(value: StoresDetails) { this._featuredStore.next(value); }
+    // /** Setter for featuredStore */
+    // set featuredStore(value: StoresDetails) { this._featuredStore.next(value); }
  
-    /** Getter for featuredStores */
-    get featuredStores$(): Observable<StoresDetails[]> { return this._featuredStores.asObservable(); }
+    // /** Getter for featuredStores */
+    // get featuredStores$(): Observable<StoresDetails[]> { return this._featuredStores.asObservable(); }
      
-    /** Setter for featuredStores */
-    set featuredStores(value: StoresDetails[]) { this._featuredStores.next(value); }
+    // /** Setter for featuredStores */
+    // set featuredStores(value: StoresDetails[]) { this._featuredStores.next(value); }
  
-    /** Getter for featuredStoresPagination pagination */
-    get featuredStoresPagination$(): Observable<StorePagination> { return this._featuredStoresPagination.asObservable(); }
+    // /** Getter for featuredStoresPagination pagination */
+    // get featuredStoresPagination$(): Observable<StorePagination> { return this._featuredStoresPagination.asObservable(); }
 
     // ----------------------
     // Tag
@@ -177,180 +177,180 @@ export class LocationService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * 
-     * @param params
-     * @returns 
-     */
-    getFeaturedStores(params: {
-        storeName?          : string,
-        parentCategoryId?   : string,
-        page?               : number, 
-        pageSize?           : number, 
-        sortByCol?          : string, 
-        sortingOrder?       : 'ASC' | 'DESC' | '',
-        regionCountryId?    : string, 
-        country?            : string, 
-        stateId?            : string, 
-        state?              : string, 
-        cityId?             : string | string[],
-        city?               : string,
-        postcode?           : string,
-        isDisplay?          : boolean,
-        isMainLevel?        : boolean,
-        latitude?           : number,
-        longitude?          : number
-    } = {
-        storeName       : null,
-        parentCategoryId: null,
-        page            : 0, 
-        pageSize        : 20, 
-        sortByCol       : 'sequence', 
-        sortingOrder    : 'ASC',
-        regionCountryId : null, 
-        country         : null, 
-        stateId         : null, 
-        state           : null, 
-        cityId          : null, 
-        city            : null, 
-        postcode        : null,
-        isDisplay       : false,
-        isMainLevel     : false,
-        latitude        : 0,
-        longitude       : 0
-    }): Observable<StoresDetails[]>
-    {
-        let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._authService.publicToken;
+    // /**
+    //  * 
+    //  * @param params
+    //  * @returns 
+    //  */
+    // getFeaturedStores(params: {
+    //     storeName?          : string,
+    //     parentCategoryId?   : string,
+    //     page?               : number, 
+    //     pageSize?           : number, 
+    //     sortByCol?          : string, 
+    //     sortingOrder?       : 'ASC' | 'DESC' | '',
+    //     regionCountryId?    : string, 
+    //     country?            : string, 
+    //     stateId?            : string, 
+    //     state?              : string, 
+    //     cityId?             : string | string[],
+    //     city?               : string,
+    //     postcode?           : string,
+    //     isDisplay?          : boolean,
+    //     isMainLevel?        : boolean,
+    //     latitude?           : number,
+    //     longitude?          : number
+    // } = {
+    //     storeName       : null,
+    //     parentCategoryId: null,
+    //     page            : 0, 
+    //     pageSize        : 20, 
+    //     sortByCol       : 'sequence', 
+    //     sortingOrder    : 'ASC',
+    //     regionCountryId : null, 
+    //     country         : null, 
+    //     stateId         : null, 
+    //     state           : null, 
+    //     cityId          : null, 
+    //     city            : null, 
+    //     postcode        : null,
+    //     isDisplay       : false,
+    //     isMainLevel     : false,
+    //     latitude        : 0,
+    //     longitude       : 0
+    // }): Observable<StoresDetails[]>
+    // {
+    //     let locationService = this._apiServer.settings.apiServer.locationService;
+    //     let accessToken = this._authService.publicToken;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: params
-        };
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: params
+    //     };
 
-        // Delete empty value
-        Object.keys(header.params).forEach(key => {
+    //     // Delete empty value
+    //     Object.keys(header.params).forEach(key => {
 
-            if (Array.isArray(header.params[key])) {
-                header.params[key] = header.params[key].filter(element => element !== null)
-            }
-            if (!header.params[key] || (Array.isArray(header.params[key]) && header.params[key].length === 0)) {
-                delete header.params[key];
-            }
-        });
+    //         if (Array.isArray(header.params[key])) {
+    //             header.params[key] = header.params[key].filter(element => element !== null)
+    //         }
+    //         if (!header.params[key] || (Array.isArray(header.params[key]) && header.params[key].length === 0)) {
+    //             delete header.params[key];
+    //         }
+    //     });
 
-        return this._httpClient.get<StoresDetails[]>(locationService + '/featured/store', header)
-            .pipe(
-                switchMap(async (response:StoresDetails[]) => {
+    //     return this._httpClient.get<StoresDetails[]>(locationService + '/featured/store', header)
+    //         .pipe(
+    //             switchMap(async (response:StoresDetails[]) => {
                     
-                    let city = params.cityId ? (" - " + params.cityId) : "";
-                    let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
-                    this._logging.debug("Response from LocationService (getFeaturedStores)" + city + category, response);
+    //                 let city = params.cityId ? (" - " + params.cityId) : "";
+    //                 let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
+    //                 this._logging.debug("Response from LocationService (getFeaturedStores)" + city + category, response);
 
-                    let _pagination = {
-                        length: response["data"].totalElements,
-                        size: response["data"].size,
-                        page: response["data"].number,
-                        lastPage: response["data"].totalPages,
-                        startIndex: response["data"].pageable.offset,
-                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                    }
-                    this._featuredStoresPagination.next(_pagination);
-                    this._featuredStores.next(response["data"].content);
+    //                 let _pagination = {
+    //                     length: response["data"].totalElements,
+    //                     size: response["data"].size,
+    //                     page: response["data"].number,
+    //                     lastPage: response["data"].totalPages,
+    //                     startIndex: response["data"].pageable.offset,
+    //                     endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+    //                 }
+    //                 this._featuredStoresPagination.next(_pagination);
+    //                 this._featuredStores.next(response["data"].content);
 
-                    return response["data"].content;
-                })
-            );
-    }
+    //                 return response["data"].content;
+    //             })
+    //         );
+    // }
 
-    /**
-     * 
-     * @param params
-     * @returns 
-     */
-     getFeaturedProducts(params: {
-        storeName?          : string,
-        parentCategoryId?   : string,
-        page?               : number, 
-        pageSize?           : number, 
-        sortByCol?          : string, 
-        sortingOrder?       : 'ASC' | 'DESC' | '',
-        regionCountryId?    : string, 
-        country?            : string, 
-        stateId?            : string, 
-        state?              : string, 
-        cityId?             : string | string[],
-        city?               : string, 
-        postcode?           : string,
-        isDisplay?          : boolean,
-        isMainLevel?        : boolean,
-        status?             : string[],
-        latitude?           : number,
-        longitude?          : number
-    } = {
-        storeName       : null,
-        parentCategoryId: null,
-        page            : 0, 
-        pageSize        : 20, 
-        sortByCol       : 'sequence', 
-        sortingOrder    : 'ASC',
-        regionCountryId : null, 
-        country         : null, 
-        stateId         : null, 
-        state           : null, 
-        cityId          : null, 
-        city            : null, 
-        postcode        : null,
-        isDisplay       : false,
-        isMainLevel     : false,
-        status          : ['ACTIVE', 'OUTOFSTOCK'],
-        latitude        : 0,
-        longitude       : 0
-    }): Observable<ProductDetails[]>
-    {
-        let locationService = this._apiServer.settings.apiServer.locationService;
-        let accessToken = this._authService.publicToken;
+    // /**
+    //  * 
+    //  * @param params
+    //  * @returns 
+    //  */
+    //  getFeaturedProducts(params: {
+    //     storeName?          : string,
+    //     parentCategoryId?   : string,
+    //     page?               : number, 
+    //     pageSize?           : number, 
+    //     sortByCol?          : string, 
+    //     sortingOrder?       : 'ASC' | 'DESC' | '',
+    //     regionCountryId?    : string, 
+    //     country?            : string, 
+    //     stateId?            : string, 
+    //     state?              : string, 
+    //     cityId?             : string | string[],
+    //     city?               : string, 
+    //     postcode?           : string,
+    //     isDisplay?          : boolean,
+    //     isMainLevel?        : boolean,
+    //     status?             : string[],
+    //     latitude?           : number,
+    //     longitude?          : number
+    // } = {
+    //     storeName       : null,
+    //     parentCategoryId: null,
+    //     page            : 0, 
+    //     pageSize        : 20, 
+    //     sortByCol       : 'sequence', 
+    //     sortingOrder    : 'ASC',
+    //     regionCountryId : null, 
+    //     country         : null, 
+    //     stateId         : null, 
+    //     state           : null, 
+    //     cityId          : null, 
+    //     city            : null, 
+    //     postcode        : null,
+    //     isDisplay       : false,
+    //     isMainLevel     : false,
+    //     status          : ['ACTIVE', 'OUTOFSTOCK'],
+    //     latitude        : 0,
+    //     longitude       : 0
+    // }): Observable<ProductDetails[]>
+    // {
+    //     let locationService = this._apiServer.settings.apiServer.locationService;
+    //     let accessToken = this._authService.publicToken;
 
-        const header = {
-            headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
-            params: params
-        };        
+    //     const header = {
+    //         headers: new HttpHeaders().set("Authorization", `Bearer ${accessToken}`),
+    //         params: params
+    //     };        
 
-        // Delete empty value
-        Object.keys(header.params).forEach(key => {
+    //     // Delete empty value
+    //     Object.keys(header.params).forEach(key => {
 
-            if (Array.isArray(header.params[key])) {
-                header.params[key] = header.params[key].filter(element => element !== null)
-            }
-            if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
-                delete header.params[key];
-            }
-        });
+    //         if (Array.isArray(header.params[key])) {
+    //             header.params[key] = header.params[key].filter(element => element !== null)
+    //         }
+    //         if (header.params[key] === null || (header.params[key].constructor === Array && header.params[key].length === 0)) {
+    //             delete header.params[key];
+    //         }
+    //     });
 
-        return this._httpClient.get<ProductDetails[]>(locationService + '/featured/product', header)
-            .pipe(
-                switchMap(async (response:ProductDetails[]) => {
+    //     return this._httpClient.get<ProductDetails[]>(locationService + '/featured/product', header)
+    //         .pipe(
+    //             switchMap(async (response:ProductDetails[]) => {
                                 
-                    let city = params.cityId ? (" - " + params.cityId) : "";
-                    let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
-                    this._logging.debug("Response from LocationService (getFeaturedProducts)" + city + category, response);
+    //                 let city = params.cityId ? (" - " + params.cityId) : "";
+    //                 let category = params.parentCategoryId ? (" - " + params.parentCategoryId) : "";
+    //                 this._logging.debug("Response from LocationService (getFeaturedProducts)" + city + category, response);
 
-                    let _pagination = {
-                        length: response["data"].totalElements,
-                        size: response["data"].size,
-                        page: response["data"].number,
-                        lastPage: response["data"].totalPages,
-                        startIndex: response["data"].pageable.offset,
-                        endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
-                    }
+    //                 let _pagination = {
+    //                     length: response["data"].totalElements,
+    //                     size: response["data"].size,
+    //                     page: response["data"].number,
+    //                     lastPage: response["data"].totalPages,
+    //                     startIndex: response["data"].pageable.offset,
+    //                     endIndex: response["data"].pageable.offset + response["data"].numberOfElements - 1
+    //                 }
                     
-                    this._featuredProductsPagination.next(_pagination);
-                    this._featuredProducts.next(response["data"].content);
+    //                 this._featuredProductsPagination.next(_pagination);
+    //                 this._featuredProducts.next(response["data"].content);
 
-                    return response["data"].content;
-                })
-            );
-    }
+    //                 return response["data"].content;
+    //             })
+    //         );
+    // }
 
     /**
      * Get featured location
