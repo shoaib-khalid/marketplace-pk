@@ -162,7 +162,7 @@
                                                 [alt]="'Product thumbnail image of ' + orderItem.productName"
                                                 [src]=
                                                     "orderItem.itemAssetDetails ? orderItem.itemAssetDetails.url 
-                                                    : orderItem.productInventory.product.thumbnailUrl ? orderItem.productInventory.product.thumbnailUrl 
+                                                    : orderItem.product.thumbnailUrl ? orderItem.product.thumbnailUrl 
                                                     : orderDetails.store.storeLogoUrl ? orderDetails.store.storeLogoUrl
                                                     : platform.logoSquare">
                                             <div

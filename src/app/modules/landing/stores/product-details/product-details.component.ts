@@ -536,6 +536,33 @@ export class LandingProductDetailsComponent implements OnInit
             return false;
         }
 
+        // Pre-check the product price
+        if (this.selectedProductInventory.price === 0) {
+            const confirmation = this._fuseConfirmationService.open({
+                "title": "Product Unavailable",
+                "message": "Sorry, this item is not available at the moment.",
+                "icon": {
+                  "show": true,
+                  "name": "heroicons_outline:exclamation",
+                  "color": "warn"
+                },
+                "actions": {
+                  "confirm": {
+                    "show": true,
+                    "label": "Ok",
+                    "color": "warn"
+                  },
+                  "cancel": {
+                    "show": false,
+                    "label": "Cancel"
+                  }
+                },
+                "dismissible": true
+              });
+
+            return false;
+        }
+
         // Precheck for combo
         if (this.product.isPackage) {
             let BreakException = {};

@@ -239,7 +239,7 @@ export class UserService
     
             return this._httpClient.get<any>(userService + "/customer/" + customerId +'/address', header)
                 .pipe(
-                    tap((address: CustomerAddress) => {
+                    map((address: CustomerAddress) => {
                         this._logging.debug("Response from UserService (getCustomerAddresses)",address);
                         this._customerAddresses.next(address["data"].content);
     
@@ -250,6 +250,8 @@ export class UserService
                         } else {
                             this._customerAddress.next(address["data"].content[0]);
                         }
+
+                        return address["data"].content;
                     }
                 )
             );
@@ -271,6 +273,8 @@ export class UserService
                         } else {
                             this._customerAddress.next(addresses[0]);
                         }
+
+                        return addresses;
                         
                     })
                 );

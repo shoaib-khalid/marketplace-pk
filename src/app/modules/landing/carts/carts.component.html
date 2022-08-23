@@ -46,8 +46,7 @@
                     <!-- Button -->
                     <div class="flex w-full justify-center items-center mt-2">
                         <button 
-                            [routerLink]="'/address'"
-                            [queryParams]="{origin: 'carts'}"
+                            (click)="addAddressPopup()"
                             class="my-2 w-full bg-primary-500 hover:bg-primary-600 rounded-md flex flex-row items-center justify-center p-1"
                         >
                             <mat-icon 
@@ -487,8 +486,7 @@
                                                             <div class="text-sm">
                                                                 <span 
                                                                     class="underline cursor-pointer text-primary" 
-                                                                    [routerLink]="'/address'"
-                                                                    [queryParams]="{origin: 'carts'}">
+                                                                    (click)="addAddressPopup()">
                                                                     Add delivery address
                                                                 </span>
                                                             </div>
@@ -593,8 +591,7 @@
                                                             <div class="text-sm">
                                                                 <span 
                                                                     class="underline cursor-pointer text-primary" 
-                                                                    [routerLink]="'/address'"
-                                                                    [queryParams]="{origin: 'carts'}">
+                                                                    (click)="addAddressPopup()">
                                                                     Add delivery address
                                                                 </span>
                                                             </div>
@@ -923,8 +920,7 @@
                         <!-- Button -->
                         <div class="flex w-full justify-center items-center mt-2">
                             <button 
-                                [routerLink]="'/address'"
-                                [queryParams]="{origin: 'carts'}"
+                                (click)="addAddressPopup()"
                                 class="my-2 w-1/2 bg-primary-500 hover:bg-primary-600 rounded-md flex flex-row items-center justify-center p-1"
                             >
                                 <mat-icon 

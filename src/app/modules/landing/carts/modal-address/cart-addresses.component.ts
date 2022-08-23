@@ -13,17 +13,17 @@ import { FuseConfirmationService } from "@fuse/services/confirmation";
 import { UserService } from "app/core/user/user.service";
 
 import { CustomerAddress, User } from "app/core/user/user.types";
-import { EditAddressDialog } from './edit-address/edit-address.component';
+import { EditCartAddressDialog } from './edit-cart-address/edit-cart-address.component';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    selector       : 'customer-addresses',
-    templateUrl    : './customer-addresses.component.html',
+    selector       : 'cart-addresses',
+    templateUrl    : './cart-addresses.component.html',
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs       : 'customer-address'
 })
-export class _CustomerAddressesComponent implements OnInit, OnDestroy
+export class CartAddressComponent implements OnInit, OnDestroy
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     private _onDestroy = new Subject<void>();
@@ -49,6 +49,8 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
     * Constructor
     */
     constructor(
+        @Inject(MAT_DIALOG_DATA) public data,
+        public dialogRef: MatDialogRef<CartAddressComponent>,
         private _fuseConfirmationService: FuseConfirmationService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _formBuilder: FormBuilder,
@@ -86,12 +88,16 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user: User) => {
-                if (user) {
+
+                if(user) {
                     this.accountForm.patchValue(user);
+
                 }
+
             });
 
         this._userService.getCustomerAddresses().subscribe((addresses: CustomerAddress[]) => {
+
             if (addresses.length < 1)
             {
                 setTimeout(() => {
@@ -109,6 +115,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
             .subscribe((addresses: CustomerAddress[]) => {
                 if (addresses){
                     this.customersAddresses = addresses;
+                    
                 } 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -254,7 +261,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
         
 
         const dialogRef = this._dialog.open( 
-            EditAddressDialog, {
+            EditCartAddressDialog, {
                 width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
@@ -298,7 +305,7 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
     editAddress(customerAddress: CustomerAddress){
         const dialogRef = this._dialog.open(
-            EditAddressDialog, {
+            EditCartAddressDialog, {
                 width: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
                 maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
@@ -426,5 +433,9 @@ export class _CustomerAddressesComponent implements OnInit, OnDestroy
 
     backClicked() {
         this._router.navigate(['/' + this.originUrl]);
+    }
+
+    closeDialog() {
+        this.dialogRef.close();
     }
 }

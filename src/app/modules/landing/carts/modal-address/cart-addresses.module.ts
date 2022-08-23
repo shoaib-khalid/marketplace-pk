@@ -4,8 +4,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { SwiperModule } from 'swiper/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatIconModule } from '@angular/material/icon';
-import { _CustomerAddressesComponent } from './customer-addresses.component';
-import { EditAddressDialog } from './edit-address/edit-address.component';
+import { EditCartAddressDialog } from './edit-cart-address/edit-cart-address.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,11 +14,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FuseAlertModule } from '@fuse/components/alert';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { CartAddressComponent } from './cart-addresses.component';
 
 @NgModule({
     declarations: [
-        _CustomerAddressesComponent,
-        EditAddressDialog,
+        CartAddressComponent,
+        EditCartAddressDialog,
     ],
     imports     : [
         RouterModule.forChild([]),
@@ -42,9 +42,13 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
     ],
     exports     : [
-        _CustomerAddressesComponent
+        CartAddressComponent
+    ],
+    providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: MatDialogRef, useValue: {} }
     ]
 })
-export class _CustomerAddressesModule
+export class CartAddressModule
 {
 }

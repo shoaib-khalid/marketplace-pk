@@ -20,12 +20,14 @@ import { ModalConfirmationDeleteItemComponent } from './modal-confirmation-delet
 import { ErrorBackgroundModule } from 'app/shared/error-background/error-background.module';
 import { MatRadioModule } from '@angular/material/radio';
 import { SelfPickupInfoDialog } from './modal-self-pickup-info/modal-self-pickup-info.component';
+import { CartAddressComponent } from './modal-address/cart-addresses.component';
+import { CartAddressModule } from './modal-address/cart-addresses.module';
 
 @NgModule({
     declarations: [
         CartListComponent,
         ModalConfirmationDeleteItemComponent,
-        SelfPickupInfoDialog
+        SelfPickupInfoDialog,
     ],
     imports     : [
         RouterModule.forChild(voucherRoutes),
@@ -43,7 +45,8 @@ import { SelfPickupInfoDialog } from './modal-self-pickup-info/modal-self-pickup
         MatTabsModule,
         ErrorBackgroundModule,
         FuseCardModule,
-        MatRadioModule
+        MatRadioModule,
+        CartAddressModule
     ],
     providers: [
         CurrencyPipe,

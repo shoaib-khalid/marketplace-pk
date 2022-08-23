@@ -25,6 +25,7 @@ import { CustomerVoucher, CustomerVoucherPagination, GuestVoucher, UsedCustomerV
 import { VoucherService } from 'app/core/_voucher/voucher.service';
 import { VoucherModalComponent } from 'app/modules/customer/vouchers/voucher-modal/voucher-modal.component';
 import { SelfPickupInfoDialog } from './modal-self-pickup-info/modal-self-pickup-info.component';
+import { CartAddressComponent } from './modal-address/cart-addresses.component';
 
 @Component({
     selector     : 'carts',
@@ -590,6 +591,16 @@ export class CartListComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
+        // this._cartService.selectedCartsObs$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((selectedCarts) => {
+        //         console.log('selectedCarts', selectedCarts);
+        //         if (selectedCarts) {
+        //             this.selectedCart = selectedCarts;
+        //         }
+                
+        //     })
+
         // once selectCart() is triggered, it will set isLoading to true
         // this function will wait for both cartsWithDetails$ & cartSummary$ result first
         // then is isLoading to false
@@ -929,6 +940,8 @@ export class CartListComponent implements OnInit, OnDestroy
                 }));
             }
         });
+        
+        // this._cartService.selectedCartsObs = this.selectedCart;
 
         this.initializeCheckoutList();
 
@@ -1240,7 +1253,7 @@ export class CartListComponent implements OnInit, OnDestroy
 
         if (checkoutListBody.length > 0 && this.voucherApplied) {
             // If login
-            if (this.customerId && (this.customerAddress || this.selfPickupInfo)) {
+            if (this.customerId) {
                 checkoutParams = {
                     platformVoucherCode: this.voucherApplied.voucher.voucherCode, 
                     customerId: this.customerId, 
@@ -1249,6 +1262,7 @@ export class CartListComponent implements OnInit, OnDestroy
             }
             // If guest
             else if (!this.customerId) {
+
                 if (this.customerAddress) {
                     checkoutParams = {
                         platformVoucherCode: this.voucherApplied.voucher.voucherCode, 
@@ -1263,36 +1277,118 @@ export class CartListComponent implements OnInit, OnDestroy
                         email: this.selfPickupInfo.email
                     }
                 }
-            }
-            // If Customer Address is empty, show popup
-            else {
-                const confirmation = this._fuseConfirmationService.open({
-                    "title": "Address is empty!",
-                    "message": "Please add your delivery address to use your voucher.",
-                    "icon": {
-                    "show": true,
-                    "name": "heroicons_outline:exclamation",
-                    "color": "warn"
-                    },
-                    "actions": {
-                    "confirm": {
-                        "show": true,
-                        "label": "OK",
-                        "color": "primary"
-                    },
-                    "cancel": {
-                        "show": false,
-                        "label": "Cancel"
+                else {
+                    // Check if all delivery, true if got delivery, false if all self pickup
+                    let isAllSelfPickup = this.selectedCart.carts.filter(x => x.showRequiredInfo).every(cart => cart.isSelfPickup === true);
+                    let isAllDelivery = this.selectedCart.carts.filter(x => x.showRequiredInfo).every(cart => cart.isSelfPickup === false);
+    
+                    // If all selected items are delivery
+                    if (isAllDelivery && !this.customerAddress) {
+                        
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Address is empty!",
+                            "message": "Please add your delivery address to use this voucher.",
+                            "icon": {
+                            "show": true,
+                            "name": "heroicons_outline:exclamation",
+                            "color": "warn"
+                            },
+                            "actions": {
+                            "confirm": {
+                                "show": true,
+                                "label": "OK",
+                                "color": "primary"
+                            },
+                            "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                            }
+                            },
+                            "dismissible": true
+                        });
+                        
+                        // Subscribe to the confirmation dialog closed action
+                        confirmation.afterClosed().subscribe((result) => {
+    
+                            // If the confirm button pressed...
+                            if ( result === 'confirmed' )
+                            {
+                                this.addRequiredInfo(null) 
+                            }
+                        })
+                        return;
                     }
-                    },
-                    "dismissible": true
-                });
-
-                checkoutParams = {
-                    platformVoucherCode: null, 
-                    customerId: null, 
-                    email: null
-                }
+                    // If all self pickup
+                    else if (isAllSelfPickup && !this.selfPickupInfo){
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Contact info is empty!",
+                            "message": "Please add your contact information to use this voucher.",
+                            "icon": {
+                            "show": true,
+                            "name": "heroicons_outline:exclamation",
+                            "color": "warn"
+                            },
+                            "actions": {
+                            "confirm": {
+                                "show": true,
+                                "label": "OK",
+                                "color": "primary"
+                            },
+                            "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                            }
+                            },
+                            "dismissible": true
+                        });
+    
+                        // Subscribe to the confirmation dialog closed action
+                        confirmation.afterClosed().subscribe((result) => {
+    
+                            // If the confirm button pressed...
+                            if ( result === 'confirmed' )
+                            {
+                                this.addRequiredInfo(null) 
+                            }
+                        })
+                        return;
+                    }
+                    // If mix
+                    else if (!isAllSelfPickup && !isAllDelivery && (!this.selfPickupInfo || !this.customerAddress)){
+                        const confirmation = this._fuseConfirmationService.open({
+                            "title": "Required info is empty!",
+                            "message": "Please add your address/contact information to use this voucher.",
+                            "icon": {
+                            "show": true,
+                            "name": "heroicons_outline:exclamation",
+                            "color": "warn"
+                            },
+                            "actions": {
+                            "confirm": {
+                                "show": true,
+                                "label": "OK",
+                                "color": "primary"
+                            },
+                            "cancel": {
+                                "show": false,
+                                "label": "Cancel"
+                            }
+                            },
+                            "dismissible": true
+                        });
+    
+                        // Subscribe to the confirmation dialog closed action
+                        confirmation.afterClosed().subscribe((result) => {
+    
+                            // If the confirm button pressed...
+                            if ( result === 'confirmed' )
+                            {
+                                this.addRequiredInfo(null) 
+                            }
+                        })
+                        return;
+                    }
+                }                
             }
         } else {
             checkoutParams = {
@@ -1314,6 +1410,11 @@ export class CartListComponent implements OnInit, OnDestroy
                 if (error.error.message) {
                     // if voucher is invalid
                     this.openVoucherModal('heroicons_outline:x','Error', error.error.message, null, true);
+
+                    // Set to null
+                    this.voucherApplied = null;
+                    this.paymentDetails.platformVoucherSubTotalDiscount = 0;
+                    this.guestVouchers = null;
                 }  
               
             });
@@ -1807,6 +1908,16 @@ export class CartListComponent implements OnInit, OnDestroy
                 "dismissible": true
             });
             
+            // Subscribe to the confirmation dialog closed action
+            confirmation.afterClosed().subscribe((result) => {
+
+                // If the confirm button pressed...
+                if ( result === 'confirmed' )
+                {
+                    this.addRequiredInfo(null) 
+                }
+            })
+            
             return;
         }
         // If all self pickup
@@ -1832,6 +1943,16 @@ export class CartListComponent implements OnInit, OnDestroy
                 },
                 "dismissible": true
             });
+
+            // Subscribe to the confirmation dialog closed action
+            confirmation.afterClosed().subscribe((result) => {
+
+                // If the confirm button pressed...
+                if ( result === 'confirmed' )
+                {
+                    this.addRequiredInfo(null) 
+                }
+            })
             
             return;
         }
@@ -1858,6 +1979,16 @@ export class CartListComponent implements OnInit, OnDestroy
                 },
                 "dismissible": true
             });
+
+            // Subscribe to the confirmation dialog closed action
+            confirmation.afterClosed().subscribe((result) => {
+
+                // If the confirm button pressed...
+                if ( result === 'confirmed' )
+                {
+                    this.addRequiredInfo(null) 
+                }
+            })
             
             return;
         }
@@ -1994,12 +2125,27 @@ export class CartListComponent implements OnInit, OnDestroy
                 dialogRef.afterClosed().subscribe(result=>{                
                     if (result) {
                         this.selfPickupInfo = result;
+                        this.initializeCheckoutList();
                     }
                 });
             }
             // if delivery, navigate to self address
             else {
-                this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
+                if (this.customerAddress) {
+                    this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
+
+                } else {
+                    // max-h-[90vh] max-w-120 sm:min-w-160
+                    const dialogRef = this._dialog.open( 
+                        CartAddressComponent, {
+                            width: this.currentScreenSize.includes('sm') ? '43rem' : '100%',
+                            height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                            maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                            // maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                            disableClose: false,
+                        }
+                    );  
+                }
             }
 
         }
@@ -2009,8 +2155,21 @@ export class CartListComponent implements OnInit, OnDestroy
             
             // For delivery, navigate to add address
             if (isAllDelivery) {
-                this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
-    
+                if (this.customerAddress) {
+                    this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
+
+                } else {
+                    // max-h-[90vh] max-w-120 sm:min-w-160
+                    const dialogRef = this._dialog.open( 
+                        CartAddressComponent, {
+                            width: this.currentScreenSize.includes('sm') ? '43rem' : '100%',
+                            height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                            maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                            // maxHeight: this.currentScreenSize.includes('sm') ? 'auto' : '100vh',
+                            disableClose: false,
+                        }
+                    );  
+                }
             }
             // For self pickup
             else {
@@ -2026,6 +2185,7 @@ export class CartListComponent implements OnInit, OnDestroy
                 dialogRef.afterClosed().subscribe(result=>{                
                     if (result) {
                         this.selfPickupInfo = result;
+                        this.initializeCheckoutList();
                     }
                 });
             }
@@ -2049,6 +2209,22 @@ export class CartListComponent implements OnInit, OnDestroy
         if (countObject[refId] > 1) return true;
         else return false; 
         
+    }
+
+    addAddressPopup() {
+        if (this.customerAddress) {
+            this._router.navigate(['/address'], {queryParams: {origin: 'carts'}});
+
+        } else {
+            const dialogRef = this._dialog.open( 
+                CartAddressComponent, {
+                    width: this.currentScreenSize.includes('sm') ? '43rem' : '100%',
+                    height: this.currentScreenSize.includes('sm') ? 'auto' : '100%',
+                    maxWidth: this.currentScreenSize.includes('sm') ? 'auto' : '100vw',  
+                    disableClose: false,
+                }
+            );  
+        }
     }
 
 }
