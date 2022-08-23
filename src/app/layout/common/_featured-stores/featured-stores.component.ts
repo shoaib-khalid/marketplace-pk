@@ -99,7 +99,7 @@ export class _FeaturedStoresComponent implements OnInit, OnDestroy
         if (storeAssetsIndex > -1) {
             return storeAssets[storeAssetsIndex].assetUrl;
         } else {
-            return null;
+            return this.platform.logoSquare;
         }
     }
 
