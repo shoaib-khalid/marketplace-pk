@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject, tap } from 'rxjs';
 import { AppConfig } from 'app/config/service.config';
 import { LogService } from 'app/core/logging/log.service';
 import { AuthService } from '../auth/auth.service';
@@ -122,16 +122,20 @@ export class FloatingBannerService
                 
 
         return this._httpClient.get<any>(productService +'/marketplace-popup', header).pipe(
-            map((response) => {
+            tap((response) => {
 
                 this._logging.debug("Response from ProductService (getPopupBanner)", response);
 
                 if (bannerUrl && redirectUrl) {
                     this._promoBig.next([{popupUrl: bannerUrl, actionUrl: redirectUrl}]);
                 } else {
-                    this._promoBig.next(response.data);
+                    if (response.data.length > 0) {
+                        this._promoBig.next(response.data);
+                    }
+                    else {
+                        this._promoBig.next([{popupUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Sign-Up-PopUp-Banner_600x750.jpg', actionUrl: redirectUrl}]);
+                    }
                 }
-                return response["data"];
             })
         );
     }
