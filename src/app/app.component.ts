@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { NavigationEnd, Router, RoutesRecognized } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RoutesRecognized } from '@angular/router';
 import { Platform, PlatformTag } from 'app/core/platform/platform.types';
 import { Subject, takeUntil } from 'rxjs';
 import { PlatformService } from 'app/core/platform/platform.service';
@@ -46,6 +46,7 @@ export class AppComponent
     constructor(
         private _titleService: Title,
         private _router: Router,
+        private _activatedRoute: ActivatedRoute,
         private _platformsService: PlatformService,
         private _storeService: StoresService,
         private _analyticService: AnalyticService,
@@ -180,6 +181,24 @@ export class AppComponent
                 
                 this._analyticService.postActivity(this.customerActivity).subscribe();           
             }        
+        });
+
+        // Get searches from url parameter 
+        this._activatedRoute.queryParams.subscribe(params => {
+            let channel = null;
+            if (params['gclid']) {
+                channel = "Google";
+            } 
+            
+            if (params['fbclid']) {
+                channel = "Facebook";
+            }
+
+            if (channel === null) {
+                channel = this.customerActivity.channel;
+            }
+            
+            this.customerActivity.channel = channel
         });
     }
 }
