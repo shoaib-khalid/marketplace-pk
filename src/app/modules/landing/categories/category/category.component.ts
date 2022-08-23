@@ -159,6 +159,11 @@ export class CategoryComponent implements OnInit
                 this.platform = platform;
                 this.currentLocation = currentLocation;
 
+                // Set title if location is on
+                if (currentLocation.isAllowed) {
+                    this.storesDetailsTitle = 'Discover Shops Near Me';
+                }
+
                 let currentLat = currentLocation.isAllowed ? currentLocation.location.lat : null;
                 let currentLong = currentLocation.isAllowed ? currentLocation.location.lng : null;
 
@@ -235,7 +240,9 @@ export class CategoryComponent implements OnInit
                             sortingOrder    : 'DESC', 
                             regionCountryId : this.platform.country,
                             cityId          : this.adjacentLocationIds,
-                            parentCategoryId: this.categoryId
+                            parentCategoryId: this.categoryId,
+                            latitude        : currentLat,
+                            longitude       : currentLong
                         })
                         .subscribe((storesDetails: StoresDetails[])=>{
                         });
@@ -261,7 +268,8 @@ export class CategoryComponent implements OnInit
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(location => {
                 if (location) {
-                    this.location = location;                
+                    this.location = location;
+                    this.storesDetailsTitle = "Discover Shops Near " + location.cityDetails.name             
                 }
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
