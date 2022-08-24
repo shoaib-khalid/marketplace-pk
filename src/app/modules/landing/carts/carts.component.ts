@@ -1062,6 +1062,11 @@ export class CartListComponent implements OnInit, OnDestroy
                     }
                 });
                 this.isGettingDeliveryPrices = false;
+                
+                // if got cart selected, call initializeCheckoutList
+                if (this.totalSelectedCartItem > 0) {
+                    this.initializeCheckoutList()
+                }
             });
     }
 

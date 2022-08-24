@@ -133,7 +133,7 @@ export class FloatingBannerService
                         this._promoBig.next(response.data);
                     }
                     else {
-                        this._promoBig.next([{popupUrl: this._apiServer.settings.apiServer.assetsService + '/store-assets/Sign-Up-PopUp-Banner_600x750.jpg', actionUrl: redirectUrl}]);
+                        this._promoBig.next(null);
                     }
                 }
             })
