@@ -433,5 +433,13 @@ export class OrderListComponent implements OnInit
         return countObject[value]
         
     }
+
+    scrollToTop(){        
+        window.scroll({ 
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+     });
+    }
     
 }

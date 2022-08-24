@@ -231,6 +231,7 @@
                             [initialPage]="ordersDetailsPagination.page + 1"
                             [pageSize]="ordersDetailsPagination.size"
                             (changePage)="onChangePage($event, 'orderDetails')"
+                            (click)="scrollToTop()"
                             #ordersDetailsPaginator></pagination>
                     </div>
                 </ng-container>
@@ -482,6 +483,7 @@
                             [initialPage]="ordersGroupsPagination.page + 1"
                             [pageSize]="ordersGroupsPagination.size"
                             (changePage)="onChangePage($event, 'orderGroups')"
+                            (click)="scrollToTop()"
                             #ordersGroupsPaginator></pagination>
                     </div>
                 </ng-template>
