@@ -160,7 +160,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             .pipe(
                 debounceTime(1000),
                 takeUntil(this._unsubscribeAll)
-            ).subscribe((userInput) => {                
+            ).subscribe(userInput => {                
                 this.autoCompleteSetList({ address: userInput + " " + this.country});
             });
     }
@@ -343,7 +343,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
 
         if (this.autoCompleteList && this.autoCompleteList.length > 0 && this.autoCompleteList[0].type !== "error") {
             let address = this.autoCompleteList[0].location;
-            this.searchControl.patchValue(address);
+            // this.searchControl.patchValue(address);
             // GoogleMap API        
             this.loader.load().then(() => {
     
@@ -364,6 +364,7 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
                     }
                 });
             });
+            this.autoCompleteList = null;
         }
 
         // we'll assume , we already have currentLat, currentLong
@@ -375,8 +376,6 @@ export class _SearchLocationComponent implements OnInit, OnDestroy
             }
             this._router.navigate(['/search'], {queryParams: location});
         }
-
-        this.autoCompleteList = [];
     }
 
     resetLocation() {
